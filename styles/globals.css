@@ -42,7 +42,6 @@
   align-items: center;
 }
 
-
 .step-wrapper {
   position: relative;
   padding: 10px 20px;
@@ -66,7 +65,7 @@
 
 .progress {
   background: linear-gradient(320.04deg, #0052cc 15.35%, #4c9aff 86.73%);
-  width:60%;
+  width: 60%;
   transition: 0.5s;
 }
 
@@ -84,3 +83,13 @@
   color: #fff;
   transition: 0.5s;
 }
+
+input[type="checkbox"] {
+  width: 40px;
+  height: 25px;
+  border-radius: 5px;
+
+ 
+}
+
+
