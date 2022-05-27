@@ -1,10 +1,8 @@
-import React from "react";
-
 const QuestionIcon = () => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      style={{width : "20px"}}
+      style={{ width: "20px" }}
       className="h-5 w-5"
       viewBox="0 0 20 20"
       fill="gray"
