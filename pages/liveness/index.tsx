@@ -4,7 +4,7 @@ import Camera from "../../components/Camera";
 import Footer from "../../components/Footer";
 import ProgressStepBar from "../../components/ProgressStepBar";
 
-const Index = () => {
+const Liveness = () => {
   return (
     <div className="py-10 px-2">
       <span className="font-poppins text-sm ">
@@ -23,4 +23,4 @@ const Index = () => {
   );
 };
 
-export default Index;
+export default Liveness;

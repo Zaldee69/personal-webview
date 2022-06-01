@@ -22,7 +22,7 @@ interface Type {
   confirmPassword: string;
 }
 
-const index: React.FC = () => {
+const Form: React.FC = () => {
   const [input, setInput] = useState<InputType>({
     password: "",
     confirmPassword: "",
@@ -287,4 +287,4 @@ const index: React.FC = () => {
   );
 };
 
-export default index;
+export default Form;
