@@ -3,7 +3,7 @@ import Link from "next/link";
 import React from "react";
 import Footer from "../../components/Footer";
 
-const index = () => {
+const LivenessFail = () => {
   return (
     <div className="px-5 pt-8 sm:w-full md:w-4/5 mx-auto">
       <div className="flex flex-col gap-20 items-center justify-center">
@@ -18,7 +18,9 @@ const index = () => {
             benar.
           </span>
           <Link href="/guide">
-          <button  className="bg-primary btn md:mx-auto md:block md:w-1/4 text-white font-poppins w-full mx-auto rounded-sm h-9">ULANGI</button>
+            <button className="bg-primary btn md:mx-auto md:block md:w-1/4 text-white font-poppins w-full mx-auto rounded-sm h-9">
+              ULANGI
+            </button>
           </Link>
         </div>
       </div>
@@ -27,4 +29,4 @@ const index = () => {
   );
 };
 
-export default index;
+export default LivenessFail;

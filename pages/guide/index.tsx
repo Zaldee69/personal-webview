@@ -3,7 +3,7 @@ import Link from "next/link";
 import React from "react";
 import Footer from "../../components/Footer";
 
-const Index = () => {
+const Guide = () => {
   return (
     <div className="px-5 pt-8 sm:w-full md:w-4/5 mx-auto ">
       <span className="font-poppins text-sm mt-5">
@@ -42,4 +42,4 @@ const Index = () => {
   );
 };
 
-export default Index;
+export default Guide;

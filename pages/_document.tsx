@@ -16,7 +16,8 @@ class MyDocument extends Document {
           <link
             href="https://fonts.googleapis.com/css2?family=Aguafina+Script&family=Allan&family=Architects+Daughter&family=Berkshire+Swash&family=Give+You+Glory&family=Miss+Fajardose&family=Poppins:wght@200;300;400;500;600;700&display=swap"
             rel="stylesheet"
-          ></link>
+          />
+          <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.3.200/pdf.js"></script>
         </Head>
         <body>
           <Main />
