@@ -1,0 +1,42 @@
+import Image from "next/image";
+import Link from "next/link";
+import React from "react";
+
+type Props = {};
+
+const LinkAccountFailure = (props: Props) => {
+  return (
+    <div className="px-10 pt-16 pb-9 text-center">
+      <p className="font-poppins text-base font-semibold text-neutral800">
+        Penautan Akun Gagal
+      </p>
+      <div className="mt-20">
+        <Image
+          src="/images/linkAccountFailure.svg"
+          width="196px"
+          height="196px"
+        />
+      </div>
+      <div className="mt-14">
+        <p className="font-poppins text-xs text-neutral200">
+          Pastikan data sesuai dengan akun Tilaka yang akan ditautkan.
+        </p>
+      </div>
+      <div className="mt-20 text-primary text-base font-medium font-poppins underline hover:cursor-pointer">
+        <Link href="/link-account">
+          <a>Tautkan Akun Tilaka</a>
+        </Link>
+      </div>
+      <div className="mt-11 flex justify-center">
+        <Image
+          src="/images/poweredByTilaka.svg"
+          alt="powered-by-tilaka"
+          width="80px"
+          height="41.27px"
+        />
+      </div>
+    </div>
+  );
+};
+
+export default LinkAccountFailure;
