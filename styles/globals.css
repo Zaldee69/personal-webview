@@ -90,8 +90,39 @@ input[type="checkbox"] {
   width: 40px;
   height: 25px;
   border-radius: 5px;
-
- 
 }
 
+.tooltip {
+  position: relative;
+  display: inline-block;
+  border-bottom: 1px dotted #6B778C;
+}
 
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 160px;
+  background-color: #6B778C;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 8px;
+  position: absolute;
+  z-index: 1;
+  top: -5px;
+  left: 140%;
+}
+
+.tooltip .tooltiptext::after {
+  content: "";
+  position: absolute;
+  top: 12px;
+  right: 100%;
+  margin-top: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: transparent #6B778C transparent transparent;
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+}
