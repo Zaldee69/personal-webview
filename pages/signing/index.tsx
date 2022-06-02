@@ -1,6 +1,12 @@
 import Image from "next/image";
 import { Viewer } from "./../../components/Viewer";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import {
+  ChangeEvent,
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useState,
+} from "react";
 import FRCamera from "../../components/FRCamera";
 import SignaturePad from "./../../components/SignaturePad";
 import Footer from "../../components/Footer";
@@ -16,6 +22,7 @@ const Signing = () => {
   const [openFRModal, setopenFRModal] = useState<boolean>(false);
   const [openScratchesModal, setOpenScratchesModal] = useState<boolean>(false);
   const [selectFontModal, setSelectFontModal] = useState<boolean>(false);
+  const [otpModal, setOtpModal] = useState<boolean>(true);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   useEffect(() => {
@@ -64,6 +71,7 @@ const Signing = () => {
             modal={openScratchesModal}
             setModal={setOpenScratchesModal}
           />
+          <OTPModal modal={otpModal} setModal={setOtpModal} />
           <Viewer setTotalPages={setTotalPages} url="/images/pinjaman.pdf" />
           <button
             onClick={() => setopenFRModal(true)}
@@ -234,6 +242,48 @@ const ChooseScratchModal: React.FC<Active> = ({ modal, setModal }) => {
         <button
           onClick={() => setModal(!modal)}
           className="  text-[#97A0AF]  font-poppins w-full  mx-auto rounded-sm h-9"
+        >
+          BATAL
+        </button>
+      </div>
+    </div>
+  ) : null;
+};
+
+const OTPModal: React.FC<Active> = ({ modal, setModal }) => {
+  const numberOnly = (e: ChangeEvent<HTMLInputElement>) => {
+    const numbers = e.target.value.replace(/[^0-9]/g, "");
+    e.target.value = numbers;
+  };
+
+  return modal ? (
+    <div
+      style={{ backgroundColor: "rgba(0, 0, 0, .5)" }}
+      className="fixed z-50 flex items-start transition-all duration-1000 pb-3 justify-center w-full left-0 top-0 h-full "
+    >
+      <div className="bg-white mt-20 pt-5 px-2 pb-3 rounded-md w-full mx-2">
+        <p className="font-poppins block text-center pb-5  whitespace-nowrap  font-semibold ">
+          Goresan
+        </p>
+        <span className="font-poppins block text-center pb-5  ">
+          Masukkan 6 digit OTP
+        </span>
+        <input
+          onChange={(e) => numberOnly(e)}
+          maxLength={6}
+          name="otpInput"
+          type={"text"}
+          className={`font-poppins py-3 focus:outline-none border-borderColor focus:ring  placeholder:text-placeholder placeholder:font-light  px-2 rounded-md border  w-full`}
+        />
+        <button
+          onClick={() => setModal(!modal)}
+          className="bg-primary btn mt-20  text-white font-poppins w-full mx-auto rounded-sm h-9"
+        >
+          TERAPKAN
+        </button>
+        <button
+          onClick={() => setModal(!modal)}
+          className="  text-[#97A0AF]  font-poppins w-full mt-4  mx-auto rounded-sm h-9"
         >
           BATAL
         </button>
