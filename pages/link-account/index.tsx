@@ -16,6 +16,7 @@ type Tform = {
 
 const LinkAccount = (props: Props) => {
   const router = useRouter();
+  const routerQuery = router.query;
   const [showPassword, showPasswordSetter] = useState<boolean>(false);
   const [nikRegistered, nikRegisteredSetter] = useState<boolean>(true);
   const [isProcessing, isProcessingSetter] = useState<boolean>(false);
@@ -50,7 +51,10 @@ const LinkAccount = (props: Props) => {
 
     setTimeout(() => {
       if (tilaka_name === "success") {
-        router.replace("/link-account/success");
+        router.replace({
+          pathname: "/link-account/success",
+          query: { ...routerQuery },
+        });
       } else if (tilaka_name === "failure") {
         router.replace("/link-account/failure");
       } else {
@@ -64,9 +68,9 @@ const LinkAccount = (props: Props) => {
 
   useEffect(() => console.log(form), [form]);
 
-  if (isProcessing) {
-    return <LinkAccountProcess {...props} />;
-  }
+  // if (isProcessing) {
+  //   return <LinkAccountProcess {...props} />;
+  // }
 
   return (
     <div className="px-5 py-9">
@@ -150,7 +154,8 @@ const LinkAccount = (props: Props) => {
         </div>
         <button
           type="submit"
-          className="mt-16 w-full p-2.5 text-base text-white rounded-sm bg-primary"
+          className="mt-16 w-full p-2.5 text-base text-white rounded-sm bg-primary disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled={isProcessing}
         >
           TAUTKAN AKUN
         </button>
@@ -169,36 +174,36 @@ const LinkAccount = (props: Props) => {
 
 export default LinkAccount;
 
-const LinkAccountProcess = (props: Props) => {
-  return (
-    <div className="px-10 pt-16 pb-9 text-center">
-      <p className="font-poppins text-base font-semibold text-neutral800">
-        Penautan Akun Berhasil!
-      </p>
-      <div className="mt-20">
-        <Image
-          src="/images/linkAccountSuccess.svg"
-          width="196px"
-          height="196px"
-        />
-      </div>
-      <div className="mt-24">
-        <Image
-          src="/images/loader.svg"
-          width="46.22px"
-          height="48px"
-          className="animate-spin"
-        />
-        <p className="font-poppins text-sm text-neutral50">Mohon menunggu...</p>
-      </div>
-      <div className="mt-11 flex justify-center">
-        <Image
-          src="/images/poweredByTilaka.svg"
-          alt="powered-by-tilaka"
-          width="80px"
-          height="41.27px"
-        />
-      </div>
-    </div>
-  );
-};
+// const LinkAccountProcess = (props: Props) => {
+//   return (
+//     <div className="px-10 pt-16 pb-9 text-center">
+//       <p className="font-poppins text-base font-semibold text-neutral800">
+//         Penautan Akun Berhasil!
+//       </p>
+//       <div className="mt-20">
+//         <Image
+//           src="/images/linkAccountSuccess.svg"
+//           width="196px"
+//           height="196px"
+//         />
+//       </div>
+//       <div className="mt-24">
+//         <Image
+//           src="/images/loader.svg"
+//           width="46.22px"
+//           height="48px"
+//           className="animate-spin"
+//         />
+//         <p className="font-poppins text-sm text-neutral50">Mohon menunggu...</p>
+//       </div>
+//       <div className="mt-11 flex justify-center">
+//         <Image
+//           src="/images/poweredByTilaka.svg"
+//           alt="powered-by-tilaka"
+//           width="80px"
+//           height="41.27px"
+//         />
+//       </div>
+//     </div>
+//   );
+// };

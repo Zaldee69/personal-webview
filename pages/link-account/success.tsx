@@ -1,10 +1,28 @@
+import { NextParsedUrlQuery } from "next/dist/server/request-meta";
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
+import { useRouter } from "next/router";
+import React, { useEffect } from "react";
 
 type Props = {};
 
 const LinkAccountSuccess = (props: Props) => {
+  const router = useRouter();
+  const routerIsReady: boolean = router.isReady;
+  const routerQuery: NextParsedUrlQuery & { signing?: "1" } = router.query;
+  const isSigning: boolean = routerQuery.signing === "1";
+
+  useEffect(() => {
+    if (!routerIsReady) return;
+    if (!isSigning) return;
+    setTimeout(() => {
+      router.replace({
+        pathname: "/signing",
+        query: { ...routerQuery },
+      });
+    }, 1000);
+  }, [isSigning]);
+
   return (
     <div className="px-10 pt-16 pb-9 text-center">
       <p className="font-poppins text-base font-semibold text-neutral800">
@@ -22,11 +40,13 @@ const LinkAccountSuccess = (props: Props) => {
           Akun Tilaka Anda telah berhasil ditautkan.
         </p>
       </div>
-      <div className="mt-20 text-primary text-base font-medium font-poppins underline hover:cursor-pointer">
-        <Link href="/">
-          <a>Kembali ke Halaman Utama</a>
-        </Link>
-      </div>
+      {!isSigning && (
+        <div className="mt-20 text-primary text-base font-medium font-poppins underline hover:cursor-pointer">
+          <Link href="/">
+            <a>Kembali ke Halaman Utama</a>
+          </Link>
+        </div>
+      )}
       <div className="mt-11 flex justify-center">
         <Image
           src="/images/poweredByTilaka.svg"
