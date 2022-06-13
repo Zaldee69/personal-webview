@@ -4,6 +4,7 @@ import { store } from "../redux/app/store";
 import { Provider } from "react-redux";
 import "react-toastify/dist/ReactToastify.min.css";
 import "../styles/globals.css";
+import Script from "next/script";
 
 type TcontextClass = {
   success: string;
@@ -26,9 +27,13 @@ const contextClass: TcontextClass = {
 function MyApp({ Component, pageProps }: AppProps) {
   return (
     <>
+      <Script
+        src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.3.200/pdf.js"
+        strategy="beforeInteractive"
+      ></Script>
       <Provider store={store}>
         <ToastContainer
-          toastClassName={(context) =>
+          toastClassName={(context: any) =>
             contextClass[(context?.type || "default") as keyof TcontextClass] +
             " relative p-1 min-h-10 rounded text-sm overflow-hidden hover:cursor-pointer flex justify-between"
           }
