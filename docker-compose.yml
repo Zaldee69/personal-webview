@@ -1,0 +1,16 @@
+version: '3.7'
+
+services:
+    api-personal-webview:
+        image: $IMAGE_TAG
+        volumes:
+            - /etc/localtime:/etc/localtime:ro
+        ports:
+            - 8030:3000
+        restart: unless-stopped
+        networks:
+            - api-personal-webview
+        container_name: api-personal-webview
+networks:
+    api-personal-webview:
+
