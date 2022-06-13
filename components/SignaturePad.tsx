@@ -9,6 +9,7 @@ const SignaturePad = () => {
     <div>
       <div className="flex w-full mt-5 border rounded-md border-[#DFE1E6] relative justify-center">
         <button
+          type="button"
           onClick={() => sigPad.current.clear()}
           className="absolute z-50 top-2 right-2"
         >

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import SignaturePad from "../../components/SignaturePad";
 import InfoIcon from "../../public/icons/InfoIcon";
 
 type Props = {};
@@ -106,18 +107,17 @@ function SettingSignatureAndMFA({}: Props) {
           </label>
         </div>
         <div
-          className="mt-6 rounded-md bg-blue50 p-3"
-          style={{ backgroundColor: "#F6F6F6" }}
+          className={
+            form.signature_type === "signature_type_goresan"
+              ? undefined
+              : "hidden"
+          }
         >
-          <p className="text-sm" style={{ color: "#727272" }}>
-            Yeshica
-          </p>
+          <SignaturePad />
         </div>
         <div
           className={
-            form.signature_type === "signature_type_goresan"
-              ? "hidden"
-              : undefined
+            form.signature_type === "signature_type_font" ? undefined : "hidden"
           }
         >
           <div className="grid grid-cols-2 gap-3 mt-5">
