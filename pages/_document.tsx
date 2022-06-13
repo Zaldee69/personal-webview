@@ -1,7 +1,8 @@
 import Document, { Html, Head, Main, NextScript } from "next/document";
 
 /**
- * Use <Script> Component instead of <script> tag.
+ * Use <Script> Component instead of <script> tag,
+ * by default <Script> Component use afterInteractive strategy (use beforeInteractive strategy as prop to load before the page is interactive).
  * Unfortunately you can't use the next/script component inside the _document.js page,
  * for global script use it inside _app.js page instead.
  * see:

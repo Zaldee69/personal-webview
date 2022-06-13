@@ -27,7 +27,10 @@ const contextClass: TcontextClass = {
 function MyApp({ Component, pageProps }: AppProps) {
   return (
     <>
-      <Script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.3.200/pdf.js"></Script>
+      <Script
+        src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.3.200/pdf.js"
+        strategy="beforeInteractive"
+      ></Script>
       <Provider store={store}>
         <ToastContainer
           toastClassName={(context: any) =>
