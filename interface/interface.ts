@@ -28,3 +28,24 @@ export type TLoginProps = {
   nik?: string;
   company_id? : string
 };
+
+export type TDocumentResponse = {
+  response: {
+    success: string;
+    message: boolean;
+    data: {
+      document: string;
+      mfa: "FR" | "OTP";
+      posX: number;
+      posY: number;
+      width: number;
+      height: number;
+      tandaTangan: string
+    };
+  } & Status;
+} 
+
+export type TDocumentProps = {
+  transaction_id: string;
+  company_id: string;
+};

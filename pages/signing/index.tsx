@@ -1,5 +1,9 @@
-import Image from "next/image";
-import { Viewer } from "./../../components/Viewer";
+import { Viewer } from "@/components/Viewer";
+import { useDispatch, useSelector } from "react-redux";
+import { getDocument } from "@/redux/slices/documentSlice";
+import { useRouter } from "next/router";
+import { AppDispatch, RootState } from "@/redux/app/store";
+import { TDocumentProps } from "@/interface/interface";
 import {
   ChangeEvent,
   Dispatch,
@@ -7,14 +11,29 @@ import {
   useEffect,
   useState,
 } from "react";
-import FRCamera from "../../components/FRCamera";
-import SignaturePad from "./../../components/SignaturePad";
-import Footer from "../../components/Footer";
+import Image from "next/image";
 import Head from "next/head";
+import FRCamera from "@/components/FRCamera";
+import SignaturePad from "@/components/SignaturePad";
+import Footer from "@/components/Footer";
+import { setAuthToken } from "@/config/API";
+
+type TFontSig =
+| "signature_font_type_allan"
+| "signature_font_type_aguafinaScript"
+| "signature_font_type_architectsDaughter"
+| "signature_font_type_giveYouGlory"
+| "signature_font_type_berkshireSwash"
+| "signature_font_type_missFajardose";
 
 interface Active {
   modal: boolean;
   setModal: Dispatch<SetStateAction<boolean>>;
+}
+
+interface Props {
+  token: string;
+  pathname: string;
 }
 
 const Signing = () => {
@@ -22,15 +41,26 @@ const Signing = () => {
   const [openFRModal, setopenFRModal] = useState<boolean>(false);
   const [openScratchesModal, setOpenScratchesModal] = useState<boolean>(false);
   const [selectFontModal, setSelectFontModal] = useState<boolean>(false);
-  const [otpModal, setOtpModal] = useState<boolean>(true);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [otpModal, setOtpModal] = useState<boolean>(false);
+  const router = useRouter();
+  const routerIsReady = router.isReady;
+  const pathname = router.pathname;
+  const { company_id, transaction_id } = router.query;
+
+  const dispatch: AppDispatch = useDispatch();
+  const res = useSelector((state: RootState) => state.document);
 
   useEffect(() => {
-    setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 4000);
-  }, []);
+    const token = localStorage.getItem("token")
+    if(!token){
+       router.replace({
+      pathname: "/login",
+      query: { ...router.query },
+    });
+    }
+    setAuthToken({token, pathname} as Props)
+    if(routerIsReady) dispatch(getDocument({company_id, transaction_id} as TDocumentProps))
+  }, [routerIsReady]);
 
   return (
     <>
@@ -38,8 +68,7 @@ const Signing = () => {
         <title>Tanda Tangan</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
-
-      {isLoading ? (
+      {res.response.status === "PENDING" ? (
         <>
           {" "}
           <div className="flex justify-center relative h-[45rem] items-center ">
@@ -54,7 +83,7 @@ const Signing = () => {
           <Footer />
         </>
       ) : (
-        <div className="px-5 pt-8 sm:w-full md:w-4/5 relative  mx-auto">
+        <div className=" pt-8 sm:w-full bg-[#f4f5f7] md:w-4/5 relative  mx-auto">
           {" "}
           <FRModal modal={openFRModal} setModal={setopenFRModal} />
           <Configuration
@@ -72,13 +101,15 @@ const Signing = () => {
             setModal={setOpenScratchesModal}
           />
           <OTPModal modal={otpModal} setModal={setOtpModal} />
-          <Viewer setTotalPages={setTotalPages} url="/images/pinjaman.pdf" />
+          <Viewer setTotalPages={setTotalPages} url={`{data:application/pdf;base64,${res.response.data.document}`}    />
+        <div className="px-5" >
           <button
-            onClick={() => setopenFRModal(true)}
+            onClick={() => res.response.data.mfa === "FR" ? setopenFRModal(true) : setOtpModal(true)}
             className="bg-primary btn md:mx-auto md:block md:w-1/4 my-10 text-white font-poppins w-full mx-auto rounded-sm h-9"
           >
             TANDA TANGANI
           </button>
+        </div>
         </div>
       )}
     </>
@@ -99,7 +130,7 @@ const Configuration: React.FC<{
   setOpenScratchesModal,
 }) => {
   return (
-    <div className="flex flex-row items-center z-10 left-0 fixed py-5 w-full top-0 bg-[rgb(223,225,230)] justify-center gap-10">
+    <div className="flex flex-row items-center shadow-xl z-10 left-0 fixed py-2 w-full top-0 bg-[rgb(223,225,230)] justify-center gap-10">
       <div className="flex flex-col  ">
         <button onClick={() => setOpenScratchesModal(!openScratchesModal)}>
           <Image width={25} height={25} src="/images/goresan.svg" />
@@ -116,7 +147,7 @@ const Configuration: React.FC<{
   );
 };
 
-const FRModal: React.FC<Active> = ({ modal, setModal }) => {
+const FRModal: React.FC<Active | any> = ({ modal, setModal }) => {
   const [isFRSuccess, setIsFRSuccess] = useState<boolean>(false);
 
   if (modal) {
@@ -124,6 +155,14 @@ const FRModal: React.FC<Active> = ({ modal, setModal }) => {
       setIsFRSuccess(true);
     }, 5000);
   }
+
+  useEffect(() => {
+    if(isFRSuccess && modal){
+      document.body.style.overflow = "hidden"
+    }else {
+      document.body.style.overflow = "scroll"
+    }
+  },[isFRSuccess])
 
   return modal ? (
     <div
@@ -141,7 +180,10 @@ const FRModal: React.FC<Active> = ({ modal, setModal }) => {
             </div>
 
             <button
-              onClick={() => setModal(!modal)}
+              onClick={() => {
+                setModal(!modal)
+                setIsFRSuccess(false)
+              }}
               className="bg-primary btn  text-white font-poppins w-full mt-5 mx-auto rounded-sm h-9"
             >
               TUTUP
@@ -170,6 +212,10 @@ const FRModal: React.FC<Active> = ({ modal, setModal }) => {
 };
 
 const ChooseFontModal: React.FC<Active> = ({ modal, setModal }) => {
+  const [form, formSetter] = useState<TFontSig | string>("signature_font_type_aguafinaScript")
+  const handleFormOnChange = (e: React.FormEvent<HTMLInputElement>): void => {
+    formSetter(e.currentTarget.value);
+  };
   return modal ? (
     <div
       style={{ backgroundColor: "rgba(0, 0, 0, .5)" }}
@@ -180,30 +226,104 @@ const ChooseFontModal: React.FC<Active> = ({ modal, setModal }) => {
           Pilih Font
         </p>
         <div className="mt-5 flex flex-col gap-5">
-          <div className="flex gap-3 items-center justify-center">
-            <button className="font-allan w-2/4 rounded-md py-3 border-[#DFE1E6] border transition-all duration-500 focus:border-[#1A73E8] text-2xl">
-              M. Rizaldy
-            </button>
-            <button className="font-aguafinaScript w-2/4 rounded-md border py-3 border-[#DFE1E6] transition-all duration-500 focus:border-[#1A73E8] text-2xl">
-              M. Rizaldy
-            </button>
+        <div className="grid grid-cols-2 gap-3 mt-5">
+            <label className="relative flex items-center">
+              <input
+                type="radio"
+                name="signature_font_type"
+                value="signature_font_type_allan"
+                onChange={handleFormOnChange}
+                checked={
+                  form === "signature_font_type_allan"
+                }
+                className="appearance-none border border-_B6B6B6 checked:border-_1A73E8 rounded-md w-full h-12"
+              />
+              <p className="text-2xl font-allan text-_030326 absolute w-full text-center">
+                Yeshica
+              </p>
+            </label>
+            <label className="relative flex items-center">
+              <input
+                type="radio"
+                name="signature_font_type"
+                value="signature_font_type_aguafinaScript"
+                onChange={handleFormOnChange}
+                checked={
+                  form ===
+                  "signature_font_type_aguafinaScript"
+                }
+                className="appearance-none border border-_B6B6B6 checked:border-_1A73E8 rounded-md w-full h-12"
+              />
+              <p className="text-2xl font-aguafinaScript text-_030326 absolute w-full text-center">
+                Yeshica
+              </p>
+            </label>
+            <label className="relative flex items-center">
+              <input
+                type="radio"
+                name="signature_font_type"
+                value="signature_font_type_architectsDaughter"
+                onChange={handleFormOnChange}
+                checked={
+                  form ===
+                  "signature_font_type_architectsDaughter"
+                }
+                className="appearance-none border border-_B6B6B6 checked:border-_1A73E8 rounded-md w-full h-12"
+              />
+              <p className="text-lg font-architectsDaughter text-_030326 absolute w-full text-center">
+                Yeshica
+              </p>
+            </label>
+            <label className="relative flex items-center">
+              <input
+                type="radio"
+                name="signature_font_type"
+                value="signature_font_type_giveYouGlory"
+                onChange={handleFormOnChange}
+                checked={
+                  form ===
+                  "signature_font_type_giveYouGlory"
+                }
+                className="appearance-none border border-_B6B6B6 checked:border-_1A73E8 rounded-md w-full h-12"
+              />
+              <p className="text-base font-giveYouGlory text-_030326 absolute w-full text-center">
+                Yeshica
+              </p>
+            </label>
+            <label className="relative flex items-center">
+              <input
+                type="radio"
+                name="signature_font_type"
+                value="signature_font_type_berkshireSwash"
+                onChange={handleFormOnChange}
+                checked={
+                  form ===
+                  "signature_font_type_berkshireSwash"
+                }
+                className="appearance-none border border-_B6B6B6 checked:border-_1A73E8 rounded-md w-full h-12"
+              />
+              <p className="text-2xl font-berkshireSwash text-_030326 absolute w-full text-center">
+                Yeshica
+              </p>
+            </label>
+            <label className="relative flex items-center">
+              <input
+                type="radio"
+                name="signature_font_type"
+                value="signature_font_type_missFajardose"
+                onChange={handleFormOnChange}
+                checked={
+                  form ===
+                  "signature_font_type_missFajardose"
+                }
+                className="appearance-none border border-_B6B6B6 checked:border-_1A73E8 rounded-md w-full h-12"
+              />
+              <p className="text-2xl font-missFajardose text-_030326 absolute w-full text-center">
+                Yeshica
+              </p>
+            </label>
           </div>
-          <div className="flex gap-3 items-center justify-center">
-            <button className="font-architectsDaughter w-2/4 rounded-md py-3 border-[#DFE1E6] border transition-all duration-500 focus:border-[#1A73E8] text-2xl">
-              M. Rizaldy
-            </button>
-            <button className="font-giveYouGlory w-2/4 rounded-md border py-3 border-[#DFE1E6] transition-all duration-500 focus:border-[#1A73E8] text-2xl">
-              M. Rizaldy
-            </button>
-          </div>
-          <div className="flex gap-3 items-center justify-center">
-            <button className="font-berkshireSwash w-2/4 rounded-md py-3 border-[#DFE1E6] border transition-all duration-500 focus:border-[#1A73E8] text-2xl">
-              M. Rizaldy
-            </button>
-            <button className="font-missFajardose w-2/4 rounded-md border py-3 border-[#DFE1E6] transition-all duration-500 focus:border-[#1A73E8] text-2xl">
-              M. Rizaldy
-            </button>
-          </div>
+        </div>        
           <button
             onClick={() => setModal(!modal)}
             className="bg-primary btn  text-white font-poppins w-full mt-5 mx-auto rounded-sm h-9"
@@ -218,7 +338,6 @@ const ChooseFontModal: React.FC<Active> = ({ modal, setModal }) => {
           </button>
         </div>
       </div>
-    </div>
   ) : null;
 };
 
@@ -241,7 +360,7 @@ const ChooseScratchModal: React.FC<Active> = ({ modal, setModal }) => {
         </button>
         <button
           onClick={() => setModal(!modal)}
-          className="  text-[#97A0AF]  font-poppins w-full  mx-auto rounded-sm h-9"
+          className="  text-[#97A0AF]  font-poppins w-full mt-3  mx-auto rounded-sm h-9"
         >
           BATAL
         </button>

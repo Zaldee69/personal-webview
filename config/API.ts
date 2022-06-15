@@ -14,23 +14,13 @@ export const API = axios.create({
 
 // Set Authorization Token Header
 export const setAuthToken = (props: Props) => {
-  // switch (props.pathname) {
-  //   case "/login":
-  //     if (props.channel_id) {
-  //       API.defaults.headers.common["channel-id"] = props.channel_id;
-  //     } else {
-  //       delete API.defaults.headers.common["channel-id"];
-  //     }
-  //     break;
-  //   default:
-  //     if(props.token && props.channel_id && props.channel_auth){
-  //       API.defaults.headers.common["Authorization"] = props.token
-  //       API.defaults.headers.common["channel-id"] = props.channel_id
-  //       API.defaults.headers.common["channel-auth"] = props.channel_auth
-  //     }else {
-  //       delete API.defaults.headers.common["Authorization"]
-  //       delete API.defaults.headers.common["channel-id"]
-  //       delete API.defaults.headers.common["channel-auth"]
-  //     }
-  // }
+  switch (props.pathname) {
+    case "/signing":
+      if(props.token){
+        API.defaults.headers.common["Authorization"] =`Bearer ${props.token}`
+      }else {
+
+        delete API.defaults.headers.common["Authorization"]
+      }
+  }
 };
