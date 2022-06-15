@@ -12,8 +12,8 @@
 }
 
 .percent {
-  width: 74%;
-  height: 93%;
+  width: 80%;
+  height: 100%;
 }
 
 .track {
@@ -67,7 +67,7 @@
 
 .progress {
   background: linear-gradient(320.04deg, #0052cc 15.35%, #4c9aff 86.73%);
-  width: 60%;
+  width: 85%;
   transition: 0.5s;
 }
 

@@ -18,6 +18,7 @@ const Camera: React.FC = () => {
   return (
       <div className="relative">
         <Webcam
+          style={{height: "350px", objectFit: "cover"}}
           className="mt-10 rounded-md sm:w-full md:w-full"
           audio={false}
           height={720}
