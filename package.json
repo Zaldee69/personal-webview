@@ -14,11 +14,13 @@
     "next": "12.1.5",
     "react": "18.0.0",
     "react-dom": "18.0.0",
+    "react-input-pin-code": "^1.2.0",
     "react-pdf": "^5.7.2",
     "react-redux": "^8.0.2",
     "react-signature-canvas": "^1.0.5",
     "react-toastify": "^9.0.2",
-    "react-webcam": "^7.0.1"
+    "react-webcam": "^7.0.1",
+    "styled-components": "^5.3.5"
   },
   "devDependencies": {
     "@types/node": "17.0.27",

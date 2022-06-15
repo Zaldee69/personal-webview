@@ -126,3 +126,10 @@ input[type="checkbox"] {
 .tooltip:hover .tooltiptext {
   visibility: visible;
 }
+
+
+.kfAyjk {
+  justify-content: center;
+  gap: 5px;
+  margin-top: 10px;
+}

@@ -4,6 +4,7 @@ import { getDocument } from "@/redux/slices/documentSlice";
 import { useRouter } from "next/router";
 import { AppDispatch, RootState } from "@/redux/app/store";
 import { TDocumentProps } from "@/interface/interface";
+import { PinInput } from "react-input-pin-code";
 import {
   ChangeEvent,
   Dispatch,
@@ -19,12 +20,12 @@ import Footer from "@/components/Footer";
 import { setAuthToken } from "@/config/API";
 
 type TFontSig =
-| "signature_font_type_allan"
-| "signature_font_type_aguafinaScript"
-| "signature_font_type_architectsDaughter"
-| "signature_font_type_giveYouGlory"
-| "signature_font_type_berkshireSwash"
-| "signature_font_type_missFajardose";
+  | "signature_font_type_allan"
+  | "signature_font_type_aguafinaScript"
+  | "signature_font_type_architectsDaughter"
+  | "signature_font_type_giveYouGlory"
+  | "signature_font_type_berkshireSwash"
+  | "signature_font_type_missFajardose";
 
 interface Active {
   modal: boolean;
@@ -51,15 +52,16 @@ const Signing = () => {
   const res = useSelector((state: RootState) => state.document);
 
   useEffect(() => {
-    const token = localStorage.getItem("token")
-    if(!token){
-       router.replace({
-      pathname: "/login",
-      query: { ...router.query },
-    });
+    const token = localStorage.getItem("token");
+    if (!token) {
+      router.replace({
+        pathname: "/login",
+        query: { ...router.query },
+      });
     }
-    setAuthToken({token, pathname} as Props)
-    if(routerIsReady) dispatch(getDocument({company_id, transaction_id} as TDocumentProps))
+    setAuthToken({ token, pathname } as Props);
+    if (routerIsReady)
+      dispatch(getDocument({ company_id, transaction_id } as TDocumentProps));
   }, [routerIsReady]);
 
   return (
@@ -101,15 +103,22 @@ const Signing = () => {
             setModal={setOpenScratchesModal}
           />
           <OTPModal modal={otpModal} setModal={setOtpModal} />
-          <Viewer setTotalPages={setTotalPages} url={`{data:application/pdf;base64,${res.response.data.document}`}    />
-        <div className="px-5" >
-          <button
-            onClick={() => res.response.data.mfa === "FR" ? setopenFRModal(true) : setOtpModal(true)}
-            className="bg-primary btn md:mx-auto md:block md:w-1/4 my-10 text-white font-poppins w-full mx-auto rounded-sm h-9"
-          >
-            TANDA TANGANI
-          </button>
-        </div>
+          <Viewer
+            setTotalPages={setTotalPages}
+            url={`{data:application/pdf;base64,${res.response.data.document}`}
+          />
+          <div className="px-5">
+            <button
+              onClick={() =>
+                res.response.data.mfa === "FR"
+                  ? setopenFRModal(true)
+                  : setOtpModal(true)
+              }
+              className="bg-primary btn md:mx-auto md:block md:w-1/4 my-10 text-white font-poppins w-full mx-auto rounded-sm h-9"
+            >
+              TANDA TANGANI
+            </button>
+          </div>
         </div>
       )}
     </>
@@ -157,12 +166,12 @@ const FRModal: React.FC<Active | any> = ({ modal, setModal }) => {
   }
 
   useEffect(() => {
-    if(isFRSuccess && modal){
-      document.body.style.overflow = "hidden"
-    }else {
-      document.body.style.overflow = "scroll"
+    if (isFRSuccess && modal) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "scroll";
     }
-  },[isFRSuccess])
+  }, [isFRSuccess]);
 
   return modal ? (
     <div
@@ -181,8 +190,8 @@ const FRModal: React.FC<Active | any> = ({ modal, setModal }) => {
 
             <button
               onClick={() => {
-                setModal(!modal)
-                setIsFRSuccess(false)
+                setModal(!modal);
+                setIsFRSuccess(false);
               }}
               className="bg-primary btn  text-white font-poppins w-full mt-5 mx-auto rounded-sm h-9"
             >
@@ -212,7 +221,9 @@ const FRModal: React.FC<Active | any> = ({ modal, setModal }) => {
 };
 
 const ChooseFontModal: React.FC<Active> = ({ modal, setModal }) => {
-  const [form, formSetter] = useState<TFontSig | string>("signature_font_type_aguafinaScript")
+  const [form, formSetter] = useState<TFontSig | string>(
+    "signature_font_type_aguafinaScript"
+  );
   const handleFormOnChange = (e: React.FormEvent<HTMLInputElement>): void => {
     formSetter(e.currentTarget.value);
   };
@@ -226,16 +237,14 @@ const ChooseFontModal: React.FC<Active> = ({ modal, setModal }) => {
           Pilih Font
         </p>
         <div className="mt-5 flex flex-col gap-5">
-        <div className="grid grid-cols-2 gap-3 mt-5">
+          <div className="grid grid-cols-2 gap-3 mt-5">
             <label className="relative flex items-center">
               <input
                 type="radio"
                 name="signature_font_type"
                 value="signature_font_type_allan"
                 onChange={handleFormOnChange}
-                checked={
-                  form === "signature_font_type_allan"
-                }
+                checked={form === "signature_font_type_allan"}
                 className="appearance-none border border-_B6B6B6 checked:border-_1A73E8 rounded-md w-full h-12"
               />
               <p className="text-2xl font-allan text-_030326 absolute w-full text-center">
@@ -248,10 +257,7 @@ const ChooseFontModal: React.FC<Active> = ({ modal, setModal }) => {
                 name="signature_font_type"
                 value="signature_font_type_aguafinaScript"
                 onChange={handleFormOnChange}
-                checked={
-                  form ===
-                  "signature_font_type_aguafinaScript"
-                }
+                checked={form === "signature_font_type_aguafinaScript"}
                 className="appearance-none border border-_B6B6B6 checked:border-_1A73E8 rounded-md w-full h-12"
               />
               <p className="text-2xl font-aguafinaScript text-_030326 absolute w-full text-center">
@@ -264,10 +270,7 @@ const ChooseFontModal: React.FC<Active> = ({ modal, setModal }) => {
                 name="signature_font_type"
                 value="signature_font_type_architectsDaughter"
                 onChange={handleFormOnChange}
-                checked={
-                  form ===
-                  "signature_font_type_architectsDaughter"
-                }
+                checked={form === "signature_font_type_architectsDaughter"}
                 className="appearance-none border border-_B6B6B6 checked:border-_1A73E8 rounded-md w-full h-12"
               />
               <p className="text-lg font-architectsDaughter text-_030326 absolute w-full text-center">
@@ -280,10 +283,7 @@ const ChooseFontModal: React.FC<Active> = ({ modal, setModal }) => {
                 name="signature_font_type"
                 value="signature_font_type_giveYouGlory"
                 onChange={handleFormOnChange}
-                checked={
-                  form ===
-                  "signature_font_type_giveYouGlory"
-                }
+                checked={form === "signature_font_type_giveYouGlory"}
                 className="appearance-none border border-_B6B6B6 checked:border-_1A73E8 rounded-md w-full h-12"
               />
               <p className="text-base font-giveYouGlory text-_030326 absolute w-full text-center">
@@ -296,10 +296,7 @@ const ChooseFontModal: React.FC<Active> = ({ modal, setModal }) => {
                 name="signature_font_type"
                 value="signature_font_type_berkshireSwash"
                 onChange={handleFormOnChange}
-                checked={
-                  form ===
-                  "signature_font_type_berkshireSwash"
-                }
+                checked={form === "signature_font_type_berkshireSwash"}
                 className="appearance-none border border-_B6B6B6 checked:border-_1A73E8 rounded-md w-full h-12"
               />
               <p className="text-2xl font-berkshireSwash text-_030326 absolute w-full text-center">
@@ -312,10 +309,7 @@ const ChooseFontModal: React.FC<Active> = ({ modal, setModal }) => {
                 name="signature_font_type"
                 value="signature_font_type_missFajardose"
                 onChange={handleFormOnChange}
-                checked={
-                  form ===
-                  "signature_font_type_missFajardose"
-                }
+                checked={form === "signature_font_type_missFajardose"}
                 className="appearance-none border border-_B6B6B6 checked:border-_1A73E8 rounded-md w-full h-12"
               />
               <p className="text-2xl font-missFajardose text-_030326 absolute w-full text-center">
@@ -323,21 +317,21 @@ const ChooseFontModal: React.FC<Active> = ({ modal, setModal }) => {
               </p>
             </label>
           </div>
-        </div>        
-          <button
-            onClick={() => setModal(!modal)}
-            className="bg-primary btn  text-white font-poppins w-full mt-5 mx-auto rounded-sm h-9"
-          >
-            TERAPKAN
-          </button>
-          <button
-            onClick={() => setModal(!modal)}
-            className="  text-[#97A0AF]  font-poppins w-full  mx-auto rounded-sm h-9"
-          >
-            BATAL
-          </button>
         </div>
+        <button
+          onClick={() => setModal(!modal)}
+          className="bg-primary btn  text-white font-poppins w-full mt-5 mx-auto rounded-sm h-9"
+        >
+          TERAPKAN
+        </button>
+        <button
+          onClick={() => setModal(!modal)}
+          className="  text-[#97A0AF]  font-poppins w-full  mx-auto rounded-sm h-9"
+        >
+          BATAL
+        </button>
       </div>
+    </div>
   ) : null;
 };
 
@@ -370,33 +364,28 @@ const ChooseScratchModal: React.FC<Active> = ({ modal, setModal }) => {
 };
 
 const OTPModal: React.FC<Active> = ({ modal, setModal }) => {
-  const numberOnly = (e: ChangeEvent<HTMLInputElement>) => {
-    const numbers = e.target.value.replace(/[^0-9]/g, "");
-    e.target.value = numbers;
-  };
-
+  const [values, setValues] = useState<any>(["", "", "", "", "", ""]);
   return modal ? (
     <div
       style={{ backgroundColor: "rgba(0, 0, 0, .5)" }}
       className="fixed z-50 flex items-start transition-all duration-1000 pb-3 justify-center w-full left-0 top-0 h-full "
     >
-      <div className="bg-white mt-20 pt-5 px-2 pb-3 rounded-md w-full mx-2">
+      <div className="bg-white max-w-xl mt-20 pt-5 px-2 pb-3 rounded-md w-full mx-5">
         <p className="font-poppins block text-center pb-5  whitespace-nowrap  font-semibold ">
           Goresan
         </p>
         <span className="font-poppins block text-center pb-5  ">
           Masukkan 6 digit OTP
         </span>
-        <input
-          onChange={(e) => numberOnly(e)}
-          maxLength={6}
-          name="otpInput"
-          type={"text"}
-          className={`font-poppins py-3 focus:outline-none border-borderColor focus:ring  placeholder:text-placeholder placeholder:font-light  px-2 rounded-md border  w-full`}
+        <PinInput
+          placeholder=""
+          size="lg"
+          values={values as typeof values}
+          onChange={(values) => setValues(values)}
         />
         <button
           onClick={() => setModal(!modal)}
-          className="bg-primary btn mt-20  text-white font-poppins w-full mx-auto rounded-sm h-9"
+          className="bg-primary btn mt-16  text-white font-poppins w-full mx-auto rounded-sm h-9"
         >
           TERAPKAN
         </button>
