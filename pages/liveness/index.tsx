@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Head from "next/head";
 import React from "react";
 import Camera from "../../components/Camera";
 import Footer from "../../components/Footer";
@@ -6,7 +7,12 @@ import ProgressStepBar from "../../components/ProgressStepBar";
 
 const Liveness = () => {
   return (
-    <div className="py-10 px-2">
+    <>
+      <Head>
+        <title>Liveness</title>
+        <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+      </Head>
+    <div className="py-10 max-w-sm mx-auto px-2">
       <span className="font-poppins text-sm ">
         Pastikan wajah di dalam garis panduan dan ikuti petunjuk dengan benar
       </span>
@@ -20,6 +26,7 @@ const Liveness = () => {
       </div>
       <Footer/>
     </div>
+    </>
   );
 };
 
