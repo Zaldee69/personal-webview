@@ -35,9 +35,9 @@ function MyApp({ Component, pageProps }: AppProps) {
         <ToastContainer
           toastClassName={(context: any) =>
             contextClass[(context?.type || "default") as keyof TcontextClass] +
-            " relative p-1 min-h-10 rounded text-sm overflow-hidden hover:cursor-pointer flex justify-between"
+            " relative  rounded items-center w-fit px-5 mx-auto mt-5 text-sm overflow-hidden hover:cursor-pointer flex justify-between"
           }
-          bodyClassName={() => "text-sm font-poppins p-3 flex items-center"}
+          bodyClassName={() => "text-sm font-poppins  p-3 flex items-center"}
           position="top-center"
           autoClose={3000}
           hideProgressBar={true}
