@@ -218,13 +218,14 @@ function SettingSignatureAndMFA({}: Props) {
             </label>
           </div>
         </div>
-        <p className="text-md text-neutral800 mt-8">Pilih tipe tanda tangan</p>
+        <p className="text-md text-neutral800 mt-8">Pilih metode otentikasi</p>
         <div className="mt-1.5 rounded-md bg-blue50 py-2 px-4 flex items-start">
           <div className="pt-1">
             <InfoIcon />
           </div>
           <p className="text-xs text-blue500 ml-4">
-            Untuk meningkatkan keamanan, diperlukan Multi Factor Authentication
+            Untuk meningkatkan keamanan, diperlukan{" "}
+            <i>Multi Factor Authentication</i>
             yang harus Anda gunakan saat melakukan aktivitas tandatangan digital
             ataupun aktivitas lainnya di tilaka.id. Silakan pilih metode MFA
             yang sesuai dengan kenyamanan Anda.

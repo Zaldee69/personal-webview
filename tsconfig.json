@@ -13,7 +13,17 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
-    "incremental": true
+    "incremental": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/components/*": ["components/*"],
+      "@/hook/*": ["hook/*"],
+      "@/interface/*": ["interface/*"],
+      "@/redux/*": ["redux/*"],
+      "@/public/*": ["public/*"],
+      "@/config/*": ["config/*"],
+      "@/utils/*": ["utils/*"],
+    }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "pdf-worker.js"],
   "exclude": ["node_modules"]
