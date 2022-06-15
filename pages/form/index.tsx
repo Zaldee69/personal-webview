@@ -4,7 +4,7 @@ import Footer from "../../components/Footer";
 import EyeIcon from "../../public/icons/EyeIcon";
 import EyeIconOff from "./../../public/icons/EyeIconOff";
 import QuestionIcon from "./../../public/icons/QuestionIcon";
-
+import Head from "next/head"
 interface InputType {
   password: string | number;
   confirmPassword: string | number;
@@ -40,17 +40,15 @@ const Form: React.FC = () => {
     confirmPassword: "password",
   });
 
-  const [isChecked, setIsCheked] = useState<boolean>(true);
-
-  const [disabled, setDisabled] = useState<boolean>(true);
+  const [isChecked, setIsCheked] = useState<boolean>(false);
+  const disabled  = !input.password || !input.confirmPassword || !input.tilakaName || error.tilakaName || error.confirmPassword || error.password || !isChecked
 
   const onChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    const { password, confirmPassword, tilakaName } = input;
 
     if (name === "tnc") {
-      setIsCheked(!e.target.checked);
-      console.log(e.target.checked, isChecked);
+      setIsCheked(e.target.checked);
+      console.log(e.target.checked)
     } else {
       setInput((prev) => ({
         ...prev,
@@ -109,17 +107,6 @@ const Form: React.FC = () => {
           break;
       }
 
-      if (
-        confirmPassword !== "" &&
-        tilakaName !== "" &&
-        password !== "" &&
-        isChecked
-      ) {
-        setDisabled(false);
-      } else {
-        setDisabled(true);
-      }
-
       return stateObj;
     });
   };
@@ -146,6 +133,11 @@ const Form: React.FC = () => {
   };
 
   return (
+    <>
+    <Head>
+      <title>Aktivasi Akun</title>
+      <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+    </Head>
     <div className="px-5 pt-8 sm:w-full md:w-4/5 mx-auto">
       <h1 className="font-poppins font-semibold text-xl">Aktivasi Akun</h1>
       <div className="flex justify-center mt-10">
@@ -274,9 +266,8 @@ const Form: React.FC = () => {
           </label>
         </div>
         <button
-          disabled={disabled}
-          className={`bg-primary mt-10 md:mx-auto md:block md:w-1/4 text-white font-poppins w-full mx-auto rounded-sm h-9 ${
-            disabled ? "opacity-30" : ""
+          disabled={disabled as boolean}
+          className={`bg-primary mt-10 md:mx-auto md:block md:w-1/4 text-white font-poppins w-full mx-auto rounded-sm h-9 disabled:opacity-50
           }`}
         >
           AKTIVASI AKUN
@@ -284,6 +275,7 @@ const Form: React.FC = () => {
       </form>
       <Footer />
     </div>
+    </>
   );
 };
 
