@@ -1,8 +1,10 @@
 import { configureStore } from "@reduxjs/toolkit";
 import loginSlice from "../slices/loginSlice";
+import documentSlice from "../slices/documentSlice";
 export const store = configureStore({
   reducer: {
     login : loginSlice,
+    document : documentSlice,
   },
   middleware: (getDefaultMiddleware) =>
   getDefaultMiddleware({
