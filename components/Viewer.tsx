@@ -15,14 +15,37 @@ export const Viewer: React.FC<Props> = ({ url, setTotalPages }) => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [pdfDisplayed, setPdfDisplayed] = useState<number>(2);
   const [zoomCount, setZoomCount] = useState<number>(1);
+  const [isShowPagination, setIsShowPagination] = useState<boolean>(true)
 
   const indexOfLastPdf = currentPage * 2;
   const indexOfFirstPdf = indexOfLastPdf - 2;
   const currentPages = pages.slice(indexOfFirstPdf, indexOfLastPdf);
 
+  let iddleState = false;
+  let iddleTimer : any
+
   useEffect(() => {
     setTotalPages(pages.length);
+    showPagination()
   }, []);
+
+  const showPagination = () => {
+    clearTimeout(iddleTimer)
+    if(iddleState){
+      setIsShowPagination(true)
+    }
+   iddleState = false
+   iddleTimer = setTimeout(() => {
+      setIsShowPagination(false)
+      iddleState = true
+    }, 2000)
+  }
+
+  if(typeof window !== "undefined"){
+    window.addEventListener("scroll", () => {
+      showPagination()
+    })
+  }
 
   return (
     <div className="mt-9 relative overflow-auto w-full">
@@ -39,16 +62,17 @@ export const Viewer: React.FC<Props> = ({ url, setTotalPages }) => {
           return <img className="mt-5 shadow-xl" src={canvasURL} key={idx} />;
         })}
       </div>
-      <Pagination
-        currentPage={currentPage}
-        currentPages={currentPages.length}
-        setCurrentPage={setCurrentPage}
-        totalPages={pages.length}
-        pdfDisplayed={pdfDisplayed}
-        setPdfDisplayed={setPdfDisplayed}
-        zoomCount={zoomCount}
-        setZoomCount={setZoomCount}
-      />
+          <Pagination
+            currentPage={currentPage}
+            currentPages={currentPages.length}
+            setCurrentPage={setCurrentPage}
+            totalPages={pages.length}
+            pdfDisplayed={pdfDisplayed}
+            setPdfDisplayed={setPdfDisplayed}
+            zoomCount={zoomCount}
+            setZoomCount={setZoomCount}
+            isShow={isShowPagination}
+          />
     </div>
   );
 };
