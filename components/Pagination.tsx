@@ -4,12 +4,14 @@ import ChevronLeft from "../public/icons/ChevronLeft";
 import PlusIcon from "../public/icons/PlusIcon";
 import MinusIcon from "../public/icons/MinusIcon";
 
+
 interface Props {
   currentPages: number;
   totalPages: number;
   currentPage: number;
   pdfDisplayed: number;
   zoomCount: number;
+  isShow: boolean
   setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
   setPdfDisplayed: React.Dispatch<React.SetStateAction<number>>;
   setZoomCount: React.Dispatch<React.SetStateAction<number>>;
@@ -24,6 +26,7 @@ const Pagination: React.FC<Props> = ({
   currentPages,
   zoomCount,
   setZoomCount,
+  isShow
 }) => {
   const zoomInHandler = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
@@ -53,8 +56,8 @@ const Pagination: React.FC<Props> = ({
   return (
     <div
       className={`${
-        zoomCount > 1 ? "bottom-32 fixed" : "bottom-0 absolute"
-      } flex justify-center w-full  left-0 right-0`}
+        zoomCount > 1 ? "bottom-24 fixed" : "bottom-5 absolute"
+      } ${!isShow ? "opacity-0" : "opacity-100"} transition-all duration-500 flex justify-center w-full  left-0 right-0`}
     >
       <div className=" w-64 h-10 flex justify-center rounded py-1  bg-[#424242]">
         <div className="flex items-center gap-1">

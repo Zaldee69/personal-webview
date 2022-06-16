@@ -108,16 +108,18 @@ const Signing = () => {
             url={`{data:application/pdf;base64,${res.response.data.document}`}
           />
           <div className="px-5">
-            <button
-              onClick={() =>
-                res.response.data.mfa === "FR"
-                  ? setopenFRModal(true)
-                  : setOtpModal(true)
-              }
-              className="bg-primary btn md:mx-auto md:block md:w-1/4 my-10 text-white font-poppins w-full mx-auto rounded-sm h-9"
-            >
-              TANDA TANGANI
-            </button>
+            {res.response.data.document && (
+              <button
+                onClick={() =>
+                  res.response.data.mfa === "FR"
+                    ? setopenFRModal(true)
+                    : setOtpModal(true)
+                }
+                className="bg-primary btn md:mx-auto md:block md:w-1/4 my-5 text-white font-poppins w-full mx-auto rounded-sm h-9"
+              >
+                TANDA TANGANI
+              </button>
+            )}
           </div>
         </div>
       )}
@@ -381,7 +383,7 @@ const OTPModal: React.FC<Active> = ({ modal, setModal }) => {
           placeholder=""
           size="lg"
           values={values as typeof values}
-          onChange={(values) => setValues(values)}
+          onChange={(values : any) => setValues(values)}
         />
         <button
           onClick={() => setModal(!modal)}
