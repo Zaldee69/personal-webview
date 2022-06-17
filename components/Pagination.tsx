@@ -55,9 +55,7 @@ const Pagination: React.FC<Props> = ({
   };
   return (
     <div
-      className={`${
-        zoomCount > 1 ? "bottom-24 fixed" : "bottom-5 absolute"
-      } ${!isShow ? "opacity-0" : "opacity-100"} transition-all duration-500 flex justify-center w-full  left-0 right-0`}
+      className={` ${!isShow ? "opacity-0" : "opacity-100"} bottom-20 fixed transition-all duration-500 flex justify-center w-full  left-0 right-0`}
     >
       <div className=" w-64 h-10 flex justify-center rounded py-1  bg-[#424242]">
         <div className="flex items-center gap-1">
