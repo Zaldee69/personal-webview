@@ -366,7 +366,7 @@ const ChooseScratchModal: React.FC<Active> = ({ modal, setModal }) => {
 };
 
 const OTPModal: React.FC<Active> = ({ modal, setModal }) => {
-  const [values, setValues] = useState<any>(["", "", "", "", "", ""]);
+  const [values, setValues] = useState(["", "", "", "", "", ""]);
   return modal ? (
     <div
       style={{ backgroundColor: "rgba(0, 0, 0, .5)" }}
@@ -382,8 +382,8 @@ const OTPModal: React.FC<Active> = ({ modal, setModal }) => {
         <PinInput
           placeholder=""
           size="lg"
-          values={values as typeof values}
-          onChange={(values : any) => setValues(values)}
+          values={values}
+          onChange={(value, index, values) => setValues(values)}
         />
         <button
           onClick={() => setModal(!modal)}
@@ -399,5 +399,6 @@ const OTPModal: React.FC<Active> = ({ modal, setModal }) => {
         </button>
       </div>
     </div>
+
   ) : null;
 };
