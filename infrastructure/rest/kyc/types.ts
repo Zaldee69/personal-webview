@@ -24,3 +24,16 @@ export type TKycFinalFormResponseData = {
     status: string;
   };
 };
+
+export type TKycGenerateActionRequestData = {
+  registerId: string
+}
+
+export type TKycVerificationRequestData = {
+  registerId: string
+  mode: string
+  image_selfie: string
+  image_action1: string
+  image_action2: string
+  image_action3: string
+}

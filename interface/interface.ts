@@ -29,6 +29,10 @@ export type TLoginProps = {
   company_id? : string
 };
 
+export type TImagesPayload = {
+  step: string
+  action: string
+}
 export type TDocumentResponse = {
   response: {
     success: string;
