@@ -38,7 +38,7 @@ export const Viewer: React.FC<Props> = ({ url, setTotalPages }) => {
    iddleTimer = setTimeout(() => {
       setIsShowPagination(false)
       iddleState = true
-    }, 2000)
+    }, 3000)
   }
 
   if(typeof window !== "undefined"){
