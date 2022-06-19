@@ -259,7 +259,7 @@ const Form: React.FC = () => {
               className="font-poppins px-2 text-label font-light"
               htmlFor="password"
             >
-              Password
+              Kata Sandi
             </label>
             <div className="relative">
               <input
@@ -328,11 +328,13 @@ const Form: React.FC = () => {
             />
             <label className="ml-2 text-neutral font-poppins " htmlFor="tnc">
               Saya setuju dengan{" "}
-              <a className="text-primary">
-                CP/CPS, Kebijakan Jaminan, Kebijakan Privasi,
-              </a>{" "}
+              <span className="text-primary">
+                <a href="https://repository.tilaka.id/CP_CPS.pdf" target="blank" >CP/CPS</a>,
+                <a href="https://repository.tilaka.id/kebijakan-jaminan.pdf" target="_blank" >Kebijakan Jaminan</a>,
+                <a href="https://repository.tilaka.id/kebijakan-privasi.pdf" target="_blank" >Kebijakan Privasi</a>,
+              </span>
               dan
-              <a className="text-primary"> Perjanjian Pemilik Sertifikat</a>
+              <a target="blank" href="https://repository.tilaka.id/perjanjian-pemilik-sertifikat.pdf" className="text-primary"> Perjanjian Pemilik Sertifikat</a>
             </label>
           </div>
           <button
