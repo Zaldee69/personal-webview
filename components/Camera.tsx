@@ -1,5 +1,6 @@
 import Webcam from "react-webcam";
-import { useRef, useCallback, useEffect, useState } from "react";
+import React from 'react'
+import { useRef, useEffect, useState } from "react";
 import CircularProgressBar from "./CircularProgressBar";
 
 let result: any;
@@ -31,8 +32,8 @@ const Camera: React.FC<Props> = ({
     facingMode: "user",
   };
 
-  const captureButtonRef = useRef(null);
-  const webcamRef = useRef(null);
+  const captureButtonRef = useRef<HTMLButtonElement>(null);
+  const webcamRef = useRef<Webcam | null>(null);
   const _isMounted = useRef(true);
 
 
@@ -43,6 +44,8 @@ const Camera: React.FC<Props> = ({
   const [isCurrentStepDone, setIsCurrentStepDone] = useState(false);
   const [successState, setIsSuccessState] = useState(false);
   const [image, setImage] = useState("");
+  const [images, setImages] = useState({});
+
 
 
   const isIndexDone = async (i: any) => {
@@ -195,7 +198,7 @@ const Camera: React.FC<Props> = ({
     try {
       const devices = await navigator.mediaDevices.enumerateDevices();
       const videoInputs = [];
-      Object.keys(devices).forEach((key) => {
+      Object.keys(devices).forEach((key: any) => {
         if (devices[key].kind === "videoinput") {
           videoInputs.push(devices[key]);
         }
@@ -219,20 +222,18 @@ const Camera: React.FC<Props> = ({
   };
 
   const setImagesToPool = async () => {
-    const image = await webcamRef.current?.getScreenshot();
+    const image: any = await webcamRef.current?.getScreenshot();
+    setImages({
+      value: image,
+      step: currentStep,
+      action: currentActionState,
+    })
 
-    await dispatch(
-      setImages({
-        value: image,
-        step: currentStep,
-        action: currentActionState,
-      })
-    );
   };
 
-  const capture = async (e) => {
+  const capture = async (e: any) => {
     e.preventDefault();
-    retakeButton && image !== "" ? null : await setImagesToPool();
+    await setImagesToPool();
     if (currentStep === "Liveness Detection" || currentStep === "Issue Liveness Detection") {
       setCurrentActionIndex(++currentActionIndex);
       if (currentActionIndex > actionsState.length - 1) {
@@ -247,7 +248,7 @@ const Camera: React.FC<Props> = ({
       }
     } else {
       if (image == "") {
-        const image = await webcamRef.current.getScreenshot();
+        const image: any = await webcamRef?.current?.getScreenshot();
         setImage(image)
         setIsCurrentStepDone(true);
         webcamRef.current = null;
@@ -265,6 +266,7 @@ const Camera: React.FC<Props> = ({
         style={{ height: "350px", objectFit: "cover" }}
         className="mt-10 rounded-md sm:w-full md:w-full"
         audio={false}
+        ref={webcamRef}
         height={720}
         screenshotFormat="image/jpeg"
         width={1280}
