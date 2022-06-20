@@ -225,10 +225,10 @@ function SettingSignatureAndMFA({}: Props) {
           </div>
           <p className="text-xs text-blue500 ml-4">
             Untuk meningkatkan keamanan, diperlukan{" "}
-            <i>Multi Factor Authentication</i>
-            yang harus Anda gunakan saat melakukan aktivitas tandatangan digital
-            ataupun aktivitas lainnya di tilaka.id. Silakan pilih metode MFA
-            yang sesuai dengan kenyamanan Anda.
+            <i>Multi Factor Authentication</i> yang harus Anda gunakan saat
+            melakukan aktivitas tandatangan digital ataupun aktivitas lainnya di
+            tilaka.id. Silakan pilih metode MFA yang sesuai dengan kenyamanan
+            Anda.
           </p>
         </div>
         <div className="mt-6">
