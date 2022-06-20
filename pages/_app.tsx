@@ -16,8 +16,9 @@ type TcontextClass = {
 };
 
 const contextClass: TcontextClass = {
-  success: "bg-success text-white",
-  error: "bg-red50 text-neutral800 border border-red75",
+  success:
+    "Toastify__toast-success bg-green50 text-neutral800 border border-green200",
+  error: "Toastify__toast-error bg-red50 text-neutral800 border border-red75",
   info: "bg-primary text-white",
   warning: "bg-warning text-neutral800",
   default: "bg-white text-neutral800",

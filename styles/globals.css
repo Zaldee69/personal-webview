@@ -133,3 +133,13 @@ input[type="checkbox"] {
   gap: 5px;
   margin-top: 10px;
 }
+
+/* override react toastify style */
+
+.Toastify__toast-success .Toastify__toast-icon {
+  color: #57D9A3;
+}
+
+.Toastify__toast-error .Toastify__toast-icon {
+  color: #FF5630;
+}
