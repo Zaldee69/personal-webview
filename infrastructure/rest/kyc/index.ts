@@ -6,7 +6,9 @@ import {
   TKycFinalFormRequestData,
   TKycFinalFormResponseData,
   TKycGenerateActionRequestData,
-  TKycVerificationRequestData
+  TKycGenerateActionResponseData,
+  TKycVerificationRequestData,
+  TKycVerificationResponseData
 } from "./types";
 
 const BASE_URL =
@@ -54,27 +56,31 @@ export const RestKycFinalForm = ({
 
 export const  RestKycGenerateAction =(
   body: TKycGenerateActionRequestData
-): Promise<any> {
+): Promise<TKycGenerateActionResponseData> => {
   return axios
-    .post(`${BASE_URL}/api/kyc/generateaction`, body, {
+    .post<TKycGenerateActionResponseData>(`${BASE_URL}/api/kyc/generateaction`, body, {
       headers: {
         'Content-Type': 'application/json',
       },
     })
-    .then((res: any) => ({ res }))
-    .catch((err: any) => ({ err: err }))
+    .then((res) => res.data)
+    .catch((err) => {
+      throw err;
+    })
 }
 
 export const RestKycVerification = (
   body: TKycVerificationRequestData
-): Promise<any> {
+): Promise<TKycVerificationResponseData> => {
   return axios
-    .post(`${BASE_URL}/api/kyc/verification`, body, {
+    .post<TKycVerificationResponseData>(`${BASE_URL}/api/kyc/verification`, body, {
       headers: {
-        Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+        Authorization: `Bearer ${localStorage.getItem("kyc_checkstep_token")}`,
         "Content-Type": "application/json"
       }
     })
-    .then((res: any) => ({ res }))
-    .catch((err: any) => ({ err: err }))
+    .then((res) =>  res.data )
+    .catch((err) => { 
+      throw err;
+     })
 }
