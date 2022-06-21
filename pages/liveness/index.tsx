@@ -16,16 +16,16 @@ const Liveness = () => {
   const router = useRouter()
   const routerQuery = router.query
 
-  let [actionsState, setActionState] = useState([])
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSuccessState, setIsSuccessState] = useState(false);
-  const [isVerification, setIsVerification] = useState(false);
+  let [actionsState, setActionState] = useState<string[]>([])
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isSuccessState, setIsSuccessState] = useState<boolean>(false);
+  const [isVerification, setIsVerification] = useState<boolean>(false);
 
   const dispatch = useDispatch();
 
   const generateAction = () => {
     const body = {
-      registerId: routerQuery.uuid as string
+      registerId: routerQuery.registerId as string
     }
     toast(`Mengecek status...`, {
       type: 'info',
@@ -36,15 +36,15 @@ const Liveness = () => {
     RestKycGenerateAction(body).then((res) => {
       if (res?.data) {
         setActionState(res.data.actionList)
-        toast(`${res.data.message}`, {
+        toast(`${res.message}`, {
           type: 'success',
           position: 'top-center',
           autoClose: 3000,
         })
         toast.dismiss('generateAction')
-        router.push('/liveness')
+        // router.push('/liveness')
       } else {
-        throw new Error(res.err?.response?.data?.message)
+        throw new Error(res.message)
       }
     }).catch((err) => {
       toast.dismiss('generateAction')
@@ -62,9 +62,7 @@ const Liveness = () => {
     })
   }
 
-  generateAction()
-
-  const changePage = async (e) => {
+  const changePage = async (e: React.SyntheticEvent) => {
     e.preventDefault();
 
     try {
@@ -78,28 +76,34 @@ const Liveness = () => {
         image_action3: "",
         image_selfie: ""
       };
-      const imageActions = images.filter(
-        (image) =>
-          image.step === "Liveness Detection" &&
-          image.action !== "Look Straight"
-      );
-      imageActions.forEach((image, index) => {
-        body[`image_action${++index}`] = image.value;
-      });
-      const imageSelfie = images.filter(
-        (image) => image.action === "Look Straight"
-      )[0];
 
-      body.image_selfie = imageSelfie.value;
+      //============ START Error: Cannot find name 'images'
+
+      // const imageActions = images.filter(
+      //   (image) =>
+      //     image.step === "Liveness Detection" &&
+      //     image.action !== "Look Straight"
+      // );
+      // imageActions.forEach((image, index) => {
+      //   body[`image_action${++index}`] = image.value;
+      // });
+      // const imageSelfie = images.filter(
+      //   (image) => image.action === "Look Straight"
+      // )[0];
+
+      // body.image_selfie = imageSelfie.value;
+
+      //============ END Error: Cannot find name 'images'
+
 
       const result = await RestKycVerification(body);
-      const status = result.data.data.status;
-      if (result.data.success) {
+      const status = result.data.status;
+      if (result.success) {
         removeStorage();
         router.push({ pathname: "/form", query: { registerId: router.query.registerId } });
       } else {
         if (status !== "E" && status !== "F") {
-          if (sessionStorage.getItem("tlk-reg-id") === router.query.registerId && parseInt(sessionStorage.getItem("tlk-counter")) >= 2) {
+          if (sessionStorage.getItem("tlk-reg-id") === router.query.registerId && parseInt(sessionStorage.getItem("tlk-counter") as string) >= 2) {
             setIsSuccessState(false);
             router.push({ pathname: "/liveness-fail", query: { registerId: router.query.registerId } });
             removeStorage();
@@ -138,6 +142,10 @@ const Liveness = () => {
     sessionStorage.removeItem("tlk-failing");
   }
 
+  useEffect(() => {
+    if(!router.isReady) return
+    generateAction()
+  }, [router.isReady])
 
   return (
     <>

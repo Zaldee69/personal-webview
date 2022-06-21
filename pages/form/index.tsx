@@ -354,6 +354,7 @@ const Form: React.FC = () => {
                 <a
                   href="https://repository.tilaka.id/kebijakan-jaminan.pdf"
                   target="_blank"
+                  rel="noreferrer"
                 >
                   Kebijakan Jaminan
                 </a>
@@ -361,6 +362,7 @@ const Form: React.FC = () => {
                 <a
                   href="https://repository.tilaka.id/kebijakan-privasi.pdf"
                   target="_blank"
+                  rel="noreferrer"
                 >
                   Kebijakan Privasi
                 </a>
