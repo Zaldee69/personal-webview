@@ -8,6 +8,8 @@ import EyeIcon from "../../public/icons/EyeIcon";
 import EyeIconOff from "./../../public/icons/EyeIconOff";
 import QuestionIcon from "./../../public/icons/QuestionIcon";
 import Head from "next/head";
+import XIcon from "@/public/icons/XIcon";
+import CheckOvalIcon from "@/public/icons/CheckOvalIcon";
 interface InputType {
   password: string | number;
   confirmPassword: string | number;
@@ -159,21 +161,26 @@ const Form: React.FC = () => {
       .then((res) => {
         if (res.success) {
           toast.dismiss("kycCheckStepRequestToast");
-          toast.success(res?.message || "berhasil");
+          toast.success(res?.message || "berhasil", {
+            icon: <CheckOvalIcon />,
+          });
           router.replace({ pathname: router.pathname + "/success" });
         } else {
           toast.dismiss("kycCheckStepRequestToast");
-          toast.error(res?.message || "gagal");
+          toast.error(res?.message || "gagal", { icon: <XIcon /> });
         }
       })
       .catch((err) => {
         toast.dismiss("kycCheckStepRequestToast");
         if (err.response?.data?.data?.errors?.[0]) {
           toast.error(
-            `${err.response?.data?.message}, ${err.response?.data?.data?.errors?.[0]}`
+            `${err.response?.data?.message}, ${err.response?.data?.data?.errors?.[0]}`,
+            { icon: <XIcon /> }
           );
         } else {
-          toast.error(err.response?.data?.message || "gagal");
+          toast.error(err.response?.data?.message || "gagal", {
+            icon: <XIcon />,
+          });
         }
       });
   };
@@ -186,18 +193,26 @@ const Form: React.FC = () => {
       .then((res) => {
         if (res.success) {
           toast.dismiss("kycCheckStepRequestToast");
-          toast.success(res?.message || "pengecekan step berhasil");
+          toast.success(res?.message || "pengecekan step berhasil", {
+            icon: <CheckOvalIcon />,
+          });
         } else {
           toast.dismiss("kycCheckStepRequestToast");
-          toast.error(res?.message || "pengecekan step tidak sukses");
+          toast.error(res?.message || "pengecekan step tidak sukses", {
+            icon: <XIcon />,
+          });
         }
       })
       .catch((err) => {
         toast.dismiss("kycCheckStepRequestToast");
         if (err.response?.data?.data?.errors?.[0]) {
-          toast.error(err.response?.data?.data?.errors?.[0]);
+          toast.error(err.response?.data?.data?.errors?.[0], {
+            icon: <XIcon />,
+          });
         } else {
-          toast.error(err.response?.data?.message || "pengecekan step gagal");
+          toast.error(err.response?.data?.message || "pengecekan step gagal", {
+            icon: <XIcon />,
+          });
         }
       });
   }, [router.isReady, registerId]);
@@ -329,12 +344,37 @@ const Form: React.FC = () => {
             <label className="ml-2 text-neutral font-poppins " htmlFor="tnc">
               Saya setuju dengan{" "}
               <span className="text-primary">
-                <a href="https://repository.tilaka.id/CP_CPS.pdf" target="blank" >CP/CPS</a>,
-                <a href="https://repository.tilaka.id/kebijakan-jaminan.pdf" target="_blank" >Kebijakan Jaminan</a>,
-                <a href="https://repository.tilaka.id/kebijakan-privasi.pdf" target="_blank" >Kebijakan Privasi</a>,
+                <a
+                  href="https://repository.tilaka.id/CP_CPS.pdf"
+                  target="blank"
+                >
+                  CP/CPS
+                </a>
+                ,
+                <a
+                  href="https://repository.tilaka.id/kebijakan-jaminan.pdf"
+                  target="_blank"
+                >
+                  Kebijakan Jaminan
+                </a>
+                ,
+                <a
+                  href="https://repository.tilaka.id/kebijakan-privasi.pdf"
+                  target="_blank"
+                >
+                  Kebijakan Privasi
+                </a>
+                ,
               </span>
               dan
-              <a target="blank" href="https://repository.tilaka.id/perjanjian-pemilik-sertifikat.pdf" className="text-primary"> Perjanjian Pemilik Sertifikat</a>
+              <a
+                target="blank"
+                href="https://repository.tilaka.id/perjanjian-pemilik-sertifikat.pdf"
+                className="text-primary"
+              >
+                {" "}
+                Perjanjian Pemilik Sertifikat
+              </a>
             </label>
           </div>
           <button
