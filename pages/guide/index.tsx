@@ -29,7 +29,7 @@ const Guide = () => {
             />
             <img
               alt="right-guide"
-              src="/images/right.svg"
+              src="/images/Right.svg"
               width={30}
               height={30}
             />
@@ -43,7 +43,7 @@ const Guide = () => {
             />
             <img
               alt="wrong-guide"
-              src="/images/wrong.svg"
+              src="/images/Wrong.svg"
               width={30}
               height={30}
             />
