@@ -29,6 +29,14 @@ export type TKycGenerateActionRequestData = {
   registerId: string
 }
 
+export type TKycGenerateActionResponseData = {
+  success: boolean;
+  message: string;
+  data: {
+    actionList: string[];
+  };
+};
+
 export type TKycVerificationRequestData = {
   registerId: string
   mode: string
@@ -37,3 +45,15 @@ export type TKycVerificationRequestData = {
   image_action2: string
   image_action3: string
 }
+
+export type TKycVerificationResponseData = {
+  success: boolean;
+  message: string;
+  data: {
+    nik: string;
+    name: string;
+    email: string;
+    companyname: string;
+    status: string;
+  };
+};
