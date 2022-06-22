@@ -6,73 +6,88 @@ import Pagination from "./Pagination";
 
 interface Props {
   url: any;
+  tandaTangan: any;
   setTotalPages: Dispatch<SetStateAction<number>>;
 }
-export const Viewer: React.FC<Props> = ({ url, setTotalPages }) => {
+export const Viewer: React.FC<Props> = ({ url, setTotalPages, tandaTangan }) => {
   const { pages } = useDocument({
     url: url,
   });
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [pdfDisplayed, setPdfDisplayed] = useState<number>(2);
   const [zoomCount, setZoomCount] = useState<number>(1);
-  const [isShowPagination, setIsShowPagination] = useState<boolean>(true)
+  const [isShowPagination, setIsShowPagination] = useState<boolean>(true);
 
   const indexOfLastPdf = currentPage * 2;
   const indexOfFirstPdf = indexOfLastPdf - 2;
   const currentPages = pages.slice(indexOfFirstPdf, indexOfLastPdf);
 
   let iddleState = false;
-  let iddleTimer : any
+  let iddleTimer: any;
 
   useEffect(() => {
-    setTotalPages(pages.length);
-    showPagination()
-  }, []);
+    if(pages){
+      setTotalPages(pages.length);
+    }
+  }, [pages.length]);
+
+  useEffect(() => {
+    showPagination();
+  },[])
 
   const showPagination = () => {
-    clearTimeout(iddleTimer)
-    if(iddleState){
-      setIsShowPagination(true)
+    clearTimeout(iddleTimer);
+    if (iddleState) {
+      setIsShowPagination(true);
     }
-   iddleState = false
-   iddleTimer = setTimeout(() => {
-      setIsShowPagination(false)
-      iddleState = true
-    }, 3000)
-  }
+    iddleState = false;
+    iddleTimer = setTimeout(() => {
+      setIsShowPagination(false);
+      iddleState = true;
+    }, 4000);
+  };
 
-  if(typeof window !== "undefined"){
+  if (typeof window !== "undefined") {
     window.addEventListener("scroll", () => {
-      showPagination()
-    })
+      showPagination();
+    });
   }
 
   return (
-    <div className="mt-9 relative overflow-auto w-full">
-      <div
-        style={{
-          transform: `matrix(${zoomCount}, 0, 0, ${zoomCount}, 0, 0)`,
-          transformOrigin: "top left",
-          transition: "all .3s",
-        }}
-        className="content-parent "
-      >
-        <Signature />
+    <div className=" relative overflow-auto w-full">
+      <div className="w-fit mx-auto h-fit pt-14" >
+        {
+          tandaTangan ? <Signature /> : null
+        }
         {currentPages.map((canvasURL, idx) => {
-          return <img className="mt-5 shadow-xl" src={canvasURL} key={idx} />;
+          return (
+            <div onClick={showPagination} onTouchStart={showPagination} className="relative flex flex-col items-center">
+              <img
+                style={{
+                  transform: `matrix(${zoomCount}, 0, 0, ${zoomCount}, 0, 0)`,
+                  transformOrigin: "top left",
+                  transition: "all .3s",
+                }}
+                className=" shadow-xl"
+                src={canvasURL}
+                key={idx + 1}
+              />
+              ;
+              <Pagination
+                currentPage={currentPage}
+                currentPages={currentPages.length}
+                setCurrentPage={setCurrentPage}
+                totalPages={pages.length}
+                pdfDisplayed={pdfDisplayed}
+                setPdfDisplayed={setPdfDisplayed}
+                zoomCount={zoomCount}
+                setZoomCount={setZoomCount}
+                isShow={isShowPagination}
+              />
+            </div>
+          );
         })}
       </div>
-          <Pagination
-            currentPage={currentPage}
-            currentPages={currentPages.length}
-            setCurrentPage={setCurrentPage}
-            totalPages={pages.length}
-            pdfDisplayed={pdfDisplayed}
-            setPdfDisplayed={setPdfDisplayed}
-            zoomCount={zoomCount}
-            setZoomCount={setZoomCount}
-            isShow={isShowPagination}
-          />
     </div>
   );
 };
@@ -83,6 +98,7 @@ const Signature = () => {
     <div
       style={{
         transform: `translate(${res.response.data.posX}px,${res.response.data.posY}px)`,
+        zIndex: "2",
       }}
       className="absolute"
     >
@@ -95,8 +111,8 @@ const Signature = () => {
         className=" relative border-[#1A73E8] handle "
       >
         <img
-          style={{ touchAction: "none", width: `${100}px`, height: `${50}px` }}
-          src="/images/download.png"
+          style={{ touchAction: "none", width: `${res.response.data.width}px`, height: `${res.response.data.height}px` }}
+          src={`data:image/png;base64,${res.response.data.tandaTangan.replaceAll('"', '')}`}
           alt="signature"
         />
         <div

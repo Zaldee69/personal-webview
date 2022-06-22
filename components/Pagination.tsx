@@ -55,7 +55,7 @@ const Pagination: React.FC<Props> = ({
   };
   return (
     <div
-      className={` ${!isShow ? "opacity-0" : "opacity-100"} bottom-20 fixed transition-all duration-500 flex justify-center w-full  left-0 right-0`}
+      className={`${!isShow ? "hidden" : "flex"}  bottom-10 absolute transition-all duration-500  justify-center w-full  left-0 right-0`}
     >
       <div className=" w-64 h-10 flex justify-center rounded py-1  bg-[#424242]">
         <div className="flex items-center gap-1">
@@ -75,7 +75,7 @@ const Pagination: React.FC<Props> = ({
             style={{ paddingTop: 5, paddingBottom: 6 }}
             className="text-white px-5 font-poppins block text-sm  bg-[#616161]"
           >
-            {pdfDisplayed}
+            {totalPages}
           </p>
           <button
             disabled={currentPage >= totalPages / 2}
