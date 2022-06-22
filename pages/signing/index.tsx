@@ -6,7 +6,6 @@ import { AppDispatch, RootState } from "@/redux/app/store";
 import { TDocumentProps } from "@/interface/interface";
 import { PinInput } from "react-input-pin-code";
 import {
-  ChangeEvent,
   Dispatch,
   SetStateAction,
   useEffect,
@@ -42,7 +41,7 @@ const Signing = () => {
   const [openFRModal, setopenFRModal] = useState<boolean>(false);
   const [openScratchesModal, setOpenScratchesModal] = useState<boolean>(false);
   const [selectFontModal, setSelectFontModal] = useState<boolean>(false);
-  const [otpModal, setOtpModal] = useState<boolean>(false);
+  const [otpModal, setOtpModal] = useState<boolean>(true);
   const router = useRouter();
   const routerIsReady = router.isReady;
   const pathname = router.pathname;
@@ -53,6 +52,12 @@ const Signing = () => {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
+    if (routerIsReady){
+      dispatch(getDocument({ company_id, transaction_id } as TDocumentProps));
+      if(res.response.status === "REJECTED"){
+        localStorage.removeItem("token")
+      }
+    }
     if (!token) {
       router.replace({
         pathname: "/login",
@@ -60,8 +65,6 @@ const Signing = () => {
       });
     }
     setAuthToken({ token, pathname } as Props);
-    if (routerIsReady)
-      dispatch(getDocument({ company_id, transaction_id } as TDocumentProps));
   }, [routerIsReady]);
 
   return (
@@ -85,7 +88,7 @@ const Signing = () => {
           <Footer />
         </>
       ) : (
-        <div className=" pt-8 sm:w-full bg-[#f4f5f7] md:w-4/5 relative  mx-auto">
+        <div className=" pt-8 pb-10 sm:w-full bg-[#f4f5f7] h-full relative  mx-auto">
           {" "}
           <FRModal modal={openFRModal} setModal={setopenFRModal} />
           <Configuration
@@ -106,8 +109,9 @@ const Signing = () => {
           <Viewer
             setTotalPages={setTotalPages}
             url={`{data:application/pdf;base64,${res.response.data.document}`}
+            tandaTangan={res.response.data.tandaTangan}
           />
-          <div className="px-5">
+          <div className="px-5 fixed w-full flex justify-center items-center bottom-0">
             {res.response.data.document && (
               <button
                 onClick={() =>
@@ -115,7 +119,7 @@ const Signing = () => {
                     ? setopenFRModal(true)
                     : setOtpModal(true)
                 }
-                className="bg-primary btn md:mx-auto md:block md:w-1/4 my-5 text-white font-poppins w-full mx-auto rounded-sm h-9"
+                className="bg-primary  btn  md:w-1/4 my-5 text-white font-poppins w-full mx-5 rounded-sm h-9"
               >
                 TANDA TANGANI
               </button>
@@ -180,7 +184,7 @@ const FRModal: React.FC<Active | any> = ({ modal, setModal }) => {
       style={{ backgroundColor: "rgba(0, 0, 0, .5)" }}
       className="fixed z-50 flex items-start transition-all duration-1000 justify-center w-full left-0 top-0 h-full "
     >
-      <div className="bg-white mt-20 pt-5 px-2 pb-3 rounded-md w-full mx-5 ">
+      <div className="bg-white max-w-md mt-20 pt-5 px-2 pb-3 rounded-md w-full mx-5 ">
         {isFRSuccess ? (
           <div className="flex flex-col  items-center">
             <p className="font-poppins block text-center  whitespace-nowrap  font-semibold ">
@@ -234,7 +238,7 @@ const ChooseFontModal: React.FC<Active> = ({ modal, setModal }) => {
       style={{ backgroundColor: "rgba(0, 0, 0, .5)" }}
       className="fixed z-50 flex items-start transition-all duration-1000 justify-center w-full left-0 top-0 h-full "
     >
-      <div className="bg-white mt-20 pt-5 px-2 pb-3 rounded-md w-full mx-2">
+      <div className="bg-white max-w-md mt-20 pt-5 px-2 pb-3 rounded-md w-full mx-2">
         <p className="font-poppins block text-center  whitespace-nowrap  font-semibold ">
           Pilih Font
         </p>
@@ -343,7 +347,7 @@ const ChooseScratchModal: React.FC<Active> = ({ modal, setModal }) => {
       style={{ backgroundColor: "rgba(0, 0, 0, .5)" }}
       className="fixed z-50 flex items-start transition-all duration-1000 justify-center w-full left-0 top-0 h-full "
     >
-      <div className="bg-white mt-20 pt-5 px-2 pb-3 rounded-md w-full mx-2">
+      <div className="bg-white max-w-md mt-20 pt-5 px-2 pb-3 rounded-md w-full mx-2">
         <p className="font-poppins block text-center  whitespace-nowrap  font-semibold ">
           Goresan
         </p>
@@ -372,7 +376,7 @@ const OTPModal: React.FC<Active> = ({ modal, setModal }) => {
       style={{ backgroundColor: "rgba(0, 0, 0, .5)" }}
       className="fixed z-50 flex items-start transition-all duration-1000 pb-3 justify-center w-full left-0 top-0 h-full "
     >
-      <div className="bg-white max-w-xl mt-20 pt-5 px-2 pb-3 rounded-md w-full mx-5">
+      <div className="bg-white max-w-md mt-20 pt-5 px-2 pb-3 rounded-md w-full mx-5">
         <p className="font-poppins block text-center pb-5  whitespace-nowrap  font-semibold ">
           Goresan
         </p>

@@ -3,14 +3,30 @@ interface GetDocumentPagesOptions {
   url: string;
 }
 
+const BASE64_MARKER = ';base64,';
+
+function convertDataURIToBinary(dataURI : string) {
+  let base64Index = dataURI.indexOf(BASE64_MARKER) + BASE64_MARKER.length;
+  let base64 = dataURI.substring(base64Index);
+  let raw = window.atob(base64);
+  let rawLength = raw.length;
+  let array = new Uint8Array(new ArrayBuffer(rawLength));
+
+  for(let i = 0; i < rawLength; i++) {
+    array[i] = raw.charCodeAt(i);
+  }
+  return array;
+}
+
 export default async ({
   scale = 1,
   url,
 }: GetDocumentPagesOptions): Promise<Array<string>> => {
   const PDFJS = window.pdfjsLib;
+  const pdfAsArray = convertDataURIToBinary(url)
 
   // First, we need to load the document using the getDocument utility
-  const loadingTask = PDFJS.getDocument(url);
+  const loadingTask = PDFJS.getDocument(pdfAsArray);
   const pdf = await loadingTask.promise;
 
   const { numPages } = pdf;

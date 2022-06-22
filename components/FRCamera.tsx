@@ -16,7 +16,7 @@ const FRCamera = () => {
 
   return (
     <Webcam
-      style={{height: "350px", objectFit: "cover"}}
+      style={{height: "280px", objectFit: "cover"}}
       className="mt-4 rounded-md sm:w-full md:w-full"
       audio={false}
       height={720}
