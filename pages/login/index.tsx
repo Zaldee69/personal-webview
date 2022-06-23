@@ -92,7 +92,7 @@ const Login = () => {
                 value={password}
                 name="password"
                 type={type.password}
-                placeholder="Masukkkan Kata Sandi"
+                placeholder="Masukkan Kata Sandi"
                 className={`font-poppins py-3 focus:outline-none border-borderColor focus:ring  placeholder:text-placeholder placeholder:font-light px-2 rounded-md border w-full`}
               />
               <button

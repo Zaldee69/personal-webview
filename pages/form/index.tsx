@@ -258,7 +258,7 @@ const Form: React.FC = () => {
               name="tilakaName"
               autoComplete="off"
               type="text"
-              placeholder="Masukkkan Tilaka Name"
+              placeholder="Masukkan Tilaka Name"
               className={`font-poppins py-3 focus:outline-none  placeholder:text-placeholder placeholder:font-light   px-2 rounded-md border border-borderColor ${
                 error.tilakaName
                   ? "border-error "
