@@ -384,6 +384,8 @@ const OTPModal: React.FC<Active> = ({ modal, setModal }) => {
           Masukkan 6 digit OTP
         </span>
         <PinInput
+          containerStyle={{alignItems : "center", gap : 5, marginTop: "10px"}}
+          inputStyle={{alignItems : "center", gap : 5, marginTop: "10px"}}
           placeholder=""
           size="lg"
           values={values}

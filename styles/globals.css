@@ -128,11 +128,12 @@ input[type="checkbox"] {
 }
 
 
-.kfAyjk {
+.kfAyjk, .sc-bczRLJ, .hqAQls {
   justify-content: center;
   gap: 5px;
   margin-top: 10px;
 }
+
 
 /* override react toastify style */
 
