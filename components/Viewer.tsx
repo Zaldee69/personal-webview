@@ -61,7 +61,7 @@ export const Viewer: React.FC<Props> = ({ url, setTotalPages, tandaTangan }) => 
         }
         {currentPages.map((canvasURL, idx) => {
           return (
-            <div onClick={showPagination} onTouchStart={showPagination} className="relative flex flex-col items-center">
+            <div key={idx} onClick={showPagination} onTouchStart={showPagination} className="relative flex flex-col items-center">
               <img
                 style={{
                   transform: `matrix(${zoomCount}, 0, 0, ${zoomCount}, 0, 0)`,
@@ -70,7 +70,7 @@ export const Viewer: React.FC<Props> = ({ url, setTotalPages, tandaTangan }) => 
                 }}
                 className=" shadow-xl"
                 src={canvasURL}
-                key={idx + 1}
+                
               />
               ;
               <Pagination
