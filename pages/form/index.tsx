@@ -281,7 +281,7 @@ const Form: React.FC = () => {
                 onChange={(e) => onChangeHandler(e)}
                 name="password"
                 type={type.password}
-                placeholder="Masukkkan Kata Sandi"
+                placeholder="Masukkan Kata Sandi"
                 className={`font-poppins py-3 focus:outline-none  placeholder:text-placeholder placeholder:font-light  px-2 rounded-md border  w-full ${
                   error.password
                     ? "border-error "
@@ -311,7 +311,7 @@ const Form: React.FC = () => {
                 onChange={(e) => onChangeHandler(e)}
                 name="confirmPassword"
                 type={type.confirmPassword}
-                placeholder="Masukkkan Konfirmasi Kata Sandi"
+                placeholder="Masukkan Konfirmasi Kata Sandi"
                 className={`font-poppins py-3 focus:outline-none  placeholder:text-placeholder placeholder:font-light  px-2 rounded-md border border-borderColor w-full ${
                   error.confirmPassword
                     ? "border-error "
