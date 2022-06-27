@@ -10,6 +10,7 @@ import {
   SetStateAction,
   useEffect,
   useState,
+  useRef
 } from "react";
 import Image from "next/image";
 import Head from "next/head";
@@ -342,6 +343,7 @@ const ChooseFontModal: React.FC<Active> = ({ modal, setModal }) => {
 };
 
 const ChooseScratchModal: React.FC<Active> = ({ modal, setModal }) => {
+  const sigPad = useRef<any>();
   return modal ? (
     <div
       style={{ backgroundColor: "rgba(0, 0, 0, .5)" }}
@@ -351,7 +353,7 @@ const ChooseScratchModal: React.FC<Active> = ({ modal, setModal }) => {
         <p className="font-poppins block text-center  whitespace-nowrap  font-semibold ">
           Goresan
         </p>
-        <SignaturePad />
+        <SignaturePad sigPad={sigPad} />
         <button
           onClick={() => setModal(!modal)}
           className="bg-primary btn  text-white font-poppins w-full mt-5 mx-auto rounded-sm h-9"
