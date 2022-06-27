@@ -23,13 +23,13 @@ const Guide = () => {
           <div className="flex flex-col items-center space-y-4">
             <img
               alt="guide-1"
-              src="/images/Liveness.svg"
+              src="images/Liveness.svg"
               width={150}
               height={120}
             />
             <img
               alt="right-guide"
-              src="/images/Right.svg"
+              src="images/Right.svg"
               width={30}
               height={30}
             />
@@ -37,13 +37,13 @@ const Guide = () => {
           <div className="flex flex-col items-center space-y-4">
             <img
               alt="guide-2"
-              src="/images/guide1.svg"
+              src="images/guide1.svg"
               width={150}
               height={120}
             />
             <img
               alt="wrong-guide"
-              src="/images/Wrong.svg"
+              src="images/Wrong.svg"
               width={30}
               height={30}
             />
