@@ -11,7 +11,7 @@ function CertificateInformation({}: Props) {
         <img src="/images/certInfo.svg" alt="ill" />
       </div>
       <p className="text-sm text-neutral800">
-        Informasi data pada sertifika Anda
+        Informasi data pada sertifikat Anda
       </p>
       <div className="mt-5">
         <div className="flex items-center">
@@ -42,7 +42,7 @@ function CertificateInformation({}: Props) {
       <p className="text-xs text-neutral800 mt-4 font-normal text-justify">
         Apabila dalam jangka waktu{" "}
         <span className="font-semibold">
-          sembilan hari kalender tidak ada keluhan
+          sembilan hari kalender tidak ada keluhan,
         </span>{" "}
         maka pelanggan dianggap telah menerima bahwa semua informasi yang
         terdapat dalam sertifikat adalah benar.
@@ -53,9 +53,14 @@ function CertificateInformation({}: Props) {
       >
         SESUAI
       </button>
-      <button className="mt-4 p-2.5 text-base text-primary bg-white w-full font-medium rounded-sm border border-primary">
+      <a
+        target="_blank"
+        rel="noreferrer"
+        href="https://cantikatnt.atlassian.net/servicedesk/customer/portal/2/group/8/create/27"
+        className="mt-4 p-2.5 text-base text-primary bg-white w-full font-medium rounded-sm border border-primary inline-block text-center"
+      >
         AJUKAN KOMPLAIN
-      </button>
+      </a>
       <div className="mt-8 flex justify-center">
         <img src="/images/poweredByTilaka.svg" alt="powered-by-tilaka" />
       </div>
