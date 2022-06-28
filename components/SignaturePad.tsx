@@ -4,8 +4,11 @@ import SignatureCanvas from "react-signature-canvas";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/app/store";
 
-const SignaturePad = () => {
-  const sigPad = useRef<any>();
+type Props = {
+  sigPad : React.MutableRefObject<any>
+}
+
+const SignaturePad = ({sigPad} : Props) => {
   const [showInitialSig, setShowInitialSig] = useState(true)
   const res = useSelector((state : RootState) => state.document)
   return (
