@@ -1,6 +1,7 @@
 import Webcam from "react-webcam";
 import React from 'react'
 import { useRef, useEffect, useState } from "react";
+import { assetPrefix } from '../next.config'
 import CircularProgressBar from "./CircularProgressBar";
 
 let result: any;
@@ -71,7 +72,7 @@ const Camera: React.FC<Props> = ({
       const humanConfig = { // user configuration for human, used to fine-tune behavior
         // backend: 'webgl',
         // async: true,
-        modelBasePath: '/models',
+        modelBasePath: assetPrefix ? `${assetPrefix}`  : '/models',
         filter: { enabled: false, equalization: false },
         face: { enabled: true, detector: { rotation: false }, mesh: { enabled: true }, iris: { enabled: false }, description: { enabled: false }, emotion: { enabled: false } },
         body: { enabled: false },
