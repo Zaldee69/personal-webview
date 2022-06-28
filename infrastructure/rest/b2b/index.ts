@@ -5,7 +5,7 @@ import {
   TSetDefaultMFARequestData
 } from "./types";
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://10.117.1.151:8080";
+const BASE_URL = process.env.NEXT_PUBLIC_DS_API_URL || "http://10.117.1.151:8080";
 
 
 export const restSetDefaultSignature = ({
