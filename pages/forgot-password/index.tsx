@@ -11,7 +11,7 @@ type Tform = {
   email?: string;
 };
 
-const ForgotTilakaName = (props: Props) => {
+const ForgotPassword = (props: Props) => {
   const [form, formSetter] = useState<Tform>({});
   const [modalSuccess, modalSuccessSetter] = useState<boolean>(false);
   const [reCaptchaSuccess, reCaptchaSuccessSetter] = useState<boolean>(false);
@@ -44,17 +44,17 @@ const ForgotTilakaName = (props: Props) => {
   return (
     <>
       <Head>
-        <title>Lupa Tilaka Name</title>
+        <title>Lupa Kata Sandi</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
       <div className="px-5 py-9 min-h-screen flex flex-col justify-between">
         <div>
           <p className="font-poppins text-lg font-semibold text-neutral800">
-            Lupa Tilaka Name
+            Lupa Kata Sandi
           </p>
           <div className="flex justify-center mt-6">
             <Image
-              src="/images/forgotTilakaName.svg"
+              src="/images/forgotPassword.svg"
               width="205px"
               height="205px"
             />
@@ -113,7 +113,7 @@ const ForgotTilakaName = (props: Props) => {
   );
 };
 
-export default ForgotTilakaName;
+export default ForgotPassword;
 
 const ModalSuccess: React.FC<{
   modal: boolean;
@@ -132,7 +132,7 @@ const ModalSuccess: React.FC<{
           <Image src="/images/checkCircle.svg" width="53px" height="53px" />
         </div>
         <p className="text-neutral800 text-base font-normal mt-8 font-poppins text-center">
-          Silahkan periksa email Anda untuk melihat informasi Tilaka Name.
+          Silahkan periksa email Anda untuk mereset kata sandi Anda.
         </p>
         <button
           onClick={() => setModal(false)}
