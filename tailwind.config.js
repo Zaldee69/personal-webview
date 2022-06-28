@@ -27,6 +27,7 @@ module.exports = {
       placeholder: "rgba(193, 199, 208, 1)",
       error: "rgba(255, 86, 48, 1)",
       black : "#000",
+      neutral10: '#FAFBFC',
       neutral40: '#DFE1E6',
       neutral50: '#C1C7D0',
       neutral80: '#97A0AF',

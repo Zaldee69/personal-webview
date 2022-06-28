@@ -178,7 +178,7 @@ function SettingSignatureAndMFA({}: Props) {
       <div className="bg-white p-4 font-poppins">
         <form onSubmit={handleFormOnSubmit}>
           <div className="flex justify-center">
-            <img src="/images/ttdSetting.svg" alt="ill" />
+            <img src="images/ttdSetting.svg" alt="ill" />
           </div>
           <p className="text-md text-neutral800">Pilih tipe tanda tangan</p>
           <div className="mt-2 rounded-md bg-blue50 py-2 px-4 flex items-start">
@@ -385,7 +385,7 @@ function SettingSignatureAndMFA({}: Props) {
             LANJUT
           </button>
           <div className="mt-8 flex justify-center">
-            <img src="/images/poweredByTilaka.svg" alt="powered-by-tilaka" />
+            <img src="images/poweredByTilaka.svg" alt="powered-by-tilaka" />
           </div>
         </form>
         <div

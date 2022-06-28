@@ -11,6 +11,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { login } from "@/redux/slices/loginSlice";
 import Head from "next/head";
 import { TLoginProps } from "@/interface/interface";
+import { assetPrefix } from '../../next.config'
 
 type Props = {};
 
@@ -24,7 +25,7 @@ const LinkAccount = (props: Props) => {
   const [showPassword, showPasswordSetter] = useState<boolean>(false);
   const [nikRegistered, nikRegisteredSetter] = useState<boolean>(true);
   const [form, formSetter] = useState<Tform>({ tilaka_name: "", password: "" });
-  const {nik} = router.query;
+  const { nik } = router.query;
   const dispatch: AppDispatch = useDispatch();
   const data = useSelector((state: RootState) => state.login);
 
@@ -48,7 +49,7 @@ const LinkAccount = (props: Props) => {
         password,
         nik,
         tilaka_name,
-        ...router.query
+        ...router.query,
       } as TLoginProps)
     );
   };
@@ -62,11 +63,20 @@ const LinkAccount = (props: Props) => {
     } else if (nik !== data.data.nik) {
       router.replace("/link-account/failure");
     } else if (data.status === "FULLFILLED" && !data.data.status) {
-      toast.error(!data.data.message ? "Error" : data.data?.message[0] === "I" ? "Tilaka name / Kata sandi salah" : data.data.message, {
-        icon: <XIcon />,
-      });
-    }else if (data.status === "REJECTED" ||
-    (data.status === "FULLFILLED" && !data.data.status)){
+      toast.error(
+        !data.data.message
+          ? "Error"
+          : data.data?.message[0] === "I"
+          ? "Tilaka name / Kata sandi salah"
+          : data.data.message,
+        {
+          icon: <XIcon />,
+        }
+      );
+    } else if (
+      data.status === "REJECTED" ||
+      (data.status === "FULLFILLED" && !data.data.status)
+    ) {
       toast.error("Error", {
         icon: <XIcon />,
       });
@@ -88,7 +98,7 @@ const LinkAccount = (props: Props) => {
           Penautan Akun
         </p>
         <div className="flex justify-center mt-6">
-          <Image src="/images/linkAccount.svg" width="150px" height="150px" />
+          <Image src={`${assetPrefix}/images/linkAccount.svg`} width="150px" height="150px" />
         </div>
         {nikRegistered && (
           <p className="font-poppins text-sm text-neutral800 mt-5">
@@ -156,9 +166,9 @@ const LinkAccount = (props: Props) => {
               </a>
             </Link>
             <div className="block mx-2.5">
-              <Image src="/images/lineVertical.svg" width="8px" height="24px" />
+              <Image src={`${assetPrefix}/images/lineVertical.svg`} width="8px" height="24px" />
             </div>
-            <Link href="/forgot-tilakaname">
+            <Link href="/forgot-tilaka-name">
               <a className="font-poppins text-primary text-xs">
                 Lupa Tilaka Name
               </a>
@@ -174,7 +184,7 @@ const LinkAccount = (props: Props) => {
         </form>
         <div className="mt-8 flex justify-center">
           <Image
-            src="/images/poweredByTilaka.svg"
+            src={`${assetPrefix}/images/poweredByTilaka.svg`}
             alt="powered-by-tilaka"
             width="80px"
             height="41.27px"

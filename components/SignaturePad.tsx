@@ -4,6 +4,7 @@ import SignatureCanvas from "react-signature-canvas";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/redux/app/store";
 import { removeSignature } from "@/redux/slices/signatureSlice";
+import { assetPrefix } from "../next.config";
 
 type Props = {
   sigPad: React.MutableRefObject<any>;
@@ -30,7 +31,7 @@ const SignaturePad = ({ sigPad }: Props) => {
           type="button"
           className="absolute z-50 top-2 right-2"
         >
-          <Image alt="trash" width={35} height={35} src="/images/Frame.svg" />
+          <Image alt="trash" width={35} height={35} src={`${assetPrefix}/images/Frame.svg`} />
         </button>
         {(showInitialSig && res.response.data.tandaTangan) || showInitialSig &&
         data?.data.scratch ? (
