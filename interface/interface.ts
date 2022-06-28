@@ -11,11 +11,9 @@ type Status = {
 
 export type TLoginInitialState = {
   data: {
-    tilaka_id: string;
-    message: string;
-    status: boolean;
-    nik?: string,
-    token?: string
+   data : string,
+   message : string
+   success : boolean
   };
 } & Status;
 
