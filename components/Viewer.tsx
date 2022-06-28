@@ -2,89 +2,77 @@ import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/app/store";
 import useDocument from "../hooks/useDocument";
-import Pagination from "./Pagination";
+// import Pagination from "./Pagination";
 
 interface Props {
   url: any;
   tandaTangan: any;
   setTotalPages: Dispatch<SetStateAction<number>>;
 }
-export const Viewer: React.FC<Props> = ({ url, setTotalPages, tandaTangan }) => {
+export const Viewer: React.FC<Props> = ({
+  url,
+  setTotalPages,
+  tandaTangan,
+}) => {
   const { pages } = useDocument({
     url: url,
   });
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [pdfDisplayed, setPdfDisplayed] = useState<number>(2);
   const [zoomCount, setZoomCount] = useState<number>(1);
-  const [isShowPagination, setIsShowPagination] = useState<boolean>(true);
+  // const [isShowPagination, setIsShowPagination] = useState<boolean>(true);
 
-  const indexOfLastPdf = currentPage * 2;
-  const indexOfFirstPdf = indexOfLastPdf - 2;
-  const currentPages = pages.slice(indexOfFirstPdf, indexOfLastPdf);
+  // const indexOfLastPdf = currentPage * 2;
+  // const indexOfFirstPdf = indexOfLastPdf - 2;
+  // const currentPages = pages.slice(indexOfFirstPdf, indexOfLastPdf);
 
   let iddleState = false;
   let iddleTimer: any;
 
   useEffect(() => {
-    if(pages){
+    if (pages) {
       setTotalPages(pages.length);
     }
   }, [pages.length]);
 
-  useEffect(() => {
-    showPagination();
-  },[])
+  // useEffect(() => {
+  //   showPagination();
+  // }, []);
 
-  const showPagination = () => {
-    clearTimeout(iddleTimer);
-    if (iddleState) {
-      setIsShowPagination(true);
-    }
-    iddleState = false;
-    iddleTimer = setTimeout(() => {
-      setIsShowPagination(false);
-      iddleState = true;
-    }, 4000);
-  };
+  // const showPagination = () => {
+  //   clearTimeout(iddleTimer);
+  //   if (iddleState) {
+  //     setIsShowPagination(true);
+  //   }
+  //   iddleState = false;
+  //   iddleTimer = setTimeout(() => {
+  //     setIsShowPagination(false);
+  //     iddleState = true;
+  //   }, 4000);
+  // };
 
-  if (typeof window !== "undefined") {
-    window.addEventListener("scroll", () => {
-      showPagination();
-    });
-  }
+  // if (typeof window !== "undefined") {
+  //   window.addEventListener("scroll", () => {
+  //     showPagination();
+  //   });
+  // }
 
   return (
     <div className=" relative overflow-auto w-full">
-      <div className="w-fit mx-auto h-fit pt-14" >
-        {
-          tandaTangan ? <Signature /> : null
-        }
-        {currentPages.map((canvasURL, idx) => {
+      <div className="w-fit mx-auto h-fit pt-14">
+        {tandaTangan ? <Signature /> : null}
+        {pages.map((canvasURL, idx) => {
           return (
-            <div key={idx} onClick={showPagination} onTouchStart={showPagination} className="relative flex flex-col items-center">
               <img
+                key={idx}
                 style={{
                   transform: `matrix(${zoomCount}, 0, 0, ${zoomCount}, 0, 0)`,
                   transformOrigin: "top left",
                   transition: "all .3s",
                 }}
-                className=" shadow-xl"
+                className="mt-5 shadow-xl"
                 src={canvasURL}
-                
               />
-              ;
-              <Pagination
-                currentPage={currentPage}
-                currentPages={currentPages.length}
-                setCurrentPage={setCurrentPage}
-                totalPages={pages.length}
-                pdfDisplayed={pdfDisplayed}
-                setPdfDisplayed={setPdfDisplayed}
-                zoomCount={zoomCount}
-                setZoomCount={setZoomCount}
-                isShow={isShowPagination}
-              />
-            </div>
           );
         })}
       </div>
@@ -94,6 +82,8 @@ export const Viewer: React.FC<Props> = ({ url, setTotalPages, tandaTangan }) => 
 
 const Signature = () => {
   const res = useSelector((state: RootState) => state.document);
+  const data = useSelector((state: RootState) => state.signature);
+
   return (
     <div
       style={{
@@ -111,8 +101,16 @@ const Signature = () => {
         className=" relative border-[#1A73E8] handle "
       >
         <img
-          style={{ touchAction: "none", width: `${res.response.data.width}px`, height: `${res.response.data.height}px` }}
-          src={`data:image/png;base64,${res.response.data.tandaTangan.replaceAll('"', '')}`}
+          style={{
+            touchAction: "none",
+            width: `${res.response.data.width}px`,
+            height: `${res.response.data.height}px`,
+          }}
+          src={`data:image/png;base64,${
+            data.data.scratch !== "" || data.data.font !== ""
+              ? data?.data?.scratch?.split(",")[1] || data?.data?.font?.split(",")[1]
+              : res.response.data.tandaTangan
+          }`}
           alt="signature"
         />
         <div

@@ -53,3 +53,10 @@ export type TDocumentProps = {
   transaction_id: string;
   company_id: string;
 };
+
+export type TUserData = {
+  name: string
+  signatureFont: string
+  typeMfa: string
+  typeSignature: number
+}

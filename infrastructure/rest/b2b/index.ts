@@ -41,3 +41,48 @@ export const restSetDefaultSignature = ({
         throw err;
       });
   }
+
+
+  
+export const restGetOtp = ({
+}: {
+}): Promise<any> => {
+  return axios
+    .get(
+      `${BASE_URL}/v1/b2b/integration/totp`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+      }
+    )
+    .then((res) => {
+      return res.data;
+    })
+    .catch((err) => {
+      throw err;
+    });
+};
+
+///v1​/b2b​/integration​/user​/get​/default-signature-mfa
+
+  
+export const getUserName = ({
+}: {
+}): Promise<any> => {
+  return axios
+    .get(
+      `${BASE_URL}/v1/b2b/integration/user/get/default-signature-mfa`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+      }
+    )
+    .then((res) => {
+      return res.data;
+    })
+    .catch((err) => {
+      throw err;
+    });
+};
+
+
