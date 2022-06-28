@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Head from "next/head";
+import { assetPrefix } from '../../next.config'
 
 type Props = {};
 
@@ -17,7 +18,7 @@ const LinkAccount = (props: Props) => {
           </p>
           <div className="mt-9">
             <Image
-              src="/images/linkAccountSuccess.svg"
+              src={`${assetPrefix}/images/linkAccountSuccess.svg`}
               width="151px"
               height="151px"
             />
@@ -25,7 +26,7 @@ const LinkAccount = (props: Props) => {
         </div>
         <div className="mt-48 flex justify-center">
           <Image
-            src="/images/poweredByTilaka.svg"
+            src={`${assetPrefix}/images/poweredByTilaka.svg`}
             alt="powered-by-tilaka"
             width="80px"
             height="41.27px"

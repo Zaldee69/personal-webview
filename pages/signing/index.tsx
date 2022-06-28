@@ -18,6 +18,7 @@ import FRCamera from "@/components/FRCamera";
 import SignaturePad from "@/components/SignaturePad";
 import Footer from "@/components/Footer";
 import { setAuthToken } from "@/config/API";
+import { assetPrefix } from "../../next.config";
 
 type TFontSig =
   | "signature_font_type_allan"
@@ -82,7 +83,7 @@ const Signing = () => {
               alt="loading"
               width={50}
               height={50}
-              src="/images/Loader.svg"
+              src={`${assetPrefix}/images/Loader.svg`}
               className=" motion-safe:animate-spin"
             />
           </div>
@@ -149,13 +150,13 @@ const Configuration: React.FC<{
     <div className="flex flex-row items-center shadow-xl z-10 left-0 fixed py-2 w-full top-0 bg-[rgb(223,225,230)] justify-center gap-10">
       <div className="flex flex-col  ">
         <button onClick={() => setOpenScratchesModal(!openScratchesModal)}>
-          <Image width={25} height={25} src="/images/goresan.svg" />
+          <Image width={25} height={25} src={`${assetPrefix}/images/goresan.svg`} />
           <p className="text-[#727272] text-base  ">Goresan</p>
         </button>
       </div>
       <div className="flex flex-col">
         <button onClick={() => setSelectFontModal(!selectFontModal)}>
-          <Image width={25} height={25} src="/images/font.svg" />
+          <Image width={25} height={25} src={`${assetPrefix}/images/font.svg`} />
           <p className="text-[#727272] text-base ">Font</p>
         </button>
       </div>
@@ -192,7 +193,7 @@ const FRModal: React.FC<Active | any> = ({ modal, setModal }) => {
               Tanda Tangan Berhasil
             </p>
             <div className="my-10">
-              <Image width={150} height={150} src="/images/successFR.svg" />
+              <Image width={150} height={150} src={`${assetPrefix}/images/successFR.svg`} />
             </div>
 
             <button

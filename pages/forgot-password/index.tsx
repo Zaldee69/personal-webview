@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import XIcon from "../../public/icons/XIcon";
 import Head from "next/head";
 import ReCAPTCHA from "react-google-recaptcha";
+import { assetPrefix } from "../../next.config";
 
 type Props = {};
 
@@ -54,7 +55,7 @@ const ForgotPassword = (props: Props) => {
           </p>
           <div className="flex justify-center mt-6">
             <Image
-              src="/images/forgotPassword.svg"
+              src={`${assetPrefix}/images/forgotPassword.svg`}
               width="205px"
               height="205px"
             />
@@ -101,7 +102,7 @@ const ForgotPassword = (props: Props) => {
 
         <div className="mt-8 flex justify-center">
           <Image
-            src="/images/poweredByTilaka.svg"
+            src={`${assetPrefix}/images/poweredByTilaka.svg`}
             alt="powered-by-tilaka"
             width="80px"
             height="41.27px"
@@ -129,7 +130,7 @@ const ModalSuccess: React.FC<{
           Email Telah Dikirim
         </p>
         <div className="mt-5 text-center">
-          <Image src="/images/checkCircle.svg" width="53px" height="53px" />
+          <Image src={`${assetPrefix}/images/checkCircle.svg`} width="53px" height="53px" />
         </div>
         <p className="text-neutral800 text-base font-normal mt-8 font-poppins text-center">
           Silahkan periksa email Anda untuk mereset kata sandi Anda.

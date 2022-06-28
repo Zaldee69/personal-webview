@@ -4,6 +4,7 @@ import EyeIcon from "./../../public/icons/EyeIcon";
 import EyeIconOff from "./../../public/icons/EyeIconOff";
 import { useRouter } from "next/router";
 import Head from "next/head";
+import { assetPrefix } from '../../next.config'
 
 type Props = {};
 
@@ -190,7 +191,7 @@ const LinkAccount = (props: Props) => {
         </div>
         <div className="mt-48 flex justify-center">
           <Image
-            src="/images/poweredByTilaka.svg"
+            src={`${assetPrefix}/images/poweredByTilaka.svg`}
             alt="powered-by-tilaka"
             width="80px"
             height="41.27px"

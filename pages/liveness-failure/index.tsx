@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 import Footer from "../../components/Footer";
+import { assetPrefix } from '../../next.config'
 
 const LivenessFailure = () => {
   return (
@@ -16,7 +17,7 @@ const LivenessFailure = () => {
           <h1 className="text-center text-neutral800 font-poppins text-xl font-semibold">
             Liveness Gagal
           </h1>
-          <Image src="/images/livenessFail.svg" width={200} height={200} />
+          <Image src={`${assetPrefix}/images/livenessFail.svg`} width={200} height={200} />
           <div className="flex flex-col gap-10 ">
             <p className="text-center font-poppins  text-neutral ">
               Mohon mengisi Formulir yang dikirim ke email

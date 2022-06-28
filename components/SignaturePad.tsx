@@ -3,6 +3,7 @@ import React, { useRef, useState } from "react";
 import SignatureCanvas from "react-signature-canvas";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/app/store";
+import { assetPrefix } from "../next.config";
 
 type Props = {
   sigPad : React.MutableRefObject<any>
@@ -21,7 +22,7 @@ const SignaturePad = ({sigPad} : Props) => {
           type="button"
           className="absolute z-50 top-2 right-2"
         >
-          <Image alt="trash" width={35} height={35} src="/images/Frame.svg" />
+          <Image alt="trash" width={35} height={35} src={`${assetPrefix}/images/Frame.svg`} />
         </button>
         {
          showInitialSig && res.response.data.tandaTangan ? (

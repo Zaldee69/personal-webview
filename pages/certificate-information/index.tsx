@@ -8,7 +8,7 @@ function CertificateInformation({}: Props) {
   return (
     <div className="bg-white p-4 font-poppins">
       <div className="flex justify-center">
-        <img src="/images/certInfo.svg" alt="ill" />
+        <img src="images/certInfo.svg" alt="ill" />
       </div>
       <p className="text-sm text-neutral800">
         Informasi data pada sertifikat Anda
@@ -62,7 +62,7 @@ function CertificateInformation({}: Props) {
         AJUKAN KOMPLAIN
       </a>
       <div className="mt-8 flex justify-center">
-        <img src="/images/poweredByTilaka.svg" alt="powered-by-tilaka" />
+        <img src="images/poweredByTilaka.svg" alt="powered-by-tilaka" />
       </div>
     </div>
   );
