@@ -11,6 +11,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { login } from "@/redux/slices/loginSlice";
 import Head from "next/head";
 import { TLoginProps } from "@/interface/interface";
+import { assetPrefix } from '../../next.config'
 
 type Props = {};
 
@@ -97,7 +98,7 @@ const LinkAccount = (props: Props) => {
           Penautan Akun
         </p>
         <div className="flex justify-center mt-6">
-          <Image src="/images/linkAccount.svg" width="150px" height="150px" />
+          <Image src={`${assetPrefix}/images/linkAccount.svg`} width="150px" height="150px" />
         </div>
         {nikRegistered && (
           <p className="font-poppins text-sm text-neutral800 mt-5">
@@ -165,7 +166,7 @@ const LinkAccount = (props: Props) => {
               </a>
             </Link>
             <div className="block mx-2.5">
-              <Image src="/images/lineVertical.svg" width="8px" height="24px" />
+              <Image src={`${assetPrefix}/images/lineVertical.svg`} width="8px" height="24px" />
             </div>
             <Link href="/forgot-tilaka-name">
               <a className="font-poppins text-primary text-xs">
@@ -183,7 +184,7 @@ const LinkAccount = (props: Props) => {
         </form>
         <div className="mt-8 flex justify-center">
           <Image
-            src="/images/poweredByTilaka.svg"
+            src={`${assetPrefix}/images/poweredByTilaka.svg`}
             alt="powered-by-tilaka"
             width="80px"
             height="41.27px"

@@ -1,3 +1,4 @@
+import { assetPrefix } from "../../next.config";
 import { NextParsedUrlQuery } from "next/dist/server/request-meta";
 import Image from "next/image";
 import Link from "next/link";
@@ -30,7 +31,7 @@ const LinkAccountSuccess = (props: Props) => {
       </p>
       <div className="mt-20">
         <Image
-          src="/images/linkAccountSuccess.svg"
+          src={`${assetPrefix}/images/linkAccountSuccess.svg`}
           width="196px"
           height="196px"
         />
@@ -49,7 +50,7 @@ const LinkAccountSuccess = (props: Props) => {
       )}
       <div className="mt-11 flex justify-center">
         <Image
-          src="/images/poweredByTilaka.svg"
+          src={`${assetPrefix}/images/poweredByTilaka.svg`}
           alt="powered-by-tilaka"
           width="80px"
           height="41.27px"
