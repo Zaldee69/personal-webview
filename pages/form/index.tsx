@@ -348,7 +348,7 @@ const Form: React.FC = () => {
                 >
                   CP/CPS
                 </a>
-                ,
+                ,{" "}
                 <a
                   href="https://repository.tilaka.id/kebijakan-jaminan.pdf"
                   target="_blank"
@@ -356,7 +356,7 @@ const Form: React.FC = () => {
                 >
                   Kebijakan Jaminan
                 </a>
-                ,
+                ,{" "}
                 <a
                   href="https://repository.tilaka.id/kebijakan-privasi.pdf"
                   target="_blank"
@@ -364,7 +364,7 @@ const Form: React.FC = () => {
                 >
                   Kebijakan Privasi
                 </a>
-                ,
+                ,{" "}
               </span>
               dan
               <a
