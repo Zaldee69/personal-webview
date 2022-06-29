@@ -1,7 +1,11 @@
 import Webcam from "react-webcam";
 import React from 'react'
 import { useRef, useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { assetPrefix } from '../next.config'
+import { AppDispatch, RootState } from "@/redux/app/store";
 import CircularProgressBar from "./CircularProgressBar";
+import { setImages, setIsDone } from "@/redux/slices/livenessSlice";
 
 let result: any;
 let dom: any;
@@ -16,13 +20,11 @@ interface Constraint {
 }
 
 interface Props {
-  actions: string[],
   currentAction?: string,
-  currentStep?: string
+  currentStep: string
 }
 
 const Camera: React.FC<Props> = ({
-  actions,
   currentAction,
   currentStep,
 }) => {
@@ -36,15 +38,15 @@ const Camera: React.FC<Props> = ({
   const webcamRef = useRef<Webcam | null>(null);
   const _isMounted = useRef(true);
 
+  const actionList = useSelector((state: RootState) => state.liveness.actionList);
 
 
-  const [actionsState, setactionsState] = useState(actions);
   const [currentActionState, setCurrentActionState] = useState(currentAction);
   let [currentActionIndex, setCurrentActionIndex] = useState(0);
   const [isCurrentStepDone, setIsCurrentStepDone] = useState(false);
   const [successState, setIsSuccessState] = useState(false);
   const [image, setImage] = useState("");
-  const [images, setImages] = useState({});
+  const dispatch: AppDispatch = useDispatch();
 
 
 
@@ -56,11 +58,16 @@ const Camera: React.FC<Props> = ({
   }
 
   useEffect(() => {
-    if (_isMounted) {
-      if (currentStep === "Liveness Detection" || currentStep === "Issue Liveness Detection") {
-        setCurrentActionState("Look Straight");
-      }
+    if(isDone?.filter((i : any) => i).length === actionList.length){
+      dispatch(setIsDone(true))
+    }
+  })
 
+  useEffect(() => {
+    if (_isMounted) {
+      if ((currentStep === "Liveness Detection" || currentStep === "Issue Liveness Detection") && actionList.length) {
+        setCurrentActionState(actionList[0]);
+      }
       checkCamera();
     }
   }, []);
@@ -71,7 +78,7 @@ const Camera: React.FC<Props> = ({
       const humanConfig = { // user configuration for human, used to fine-tune behavior
         // backend: 'webgl',
         // async: true,
-        modelBasePath: '/models',
+        modelBasePath: assetPrefix ? `${assetPrefix}/models`  : '/models',
         filter: { enabled: false, equalization: false },
         face: { enabled: true, detector: { rotation: false }, mesh: { enabled: true }, iris: { enabled: false }, description: { enabled: false }, emotion: { enabled: false } },
         body: { enabled: false },
@@ -98,14 +105,12 @@ const Camera: React.FC<Props> = ({
   async function drawLoop() { // main screen refresh loop
     let clicked = false;
     if (result) {
-      const interpolated = await human.next(result); // smoothen result using last-known results
-      //await human.draw.canvas(dom.video, dom.canvas); // draw canvas to screen
-      //await human.draw.all(dom.canvas, interpolated); // draw labels, boxes, lines, etc.
+      const interpolated = await human.next(result);
       if ((interpolated.face.length > 0) && (interpolated.face[0].rotation != undefined) && (captureButtonRef.current != null)) {
         const roll = interpolated.face[0].rotation.angle.roll * (180 / Math.PI);
         const yaw = interpolated.face[0].rotation.angle.yaw * (180 / Math.PI);
         const pitch = interpolated.face[0].rotation.angle.pitch * (180 / Math.PI);
-        if (actionsState[currentActionIndex] == "Look Straight") {
+        if (actionList[currentActionIndex] == "look_straight") {
           if ((roll > -10) && (roll < 10)) {
             if ((yaw > -10) && (yaw < 10)) {
               if ((pitch > -10) && (pitch < 10)) {
@@ -118,7 +123,7 @@ const Camera: React.FC<Props> = ({
               }
             }
           }
-        } else if (actionsState[currentActionIndex] == "Look Left") {
+        } else if (actionList[currentActionIndex] == "look_left") {
           if ((roll > -20) && (roll < 20)) {
             if ((pitch > -20) && (pitch < 20)) {
               if ((yaw < -29) && (yaw > -35)) {
@@ -132,7 +137,7 @@ const Camera: React.FC<Props> = ({
               }
             }
           }
-        } else if (actionsState[currentActionIndex] == "Look Right") {
+        } else if (actionList[currentActionIndex] == "look_right") {
           if ((roll > -20) && (roll < 20)) {
             if ((pitch > -20) && (pitch < 20)) {
               if ((yaw > 29) && (yaw < 35)) {
@@ -146,7 +151,7 @@ const Camera: React.FC<Props> = ({
               }
             }
           }
-        } else if (actionsState[currentActionIndex] == "Look Up") {
+        } else if (actionList[currentActionIndex] == "look_up") {
           if ((roll > -20) && (roll < 20)) {
             if ((yaw > -20) && (yaw < 20)) {
               if ((pitch < -19) && (pitch > -31)) {
@@ -160,7 +165,7 @@ const Camera: React.FC<Props> = ({
               }
             }
           }
-        } else if (actionsState[currentActionIndex] == "Look Down") {
+        } else if (actionList[currentActionIndex] == "look_down") {
           if ((roll > -20) && (roll < 20)) {
             if ((yaw > -20) && (yaw < 20)) {
               if ((pitch > 29) && (pitch < 35)) {
@@ -185,9 +190,8 @@ const Camera: React.FC<Props> = ({
   }
 
   const onPlay = async () => {
-    console.log(actionsState)
-    isDone = new Array(actionsState.length);
-    for (var i = 0; i < actionsState.length; i++) {
+    isDone = new Array(actionList.length);
+    for (var i = 0; i < actionList.length; i++) {
       isDone[i] = false;
     }
     await detectionLoop();
@@ -223,12 +227,11 @@ const Camera: React.FC<Props> = ({
 
   const setImagesToPool = async () => {
     const image: any = await webcamRef.current?.getScreenshot();
-    setImages({
+    dispatch(setImages({
       value: image,
       step: currentStep,
       action: currentActionState,
-    })
-
+    }))
   };
 
   const capture = async (e: any) => {
@@ -236,12 +239,12 @@ const Camera: React.FC<Props> = ({
     await setImagesToPool();
     if (currentStep === "Liveness Detection" || currentStep === "Issue Liveness Detection") {
       setCurrentActionIndex(++currentActionIndex);
-      if (currentActionIndex > actionsState.length - 1) {
-        setCurrentActionState(actionsState[actionsState.length - 1]);
+      if (currentActionIndex > actionList.length - 1) {
+        setCurrentActionState(actionList[actionList.length - 1]);
       } else {
-        setCurrentActionState(actionsState[currentActionIndex]);
+        setCurrentActionState(actionList[currentActionIndex]);
       }
-      if (currentActionIndex === actionsState.length) {
+      if (currentActionIndex === actionList.length) {
         setIsCurrentStepDone(true);
         webcamRef.current = null;
         return;
