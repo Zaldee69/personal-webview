@@ -154,9 +154,13 @@ const FRCamera = ({setIsFRSuccess} : Props) => {
         className="mt-4 rounded-md sm:w-full md:w-full"
         ref={webcamRef}
         audio={false}
-        height={720}
+        height={960}
         screenshotFormat="image/jpeg"
         width={1280}
+        screenshotQuality={1}
+        minScreenshotWidth={1280}
+        mirrored={false}
+        minScreenshotHeight={960}
         videoConstraints={constraint}
         onLoadedMetadata={(e) => onPlay()}
       />

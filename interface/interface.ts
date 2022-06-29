@@ -14,6 +14,7 @@ export type TLoginInitialState = {
    data : string,
    message : string
    success : boolean
+   nik : string
   };
 } & Status;
 
