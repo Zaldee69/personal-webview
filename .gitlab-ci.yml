@@ -306,3 +306,9 @@ notify_fail-production:
       allow_failure: true
       when: on_failure
 
+fail_pipeline:
+  stage: deploy
+  image: bash
+  script:
+    - exit 1
+  when: on_failure
