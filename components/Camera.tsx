@@ -1,5 +1,5 @@
 import Webcam from "react-webcam";
-import React from 'react'
+import React, { Dispatch, SetStateAction } from 'react'
 import { useRef, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { assetPrefix } from '../next.config'
@@ -20,13 +20,15 @@ interface Constraint {
 }
 
 interface Props {
-  currentAction?: string,
   currentStep: string
+  currentActionIndex: number
+  setCurrentActionIndex: Dispatch<SetStateAction<number>> 
 }
 
 const Camera: React.FC<Props> = ({
-  currentAction,
   currentStep,
+  currentActionIndex,
+  setCurrentActionIndex,
 }) => {
   const constraint: Constraint = {
     width: 1280,
@@ -41,8 +43,7 @@ const Camera: React.FC<Props> = ({
   const actionList = useSelector((state: RootState) => state.liveness.actionList);
 
 
-  const [currentActionState, setCurrentActionState] = useState(currentAction);
-  let [currentActionIndex, setCurrentActionIndex] = useState(0);
+  const [currentActionState, setCurrentActionState] = useState('look_straight');
   const [isCurrentStepDone, setIsCurrentStepDone] = useState(false);
   const [successState, setIsSuccessState] = useState(false);
   const [image, setImage] = useState("");
@@ -58,16 +59,7 @@ const Camera: React.FC<Props> = ({
   }
 
   useEffect(() => {
-    if(isDone?.filter((i : any) => i).length === actionList.length){
-      dispatch(setIsDone(true))
-    }
-  })
-
-  useEffect(() => {
     if (_isMounted) {
-      if ((currentStep === "Liveness Detection" || currentStep === "Issue Liveness Detection") && actionList.length) {
-        setCurrentActionState(actionList[0]);
-      }
       checkCamera();
     }
   }, []);
@@ -247,6 +239,7 @@ const Camera: React.FC<Props> = ({
       if (currentActionIndex === actionList.length) {
         setIsCurrentStepDone(true);
         webcamRef.current = null;
+        dispatch(setIsDone(true))
         return;
       }
     } else {
