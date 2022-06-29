@@ -5,9 +5,9 @@ import { API } from "../../config/API";
 
 const initialState: TLoginInitialState = {
   data: {
-    tilaka_id: "",
+    data: "",
     message: "",
-    status: false,
+    success: false,
   },
   status: "IDDLE",
 };

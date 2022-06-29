@@ -11,11 +11,9 @@ type Status = {
 
 export type TLoginInitialState = {
   data: {
-    tilaka_id: string;
-    message: string;
-    status: boolean;
-    nik?: string,
-    token?: string
+   data : string,
+   message : string
+   success : boolean
   };
 } & Status;
 
@@ -53,3 +51,10 @@ export type TDocumentProps = {
   transaction_id: string;
   company_id: string;
 };
+
+export type TUserData = {
+  name: string
+  signatureFont: string
+  typeMfa: string
+  typeSignature: number
+}

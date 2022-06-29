@@ -1,8 +1,9 @@
 import {
   restSetDefaultSignature,
   restSetDefaultMFA,
+  getUserName
 } from "infrastructure/rest/b2b";
-import {  useState, useRef } from "react";
+import {  useState, useRef, useEffect } from "react";
 import SignaturePad from "../../components/SignaturePad";
 import InfoIcon from "../../public/icons/InfoIcon";
 import html2canvas from "html2canvas";
@@ -10,6 +11,7 @@ import { toast } from "react-toastify";
 import XIcon from "@/public/icons/XIcon";
 import { useRouter } from "next/router";
 import Head from "next/head";
+import {TUserData} from "@/interface/interface"
 
 type Props = {};
 
@@ -33,6 +35,7 @@ function SettingSignatureAndMFA({}: Props) {
     mfa_method: "fr",
   });
   const [imageURL, setImageURL] = useState<string>();
+  const [data, setData] = useState<string>()
   let ref: any = null;
   const sigPad = useRef<any>();
   const router = useRouter();
@@ -45,11 +48,23 @@ function SettingSignatureAndMFA({}: Props) {
     convertToDataURL();
   };
 
+  useEffect(() => {
+    if (router.isReady) {
+      getUserName({}).then((res) => {
+      const data = JSON.parse(res.data)
+      setData(data.name)
+    })
+    } 
+  }, [router.isReady]);
+
+
   //Convert HTML element to base64 png
   const convertToDataURL = async () => {
     const canvas = await html2canvas(ref.parentNode.children[1], {
       height: 60,
+      backgroundColor : "rgba(0, 0, 0, 0)"
     });
+    canvas.style.backgroundColor = "rgba(0, 0, 0, 0)"
     const image = canvas.toDataURL("image/png");
     setImageURL(image);
   };
@@ -205,8 +220,8 @@ function SettingSignatureAndMFA({}: Props) {
             <SignaturePad sigPad={sigPad} />
           </div>
           <div className={form.signature_type == 1 ? undefined : "hidden"}>
-            <div className="grid grid-cols-2 gap-3 mt-5">
-              <label className="relative flex items-center">
+            <div className={`grid  ${data?.length as number > 15 ? "grid-cols gap-5" : "grid-col-2"} gap-3 mt-5`}>
+              <label className="relative flex items-center justify-center">
                 <input
                   type="radio"
                   name="signature_font_type"
@@ -217,11 +232,11 @@ function SettingSignatureAndMFA({}: Props) {
                   }
                   className="appearance-none border border-_B6B6B6 checked:border-_1A73E8 rounded-md w-full h-12"
                 />
-                <p className="text-2xl font-allan text-_030326 absolute w-full text-center">
-                  {router.query.tilaka_name}
+                <p className="text-2xl font-allan text-_030326 absolute w-fit text-center">
+                  {data}
                 </p>
               </label>
-              <label className="relative flex items-center">
+              <label className="relative flex items-center justify-center">
                 <input
                   type="radio"
                   name="signature_font_type"
@@ -233,11 +248,11 @@ function SettingSignatureAndMFA({}: Props) {
                   }
                   className="appearance-none border border-_B6B6B6 checked:border-_1A73E8 rounded-md w-full h-12"
                 />
-                <p className="text-2xl font-aguafinaScript text-_030326 absolute w-full text-center">
-                  {router.query.tilaka_name}
+                <p className="text-2xl font-aguafinaScript text-_030326 absolute w-fit text-center">
+                  {data}
                 </p>
               </label>
-              <label className="relative flex items-center">
+              <label className="relative flex items-center justify-center">
                 <input
                   type="radio"
                   name="signature_font_type"
@@ -249,11 +264,11 @@ function SettingSignatureAndMFA({}: Props) {
                   }
                   className="appearance-none border border-_B6B6B6 checked:border-_1A73E8 rounded-md w-full h-12"
                 />
-                <p className="text-lg font-architectsDaughter text-_030326 absolute w-full text-center">
-                  {router.query.tilaka_name}
+                <p className="text-lg font-architectsDaughter text-_030326 absolute w-fit text-center">
+                  {data}
                 </p>
               </label>
-              <label className="relative flex items-center">
+              <label className="relative flex items-center justify-center">
                 <input
                   type="radio"
                   name="signature_font_type"
@@ -265,11 +280,11 @@ function SettingSignatureAndMFA({}: Props) {
                   }
                   className="appearance-none border border-_B6B6B6 checked:border-_1A73E8 rounded-md w-full h-12"
                 />
-                <p className="text-base font-giveYouGlory text-_030326 absolute w-full text-center">
-                  {router.query.tilaka_name}
+                <p className="text-base font-giveYouGlory text-_030326 absolute w-fit text-center">
+                  {data}
                 </p>
               </label>
-              <label className="relative flex items-center">
+              <label className="relative flex items-center justify-center">
                 <input
                   type="radio"
                   name="signature_font_type"
@@ -281,11 +296,11 @@ function SettingSignatureAndMFA({}: Props) {
                   }
                   className="appearance-none border border-_B6B6B6 checked:border-_1A73E8 rounded-md w-full h-12"
                 />
-                <p className="text-2xl font-berkshireSwash text-_030326 absolute w-full text-center">
-                  {router.query.tilaka_name}
+                <p className="text-2xl font-berkshireSwash text-_030326 absolute w-fit text-center">
+                  {data}
                 </p>
               </label>
-              <label className="relative flex items-center">
+              <label className="relative flex items-center justify-center">
                 <input
                   type="radio"
                   name="signature_font_type"
@@ -297,8 +312,8 @@ function SettingSignatureAndMFA({}: Props) {
                   }
                   className="appearance-none border border-_B6B6B6 checked:border-_1A73E8 rounded-md w-full h-12"
                 />
-                <p className="text-2xl font-missFajardose text-_030326 absolute w-full text-center">
-                  {router.query.tilaka_name}
+                <p className="text-2xl font-missFajardose text-_030326 absolute w-fit text-center">
+                  {data}
                 </p>
               </label>
             </div>

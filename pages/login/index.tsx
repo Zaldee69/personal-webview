@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from "react";
+import {
+  getCertificateList
+} from "infrastructure/rest/b2b";
 import Footer from "@/components/Footer";
 import EyeIcon from "@/public/icons/EyeIcon";
 import EyeIconOff from "@/public/icons/EyeIconOff";
@@ -25,7 +28,7 @@ const Login = () => {
   const dispatch: AppDispatch = useDispatch();
   const data = useSelector((state: RootState) => state.login);
   const router = useRouter();
-  const { channel_id, tilaka_name} = router.query;
+  const { channel_id, tilaka_name, company_id} = router.query;
   const { pathname } = router;
 
 
@@ -37,8 +40,22 @@ const Login = () => {
   }, [router.isReady]);
 
   useEffect(() => {
-    if(data.status === "FULLFILLED" && data.data.status){
-      localStorage.setItem("token", data.data.token as string)
+    if(data.status === "FULLFILLED" && data.data.success){
+      localStorage.setItem("token", data.data.data as string)
+      getCertificateList({params : company_id as string}).then((res) => {
+        const certif = JSON.parse(res.data)
+        if(certif[0].status == "Aktif"){
+          router.replace({
+            pathname: "/signing",
+            query: { ...router.query },
+          });
+        }else {
+          router.replace({
+            pathname: "/certificate-information",
+            query: { ...router.query },
+          });
+        }
+      })
     }
     toastCaller(data);
   }, [data.status]);

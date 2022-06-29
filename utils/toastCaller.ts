@@ -11,7 +11,7 @@ const toastCaller = (props : TLoginInitialState) => {
           isLoading: true,
           position: "top-center",
         });
-      } else if (props.status === "FULLFILLED" && props.data.status) {
+      } else if (props.status === "FULLFILLED" && props.data.success) {
         toast.dismiss("info");
         toast(`Login berhasil`, {
           type: "success",
@@ -19,10 +19,10 @@ const toastCaller = (props : TLoginInitialState) => {
         });
       } else if (
         props.status === "REJECTED" ||
-        (props.status === "FULLFILLED" && !props.data.status)
+        (props.status === "FULLFILLED" && !props.data.success)
       ) {
         toast.dismiss("info");
-        toast(!props.data.message ? "Error" : props.data?.message[0] === "I" ? "Tilaka name / Kata sandi salah" : props.data.message , {
+        toast(!props.data.message ? "Error" : props.data?.message[0] === "I" ? "Tilaka name / Kata sandi salah" : "Login terlalu banyak" , {
           type: "error",
           toastId: "error",
           position: "top-center",
