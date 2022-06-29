@@ -8,6 +8,7 @@ const initialState: TLoginInitialState = {
     data: "",
     message: "",
     success: false,
+    nik: "",
   },
   status: "IDDLE",
 };

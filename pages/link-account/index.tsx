@@ -55,14 +55,14 @@ const LinkAccount = (props: Props) => {
   };
 
   useEffect(() => {
-    if (data.status === "FULLFILLED" && data.data.status) {
+    if (data.status === "FULLFILLED" && data.data.success) {
       router.replace({
         pathname: "/link-account/success",
         query: { ...router.query },
       });
     } else if (nik !== data.data.nik) {
       router.replace("/link-account/failure");
-    } else if (data.status === "FULLFILLED" && !data.data.status) {
+    } else if (data.status === "FULLFILLED" && !data.data.success) {
       toast.error(
         !data.data.message
           ? "Error"
@@ -75,7 +75,7 @@ const LinkAccount = (props: Props) => {
       );
     } else if (
       data.status === "REJECTED" ||
-      (data.status === "FULLFILLED" && !data.data.status)
+      (data.status === "FULLFILLED" && !data.data.success)
     ) {
       toast.error("Error", {
         icon: <XIcon />,
