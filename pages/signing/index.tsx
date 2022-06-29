@@ -131,7 +131,7 @@ const Signing = () => {
             {res.response.data.document && (
               <button
                 onClick={() =>
-                  res.response.data.mfa !== "FR"
+                  res.response.data.mfa.toLowerCase() == "fr"
                     ? setopenFRModal(true)
                     : setOtpModal(true)
                 }
