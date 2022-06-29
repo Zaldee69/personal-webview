@@ -137,7 +137,7 @@ const FRCamera = ({setIsFRSuccess} : Props) => {
         <CountdownCircleTimer
           onComplete={() => {
             capture()
-            return {shouldRepeat: true, delay: 5}
+            return {shouldRepeat: true, delay: 15}
           }}
           isPlaying={isPlaying}
           size={45}
