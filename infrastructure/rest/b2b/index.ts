@@ -6,7 +6,7 @@ import {
 } from "./types";
 
 const BASE_URL =
-  process.env.NEXT_PUBLIC_DS_API_URL || "http://10.117.1.151:8080";
+  process.env.NEXT_PUBLIC_DS_API_URL || "https://dev-api.tilaka.id";
 
 export const restSetDefaultSignature = ({
   payload,
@@ -15,7 +15,7 @@ export const restSetDefaultSignature = ({
 }): Promise<TSetDefaultSignatureResponseData> => {
   return axios
     .post<TSetDefaultSignatureResponseData>(
-      `${BASE_URL}/v1/b2b/integration/user/set/default-signature`,
+      `${BASE_URL}/integration/user/set/default-signature`,
       payload,
       {
         headers: {
@@ -36,7 +36,7 @@ export const restSetDefaultMFA = ({
 }): Promise<TSetDefaultSignatureResponseData> => {
   return axios
     .post<TSetDefaultSignatureResponseData>(
-      `${BASE_URL}/v1/b2b/integration/user/set/default-mfa`,
+      `${BASE_URL}/integration/user/set/default-mfa`,
       payload,
       {
         headers: {
@@ -52,7 +52,7 @@ export const restSetDefaultMFA = ({
 
 export const restGetOtp = ({}: {}): Promise<any> => {
   return axios
-    .get(`${BASE_URL}/v1/b2b/integration/totp`, {
+    .get(`${BASE_URL}/integration/totp`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
@@ -67,7 +67,7 @@ export const restGetOtp = ({}: {}): Promise<any> => {
 
 export const getUserName = ({}: {}): Promise<any> => {
   return axios
-    .get(`${BASE_URL}/v1/b2b/integration/user/get/default-signature-mfa`, {
+    .get(`${BASE_URL}/integration/user/get/default-signature-mfa`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
@@ -86,7 +86,7 @@ export const getCertificateList = ({
   params : string
 }): Promise<any> => {
   return axios
-    .get(`${BASE_URL}/v1/b2b/certificate/list?companyId=${params}`, {
+    .get(`${BASE_URL}/certificate/list?companyId=${params}`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },

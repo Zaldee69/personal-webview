@@ -1,7 +1,7 @@
 import axios from "axios";
 import { TSigningRequestData, TSigningResponseData } from "./types";
 
-const BASE_URL = process.env.NEXT_PUBLIC_DS_API_URL || "http://10.117.1.151:8080";
+const BASE_URL = process.env.NEXT_PUBLIC_DS_API_URL || "https://dev-api.tilaka.id/";
 
 export const restSigning = ({
   payload,
@@ -10,7 +10,7 @@ export const restSigning = ({
 }): Promise<TSigningResponseData> => {
   return axios
     .post<TSigningResponseData>(
-      `${BASE_URL}/v1/integration/signing/sign-pdf`,
+      `${BASE_URL}/integration/signing/sign-pdf`,
       payload,
       {
         headers: {
