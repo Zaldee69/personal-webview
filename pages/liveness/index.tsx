@@ -1,7 +1,8 @@
 import Image from "next/image";
-import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useEffect, useState,  } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import Head from "next/head";
+import { AppDispatch, RootState } from "@/redux/app/store";
 import Camera from "../../components/Camera";
 import { useRouter } from "next/router";
 import { toast } from 'react-toastify'
@@ -11,17 +12,19 @@ import { TKycVerificationRequestData } from '../../infrastructure/rest/kyc/types
 
 import Footer from "../../components/Footer";
 import ProgressStepBar from "../../components/ProgressStepBar";
+import { setActionList } from "@/redux/slices/livenessSlice";
 
 const Liveness = () => {
   const router = useRouter()
   const routerQuery = router.query
 
-  let [actionsState, setActionState] = useState<string[]>([])
-  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isSuccessState, setIsSuccessState] = useState<boolean>(false);
-  const [isVerification, setIsVerification] = useState<boolean>(false);
+  const images = useSelector((state: RootState) => state.liveness.images);
+  const isDone = useSelector((state: RootState) => state.liveness.isDone);
 
-  const dispatch = useDispatch();
+
+
+  const dispatch: AppDispatch = useDispatch();
 
   const generateAction = () => {
     const body = {
@@ -35,14 +38,13 @@ const Liveness = () => {
     })
     RestKycGenerateAction(body).then((res) => {
       if (res?.data) {
-        setActionState(res.data.actionList)
+        dispatch(setActionList(res.data.actionList))
         toast(`${res.message}`, {
           type: 'success',
           position: 'top-center',
           autoClose: 3000,
         })
         toast.dismiss('generateAction')
-        // router.push('/liveness')
       } else {
         throw new Error(res.message)
       }
@@ -62,12 +64,8 @@ const Liveness = () => {
     })
   }
 
-  const changePage = async (e: React.SyntheticEvent) => {
-    e.preventDefault();
-
+  const changePage = async () => {
     try {
-      setIsLoading(true);
-      setIsVerification(true);
       const body: TKycVerificationRequestData = {
         registerId: router.query.registerId as string,
         mode: "web",
@@ -77,23 +75,19 @@ const Liveness = () => {
         image_selfie: ""
       };
 
-      //============ START Error: Cannot find name 'images'
+      const imageActions = images.filter(
+        (image) =>
+          image.step === "Liveness Detection" &&
+          image.action !== "look_straight"
+      );
+      imageActions.forEach((image, index) => {
+        body[`image_action${++index}` as keyof TKycVerificationRequestData] = image.value;
+      });
+      const imageSelfie = images.filter(
+        (image) => image.action === "look_straight"
+      )[0];
 
-      // const imageActions = images.filter(
-      //   (image) =>
-      //     image.step === "Liveness Detection" &&
-      //     image.action !== "Look Straight"
-      // );
-      // imageActions.forEach((image, index) => {
-      //   body[`image_action${++index}`] = image.value;
-      // });
-      // const imageSelfie = images.filter(
-      //   (image) => image.action === "Look Straight"
-      // )[0];
-
-      // body.image_selfie = imageSelfie.value;
-
-      //============ END Error: Cannot find name 'images'
+      body.image_selfie = imageSelfie.value;
 
 
       const result = await RestKycVerification(body);
@@ -143,6 +137,12 @@ const Liveness = () => {
   }
 
   useEffect(() => {
+    if(isDone){
+      changePage()
+    }  
+  })
+
+  useEffect(() => {
     if(!router.isReady) return
     generateAction()
   }, [router.isReady])
@@ -157,7 +157,7 @@ const Liveness = () => {
         <span className="font-poppins text-sm ">
           Pastikan wajah di dalam garis panduan dan ikuti petunjuk dengan benar
         </span>
-        <Camera actions={actionsState} />
+        <Camera currentStep='Liveness Detection' />
         <ProgressStepBar />
         <div className="flex items-center justify-center mt-5 flex-col">
           <span className="font-poppins font-medium">
