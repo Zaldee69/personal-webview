@@ -15,7 +15,7 @@ export const restSetDefaultSignature = ({
 }): Promise<TSetDefaultSignatureResponseData> => {
   return axios
     .post<TSetDefaultSignatureResponseData>(
-      `${BASE_URL}/integration/user/set/default-signature`,
+      `${BASE_URL}/default-signature`,
       payload,
       {
         headers: {
@@ -36,7 +36,7 @@ export const restSetDefaultMFA = ({
 }): Promise<TSetDefaultSignatureResponseData> => {
   return axios
     .post<TSetDefaultSignatureResponseData>(
-      `${BASE_URL}/integration/user/set/default-mfa`,
+      `${BASE_URL}/default-mfa`,
       payload,
       {
         headers: {
@@ -52,7 +52,7 @@ export const restSetDefaultMFA = ({
 
 export const restGetOtp = ({}: {}): Promise<any> => {
   return axios
-    .get(`${BASE_URL}/integration/totp`, {
+    .get(`${BASE_URL}/totp`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
@@ -67,7 +67,7 @@ export const restGetOtp = ({}: {}): Promise<any> => {
 
 export const getUserName = ({}: {}): Promise<any> => {
   return axios
-    .get(`${BASE_URL}/integration/user/get/default-signature-mfa`, {
+    .get(`${BASE_URL}/default-signature-mfa`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
@@ -86,7 +86,7 @@ export const getCertificateList = ({
   params : string
 }): Promise<any> => {
   return axios
-    .get(`${BASE_URL}/certificate/list?companyId=${params}`, {
+    .get(`${BASE_URL}/certificationlist`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },

@@ -10,7 +10,7 @@ export const restSigning = ({
 }): Promise<TSigningResponseData> => {
   return axios
     .post<TSigningResponseData>(
-      `${BASE_URL}/integration/signing/sign-pdf`,
+      `${BASE_URL}/sign-pdf`,
       payload,
       {
         headers: {
