@@ -13,6 +13,7 @@ import { TKycVerificationRequestData } from '../../infrastructure/rest/kyc/types
 import Footer from "../../components/Footer";
 import ProgressStepBar from "../../components/ProgressStepBar";
 import { setActionList } from "@/redux/slices/livenessSlice";
+import { handleRoute } from "@/utils/handleRoute";
 
 const Liveness = () => {
   const router = useRouter()
@@ -125,7 +126,7 @@ const Liveness = () => {
       if (result.success) {
         toast.dismiss('verification')
         removeStorage();
-        router.push({ pathname: "/form", query: { registerId: router.query.registerId } });
+        router.push({ pathname: handleRoute("/form"), query: { registerId: router.query.registerId } });
       } else {
         toast.dismiss('verification')
         if (status !== "E" && status !== "F") {
@@ -139,7 +140,7 @@ const Liveness = () => {
                 position: 'top-center',
               }
             )
-            router.push({ pathname: "/liveness-fail", query: { registerId: router.query.registerId } });
+            router.push({ pathname: handleRoute("/liveness-fail"), query: { registerId: router.query.registerId } });
             sessionStorage.removeItem("tlk-reg-id");
           } else {
             setIsSuccessState(false);
@@ -154,7 +155,7 @@ const Liveness = () => {
             let attempt = parseInt(sessionStorage.getItem('tlk-counter') as string) + 1
             sessionStorage.setItem('tlk-counter', attempt.toString())
             setTimeout(() => {
-              router.push({ pathname: "/liveness-fail", query: { registerId: router.query.registerId } });
+              router.push({ pathname: handleRoute("/liveness-fail"), query: { registerId: router.query.registerId } });
             }, 5000);
           }
 
@@ -202,7 +203,7 @@ const Liveness = () => {
       )
       setIsSuccessState(false);
       setTimeout(() => {
-        router.push({ pathname: "/liveness-fail/", query: { registerId: router.query.registerId } });
+        router.push({ pathname: handleRoute("/liveness-fail"), query: { registerId: router.query.registerId } });
       }, 5000);
     }
   };

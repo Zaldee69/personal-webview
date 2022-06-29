@@ -5,10 +5,16 @@ import React, { useEffect, useState } from "react";
 import Footer from "../../components/Footer";
 import { useRouter } from "next/router";
 import { assetPrefix } from '../../next.config'
+import { AppDispatch } from "@/redux/app/store";
+import { useDispatch } from "react-redux";
+import { setIsDone } from "@/redux/slices/livenessSlice";
+import { handleRoute } from "@/utils/handleRoute";
 
 const LivenessFail = () => {
   const router = useRouter()
   const [gagalCounter, setGagalCounter] = useState(0)
+  const dispatch: AppDispatch = useDispatch();
+
 
   const resetStorage = () => {
     setGagalCounter(0)
@@ -16,6 +22,7 @@ const LivenessFail = () => {
   }
 
   useEffect(() => {
+    dispatch(setIsDone(false))
     if (sessionStorage.getItem('tlk-counter')) {
       setGagalCounter(parseInt(sessionStorage.getItem('tlk-counter') as string))
     }
@@ -28,7 +35,7 @@ const LivenessFail = () => {
       )
     } else {
       return (
-        <Link href={`/guide?registerId=${router.query.registerId}`}>
+        <Link href={handleRoute(`/guide?registerId=${router.query.registerId}`)}>
           <button className="bg-primary btn md:mx-auto md:block md:w-1/4 text-white font-poppins w-full mx-auto rounded-sm h-9">
             ULANGI
           </button>

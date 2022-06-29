@@ -75,7 +75,7 @@ export const RestKycVerification = (
   return axios
     .post<TKycVerificationResponseData>(`${BASE_URL}/api/kyc/verification`, body, {
       headers: {
-        Authorization: `Bearer ${localStorage.getItem("kyc_checkstep_token")}`,
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
         "Content-Type": "application/json"
       }
     })

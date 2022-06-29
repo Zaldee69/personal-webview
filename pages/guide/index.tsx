@@ -2,6 +2,7 @@ import Link from "next/link";
 import { useRouter } from 'next/router'
 import Footer from "../../components/Footer";
 import Head from "next/head";
+import { handleRoute } from "@/utils/handleRoute";
 
 const Guide = () => {
   const router = useRouter()
@@ -62,7 +63,7 @@ const Guide = () => {
             </li>
           </ul>
         </div>
-        <Link href={`/liveness?registerId=${routerQuery.registerId}`}>
+        <Link href={handleRoute(`/liveness?registerId=${routerQuery.registerId}`)}>
           <button className="bg-primary btn md:mx-auto md:block md:w-1/4 text-white font-poppins w-full mx-auto rounded-sm h-9 ">
             MULAI
           </button>
