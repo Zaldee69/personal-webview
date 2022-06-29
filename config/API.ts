@@ -9,7 +9,7 @@ type Props = {
 
 // Create base URL API
 export const API = axios.create({
-  baseURL: "http://10.117.1.151:8080/v1/personal",
+  baseURL: process.env.NEXT_PUBLIC_DS_API_URL || "https://dev-api.tilaka.id",
 });
 
 // Set Authorization Token Header
