@@ -261,8 +261,8 @@ const Form: React.FC = () => {
               type="text"
               placeholder="Masukkan Tilaka Name"
               className={`font-poppins py-3 focus:outline-none  placeholder:text-placeholder placeholder:font-light   px-2 rounded-md border border-borderColor ${error.tilakaName
-                  ? "border-error "
-                  : "border-borderColor focus:ring"
+                ? "border-error "
+                : "border-borderColor focus:ring"
                 }`}
             />
             <p className="text-error font-poppins pl-2 pt-2 block text-sm">
@@ -283,8 +283,8 @@ const Form: React.FC = () => {
                 type={type.password}
                 placeholder="Masukkan Kata Sandi"
                 className={`font-poppins py-3 focus:outline-none  placeholder:text-placeholder placeholder:font-light  px-2 rounded-md border  w-full ${error.password
-                    ? "border-error "
-                    : "border-borderColor focus:ring"
+                  ? "border-error "
+                  : "border-borderColor focus:ring"
                   }`}
               />
               <button
@@ -312,8 +312,8 @@ const Form: React.FC = () => {
                 type={type.confirmPassword}
                 placeholder="Masukkan Konfirmasi Kata Sandi"
                 className={`font-poppins py-3 focus:outline-none  placeholder:text-placeholder placeholder:font-light  px-2 rounded-md border border-borderColor w-full ${error.confirmPassword
-                    ? "border-error "
-                    : "border-borderColor focus:ring"
+                  ? "border-error "
+                  : "border-borderColor focus:ring"
                   } `}
               />
               <button

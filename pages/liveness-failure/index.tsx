@@ -20,11 +20,7 @@ const LivenessFailure = () => {
           <Image src={`${assetPrefix}/images/livenessFail.svg`} width={200} height={200} />
           <div className="flex flex-col gap-10 ">
             <p className="text-center font-poppins  text-neutral ">
-              Mohon mengisi Formulir yang dikirim ke email
-              <span className="block font font-medium text-neutral800">
-                blabla@yopmail.com
-              </span>{" "}
-              untuk melanjutkan proses aktivasi akun
+              Mohon mengisi Formulir yang dikirim ke email Anda untuk melanjutkan proses aktivasi akun
             </p>
             <Link href="/">
               <span className="text-center font-semibold font-poppins underline-offset-1	underline  text-primary">
