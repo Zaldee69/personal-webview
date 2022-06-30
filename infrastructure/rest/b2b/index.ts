@@ -57,7 +57,7 @@ export const RestConfirmCertificate = (
   body: TConfirmCertificateRequestData
 ): Promise<TConfirmCertificateResponseData> => {
   return axios
-    .post<TConfirmCertificateResponseData>(`${BASE_URL}/certificate/confirm`, body, {
+    .post<TConfirmCertificateResponseData>(`${BASE_URL}/confirm`, body, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
         "Content-Type": "application/json"
@@ -73,7 +73,7 @@ export const RestRegisteredCertificate = (
   body: TGetRegisteredCertificateRequestData
 ): Promise<TGetRegisteredCertificateResponseData> => {
   return axios
-    .get<TGetRegisteredCertificateResponseData>(`${BASE_URL}/certificate/registered?companyid=${body.company_id}`, {
+    .get<TGetRegisteredCertificateResponseData>(`${BASE_URL}/registered?companyid=${body.company_id}`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
         "Content-Type": "application/json"
