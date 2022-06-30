@@ -75,7 +75,7 @@ const FRCamera = ({setIsFRSuccess} : Props) => {
       isLoading: true,
       position: "top-center",
     });
-    const imageSrc = webcamRef?.current?.getScreenshot();
+    const imageSrc = webcamRef?.current?.getScreenshot()
     restSigning({
       payload: {
         file_name: new Date().getTime().toString(),
@@ -83,7 +83,7 @@ const FRCamera = ({setIsFRSuccess} : Props) => {
         content_pdf: document.response.data.document,
         width: document.response.data.width,
         height: document.response.data.height,
-        face_image: imageSrc as string,
+        face_image: imageSrc?.split(",")[1] as string,
         coordinate_x: document.response.data.posX,
         coordinate_y: document.response.data.posY,
         signature_image: signature.data.font || signature.data.scratch || document.response.data.tandaTangan,
