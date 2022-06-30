@@ -249,7 +249,7 @@ const Liveness = () => {
   useEffect(() => {
     if (!isDone) return
     changePage()
-  })
+  }, [isDone])
 
   useEffect(() => {
     if (!router.isReady) return
