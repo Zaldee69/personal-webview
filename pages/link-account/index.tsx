@@ -61,8 +61,8 @@ const LinkAccount = (props: Props) => {
         pathname: handleRoute("/link-account/success"),
         query: { ...router.query },
       });
-    } else if (nik !== data.data.nik) {
-      router.replace(handleRoute("/link-account/success"));
+    } else if (data.data.message == "NIK Not Equals ON Tilaka System" && !data.data.success) {
+      router.replace(handleRoute("/link-account/failure"));
     } else if (data.status === "FULLFILLED" && !data.data.success) {
       toast.error(
         !data.data.message
@@ -84,9 +84,6 @@ const LinkAccount = (props: Props) => {
     }
   }, [data.status]);
 
-  // if (data.status === "PENDING") {
-  //   return <LinkAccountProcess {...props} />;
-  // }
 
   return (
     <>
