@@ -17,11 +17,12 @@ interface Constraint {
 
 interface Props {
   setIsFRSuccess: React.Dispatch<React.SetStateAction<boolean>>
+  setModal: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 let dom: any;
 
-const FRCamera = ({setIsFRSuccess} : Props) => {
+const FRCamera = ({setIsFRSuccess, setModal} : Props) => {
   const constraint: Constraint = {
     width: 1280,
     height: 720,
@@ -103,6 +104,9 @@ const FRCamera = ({setIsFRSuccess} : Props) => {
           position: "top-center",
         });
         setIsFRSuccess(true)
+      }else if(!res.success) {
+        toast.error(res.message, { icon: <XIcon /> });
+        setModal(false)
       }
     }).catch((err) => {
       if(err.request.status === 401){
@@ -111,11 +115,16 @@ const FRCamera = ({setIsFRSuccess} : Props) => {
           query: { ...router.query },
         });
       }else {
+        setModal(false)
+        setTimeout(() => {
+        setModal(true)
+        },100)
         toast.dismiss("info")
         toast.error("Wajah tidak cocok", { icon: <XIcon /> });
         const newCount = parseInt(localStorage.getItem("count" ) as string) + 1
         localStorage.setItem("count", newCount.toString())
-        const count = parseInt(localStorage.getItem("count" ) as string) 
+        const count = parseInt(localStorage.getItem("count" ) as string)
+        setModal(false)
         if(count >= 5){
           localStorage.removeItem("token")
           localStorage.setItem("count", "0")
