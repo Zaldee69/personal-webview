@@ -3,6 +3,10 @@ import {
   TSetDefaultSignatureRequestData,
   TSetDefaultSignatureResponseData,
   TSetDefaultMFARequestData,
+  TConfirmCertificateRequestData,
+  TConfirmCertificateResponseData,
+  TGetRegisteredCertificateRequestData,
+  TGetRegisteredCertificateResponseData,
 } from "./types";
 
 const BASE_URL =
@@ -42,13 +46,46 @@ export const restSetDefaultMFA = ({
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
+      })
+      .then((res) => res.data)
+      .catch((err) => {
+        throw err;
+      });
+  }
+
+export const RestConfirmCertificate = (
+  body: TConfirmCertificateRequestData
+): Promise<TConfirmCertificateResponseData> => {
+  return axios
+    .post<TConfirmCertificateResponseData>(`${BASE_URL}/certificate/confirm`, body, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        "Content-Type": "application/json"
       }
-    )
-    .then((res) => res.data)
-    .catch((err) => {
+    })
+    .then((res) =>  res.data )
+    .catch((err) => { 
       throw err;
-    });
-};
+      })
+}
+
+export const RestRegisteredCertificate = (
+  body: TGetRegisteredCertificateRequestData
+): Promise<TGetRegisteredCertificateResponseData> => {
+  return axios
+    .get<TGetRegisteredCertificateResponseData>(`${BASE_URL}/certificate/registered?companyid=${body.company_id}`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        "Content-Type": "application/json"
+      }
+    })
+    .then((res) =>  res.data )
+    .catch((err) => { 
+      throw err;
+     })
+}
+
+
 
 export const restGetOtp = ({}: {}): Promise<any> => {
   return axios
