@@ -12,6 +12,7 @@ import { setAuthToken } from "@/config/API";
 import { TLoginProps } from "@/interface/interface";
 import Head from "next/head";
 import toastCaller from "@/utils/toastCaller";
+import { toast } from 'react-toastify'
 import { useRouter } from "next/router";
 import { handleRoute } from './../../utils/handleRoute';
 
@@ -29,7 +30,7 @@ const Login = () => {
   const dispatch: AppDispatch = useDispatch();
   const data = useSelector((state: RootState) => state.login);
   const router = useRouter();
-  const { channel_id, tilaka_name, company_id} = router.query;
+  const { channel_id, tilaka_name, company_id } = router.query;
   const { pathname } = router;
 
 
@@ -37,20 +38,20 @@ const Login = () => {
     if (router.isReady) {
       setAuthToken({ channel_id, pathname } as Props);
       setTilakaName(tilaka_name as string)
-    } 
+    }
   }, [router.isReady]);
 
   useEffect(() => {
-    if(data.status === "FULLFILLED" && data.data.success){
+    if (data.status === "FULLFILLED" && data.data.success) {
       localStorage.setItem("token", data.data.data as string)
-      getCertificateList({params : company_id as string}).then((res) => {
+      getCertificateList({ params: company_id as string }).then((res) => {
         const certif = JSON.parse(res.data)
-        if(certif[0].status == "Aktif"){
+        if (certif[0].status == "Aktif") {
           router.replace({
             pathname: handleRoute("/signing"),
             query: { ...router.query },
           });
-        }else {
+        } else {
           router.replace({
             pathname: handleRoute("/certificate-information"),
             query: { ...router.query },

@@ -22,7 +22,7 @@ interface Constraint {
 interface Props {
   currentStep: string
   currentActionIndex: number
-  setCurrentActionIndex: Dispatch<SetStateAction<number>> 
+  setCurrentActionIndex: Dispatch<SetStateAction<number>>
 }
 
 const Camera: React.FC<Props> = ({
@@ -46,6 +46,8 @@ const Camera: React.FC<Props> = ({
   const [currentActionState, setCurrentActionState] = useState('look_straight');
   const [isCurrentStepDone, setIsCurrentStepDone] = useState(false);
   const [successState, setIsSuccessState] = useState(false);
+  const [error, setError] = useState(false);
+  const [progress, setProgress] = useState(0);
   const [image, setImage] = useState("");
   const dispatch: AppDispatch = useDispatch();
 
@@ -70,7 +72,7 @@ const Camera: React.FC<Props> = ({
       const humanConfig = { // user configuration for human, used to fine-tune behavior
         // backend: 'webgl',
         // async: true,
-        modelBasePath: assetPrefix ? `${assetPrefix}/models`  : '/models',
+        modelBasePath: assetPrefix ? `${assetPrefix}/models` : '/models',
         filter: { enabled: false, equalization: false },
         face: { enabled: true, detector: { rotation: false }, mesh: { enabled: true }, iris: { enabled: false }, description: { enabled: false }, emotion: { enabled: false } },
         body: { enabled: false },
@@ -103,12 +105,14 @@ const Camera: React.FC<Props> = ({
         const yaw = interpolated.face[0].rotation.angle.yaw * (180 / Math.PI);
         const pitch = interpolated.face[0].rotation.angle.pitch * (180 / Math.PI);
         if (actionList[currentActionIndex] == "look_straight") {
+          setProgress(0);
           if ((roll > -10) && (roll < 10)) {
             if ((yaw > -10) && (yaw < 10)) {
               if ((pitch > -10) && (pitch < 10)) {
                 let done = await isIndexDone(currentActionIndex);
                 if (!done) {
                   await setIndexDone(currentActionIndex);
+                  setProgress(100);
                   await captureButtonRef.current.click();
                   clicked = true;
                 }
@@ -116,12 +120,14 @@ const Camera: React.FC<Props> = ({
             }
           }
         } else if (actionList[currentActionIndex] == "look_left") {
+          setProgress(0);
           if ((roll > -20) && (roll < 20)) {
             if ((pitch > -20) && (pitch < 20)) {
               if ((yaw < -29) && (yaw > -35)) {
                 let done = await isIndexDone(currentActionIndex);
                 if (!done) {
                   await setIndexDone(currentActionIndex);
+                  setProgress(100);
                   ++currentActionIndex;
                   await captureButtonRef.current.click();
                   clicked = true;
@@ -130,12 +136,14 @@ const Camera: React.FC<Props> = ({
             }
           }
         } else if (actionList[currentActionIndex] == "look_right") {
+          setProgress(0);
           if ((roll > -20) && (roll < 20)) {
             if ((pitch > -20) && (pitch < 20)) {
               if ((yaw > 29) && (yaw < 35)) {
                 let done = await isIndexDone(currentActionIndex);
                 if (!done) {
                   await setIndexDone(currentActionIndex);
+                  setProgress(100);
                   ++currentActionIndex;
                   await captureButtonRef.current.click();
                   clicked = true;
@@ -144,12 +152,14 @@ const Camera: React.FC<Props> = ({
             }
           }
         } else if (actionList[currentActionIndex] == "look_up") {
+          setProgress(0);
           if ((roll > -20) && (roll < 20)) {
             if ((yaw > -20) && (yaw < 20)) {
               if ((pitch < -19) && (pitch > -31)) {
                 let done = await isIndexDone(currentActionIndex);
                 if (!done) {
                   await setIndexDone(currentActionIndex);
+                  setProgress(100);
                   ++currentActionIndex;
                   await captureButtonRef.current.click();
                   clicked = true;
@@ -158,12 +168,14 @@ const Camera: React.FC<Props> = ({
             }
           }
         } else if (actionList[currentActionIndex] == "look_down") {
+          setProgress(0);
           if ((roll > -20) && (roll < 20)) {
             if ((yaw > -20) && (yaw < 20)) {
               if ((pitch > 29) && (pitch < 35)) {
                 let done = await isIndexDone(currentActionIndex);
                 if (!done) {
                   await setIndexDone(currentActionIndex);
+                  setProgress(100);
                   ++currentActionIndex;
                   await captureButtonRef.current.click();
                   clicked = true;
@@ -261,16 +273,20 @@ const Camera: React.FC<Props> = ({
       <Webcam
         style={{ height: "350px", objectFit: "cover" }}
         className="mt-10 rounded-md sm:w-full md:w-full"
+        screenshotQuality={1}
         audio={false}
         ref={webcamRef}
         height={720}
         screenshotFormat="image/jpeg"
         width={1280}
+        minScreenshotWidth={1280}
+        mirrored={false}
+        minScreenshotHeight={720}
         onLoadedMetadata={(e) => onPlay()}
         videoConstraints={constraint}
       />
       <div className="circle-container">
-        <CircularProgressBar />
+        <CircularProgressBar percent={progress} error={error} />
       </div>
       <button
         ref={captureButtonRef}

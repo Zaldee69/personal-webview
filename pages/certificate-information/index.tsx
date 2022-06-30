@@ -1,9 +1,60 @@
 type Props = {};
+import { setCertificate } from "@/redux/slices/certificateSlice";
+import { useEffect } from "react";
+import { AppDispatch, RootState } from "@/redux/app/store";
+import { useDispatch, useSelector } from "react-redux";
+import { useRouter } from "next/router";
+import { RestRegisteredCertificate, RestConfirmCertificate } from "infrastructure/rest/b2b";
+import { toast } from "react-toastify";
+import { TConfirmCertificateRequestData } from "infrastructure/rest/b2b/types";
 
 function CertificateInformation({}: Props) {
+
+  const dispatch: AppDispatch = useDispatch();
+  const { certificate } = useSelector((state: RootState) => state.certificate);
+  const router = useRouter();
+  const { company_id } = router.query;
+
+
+  const getRegisteredCertificate = () => {
+    const body = {
+      company_id: company_id as string,
+    }
+    RestRegisteredCertificate(body).then((res) => {
+      if (res?.data) {
+        const result = JSON.parse(res.data[0])
+        dispatch(setCertificate(result))
+      } 
+    }).catch((_) => {
+      toast("Gagal mengecek sertifikat", {
+        type: "error",
+        toastId: "error",
+        position: "top-center",
+      });
+    })
+  } 
+
+  useEffect(() => {
+    if(!router.isReady) return
+    getRegisteredCertificate()
+  }, [router.isReady])
+  
   const handleConfirm = (): void => {
-    //
-    alert("ok");
+    const body: TConfirmCertificateRequestData = {
+      company_id: company_id as string,
+      serial_number: certificate.serial_number
+    }
+    RestConfirmCertificate(body).then((res) => {
+     if(res.success){
+      router.push('/setting-signature-and-mfa')
+     }
+    }).catch((_) => {
+      toast("Gagal mengaktifkan sertifikat", {
+        type: "error",
+        toastId: "error",
+        position: "top-center",
+      });
+    })
   };
   return (
     <div className="bg-white p-4 font-poppins">
@@ -18,24 +69,24 @@ function CertificateInformation({}: Props) {
           <p className="text-sm text-neutral800 font-normal w-24 pr-2">
             Negara
           </p>
-          <p className="text-sm text-neutral800 font-medium">ID</p>
+          <p className="text-sm text-neutral800 font-medium">{ certificate.negara }</p>
         </div>
         <div className="flex items-center">
           <p className="text-sm text-neutral800 font-normal w-24 pr-2">Nama</p>
-          <p className="text-sm text-neutral800 font-medium">Yeshica</p>
+          <p className="text-sm text-neutral800 font-medium">{ certificate.nama }</p>
         </div>
         <div className="flex items-center">
           <p className="text-sm text-neutral800 font-normal w-24 pr-2">
             Organisasi
           </p>
           <p className="text-sm text-neutral800 font-medium">
-            PT Indonesia Jaya Sentosa
+            { certificate.organisasi }
           </p>
         </div>
         <div className="flex items-center">
           <p className="text-sm text-neutral800 font-normal w-24 pr-2">Email</p>
           <p className="text-sm text-neutral800 font-medium">
-            yeshica@gmail.com
+            { certificate.emailAddress }
           </p>
         </div>
       </div>
