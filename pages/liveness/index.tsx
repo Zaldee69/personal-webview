@@ -6,13 +6,15 @@ import { AppDispatch, RootState } from "@/redux/app/store";
 import Camera from "../../components/Camera";
 import { useRouter } from "next/router";
 import { toast } from 'react-toastify'
-import { RestKycGenerateAction, RestKycVerification } from '../../infrastructure'
+import { RestKycCheckStep, RestKycGenerateAction, RestKycVerification } from '../../infrastructure'
 import { TKycVerificationRequestData } from '../../infrastructure/rest/kyc/types'
+import XIcon from "@/public/icons/XIcon";
+import CheckOvalIcon from "@/public/icons/CheckOvalIcon";
 
 
 import Footer from "../../components/Footer";
 import ProgressStepBar from "../../components/ProgressStepBar";
-import { setActionList } from "@/redux/slices/livenessSlice";
+import { resetImages, setActionList } from "@/redux/slices/livenessSlice";
 import { handleRoute } from "@/utils/handleRoute";
 
 const Liveness = () => {
@@ -57,33 +59,52 @@ const Liveness = () => {
       isLoading: true,
       position: 'top-center',
     })
-    RestKycGenerateAction(body).then((res) => {
-      if (res?.data) {
-        const payload = ['look_straight'].concat(res.data.actionList)
-        dispatch(setActionList(payload))
-        toast(`${res.message}`, {
-          type: 'success',
-          position: 'top-center',
-          autoClose: 3000,
-        })
-        toast.dismiss('generateAction')
-      } else {
-        throw new Error(res.message)
-      }
-    }).catch((err) => {
-      toast.dismiss('generateAction')
-      toast(
-        `${err || 'Tidak merespon!'
-        }`,
-        {
-          type: 'error',
-          autoClose: err
-            ? 5000
-            : false,
-          position: 'top-center',
+    RestKycCheckStep({ payload: { registerId: routerQuery.registerId as string } })
+      .then((res) => {
+        if (res.success) {
+          RestKycGenerateAction(body).then((result) => {
+            if (result?.data) {
+              const payload = ['look_straight'].concat(result.data.actionList)
+              dispatch(setActionList(payload))
+              toast(`${result.message}`, {
+                type: 'success',
+                position: 'top-center',
+                autoClose: 3000,
+              })
+              toast.dismiss('generateAction')
+            } else {
+              throw new Error(result.message)
+            }
+          }).catch((error) => {
+            toast.dismiss('generateAction')
+            toast(
+              `${error || 'Tidak merespon!'
+              }`,
+              {
+                type: 'error',
+                autoClose: error
+                  ? 5000
+                  : false,
+                position: 'top-center',
+              }
+            )
+          })
+        } else {
+
         }
-      )
-    })
+      })
+      .catch((err) => {
+        toast.dismiss("generateAction");
+        if (err.response?.data?.data?.errors?.[0]) {
+          toast.error(err.response?.data?.data?.errors?.[0], {
+            icon: <XIcon />,
+          });
+        } else {
+          toast.error(err.response?.data?.message || "pengecekan step gagal", {
+            icon: <XIcon />,
+          });
+        }
+      });
   }
 
   const changePage = async () => {
@@ -125,9 +146,11 @@ const Liveness = () => {
       const status = result.data.status;
       if (result.success) {
         toast.dismiss('verification')
+        dispatch(resetImages())
         removeStorage();
         router.push({ pathname: handleRoute("/form"), query: { registerId: router.query.registerId } });
       } else {
+        dispatch(resetImages())
         toast.dismiss('verification')
         if (status !== "E" && status !== "F") {
           if (sessionStorage.getItem("tlk-reg-id") === router.query.registerId && parseInt(sessionStorage.getItem("tlk-counter") as string) >= 2) {
@@ -189,6 +212,7 @@ const Liveness = () => {
         }
       }
     } catch (e) {
+      dispatch(resetImages())
       toast.dismiss('verification')
       toast(
         `${e || 'Tidak merespon!'
@@ -214,9 +238,8 @@ const Liveness = () => {
   }
 
   useEffect(() => {
-    if (isDone) {
-      changePage()
-    }
+    if (!isDone) return
+    changePage()
   })
 
   useEffect(() => {

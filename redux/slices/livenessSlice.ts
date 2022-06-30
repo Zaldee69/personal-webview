@@ -25,6 +25,9 @@ const livenessSlice = createSlice({
         setImages: (state, action: PayloadAction<ImageProp>) => {
             state.images = [...state.images, action.payload]
         },
+        resetImages: (state) => {
+            state.images = []
+        },
         setIsDone: (state, action: PayloadAction<boolean>) => {
             state.isDone = action.payload
         },
@@ -34,6 +37,6 @@ const livenessSlice = createSlice({
     }
 })
 
-export const { setImages, setIsDone, setActionList } = livenessSlice.actions 
+export const { setImages, setIsDone, setActionList, resetImages } = livenessSlice.actions 
 
 export default livenessSlice.reducer
