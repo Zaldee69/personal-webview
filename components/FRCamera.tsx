@@ -105,6 +105,7 @@ const FRCamera = ({setIsFRSuccess, setModal} : Props) => {
         });
         setIsFRSuccess(true)
       }else if(!res.success) {
+        toast.dismiss("info")
         toast.error(res.message, { icon: <XIcon /> });
         setModal(false)
       }
