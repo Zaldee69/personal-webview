@@ -223,7 +223,7 @@ const FRModal: React.FC<Active | any> = ({ modal, setModal }) => {
             <span className="font-poppins mt-2 block text-center text-sm font-normal">
               Arahkan wajah ke kamera untuk otentikasi
             </span>
-            <FRCamera setIsFRSuccess={setIsFRSuccess} />
+            <FRCamera setModal={setModal} setIsFRSuccess={setIsFRSuccess} />
             <button
               onClick={() => setModal(!modal)}
               className="bg-primary btn  text-white font-poppins w-full mt-5 mx-auto rounded-sm h-9"
