@@ -55,5 +55,6 @@ export type TKycVerificationResponseData = {
     email: string;
     companyname: string;
     status: string;
+    numFailedLivenessCheck?: number
   };
 };

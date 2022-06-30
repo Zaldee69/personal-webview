@@ -61,7 +61,7 @@ const Liveness = () => {
     })
     RestKycCheckStep({ payload: { registerId: routerQuery.registerId as string } })
       .then((res) => {
-        if (res.success) {
+        if (res.success && (res.data.status !== 'D' && res.data.status !== 'F' && res.data.status !== 'E')) {
           RestKycGenerateAction(body).then((result) => {
             if (result?.data) {
               const payload = ['look_straight'].concat(result.data.actionList)
@@ -77,20 +77,29 @@ const Liveness = () => {
             }
           }).catch((error) => {
             toast.dismiss('generateAction')
-            toast(
-              `${error || 'Tidak merespon!'
-              }`,
-              {
-                type: 'error',
-                autoClose: error
-                  ? 5000
-                  : false,
-                position: 'top-center',
-              }
-            )
+            if (error.response?.data?.data?.errors?.[0]) {
+              toast.error(error.response?.data?.data?.errors?.[0], {
+                icon: <XIcon />,
+              });
+            } else {
+              toast.error(error.response?.data?.message || "Generate Action gagal", {
+                icon: <XIcon />,
+              });
+            }
           })
         } else {
-
+          toast.dismiss('generateAction')
+          toast(
+            `${res.message || 'Tidak merespon!'
+            }`,
+            {
+              type: 'error',
+              autoClose: 5000,
+              position: 'top-center',
+            }
+          )
+          if (res.message === 'Anda berada di tahap pengisian formulir') router.push(handleRoute('form'), { query: { registerId: router.query.registerId } })
+          else router.push({ pathname: handleRoute("liveness-failure"), query: { registerId: router.query.registerId } });
         }
       })
       .catch((err) => {
@@ -114,8 +123,10 @@ const Liveness = () => {
       isLoading: true,
       position: 'top-center',
     })
-    sessionStorage.setItem("tlk-reg-id", router.query.registerId as string)
-    sessionStorage.setItem("tlk-counter", '0')
+    localStorage.setItem("tlk-reg-id", router.query.registerId as string)
+    if (!localStorage.getItem("tlk-counter")) {
+      localStorage.setItem("tlk-counter", '0')
+    }
 
     try {
       const body: TKycVerificationRequestData = {
@@ -146,14 +157,12 @@ const Liveness = () => {
       const status = result.data.status;
       if (result.success) {
         toast.dismiss('verification')
-        dispatch(resetImages())
         removeStorage();
-        router.push({ pathname: handleRoute("/form"), query: { registerId: router.query.registerId } });
+        router.push({ pathname: handleRoute("form"), query: { registerId: router.query.registerId } });
       } else {
-        dispatch(resetImages())
         toast.dismiss('verification')
         if (status !== "E" && status !== "F") {
-          if (sessionStorage.getItem("tlk-reg-id") === router.query.registerId && parseInt(sessionStorage.getItem("tlk-counter") as string) >= 2) {
+          if (localStorage.getItem("tlk-reg-id") === router.query.registerId && parseInt(localStorage.getItem("tlk-counter") as string) >= 2) {
             setIsSuccessState(false);
             toast(
               "You have failed 3 times \nYou will be redirected to the next page, please wait...",
@@ -163,8 +172,8 @@ const Liveness = () => {
                 position: 'top-center',
               }
             )
-            router.push({ pathname: handleRoute("/liveness-fail"), query: { registerId: router.query.registerId } });
-            sessionStorage.removeItem("tlk-reg-id");
+            router.push({ pathname: handleRoute("liveness-fail"), query: { registerId: router.query.registerId } });
+            removeStorage();
           } else {
             setIsSuccessState(false);
             toast(
@@ -175,10 +184,10 @@ const Liveness = () => {
                 position: 'top-center',
               }
             )
-            let attempt = parseInt(sessionStorage.getItem('tlk-counter') as string) + 1
-            sessionStorage.setItem('tlk-counter', attempt.toString())
+            const attempt = result.data?.numFailedLivenessCheck || parseInt(localStorage.getItem('tlk-counter') as string) + 1
+            localStorage.setItem('tlk-counter', attempt.toString())
             setTimeout(() => {
-              router.push({ pathname: handleRoute("/liveness-fail"), query: { registerId: router.query.registerId } });
+              router.push({ pathname: handleRoute("liveness-fail"), query: { registerId: router.query.registerId } });
             }, 5000);
           }
 
@@ -204,6 +213,7 @@ const Liveness = () => {
                   position: 'top-center',
                 }
               )
+              router.push({ pathname: handleRoute("liveness-fail"), query: { registerId: router.query.registerId } });
               setIsSuccessState(false);
             }
           } else {
@@ -212,7 +222,6 @@ const Liveness = () => {
         }
       }
     } catch (e) {
-      dispatch(resetImages())
       toast.dismiss('verification')
       toast(
         `${e || 'Tidak merespon!'
@@ -227,14 +236,14 @@ const Liveness = () => {
       )
       setIsSuccessState(false);
       setTimeout(() => {
-        router.push({ pathname: handleRoute("/liveness-fail"), query: { registerId: router.query.registerId } });
+        router.push({ pathname: handleRoute("liveness-fail"), query: { registerId: router.query.registerId } });
       }, 5000);
     }
   };
 
   const removeStorage = () => {
-    sessionStorage.removeItem("tlk-reg-id");
-    sessionStorage.removeItem("tlk-counter");
+    localStorage.removeItem("tlk-reg-id");
+    localStorage.removeItem("tlk-counter");
   }
 
   useEffect(() => {
@@ -245,6 +254,7 @@ const Liveness = () => {
   useEffect(() => {
     if (!router.isReady) return
     generateAction()
+    dispatch(resetImages())
   }, [router.isReady])
 
   return (
