@@ -12,6 +12,7 @@ import { login } from "@/redux/slices/loginSlice";
 import Head from "next/head";
 import { TLoginProps } from "@/interface/interface";
 import { assetPrefix } from '../../next.config'
+import { handleRoute } from './../../utils/handleRoute';
 
 type Props = {};
 
@@ -57,11 +58,11 @@ const LinkAccount = (props: Props) => {
   useEffect(() => {
     if (data.status === "FULLFILLED" && data.data.success) {
       router.replace({
-        pathname: "/link-account/success",
+        pathname: handleRoute("/link-account/success"),
         query: { ...router.query },
       });
     } else if (nik !== data.data.nik) {
-      router.replace("/link-account/failure");
+      router.replace(handleRoute("/link-account/success"));
     } else if (data.status === "FULLFILLED" && !data.data.success) {
       toast.error(
         !data.data.message
