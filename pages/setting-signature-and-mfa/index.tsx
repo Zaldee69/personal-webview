@@ -12,6 +12,7 @@ import XIcon from "@/public/icons/XIcon";
 import { useRouter } from "next/router";
 import Head from "next/head";
 import {TUserData} from "@/interface/interface"
+import { handleRoute } from "@/utils/handleRoute";
 
 type Props = {};
 
@@ -119,7 +120,7 @@ function SettingSignatureAndMFA({}: Props) {
             setTimeout(() => {
               toast.dismiss("success");
               router.replace({
-                pathname: "/signing",
+                pathname: handleRoute("/signing"),
                 query: { ...router.query },
               });
             }, 3000);
@@ -143,7 +144,7 @@ function SettingSignatureAndMFA({}: Props) {
               icon: XIcon,
             });
             router.replace({
-              pathname: "/login",
+              pathname: handleRoute("/login"),
               query: { ...router.query },
             });
           } else {

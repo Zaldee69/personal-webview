@@ -22,6 +22,7 @@ import {
   getUserName
 } from "infrastructure/rest/b2b";
 import { assetPrefix } from "../../next.config";
+import { handleRoute } from './../../utils/handleRoute';
 
 type TFontSig =
   | "signature_font_type_allan"
@@ -75,7 +76,7 @@ const Signing = () => {
     }
     if (!token) {
       router.replace({
-        pathname: "/login",
+        pathname: handleRoute("/login"),
         query: { ...router.query },
       });
     }

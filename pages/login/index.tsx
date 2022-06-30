@@ -13,6 +13,7 @@ import { TLoginProps } from "@/interface/interface";
 import Head from "next/head";
 import toastCaller from "@/utils/toastCaller";
 import { useRouter } from "next/router";
+import { handleRoute } from './../../utils/handleRoute';
 
 type Props = {
   channel_id: string;
@@ -46,12 +47,12 @@ const Login = () => {
         const certif = JSON.parse(res.data)
         if(certif[0].status == "Aktif"){
           router.replace({
-            pathname: "/signing",
+            pathname: handleRoute("/signing"),
             query: { ...router.query },
           });
         }else {
           router.replace({
-            pathname: "/certificate-information",
+            pathname: handleRoute("/certificate-information"),
             query: { ...router.query },
           });
         }

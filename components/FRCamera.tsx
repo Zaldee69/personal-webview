@@ -7,6 +7,7 @@ import { restSigning } from "infrastructure/rest/signing";
 import { useRouter } from "next/router";
 import { toast } from "react-toastify";
 import XIcon from "@/public/icons/XIcon";
+import { handleRoute } from './../utils/handleRoute';
 
 interface Constraint {
   width: number;
@@ -77,7 +78,7 @@ const FRCamera = ({setIsFRSuccess} : Props) => {
     const imageSrc = webcamRef?.current?.getScreenshot();
     restSigning({
       payload: {
-        file_name: "bsbshhshh.pdf",
+        file_name: new Date().getTime().toString(),
         otp_pin: "",
         content_pdf: document.response.data.document,
         width: document.response.data.width,
@@ -106,7 +107,7 @@ const FRCamera = ({setIsFRSuccess} : Props) => {
     }).catch((err) => {
       if(err.request.status === 401){
         router.replace({
-          pathname: "/login",
+          pathname: handleRoute("/login"),
           query: { ...router.query },
         });
       }else {
@@ -119,7 +120,7 @@ const FRCamera = ({setIsFRSuccess} : Props) => {
           localStorage.removeItem("token")
           localStorage.setItem("count", "0")
           router.replace({
-            pathname: "/login",
+            pathname: handleRoute("/login"),
             query: { ...router.query },
           });
         }
