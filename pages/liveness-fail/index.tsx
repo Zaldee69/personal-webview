@@ -15,10 +15,13 @@ const LivenessFail = () => {
   const [gagalCounter, setGagalCounter] = useState(0)
   const dispatch: AppDispatch = useDispatch();
 
+  const REDIRECT_URL = "http://10.117.1.103:9080/"
+
 
   const resetStorage = () => {
     setGagalCounter(0)
-    router.replace(handleRoute('/'))
+    sessionStorage.removeItem('tlk-counter')
+    router.push(process.env.NEXT_REDIRECT_API_URL || REDIRECT_URL)
   }
 
   useEffect(() => {
