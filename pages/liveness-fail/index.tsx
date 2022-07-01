@@ -18,13 +18,17 @@ const LivenessFail = () => {
 
   const resetStorage = () => {
     setGagalCounter(0)
-    sessionStorage.removeItem('tlk-counter')
+    router.replace(handleRoute('/'))
   }
 
   useEffect(() => {
+    if (gagalCounter > 2) localStorage.removeItem('tlk-counter')
+  }, [gagalCounter])
+
+  useEffect(() => {
     dispatch(setIsDone(false))
-    if (sessionStorage.getItem('tlk-counter')) {
-      setGagalCounter(parseInt(sessionStorage.getItem('tlk-counter') as string))
+    if (localStorage.getItem('tlk-counter')) {
+      setGagalCounter(parseInt(localStorage.getItem('tlk-counter') as string))
     }
   }, [])
 
