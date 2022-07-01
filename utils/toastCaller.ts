@@ -22,7 +22,7 @@ const toastCaller = (props : TLoginInitialState) => {
         (props.status === "FULLFILLED" && !props.data.success)
       ) {
         toast.dismiss("info");
-        toast(!props.data.message ? "Error" : props.data?.message[0] === "I" ? "Tilaka name / Kata sandi salah" : "Login terlalu banyak" , {
+        toast(!props.data.message ? "Error" : props.data?.message[0] === "I" ? "Tilaka name / Kata sandi salah" : props.data.message , {
           type: "error",
           toastId: "error",
           position: "top-center",
