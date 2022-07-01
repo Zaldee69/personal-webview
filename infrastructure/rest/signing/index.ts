@@ -1,7 +1,7 @@
 import axios from "axios";
 import { TSigningRequestData, TSigningResponseData } from "./types";
 
-const BASE_URL = process.env.NEXT_PUBLIC_DS_API_URL || "https://dev-api.tilaka.id/";
+const BASE_URL = process.env.NEXT_PUBLIC_DS_API_URL || "https://dev-api.tilaka.id";
 
 export const restSigning = ({
   payload,
