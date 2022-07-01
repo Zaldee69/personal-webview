@@ -11,6 +11,7 @@ import Head from "next/head";
 import XIcon from "@/public/icons/XIcon";
 import CheckOvalIcon from "@/public/icons/CheckOvalIcon";
 import { assetPrefix } from "../../next.config";
+import { handleRoute } from "@/utils/handleRoute";
 interface InputType {
   password: string | number;
   confirmPassword: string | number;
@@ -165,7 +166,7 @@ const Form: React.FC = () => {
           toast.success(res?.message || "berhasil", {
             icon: <CheckOvalIcon />,
           });
-          router.replace({ pathname: router.pathname + "/success" });
+          router.replace({ pathname: handleRoute("/form/success") });
         } else {
           toast.dismiss("kycCheckStepRequestToast");
           toast.error(res?.message || "gagal", { icon: <XIcon /> });
@@ -227,7 +228,11 @@ const Form: React.FC = () => {
       <div className="px-5 pt-8 sm:w-full md:w-4/5 mx-auto">
         <h1 className="font-poppins font-semibold text-xl">Aktivasi Akun</h1>
         <div className="flex justify-center mt-10">
-          <Image width={200} height={200} src={`${assetPrefix}/images/form.svg`} />
+          <Image
+            width={200}
+            height={200}
+            src={`${assetPrefix}/images/form.svg`}
+          />
         </div>
         <span className="font-poppins text-left block mt-5">
           Mohon mengisi data-data berikut sebagai proses aktivasi akun Tilaka:
@@ -260,10 +265,11 @@ const Form: React.FC = () => {
               autoComplete="off"
               type="text"
               placeholder="Masukkan Tilaka Name"
-              className={`font-poppins py-3 focus:outline-none  placeholder:text-placeholder placeholder:font-light   px-2 rounded-md border border-borderColor ${error.tilakaName
-                ? "border-error "
-                : "border-borderColor focus:ring"
-                }`}
+              className={`font-poppins py-3 focus:outline-none  placeholder:text-placeholder placeholder:font-light   px-2 rounded-md border border-borderColor ${
+                error.tilakaName
+                  ? "border-error "
+                  : "border-borderColor focus:ring"
+              }`}
             />
             <p className="text-error font-poppins pl-2 pt-2 block text-sm">
               {error.tilakaName}
@@ -282,10 +288,11 @@ const Form: React.FC = () => {
                 name="password"
                 type={type.password}
                 placeholder="Masukkan Kata Sandi"
-                className={`font-poppins py-3 focus:outline-none  placeholder:text-placeholder placeholder:font-light  px-2 rounded-md border  w-full ${error.password
-                  ? "border-error "
-                  : "border-borderColor focus:ring"
-                  }`}
+                className={`font-poppins py-3 focus:outline-none  placeholder:text-placeholder placeholder:font-light  px-2 rounded-md border  w-full ${
+                  error.password
+                    ? "border-error "
+                    : "border-borderColor focus:ring"
+                }`}
               />
               <button
                 onClick={(e) => handleShowPwd("password", e)}
@@ -311,10 +318,11 @@ const Form: React.FC = () => {
                 name="confirmPassword"
                 type={type.confirmPassword}
                 placeholder="Masukkan Konfirmasi Kata Sandi"
-                className={`font-poppins py-3 focus:outline-none  placeholder:text-placeholder placeholder:font-light  px-2 rounded-md border border-borderColor w-full ${error.confirmPassword
-                  ? "border-error "
-                  : "border-borderColor focus:ring"
-                  } `}
+                className={`font-poppins py-3 focus:outline-none  placeholder:text-placeholder placeholder:font-light  px-2 rounded-md border border-borderColor w-full ${
+                  error.confirmPassword
+                    ? "border-error "
+                    : "border-borderColor focus:ring"
+                } `}
               />
               <button
                 onClick={(e) => handleShowPwd("confirmPassword", e)}

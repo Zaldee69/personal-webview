@@ -123,10 +123,6 @@ const Liveness = () => {
       isLoading: true,
       position: 'top-center',
     })
-    localStorage.setItem("tlk-reg-id", router.query.registerId as string)
-    if (!localStorage.getItem("tlk-counter")) {
-      localStorage.setItem("tlk-counter", '0')
-    }
 
     try {
       const body: TKycVerificationRequestData = {
@@ -161,40 +157,25 @@ const Liveness = () => {
         router.push({ pathname: handleRoute("form"), query: { registerId: router.query.registerId } });
       } else {
         toast.dismiss('verification')
+        const attempt = result.data?.numFailedLivenessCheck || parseInt(localStorage.getItem('tlk-counter') as string) + 1
+        localStorage.setItem('tlk-counter', attempt.toString())
         if (status !== "E" && status !== "F") {
-          if (localStorage.getItem("tlk-reg-id") === router.query.registerId && parseInt(localStorage.getItem("tlk-counter") as string) >= 2) {
-            setIsSuccessState(false);
-            toast(
-              "You have failed 3 times \nYou will be redirected to the next page, please wait...",
-              {
-                type: 'error',
-                autoClose: 5000,
-                position: 'top-center',
-              }
-            )
+          setIsSuccessState(false);
+          toast(
+            "Live Detection failed. Please try again",
+            {
+              type: 'error',
+              autoClose: 5000,
+              position: 'top-center',
+            }
+          )
+          setTimeout(() => {
             router.push({ pathname: handleRoute("liveness-fail"), query: { registerId: router.query.registerId } });
-            removeStorage();
-          } else {
-            setIsSuccessState(false);
-            toast(
-              "Live Detection failed. Please try again",
-              {
-                type: 'error',
-                autoClose: 5000,
-                position: 'top-center',
-              }
-            )
-            const attempt = result.data?.numFailedLivenessCheck || parseInt(localStorage.getItem('tlk-counter') as string) + 1
-            localStorage.setItem('tlk-counter', attempt.toString())
-            setTimeout(() => {
-              router.push({ pathname: handleRoute("liveness-fail"), query: { registerId: router.query.registerId } });
-            }, 5000);
-          }
-
+          }, 5000);
         } else {
           if (status) {
-            removeStorage();
             if (status === "E") {
+              removeStorage();
               toast(
                 'We are unable to find your data in Dukpacil. For further assistance, please contact admin@tilaka.id',
                 {
@@ -206,14 +187,16 @@ const Liveness = () => {
               setIsSuccessState(false);
             } else if (status === "F") {
               toast(
-                'Registration Gagal',
+                result?.data?.numFailedLivenessCheck && result?.data?.numFailedLivenessCheck > 2 ? "You have failed 3 times \nYou will be redirected to the next page, please wait..." : 'Registration Gagal',
                 {
                   type: 'error',
                   autoClose: 5000,
                   position: 'top-center',
                 }
               )
-              router.push({ pathname: handleRoute("liveness-fail"), query: { registerId: router.query.registerId } });
+              setTimeout(() => {
+                router.push({ pathname: handleRoute("liveness-fail"), query: { registerId: router.query.registerId } });
+              }, 5000);
               setIsSuccessState(false);
             }
           } else {
