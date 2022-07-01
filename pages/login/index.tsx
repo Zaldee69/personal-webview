@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  getCertificateList
-} from "infrastructure/rest/b2b";
+import { getCertificateList } from "infrastructure/rest/b2b";
 import Footer from "@/components/Footer";
 import EyeIcon from "@/public/icons/EyeIcon";
 import EyeIconOff from "@/public/icons/EyeIconOff";
@@ -12,9 +10,10 @@ import { setAuthToken } from "@/config/API";
 import { TLoginProps } from "@/interface/interface";
 import Head from "next/head";
 import toastCaller from "@/utils/toastCaller";
-import { toast } from 'react-toastify'
+import { toast } from "react-toastify";
+import XIcon from "@/public/icons/XIcon";
 import { useRouter } from "next/router";
-import { handleRoute } from './../../utils/handleRoute';
+import { handleRoute } from "./../../utils/handleRoute";
 
 type Props = {
   channel_id: string;
@@ -23,41 +22,49 @@ type Props = {
 
 const Login = () => {
   const [password, setPassword] = useState<string>("");
-  const [tilakaName, setTilakaName] = useState("")
+  const [tilakaName, setTilakaName] = useState("");
   const [type, setType] = useState<{ password: string }>({
     password: "password",
   });
   const dispatch: AppDispatch = useDispatch();
   const data = useSelector((state: RootState) => state.login);
   const router = useRouter();
-  const { channel_id, tilaka_name, company_id } = router.query;
+  const { channel_id, tilaka_name, company_id, transaction_id } = router.query;
   const { pathname } = router;
-
 
   useEffect(() => {
     if (router.isReady) {
       setAuthToken({ channel_id, pathname } as Props);
-      setTilakaName(tilaka_name as string)
+      setTilakaName(tilaka_name as string);
     }
   }, [router.isReady]);
 
   useEffect(() => {
     if (data.status === "FULLFILLED" && data.data.success) {
-      localStorage.setItem("token", data.data.data as string)
+      localStorage.setItem("token", data.data.data as string);
       getCertificateList({ params: company_id as string }).then((res) => {
-        const certif = JSON.parse(res.data)
-        if (certif[0].status == "Aktif") {
-          router.replace({
-            pathname: handleRoute("/signing"),
-            query: { ...router.query },
+        const certif = JSON.parse(res.data);
+        if (!transaction_id) {
+          toast("Transaction ID tidak boleh kosong", {
+            type: "error",
+            toastId: "error",
+            position: "top-center",
+            icon: XIcon,
           });
         } else {
-          router.replace({
-            pathname: handleRoute("/certificate-information"),
-            query: { ...router.query },
-          });
+          if (certif[0].status == "Aktif") {
+            router.replace({
+              pathname: handleRoute("/signing"),
+              query: { ...router.query },
+            });
+          } else {
+            router.replace({
+              pathname: handleRoute("/certificate-information"),
+              query: { ...router.query },
+            });
+          }
         }
-      })
+      });
     }
     toastCaller(data);
   }, [data.status]);
@@ -69,9 +76,7 @@ const Login = () => {
 
   const submitHandler = (e: React.SyntheticEvent) => {
     e.preventDefault();
-    dispatch(
-      login({ password, ...router.query } as TLoginProps)
-    );
+    dispatch(login({ password, ...router.query } as TLoginProps));
     setPassword("");
   };
 
