@@ -7,8 +7,9 @@ import { useRouter } from "next/router";
 import { RestRegisteredCertificate, RestConfirmCertificate } from "infrastructure/rest/b2b";
 import { toast } from "react-toastify";
 import { TConfirmCertificateRequestData } from "infrastructure/rest/b2b/types";
+import { handleRoute } from "@/utils/handleRoute";
 
-function CertificateInformation({}: Props) {
+function CertificateInformation({ }: Props) {
 
   const dispatch: AppDispatch = useDispatch();
   const { certificate } = useSelector((state: RootState) => state.certificate);
@@ -24,7 +25,7 @@ function CertificateInformation({}: Props) {
       if (res?.data) {
         const result = JSON.parse(res.data[0])
         dispatch(setCertificate(result))
-      } 
+      }
     }).catch((_) => {
       toast("Gagal mengecek sertifikat", {
         type: "error",
@@ -32,22 +33,38 @@ function CertificateInformation({}: Props) {
         position: "top-center",
       });
     })
-  } 
+  }
 
   useEffect(() => {
-    if(!router.isReady) return
+    if (!router.isReady) return
     getRegisteredCertificate()
   }, [router.isReady])
-  
-  const handleConfirm = (): void => {
+
+  const handleConfirm = (e: React.MouseEvent<HTMLButtonElement>) => {
+    console.log('clicked')
+    e.preventDefault()
     const body: TConfirmCertificateRequestData = {
       company_id: company_id as string,
-      serial_number: certificate.serial_number
+      serial_number: certificate.serialNumber
     }
     RestConfirmCertificate(body).then((res) => {
-     if(res.success){
-      router.push('/setting-signature-and-mfa')
-     }
+      if (res.success) {
+        toast(`Sukses mengaktifkan sertifikat`, {
+          type: 'success',
+          position: 'top-center',
+          autoClose: 3000,
+        })
+        setTimeout(() => {
+          router.push(handleRoute('setting-signature-and-mfa'))
+        }, 1000);
+
+      } else {
+        toast(`${res.message}`, {
+          type: "error",
+          toastId: "error",
+          position: "top-center",
+        });
+      }
     }).catch((_) => {
       toast("Gagal mengaktifkan sertifikat", {
         type: "error",
@@ -69,24 +86,24 @@ function CertificateInformation({}: Props) {
           <p className="text-sm text-neutral800 font-normal w-24 pr-2">
             Negara
           </p>
-          <p className="text-sm text-neutral800 font-medium">{ certificate.negara }</p>
+          <p className="text-sm text-neutral800 font-medium">{certificate.negara}</p>
         </div>
         <div className="flex items-center">
           <p className="text-sm text-neutral800 font-normal w-24 pr-2">Nama</p>
-          <p className="text-sm text-neutral800 font-medium">{ certificate.nama }</p>
+          <p className="text-sm text-neutral800 font-medium">{certificate.nama}</p>
         </div>
         <div className="flex items-center">
           <p className="text-sm text-neutral800 font-normal w-24 pr-2">
             Organisasi
           </p>
           <p className="text-sm text-neutral800 font-medium">
-            { certificate.organisasi }
+            {certificate.organisasi}
           </p>
         </div>
         <div className="flex items-center">
           <p className="text-sm text-neutral800 font-normal w-24 pr-2">Email</p>
           <p className="text-sm text-neutral800 font-medium">
-            { certificate.emailAddress }
+            {certificate.emailAddress}
           </p>
         </div>
       </div>
@@ -99,7 +116,7 @@ function CertificateInformation({}: Props) {
         terdapat dalam sertifikat adalah benar.
       </p>
       <button
-        onClick={handleConfirm}
+        onClick={(e) => handleConfirm(e)}
         className="mt-8 p-2.5 text-base text-white bg-primary w-full font-medium rounded-sm"
       >
         SESUAI
