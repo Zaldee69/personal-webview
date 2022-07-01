@@ -12,6 +12,7 @@ const LinkAccountSuccess = (props: Props) => {
   const routerIsReady: boolean = router.isReady;
   const routerQuery: NextParsedUrlQuery & { signing?: "1" } = router.query;
   const isSigning: boolean = routerQuery.signing === "1";
+  const REDIRECT_URL = "http://10.117.1.103:9080/"
 
   useEffect(() => {
     if (!routerIsReady) return;
@@ -43,7 +44,7 @@ const LinkAccountSuccess = (props: Props) => {
       </div>
       {!isSigning && (
         <div className="mt-20 text-primary text-base font-medium font-poppins underline hover:cursor-pointer">
-          <Link href="/">
+          <Link href={process.env.NEXT_REDIRECT_API_URL || REDIRECT_URL}>
             <a>Kembali ke Halaman Utama</a>
           </Link>
         </div>
