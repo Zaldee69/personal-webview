@@ -45,6 +45,7 @@ const Login = () => {
       getCertificateList({ params: company_id as string }).then((res) => {
         const certif = JSON.parse(res.data);
         if (!transaction_id) {
+          toast.dismiss("success")
           toast("Transaction ID tidak boleh kosong", {
             type: "error",
             toastId: "error",
