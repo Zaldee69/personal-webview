@@ -11,8 +11,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { login } from "@/redux/slices/loginSlice";
 import Head from "next/head";
 import { TLoginProps } from "@/interface/interface";
-import { assetPrefix } from '../../next.config'
-import { handleRoute } from './../../utils/handleRoute';
+import { assetPrefix } from "../../next.config";
+import { handleRoute } from "./../../utils/handleRoute";
 
 type Props = {};
 
@@ -26,7 +26,8 @@ const LinkAccount = (props: Props) => {
   const [showPassword, showPasswordSetter] = useState<boolean>(false);
   const [nikRegistered, nikRegisteredSetter] = useState<boolean>(true);
   const [form, formSetter] = useState<Tform>({ tilaka_name: "", password: "" });
-  const { nik } = router.query;
+  const { nik, registerId, request_id, transaction_id, ...restRouterQuery } =
+    router.query;
   const dispatch: AppDispatch = useDispatch();
   const data = useSelector((state: RootState) => state.login);
 
@@ -50,7 +51,14 @@ const LinkAccount = (props: Props) => {
         password,
         nik,
         tilaka_name,
-        ...router.query,
+        request_id: registerId
+          ? registerId
+          : request_id
+          ? request_id
+          : transaction_id
+          ? transaction_id
+          : undefined,
+        ...restRouterQuery,
       } as TLoginProps)
     );
   };
@@ -61,7 +69,10 @@ const LinkAccount = (props: Props) => {
         pathname: handleRoute("/link-account/success"),
         query: { ...router.query },
       });
-    } else if (data.data.message == "NIK Not Equals ON Tilaka System" && !data.data.success) {
+    } else if (
+      data.data.message == "NIK Not Equals ON Tilaka System" &&
+      !data.data.success
+    ) {
       router.replace(handleRoute("/link-account/failure"));
     } else if (data.status === "FULLFILLED" && !data.data.success) {
       toast.error(
@@ -84,7 +95,6 @@ const LinkAccount = (props: Props) => {
     }
   }, [data.status]);
 
-
   return (
     <>
       <Head>
@@ -96,7 +106,11 @@ const LinkAccount = (props: Props) => {
           Penautan Akun
         </p>
         <div className="flex justify-center mt-6">
-          <Image src={`${assetPrefix}/images/linkAccount.svg`} width="150px" height="150px" />
+          <Image
+            src={`${assetPrefix}/images/linkAccount.svg`}
+            width="150px"
+            height="150px"
+          />
         </div>
         {nikRegistered && (
           <p className="font-poppins text-sm text-neutral800 mt-5">
@@ -164,7 +178,11 @@ const LinkAccount = (props: Props) => {
               </a>
             </Link>
             <div className="block mx-2.5">
-              <Image src={`${assetPrefix}/images/lineVertical.svg`} width="8px" height="24px" />
+              <Image
+                src={`${assetPrefix}/images/lineVertical.svg`}
+                width="8px"
+                height="24px"
+              />
             </div>
             <Link href="/forgot-tilaka-name">
               <a className="font-poppins text-primary text-xs">
