@@ -15,6 +15,7 @@ const toastCaller = (props : TLoginInitialState) => {
         toast.dismiss("info");
         toast(`Login berhasil`, {
           type: "success",
+          toastId: "success",
           position: "top-center",
         });
       } else if (
