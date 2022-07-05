@@ -41,7 +41,6 @@ function CertificateInformation({ }: Props) {
   }, [router.isReady])
 
   const handleConfirm = (e: React.MouseEvent<HTMLButtonElement>) => {
-    console.log('clicked')
     e.preventDefault()
     const body: TConfirmCertificateRequestData = {
       company_id: company_id as string,
@@ -55,7 +54,10 @@ function CertificateInformation({ }: Props) {
           autoClose: 3000,
         })
         setTimeout(() => {
-          router.push(handleRoute('setting-signature-and-mfa'))
+          router.replace({
+            pathname: handleRoute('setting-signature-and-mfa'),
+            query: { ...router.query },
+          });
         }, 1000);
 
       } else {

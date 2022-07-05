@@ -503,7 +503,7 @@ const OTPModal: React.FC<Active> = ({ modal, setModal }) => {
               Tanda Tangan Berhasil
             </p>
             <div className="my-10">
-              <Image width={150} height={150} src="/images/successFR.svg" />
+              <Image width={150} height={150} src={`${assetPrefix}/images/successFR.svg`} />
             </div>
 
             <button
