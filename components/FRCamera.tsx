@@ -4,6 +4,7 @@ import Webcam from "react-webcam";
 import { RootState } from "@/redux/app/store";
 import { useSelector } from "react-redux";
 import { restSigning } from "infrastructure/rest/signing";
+import { restLogout } from "infrastructure/rest/b2b";
 import { useRouter } from "next/router";
 import { toast } from "react-toastify";
 import XIcon from "@/public/icons/XIcon";
@@ -129,6 +130,7 @@ const FRCamera = ({setIsFRSuccess, setModal} : Props) => {
         if(count >= 5){
           localStorage.removeItem("token")
           localStorage.setItem("count", "0")
+          restLogout()
           router.replace({
             pathname: handleRoute("/login"),
             query: { ...router.query },

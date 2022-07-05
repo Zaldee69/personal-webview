@@ -41,7 +41,8 @@ const Login = () => {
 
   useEffect(() => {
     if (data.status === "FULLFILLED" && data.data.success) {
-      localStorage.setItem("token", data.data.data as string);
+      localStorage.setItem("token", data.data.data[0] as string);
+      localStorage.setItem("refresh_token", data.data.data[1] as string);
       getCertificateList({ params: company_id as string }).then((res) => {
         const certif = JSON.parse(res.data);
         if (!transaction_id) {
