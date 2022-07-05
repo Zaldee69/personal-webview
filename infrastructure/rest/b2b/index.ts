@@ -135,3 +135,13 @@ export const getCertificateList = ({
       throw err;
     });
 };
+
+export const restLogout = ()  : Promise<any> => {
+  const token =localStorage.getItem("refresh_token")
+  return axios
+  .post(`http://10.117.1.151:8080/v1/personal/logout`, {
+    refresh_token : token,
+  })
+    .then(res => res)
+    .catch(err => err)
+}

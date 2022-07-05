@@ -7,6 +7,7 @@ import { AppDispatch, RootState } from "@/redux/app/store";
 import { TDocumentProps } from "@/interface/interface";
 import { PinInput } from "react-input-pin-code";
 import { restSigning } from "infrastructure/rest/signing";
+import { restLogout } from "infrastructure/rest/b2b";
 import { toast } from "react-toastify";
 import XIcon from "@/public/icons/XIcon";
 import { restGetOtp } from "infrastructure/rest/b2b";
@@ -465,7 +466,6 @@ const OTPModal: React.FC<Active> = ({ modal, setModal }) => {
       localStorage.setItem("count", "0")
     }).catch((err) => {
       toast.dismiss("loading")
-      console.log(err) 
       if(err.request.status === 401){
         router.replace({
           pathname: "/login",
@@ -480,16 +480,15 @@ const OTPModal: React.FC<Active> = ({ modal, setModal }) => {
         if(count >= 5){
           localStorage.removeItem("token")
           localStorage.setItem("count", "0")
+          restLogout()
           router.replace({
-            pathname: "/login",
-            query: { ...router.query },
-          });
+              pathname: "/login",
+              query: { ...router.query },
+            });
         }
       }
     })
   };
-
-  console.log(values.join("").length)
 
   return modal ? (
     <div
