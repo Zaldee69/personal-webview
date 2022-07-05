@@ -11,8 +11,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { login } from "@/redux/slices/loginSlice";
 import Head from "next/head";
 import { TLoginProps } from "@/interface/interface";
-import { assetPrefix } from '../../next.config'
-import { handleRoute } from './../../utils/handleRoute';
+import { assetPrefix } from "../../next.config";
+import { handleRoute } from "./../../utils/handleRoute";
 
 type Props = {};
 
@@ -61,7 +61,10 @@ const LinkAccount = (props: Props) => {
         pathname: handleRoute("/link-account/success"),
         query: { ...router.query },
       });
-    } else if (data.data.message == "NIK Not Equals ON Tilaka System" && !data.data.success) {
+    } else if (
+      data.data.message == "NIK Not Equals ON Tilaka System" &&
+      !data.data.success
+    ) {
       router.replace(handleRoute("/link-account/failure"));
     } else if (data.status === "FULLFILLED" && !data.data.success) {
       toast.error(
@@ -84,7 +87,6 @@ const LinkAccount = (props: Props) => {
     }
   }, [data.status]);
 
-
   return (
     <>
       <Head>
@@ -96,7 +98,11 @@ const LinkAccount = (props: Props) => {
           Penautan Akun
         </p>
         <div className="flex justify-center mt-6">
-          <Image src={`${assetPrefix}/images/linkAccount.svg`} width="150px" height="150px" />
+          <Image
+            src={`${assetPrefix}/images/linkAccount.svg`}
+            width="150px"
+            height="150px"
+          />
         </div>
         {nikRegistered && (
           <p className="font-poppins text-sm text-neutral800 mt-5">
@@ -158,13 +164,22 @@ const LinkAccount = (props: Props) => {
             </div>
           </label>
           <div className="flex justify-center items-center mt-10">
-            <Link href="/forgot-password">
-              <a className="font-poppins text-primary text-xs">
-                Lupa Kata Sandi
-              </a>
-            </Link>
+            <a
+              target="_blank"
+              rel="noopener noreferrer"
+              href={`https://${
+                process.env.REDIRECT_URL_PREFIX || "dev"
+              }-corporate.tilaka.id/ca-corporate-portal/public/reset-pass-req.xhtml`}
+              className="font-poppins text-primary text-xs"
+            >
+              Lupa Kata Sandi
+            </a>
             <div className="block mx-2.5">
-              <Image src={`${assetPrefix}/images/lineVertical.svg`} width="8px" height="24px" />
+              <Image
+                src={`${assetPrefix}/images/lineVertical.svg`}
+                width="8px"
+                height="24px"
+              />
             </div>
             <Link href="/forgot-tilaka-name">
               <a className="font-poppins text-primary text-xs">
