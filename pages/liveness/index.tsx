@@ -77,10 +77,19 @@ const Liveness = () => {
             }
           }).catch((error) => {
             toast.dismiss('generateAction')
-            if (error.response?.data?.data?.errors?.[0]) {
-              toast.error(error.response?.data?.data?.errors?.[0], {
-                icon: <XIcon />,
-              });
+            const msg = error.response?.data?.data?.errors?.[0] 
+            if (msg) {
+              if(msg === "Proses ekyc untuk registrationId ini telah sukses"){
+                toast(`${msg}`, {
+                  type: 'success',
+                  position: 'top-center',
+                  autoClose: 3000,
+                })
+              }else {
+                toast.error(msg, {
+                  icon: <XIcon />,
+                });
+              }
             } else {
               toast.error(error.response?.data?.message || "Generate Action gagal", {
                 icon: <XIcon />,
