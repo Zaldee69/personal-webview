@@ -181,11 +181,16 @@ const LinkAccount = (props: Props) => {
                 height="24px"
               />
             </div>
-            <Link href="/forgot-tilaka-name">
-              <a className="font-poppins text-primary text-xs">
-                Lupa Tilaka Name
-              </a>
-            </Link>
+            <a
+              target="_blank"
+              rel="noopener noreferrer"
+              href={`https://${
+                process.env.REDIRECT_URL_PREFIX || "dev"
+              }-corporate.tilaka.id/ca-corporate-portal/public/forgot-tilaka-name.xhtml`}
+              className="font-poppins text-primary text-xs"
+            >
+              Lupa Tilaka Name
+            </a>
           </div>
           <button
             type="submit"
