@@ -1,7 +1,6 @@
 import { assetPrefix } from "../../next.config";
 import { NextParsedUrlQuery } from "next/dist/server/request-meta";
 import Image from "next/image";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useEffect } from "react";
 import { restLogout } from "infrastructure/rest/b2b";
@@ -51,9 +50,9 @@ const LinkAccountSuccess = (props: Props) => {
       </div>
       {isNotSigning && routerQuery.redirect_url && (
         <div className="mt-20 text-primary text-base font-medium font-poppins underline hover:cursor-pointer">
-          <Link href={routerQuery.redirect_url}>
+          <a href={routerQuery.redirect_url}>
             <a>Kembali ke Halaman Utama</a>
-          </Link>
+          </a>
         </div>
       )}
       <div className="mt-11 flex justify-center">

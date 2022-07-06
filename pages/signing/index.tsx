@@ -2,7 +2,7 @@ import { Viewer } from "@/components/Viewer";
 import { useDispatch, useSelector } from "react-redux";
 import { getDocument } from "@/redux/slices/documentSlice";
 import { addFont, addScratch } from "@/redux/slices/signatureSlice";
-import { useRouter } from "next/router";
+import { Router, useRouter } from "next/router";
 import { AppDispatch, RootState } from "@/redux/app/store";
 import { TDocumentProps } from "@/interface/interface";
 import { PinInput } from "react-input-pin-code";
@@ -181,6 +181,8 @@ const Configuration: React.FC<{
 };
 
 const FRModal: React.FC<Active | any> = ({ modal, setModal }) => {
+  const router = useRouter()
+  const routerQuery = router.query
   const [isFRSuccess, setIsFRSuccess] = useState<boolean>(false);
 
   useEffect(() => {
@@ -210,6 +212,9 @@ const FRModal: React.FC<Active | any> = ({ modal, setModal }) => {
               onClick={() => {
                 setModal(!modal);
                 setIsFRSuccess(false);
+                if(routerQuery.redirect_url){
+                  router.replace({pathname: handleRoute(routerQuery.redirect_url as string)})
+                }
               }}
               className="bg-primary btn  text-white font-poppins w-full mt-5 mx-auto rounded-sm h-9"
             >
@@ -411,7 +416,7 @@ const OTPModal: React.FC<Active> = ({ modal, setModal }) => {
   const document = useSelector((state: RootState) => state.document);
   const signature = useSelector((state: RootState) => state.signature);
   const router = useRouter();
-  const {transaction_id, request_id} = router.query
+  const {transaction_id, request_id, ...restRouterQuery} = router.query
 
   const [values, setValues] = useState(["", "", "", "", "", ""]);
 
@@ -509,6 +514,9 @@ const OTPModal: React.FC<Active> = ({ modal, setModal }) => {
             <button
               onClick={() => {
                 setModal(false);
+                if(restRouterQuery.redirect_url){
+                  router.replace({pathname: handleRoute(restRouterQuery.redirect_url as string)})
+                }
               }}
               className="bg-primary btn  text-white font-poppins w-full mt-5 mx-auto rounded-sm h-9"
             >

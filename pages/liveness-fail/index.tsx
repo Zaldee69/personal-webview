@@ -4,52 +4,58 @@ import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import Footer from "../../components/Footer";
 import { useRouter } from "next/router";
-import { assetPrefix } from '../../next.config'
+import { assetPrefix } from "../../next.config";
 import { AppDispatch } from "@/redux/app/store";
 import { useDispatch } from "react-redux";
 import { setIsDone } from "@/redux/slices/livenessSlice";
 import { handleRoute } from "@/utils/handleRoute";
 
 const LivenessFail = () => {
-  const router = useRouter()
-  const [gagalCounter, setGagalCounter] = useState(0)
+  const router = useRouter();
+  const [gagalCounter, setGagalCounter] = useState(0);
   const dispatch: AppDispatch = useDispatch();
 
-  const REDIRECT_URL = "http://10.117.1.103:9080/"
-
-
   const resetStorage = () => {
-    setGagalCounter(0)
-    sessionStorage.removeItem('tlk-counter')
-    router.push(process.env.NEXT_REDIRECT_API_URL || REDIRECT_URL)
-  }
+    setGagalCounter(0);
+    sessionStorage.removeItem("tlk-counter");
+    router.replace({
+      pathname: handleRoute((router.query.redirect_url as string) || "/"),
+    });
+  };
 
   useEffect(() => {
-    if (gagalCounter > 2) localStorage.removeItem('tlk-counter')
-  }, [gagalCounter])
+    if (gagalCounter > 2) localStorage.removeItem("tlk-counter");
+  }, [gagalCounter]);
 
   useEffect(() => {
-    dispatch(setIsDone(false))
-    if (localStorage.getItem('tlk-counter')) {
-      setGagalCounter(parseInt(localStorage.getItem('tlk-counter') as string))
+    dispatch(setIsDone(false));
+    if (localStorage.getItem("tlk-counter")) {
+      setGagalCounter(parseInt(localStorage.getItem("tlk-counter") as string));
     }
-  }, [])
+  }, []);
 
   const RedirectButton = () => {
     if (gagalCounter > 2) {
       return (
-        <span onClick={resetStorage} className="text-center font-semibold font-poppins underline-offset-1	underline  text-primary" >Kembali ke Halaman Utama</span>
-      )
+        <span
+          onClick={resetStorage}
+          className="cursor-pointer text-center font-semibold font-poppins underline-offset-1	underline  text-primary"
+        >
+          Kembali ke Halaman Utama
+        </span>
+      );
     } else {
       return (
-        <Link href={handleRoute(`/guide?registerId=${router.query.request_id}`)}>
+        <Link
+          href={{ pathname: handleRoute(`/guide`), query: { ...router.query } }}
+        >
           <button className="bg-primary btn md:mx-auto md:block md:w-1/4 text-white font-poppins w-full mx-auto rounded-sm h-9">
             ULANGI
           </button>
         </Link>
-      )
+      );
     }
-  }
+  };
   return (
     <>
       <Head>
@@ -61,12 +67,16 @@ const LivenessFail = () => {
           <h1 className="text-center font-poppins text-xl font-semibold">
             Liveness Gagal
           </h1>
-          <Image src={`${assetPrefix}/images/livenessFail.svg`} width={200} height={200} />
+          <Image
+            src={`${assetPrefix}/images/livenessFail.svg`}
+            width={200}
+            height={200}
+          />
           <div className="flex flex-col gap-10 ">
             <span className="text-center font-poppins text-neutral ">
-              {
-                gagalCounter > 2 ? 'Mohon mengisi Formulir yang dikirim ke email Anda untuk melanjutkan proses aktivasi akun' : 'Maaf, proses Liveness Anda gagal. Foto dan aksi yang diminta tidak sesuai. Mohon ulangi proses Liveness dan ikuti petunjuk dengan benar.'
-              }
+              {gagalCounter > 2
+                ? "Mohon mengisi Formulir yang dikirim ke email Anda untuk melanjutkan proses aktivasi akun"
+                : "Maaf, proses Liveness Anda gagal. Foto dan aksi yang diminta tidak sesuai. Mohon ulangi proses Liveness dan ikuti petunjuk dengan benar."}
             </span>
           </div>
           <RedirectButton />

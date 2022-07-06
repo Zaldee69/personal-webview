@@ -64,7 +64,7 @@ const LinkAccount = (props: Props) => {
         pathname: handleRoute("/link-account/success"),
         query: { ...router.query },
       });
-    }  else if (
+    } else if (
       data.status === "REJECTED" ||
       (data.status === "FULLFILLED" && !data.data.success)
     ) {

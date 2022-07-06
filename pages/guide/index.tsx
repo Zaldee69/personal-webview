@@ -1,12 +1,12 @@
 import Link from "next/link";
-import { useRouter } from 'next/router'
+import { useRouter } from "next/router";
 import Footer from "../../components/Footer";
 import Head from "next/head";
 import { handleRoute } from "@/utils/handleRoute";
 
 const Guide = () => {
-  const router = useRouter()
-  const routerQuery = router.query
+  const router = useRouter();
+  const routerQuery = router.query;
 
   return (
     <>
@@ -15,7 +15,7 @@ const Guide = () => {
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
       <div className="px-5 pt-8 sm:w-full md:w-4/5 mx-auto ">
-        <h2 className="font-poppins text-xl font-semibold" >Liveness</h2>
+        <h2 className="font-poppins text-xl font-semibold">Liveness</h2>
         <span className="font-poppins text-sm block mt-4">
           Mohon perhatikan hal-hal berikut saat pengambilan wajah untuk
           penilaian yang maksimal.
@@ -63,7 +63,15 @@ const Guide = () => {
             </li>
           </ul>
         </div>
-        <Link href={handleRoute(`/liveness?request_id=${routerQuery.request_id}`)}>
+        <Link
+          href={{
+            pathname: handleRoute(`/liveness`),
+            query: {
+              ...routerQuery,
+              request_id: routerQuery.request_id,
+            },
+          }}
+        >
           <button className="bg-primary btn md:mx-auto md:block md:w-1/4 text-white font-poppins w-full mx-auto rounded-sm h-9 ">
             MULAI
           </button>
