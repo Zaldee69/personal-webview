@@ -1,11 +1,14 @@
+import { handleRoute } from "@/utils/handleRoute";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import React from "react";
-import { assetPrefix } from '../../next.config'
+import { assetPrefix } from "../../next.config";
 
 type Props = {};
 
 const LinkAccountFailure = (props: Props) => {
+  const router = useRouter();
   return (
     <div className="px-10 pt-16 pb-9 text-center">
       <p className="font-poppins text-base font-semibold text-neutral800">
@@ -24,7 +27,12 @@ const LinkAccountFailure = (props: Props) => {
         </p>
       </div>
       <div className="mt-20 text-primary text-base font-medium font-poppins underline hover:cursor-pointer">
-        <Link href="/link-account">
+        <Link
+          href={{
+            pathname: handleRoute("/link-account"),
+            query: { ...router.query },
+          }}
+        >
           <a>Tautkan Akun Tilaka</a>
         </Link>
       </div>
