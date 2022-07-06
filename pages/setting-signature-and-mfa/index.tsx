@@ -46,7 +46,10 @@ function SettingSignatureAndMFA({}: Props) {
   const handleFormOnChange = (e: React.FormEvent<HTMLInputElement>): void => {
     formSetter({ ...form, [e.currentTarget.name]: e.currentTarget.value });
     ref = e.currentTarget;
-    convertToDataURL();
+
+    if(ref.name !== "mfa_method"){
+      convertToDataURL();
+    }
   };
 
   useEffect(() => {

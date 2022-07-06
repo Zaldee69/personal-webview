@@ -63,7 +63,7 @@ const Guide = () => {
             </li>
           </ul>
         </div>
-        <Link href={handleRoute(`/liveness?registerId=${routerQuery.registerId}`)}>
+        <Link href={handleRoute(`/liveness?request_id=${routerQuery.request_id}`)}>
           <button className="bg-primary btn md:mx-auto md:block md:w-1/4 text-white font-poppins w-full mx-auto rounded-sm h-9 ">
             MULAI
           </button>

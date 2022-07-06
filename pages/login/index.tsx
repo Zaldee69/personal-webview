@@ -41,10 +41,12 @@ const Login = () => {
 
   useEffect(() => {
     if (data.status === "FULLFILLED" && data.data.success) {
-      localStorage.setItem("token", data.data.data as string);
+      localStorage.setItem("token", data.data.data[0] as string);
+      localStorage.setItem("refresh_token", data.data.data[1] as string);
       getCertificateList({ params: company_id as string }).then((res) => {
         const certif = JSON.parse(res.data);
         if (!transaction_id) {
+          toast.dismiss("success")
           toast("Transaction ID tidak boleh kosong", {
             type: "error",
             toastId: "error",
@@ -127,7 +129,12 @@ const Login = () => {
                 {type.password === "password" ? <EyeIcon /> : <EyeIconOff />}
               </button>
             </div>
-            <a className="m-5 text-center font-poppins text-primary" href="#">
+            <a className="m-5 text-center font-poppins text-primary"
+               target="_blank"
+               rel="noopener noreferrer"
+               href={`https://${
+                process.env.REDIRECT_URL_PREFIX || "dev"
+              }-corporate.tilaka.id/ca-corporate-portal/public/reset-pass-req.xhtml`}>
               Lupa Kata Sandi
             </a>
           </div>

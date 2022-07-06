@@ -58,15 +58,12 @@ const LinkAccount = (props: Props) => {
 
   useEffect(() => {
     if (data.status === "FULLFILLED" && data.data.success) {
+      localStorage.setItem("refresh_token", data.data.data[1] as string);
+      localStorage.setItem("token", data.data.data[0] as string);
       router.replace({
         pathname: handleRoute("/link-account/success"),
         query: { ...router.query },
       });
-    } else if (
-      data.data.message == "NIK Not Equals ON Tilaka System" &&
-      !data.data.success
-    ) {
-      router.replace(handleRoute("/link-account/failure"));
     } else if (data.status === "FULLFILLED" && !data.data.success) {
       toast.error(
         !data.data.message
@@ -165,11 +162,16 @@ const LinkAccount = (props: Props) => {
             </div>
           </label>
           <div className="flex justify-center items-center mt-10">
-            <Link href="/forgot-password">
-              <a className="font-poppins text-primary text-xs">
-                Lupa Kata Sandi
-              </a>
-            </Link>
+            <a
+              target="_blank"
+              rel="noopener noreferrer"
+              href={`https://${
+                process.env.REDIRECT_URL_PREFIX || "dev"
+              }-corporate.tilaka.id/ca-corporate-portal/public/reset-pass-req.xhtml`}
+              className="font-poppins text-primary text-xs"
+            >
+              Lupa Kata Sandi
+            </a>
             <div className="block mx-2.5">
               <Image
                 src={`${assetPrefix}/images/lineVertical.svg`}
@@ -177,11 +179,16 @@ const LinkAccount = (props: Props) => {
                 height="24px"
               />
             </div>
-            <Link href="/forgot-tilaka-name">
-              <a className="font-poppins text-primary text-xs">
-                Lupa Tilaka Name
-              </a>
-            </Link>
+            <a
+              target="_blank"
+              rel="noopener noreferrer"
+              href={`https://${
+                process.env.REDIRECT_URL_PREFIX || "dev"
+              }-corporate.tilaka.id/ca-corporate-portal/public/forgot-tilaka-name.xhtml`}
+              className="font-poppins text-primary text-xs"
+            >
+              Lupa Tilaka Name
+            </a>
           </div>
           <button
             type="submit"

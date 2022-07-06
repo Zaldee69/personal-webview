@@ -4,7 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useEffect } from "react";
-import { handleRoute } from "@/utils/handleRoute";
+import { restLogout } from "infrastructure/rest/b2b";
+import { handleRoute } from "./../../utils/handleRoute";
 
 type Props = {};
 
@@ -19,14 +20,17 @@ const LinkAccountSuccess = (props: Props) => {
 
   useEffect(() => {
     if (!routerIsReady) return;
-    if (isNotSigning) return;
-    setTimeout(() => {
-      router.replace({
-        pathname: handleRoute("/signing"),
-        query: { ...routerQuery },
-      });
-    }, 1000);
-  }, [isNotSigning]);
+    if (isNotSigning) {
+      restLogout();
+    } else {
+      setTimeout(() => {
+        router.replace({
+          pathname: handleRoute("/signing"),
+          query: { ...routerQuery },
+        });
+      }, 1000);
+    }
+  }, [isNotSigning, routerIsReady]);
 
   return (
     <div className="px-10 pt-16 pb-9 text-center">

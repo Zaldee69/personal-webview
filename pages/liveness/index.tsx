@@ -51,7 +51,7 @@ const Liveness = () => {
 
   const generateAction = () => {
     const body = {
-      registerId: routerQuery.registerId as string
+      registerId: routerQuery.request_id as string
     }
     toast(`Mengecek status...`, {
       type: 'info',
@@ -59,7 +59,7 @@ const Liveness = () => {
       isLoading: true,
       position: 'top-center',
     })
-    RestKycCheckStep({ payload: { registerId: routerQuery.registerId as string } })
+    RestKycCheckStep({ payload: { registerId: routerQuery.request_id as string } })
       .then((res) => {
         if (res.success && (res.data.status !== 'D' && res.data.status !== 'F' && res.data.status !== 'E')) {
           RestKycGenerateAction(body).then((result) => {
@@ -77,10 +77,19 @@ const Liveness = () => {
             }
           }).catch((error) => {
             toast.dismiss('generateAction')
-            if (error.response?.data?.data?.errors?.[0]) {
-              toast.error(error.response?.data?.data?.errors?.[0], {
-                icon: <XIcon />,
-              });
+            const msg = error.response?.data?.data?.errors?.[0] 
+            if (msg) {
+              if(msg === "Proses ekyc untuk registrationId ini telah sukses"){
+                toast(`${msg}`, {
+                  type: 'success',
+                  position: 'top-center',
+                  autoClose: 3000,
+                })
+              }else {
+                toast.error(msg, {
+                  icon: <XIcon />,
+                });
+              }
             } else {
               toast.error(error.response?.data?.message || "Generate Action gagal", {
                 icon: <XIcon />,
@@ -98,8 +107,8 @@ const Liveness = () => {
               position: 'top-center',
             }
           )
-          if (res.message === 'Anda berada di tahap pengisian formulir') router.push(handleRoute('form'), { query: { registerId: router.query.registerId } })
-          else router.push({ pathname: handleRoute("liveness-failure"), query: { registerId: router.query.registerId } });
+          if (res.message === 'Anda berada di tahap pengisian formulir') router.push(handleRoute('form'), { query: { request_id: router.query.request_id } })
+          else router.push({ pathname: handleRoute("liveness-failure"), query: { request_id: router.query.request_id } });
         }
       })
       .catch((err) => {
@@ -126,7 +135,7 @@ const Liveness = () => {
 
     try {
       const body: TKycVerificationRequestData = {
-        registerId: router.query.registerId as string,
+        registerId: router.query.request_id as string,
         mode: "web",
         image_action1: "",
         image_action2: "",
@@ -154,7 +163,7 @@ const Liveness = () => {
       if (result.success) {
         toast.dismiss('verification')
         removeStorage();
-        router.push({ pathname: handleRoute("form"), query: { registerId: router.query.registerId } });
+        router.push({ pathname: handleRoute("form"), query: { request_id: router.query.request_id } });
       } else {
         toast.dismiss('verification')
         const attempt = result.data?.numFailedLivenessCheck || parseInt(localStorage.getItem('tlk-counter') as string) + 1
@@ -170,7 +179,7 @@ const Liveness = () => {
             }
           )
           setTimeout(() => {
-            router.push({ pathname: handleRoute("liveness-fail"), query: { registerId: router.query.registerId } });
+            router.push({ pathname: handleRoute("liveness-fail"), query: { request_id: router.query.request_id } });
           }, 5000);
         } else {
           if (status) {
@@ -195,7 +204,7 @@ const Liveness = () => {
                 }
               )
               setTimeout(() => {
-                router.push({ pathname: handleRoute("liveness-fail"), query: { registerId: router.query.registerId } });
+                router.push({ pathname: handleRoute("liveness-fail"), query: { request_id: router.query.request_id } });
               }, 5000);
               setIsSuccessState(false);
             }
@@ -219,7 +228,7 @@ const Liveness = () => {
       )
       setIsSuccessState(false);
       setTimeout(() => {
-        router.push({ pathname: handleRoute("liveness-fail"), query: { registerId: router.query.registerId } });
+        router.push({ pathname: handleRoute("liveness-fail"), query: { request_id: router.query.request_id } });
       }, 5000);
     }
   };
