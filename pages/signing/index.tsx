@@ -54,7 +54,7 @@ const Signing = () => {
   const router = useRouter();
   const routerIsReady = router.isReady;
   const pathname = router.pathname;
-  const { company_id, transaction_id, tilaka_name } = router.query;
+  const { company_id, request_id, transaction_id} = router.query;
 
   const dispatch: AppDispatch = useDispatch();
   const res = useSelector((state: RootState) => state.document);
@@ -70,7 +70,7 @@ const Signing = () => {
         const data = JSON.parse(res.data)
         setData(data.name)
       })
-      dispatch(getDocument({ company_id, transaction_id } as TDocumentProps));
+      dispatch(getDocument({ company_id, transaction_id : request_id as string || transaction_id  as string } as TDocumentProps));
       if (res.response.status === "REJECTED") {
         localStorage.removeItem("token");
       }
