@@ -76,6 +76,11 @@ const LinkAccount = (props: Props) => {
             });
           }
         });
+      } else {
+        router.replace({
+          pathname: handleRoute("/link-account/success"),
+          query: { ...router.query },
+        });
       }
     } else if (
       data.status === "REJECTED" ||
