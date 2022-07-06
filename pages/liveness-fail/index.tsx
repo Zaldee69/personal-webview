@@ -42,7 +42,7 @@ const LivenessFail = () => {
       )
     } else {
       return (
-        <Link href={handleRoute(`/guide?registerId=${router.query.registerId}`)}>
+        <Link href={handleRoute(`/guide?registerId=${router.query.request_id}`)}>
           <button className="bg-primary btn md:mx-auto md:block md:w-1/4 text-white font-poppins w-full mx-auto rounded-sm h-9">
             ULANGI
           </button>
