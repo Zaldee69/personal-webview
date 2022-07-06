@@ -57,15 +57,12 @@ const LinkAccount = (props: Props) => {
 
   useEffect(() => {
     if (data.status === "FULLFILLED" && data.data.success) {
+      localStorage.setItem("refresh_token", data.data.data[1] as string);
+      localStorage.setItem("token", data.data.data[0] as string);
       router.replace({
         pathname: handleRoute("/link-account/success"),
         query: { ...router.query },
       });
-    } else if (
-      data.data.message == "NIK Not Equals ON Tilaka System" &&
-      !data.data.success
-    ) {
-      router.replace(handleRoute("/link-account/failure"));
     } else if (data.status === "FULLFILLED" && !data.data.success) {
       toast.error(
         !data.data.message
