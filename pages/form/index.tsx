@@ -31,7 +31,7 @@ interface Type {
 
 const Form: React.FC = () => {
   const router = useRouter();
-  const { registerId } = router.query;
+  const { request_id } = router.query;
   const [input, setInput] = useState<InputType>({
     password: "",
     confirmPassword: "",
@@ -158,7 +158,7 @@ const Form: React.FC = () => {
     const password = target.password.value;
 
     RestKycFinalForm({
-      payload: { tilakaName, password, registerId: registerId as string },
+      payload: { tilakaName, password, registerId: request_id as string },
     })
       .then((res) => {
         if (res.success) {
@@ -189,9 +189,9 @@ const Form: React.FC = () => {
 
   useEffect(() => {
     if (!router.isReady) return;
-    if (!registerId) return;
+    if (!request_id) return;
     toast.info("pengecekan step...", { toastId: "kycCheckStepRequestToast" });
-    RestKycCheckStep({ payload: { registerId: registerId as string } })
+    RestKycCheckStep({ payload: { registerId: request_id as string } })
       .then((res) => {
         if (res.success) {
           toast.dismiss("kycCheckStepRequestToast");
@@ -217,7 +217,7 @@ const Form: React.FC = () => {
           });
         }
       });
-  }, [router.isReady, registerId]);
+  }, [router.isReady, request_id]);
 
   return (
     <>
