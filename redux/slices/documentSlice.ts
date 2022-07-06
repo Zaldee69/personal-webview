@@ -13,7 +13,8 @@ const initialState: TDocumentResponse = {
       posY: 0,
       width: 0,
       height: 0,
-      tandaTangan: ""
+      tandaTangan: "",
+      page_number: 0
     },
     status: "IDDLE",
   },
