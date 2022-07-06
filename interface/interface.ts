@@ -44,6 +44,7 @@ export type TDocumentResponse = {
       width: number;
       height: number;
       tandaTangan: string
+      page_number: number
     };
   } & Status;
 } 
