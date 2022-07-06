@@ -213,7 +213,7 @@ const FRModal: React.FC<Active | any> = ({ modal, setModal }) => {
                 setModal(!modal);
                 setIsFRSuccess(false);
                 if(routerQuery.redirect_url){
-                  router.replace({pathname: handleRoute(routerQuery.redirect_url as string)})
+                  window.location.replace(routerQuery.redirect_url as string);
                 }
               }}
               className="bg-primary btn  text-white font-poppins w-full mt-5 mx-auto rounded-sm h-9"
@@ -515,7 +515,7 @@ const OTPModal: React.FC<Active> = ({ modal, setModal }) => {
               onClick={() => {
                 setModal(false);
                 if(restRouterQuery.redirect_url){
-                  router.replace({pathname: handleRoute(restRouterQuery.redirect_url as string)})
+                  window.location.replace(restRouterQuery.redirect_url as string);
                 }
               }}
               className="bg-primary btn  text-white font-poppins w-full mt-5 mx-auto rounded-sm h-9"
