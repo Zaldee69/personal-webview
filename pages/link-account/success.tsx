@@ -29,7 +29,7 @@ const LinkAccountSuccess = (props: Props) => {
     }, 1000);
     }
 
-  }, [isSigning]);
+  }, [isSigning, routerIsReady]);
 
   return (
     <div className="px-10 pt-16 pb-9 text-center">
