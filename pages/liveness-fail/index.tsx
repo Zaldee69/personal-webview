@@ -18,9 +18,13 @@ const LivenessFail = () => {
   const resetStorage = () => {
     setGagalCounter(0);
     sessionStorage.removeItem("tlk-counter");
-    router.replace({
-      pathname: handleRoute((router.query.redirect_url as string) || "/"),
-    });
+    if (router.query.redirect_url) {
+      window.location.replace(router.query.redirect_url as string);
+    } else {
+      router.replace({
+        pathname: handleRoute("/"),
+      });
+    }
   };
 
   useEffect(() => {
