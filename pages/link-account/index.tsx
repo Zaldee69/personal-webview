@@ -64,23 +64,13 @@ const LinkAccount = (props: Props) => {
         pathname: handleRoute("/link-account/success"),
         query: { ...router.query },
       });
-    } else if (data.status === "FULLFILLED" && !data.data.success) {
-      toast.error(
-        !data.data.message
-          ? "Error"
-          : data.data?.message[0] === "I"
-          ? "Tilaka name / Kata sandi salah"
-          : data.data.message,
-        {
-          icon: <XIcon />,
-        }
-      );
-    } else if (
+    }  else if (
       data.status === "REJECTED" ||
       (data.status === "FULLFILLED" && !data.data.success)
     ) {
-      toast.error("Error", {
-        icon: <XIcon />,
+      router.replace({
+        pathname: handleRoute("/link-account/failure"),
+        query: { ...router.query },
       });
     }
   }, [data.status]);
