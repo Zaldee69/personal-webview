@@ -89,7 +89,7 @@ const FRCamera = ({setIsFRSuccess, setModal} : Props) => {
         coordinate_x: document.response.data.posX,
         coordinate_y: document.response.data.posY,
         signature_image: signature.data.font || signature.data.scratch || document.response.data.tandaTangan,
-        page_number: 1,
+        page_number: document.response.data.page_number,
         qr_content: "",
         tilakey: "",
         company_id: "",
