@@ -26,7 +26,7 @@ const LinkAccount = (props: Props) => {
   const [showPassword, showPasswordSetter] = useState<boolean>(false);
   const [nikRegistered, nikRegisteredSetter] = useState<boolean>(true);
   const [form, formSetter] = useState<Tform>({ tilaka_name: "", password: "" });
-  const { nik } = router.query;
+  const { nik, request_id, ...restRouterQuery } = router.query;
   const dispatch: AppDispatch = useDispatch();
   const data = useSelector((state: RootState) => state.login);
 
@@ -50,7 +50,8 @@ const LinkAccount = (props: Props) => {
         password,
         nik,
         tilaka_name,
-        ...router.query,
+        request_id,
+        ...restRouterQuery,
       } as TLoginProps)
     );
   };

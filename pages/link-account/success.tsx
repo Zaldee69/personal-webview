@@ -12,24 +12,25 @@ type Props = {};
 const LinkAccountSuccess = (props: Props) => {
   const router = useRouter();
   const routerIsReady: boolean = router.isReady;
-  const routerQuery: NextParsedUrlQuery & { signing?: "1" } = router.query;
-  const isSigning: boolean = routerQuery.signing === "1";
-  const REDIRECT_URL = "http://10.117.1.103:9080/"
+  const routerQuery: NextParsedUrlQuery & {
+    signing?: "0";
+    redirect_url?: string;
+  } = router.query;
+  const isNotSigning: boolean = routerQuery.signing === "0";
 
   useEffect(() => {
     if (!routerIsReady) return;
-    if (!isSigning) {
-      restLogout()
-    }else {
-        setTimeout(() => {
-      router.replace({
-        pathname: handleRoute("/signing"),
-        query: { ...routerQuery },
-      });
-    }, 1000);
+    if (isNotSigning) {
+      restLogout();
+    } else {
+      setTimeout(() => {
+        router.replace({
+          pathname: handleRoute("/signing"),
+          query: { ...routerQuery },
+        });
+      }, 1000);
     }
-
-  }, [isSigning, routerIsReady]);
+  }, [isNotSigning, routerIsReady]);
 
   return (
     <div className="px-10 pt-16 pb-9 text-center">
@@ -48,9 +49,9 @@ const LinkAccountSuccess = (props: Props) => {
           Akun Tilaka Anda telah berhasil ditautkan.
         </p>
       </div>
-      {!isSigning && (
+      {isNotSigning && routerQuery.redirect_url && (
         <div className="mt-20 text-primary text-base font-medium font-poppins underline hover:cursor-pointer">
-          <Link href={process.env.NEXT_REDIRECT_API_URL || REDIRECT_URL}>
+          <Link href={routerQuery.redirect_url}>
             <a>Kembali ke Halaman Utama</a>
           </Link>
         </div>
