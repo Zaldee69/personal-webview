@@ -129,7 +129,12 @@ const Login = () => {
                 {type.password === "password" ? <EyeIcon /> : <EyeIconOff />}
               </button>
             </div>
-            <a className="m-5 text-center font-poppins text-primary" href="#">
+            <a className="m-5 text-center font-poppins text-primary"
+               target="_blank"
+               rel="noopener noreferrer"
+               href={`https://${
+                process.env.REDIRECT_URL_PREFIX || "dev"
+              }-corporate.tilaka.id/ca-corporate-portal/public/reset-pass-req.xhtml`}>
               Lupa Kata Sandi
             </a>
           </div>
