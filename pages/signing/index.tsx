@@ -411,6 +411,7 @@ const OTPModal: React.FC<Active> = ({ modal, setModal }) => {
   const document = useSelector((state: RootState) => state.document);
   const signature = useSelector((state: RootState) => state.signature);
   const router = useRouter();
+  const {transaction_id, request_id} = router.query
 
   const [values, setValues] = useState(["", "", "", "", "", ""]);
 
@@ -452,15 +453,14 @@ const OTPModal: React.FC<Active> = ({ modal, setModal }) => {
           signature.data.font ||
           signature.data.scratch ||
           document.response.data.tandaTangan,
-        page_number: 1,
+        page_number: document.response.data.page_number,
         qr_content: "",
         tilakey: "",
         company_id: "",
         api_id: "",
-        trx_id: router.query.transaction_id as string,
+        trx_id: transaction_id as string || request_id as string
       },
     }).then((res) => {
-      console.log(res)
       setSuccessSigning(true)
       toast.dismiss("loading")
       localStorage.setItem("count", "0")

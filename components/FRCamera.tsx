@@ -34,6 +34,7 @@ const FRCamera = ({setIsFRSuccess, setModal} : Props) => {
   const signature = useSelector((state: RootState) => state.signature);
 
   const router = useRouter();
+  const {transaction_id, request_id} = router.query
 
   const [successState, setIsSuccessState] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -94,7 +95,7 @@ const FRCamera = ({setIsFRSuccess, setModal} : Props) => {
         tilakey: "",
         company_id: "",
         api_id: "",
-        trx_id: router.query.transaction_id as string,
+        trx_id: transaction_id as string || request_id as string
       },
     }).then((res) => {
       if(res.success){
