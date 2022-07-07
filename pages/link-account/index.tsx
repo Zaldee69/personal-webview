@@ -67,19 +67,34 @@ const LinkAccount = (props: Props) => {
           if (certif[0].status == "Aktif") {
             router.replace({
               pathname: handleRoute("/link-account/success"),
-              query: { ...router.query },
+              query: {
+                ...router.query,
+                redirect_url: data.data.message
+                  ? data.data.message
+                  : router.query.redirect_url,
+              },
             });
           } else {
             router.replace({
               pathname: handleRoute("/certificate-information"),
-              query: { ...router.query },
+              query: {
+                ...router.query,
+                redirect_url: data.data.message
+                  ? data.data.message
+                  : router.query.redirect_url,
+              },
             });
           }
         });
       } else {
         router.replace({
           pathname: handleRoute("/link-account/success"),
-          query: { ...router.query },
+          query: {
+            ...router.query,
+            redirect_url: data.data.message
+              ? data.data.message
+              : router.query.redirect_url,
+          },
         });
       }
     } else if (
@@ -88,7 +103,12 @@ const LinkAccount = (props: Props) => {
     ) {
       router.replace({
         pathname: handleRoute("/link-account/failure"),
-        query: { ...router.query },
+        query: {
+          ...router.query,
+          redirect_url: data.data.message
+            ? data.data.message
+            : router.query.redirect_url,
+        },
       });
     }
   }, [data.status]);

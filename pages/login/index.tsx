@@ -66,14 +66,20 @@ const Login = () => {
           if (certif[0].status == "Aktif") {
             router.replace({
               pathname: handleRoute("/signing"),
-              query: { ...router.query },
+              query: { 
+                ...router.query, 
+                redirect_url: data.data.message ? data.data.message : router.query.redirect_url, 
+              },
             });
           }else if(certif[0].status === "Revoked" || certif[0].status === "Expired" || certif[0].status === "Enroll"){
             setCertifModal(true)
           }else {
             router.replace({
               pathname: handleRoute("/certificate-information"),
-              query: { ...router.query },
+              query: { 
+                ...router.query, 
+                redirect_url: data.data.message ? data.data.message : router.query.redirect_url, 
+              },
             });
           }
         }
