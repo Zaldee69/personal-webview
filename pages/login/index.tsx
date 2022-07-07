@@ -14,15 +14,24 @@ import { toast } from "react-toastify";
 import XIcon from "@/public/icons/XIcon";
 import { useRouter } from "next/router";
 import { handleRoute } from "./../../utils/handleRoute";
+import Image from "next/image";
+import { assetPrefix } from "../../next.config";
+import { restLogout } from "infrastructure/rest/b2b";
 
 type Props = {
   channel_id: string;
   pathname: string;
 };
 
+type ModalProps = {
+  certifModal : boolean,
+  setCertifModal: React.Dispatch<React.SetStateAction<boolean>>
+}
+
 const Login = () => {
   const [password, setPassword] = useState<string>("");
   const [tilakaName, setTilakaName] = useState("");
+  const [certifModal, setCertifModal] = useState<boolean>(false)
   const [type, setType] = useState<{ password: string }>({
     password: "password",
   });
@@ -46,7 +55,7 @@ const Login = () => {
       getCertificateList({ params: company_id as string }).then((res) => {
         const certif = JSON.parse(res.data);
         if (!transaction_id) {
-          toast.dismiss("success")
+          toast.dismiss("success");
           toast("Transaction ID tidak boleh kosong", {
             type: "error",
             toastId: "error",
@@ -59,7 +68,9 @@ const Login = () => {
               pathname: handleRoute("/signing"),
               query: { ...router.query },
             });
-          } else {
+          }else if(certif[0].status === "Revoked" || certif[0].status === "Expired" || certif[0].status === "Enroll"){
+            setCertifModal(true)
+          }else {
             router.replace({
               pathname: handleRoute("/certificate-information"),
               query: { ...router.query },
@@ -91,6 +102,7 @@ const Login = () => {
   };
   return (
     <>
+    <CertifModal setCertifModal={setCertifModal} certifModal={certifModal} />
       <Head>
         <title>Tilaka</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
@@ -129,12 +141,14 @@ const Login = () => {
                 {type.password === "password" ? <EyeIcon /> : <EyeIconOff />}
               </button>
             </div>
-            <a className="m-5 text-center font-poppins text-primary"
-               target="_blank"
-               rel="noopener noreferrer"
-               href={`https://${
+            <a
+              className="m-5 text-center font-poppins text-primary"
+              target="_blank"
+              rel="noopener noreferrer"
+              href={`https://${
                 process.env.REDIRECT_URL_PREFIX || "dev"
-              }-corporate.tilaka.id/ca-corporate-portal/public/reset-pass-req.xhtml`}>
+              }-corporate.tilaka.id/ca-corporate-portal/public/reset-pass-req.xhtml`}
+            >
               Lupa Kata Sandi
             </a>
           </div>
@@ -150,6 +164,40 @@ const Login = () => {
       </div>
     </>
   );
+};
+
+const CertifModal = ({certifModal, setCertifModal} : ModalProps) => {
+  return certifModal ? (
+    <div
+      style={{ backgroundColor: "rgba(0, 0, 0, .5)" }}
+      className="fixed z-50 flex items-start transition-all duration-1000 pb-3 justify-center w-full left-0 top-0 h-full "
+    >
+      <div className="bg-white max-w-md mt-20 pt-5 px-2 pb-3 rounded-xl w-full mx-5">
+      <p className="text-center font-poppins font-semibold" >Anda Tidak Memiliki Sertifikat</p>
+      <div className="flex flex-col justify-center" >
+      <Image src={`${assetPrefix}/images/certif.svg`}  width={100} height={100} />
+        <p className="text-center font-poppins mt-5" >
+        Sertifikat Anda telah kadaluarsa
+      atau telah dicabut. Mohon membuat sertifikat baru untuk melakukan penandatanganan.
+        </p>
+      </div>
+      <button
+          className="bg-primary btn mt-8 disabled:opacity-50 text-white font-poppins w-full mx-auto rounded-sm h-9"
+        >
+          BUAT SERTIFIKAT BARU
+        </button>
+        <button
+          onClick={() => {
+            // restLogout()
+            setCertifModal(false)
+          }}
+          className="  text-[#97A0AF]  font-poppins w-full mt-4  mx-auto rounded-sm h-9"
+        >
+          BATAL
+        </button>
+      </div>
+    </div>
+  ) : null
 };
 
 export default Login;
