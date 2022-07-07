@@ -31,7 +31,7 @@ interface Type {
 
 const Form: React.FC = () => {
   const router = useRouter();
-  const { request_id } = router.query;
+  const { request_id, ...restRouterQuery } = router.query;
   const [input, setInput] = useState<InputType>({
     password: "",
     confirmPassword: "",
@@ -166,7 +166,10 @@ const Form: React.FC = () => {
           toast.success(res?.message || "berhasil", {
             icon: <CheckOvalIcon />,
           });
-          router.replace({ pathname: handleRoute("/form/success") });
+          router.replace({
+            pathname: handleRoute("/form/success"),
+            query: { request_id, ...restRouterQuery },
+          });
         } else {
           toast.dismiss("kycCheckStepRequestToast");
           toast.error(res?.message || "gagal", { icon: <XIcon /> });

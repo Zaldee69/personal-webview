@@ -1,7 +1,6 @@
 import { assetPrefix } from "../../next.config";
 import { NextParsedUrlQuery } from "next/dist/server/request-meta";
 import Image from "next/image";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useEffect } from "react";
 import { restLogout } from "infrastructure/rest/b2b";
@@ -13,14 +12,14 @@ const LinkAccountSuccess = (props: Props) => {
   const router = useRouter();
   const routerIsReady: boolean = router.isReady;
   const routerQuery: NextParsedUrlQuery & {
-    signing?: "0";
+    signing?: "1";
     redirect_url?: string;
   } = router.query;
-  const isNotSigning: boolean = routerQuery.signing === "0";
+  const isSigning: boolean = routerQuery.signing === "1";
 
   useEffect(() => {
     if (!routerIsReady) return;
-    if (isNotSigning) {
+    if (!isSigning) {
       restLogout();
     } else {
       setTimeout(() => {
@@ -30,7 +29,7 @@ const LinkAccountSuccess = (props: Props) => {
         });
       }, 1000);
     }
-  }, [isNotSigning, routerIsReady]);
+  }, [isSigning, routerIsReady]);
 
   return (
     <div className="px-10 pt-16 pb-9 text-center">
@@ -49,11 +48,11 @@ const LinkAccountSuccess = (props: Props) => {
           Akun Tilaka Anda telah berhasil ditautkan.
         </p>
       </div>
-      {isNotSigning && routerQuery.redirect_url && (
+      {!isSigning && routerQuery.redirect_url && (
         <div className="mt-20 text-primary text-base font-medium font-poppins underline hover:cursor-pointer">
-          <Link href={routerQuery.redirect_url}>
+          <a href={routerQuery.redirect_url}>
             <a>Kembali ke Halaman Utama</a>
-          </Link>
+          </a>
         </div>
       )}
       <div className="mt-11 flex justify-center">

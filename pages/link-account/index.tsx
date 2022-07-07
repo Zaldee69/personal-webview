@@ -13,6 +13,7 @@ import Head from "next/head";
 import { TLoginProps } from "@/interface/interface";
 import { assetPrefix } from "../../next.config";
 import { handleRoute } from "./../../utils/handleRoute";
+import { getCertificateList } from "infrastructure/rest/b2b";
 
 type Props = {};
 
@@ -26,7 +27,7 @@ const LinkAccount = (props: Props) => {
   const [showPassword, showPasswordSetter] = useState<boolean>(false);
   const [nikRegistered, nikRegisteredSetter] = useState<boolean>(true);
   const [form, formSetter] = useState<Tform>({ tilaka_name: "", password: "" });
-  const { nik, request_id, ...restRouterQuery } = router.query;
+  const { nik, request_id, signing, ...restRouterQuery } = router.query;
   const dispatch: AppDispatch = useDispatch();
   const data = useSelector((state: RootState) => state.login);
 
@@ -60,11 +61,28 @@ const LinkAccount = (props: Props) => {
     if (data.status === "FULLFILLED" && data.data.success) {
       localStorage.setItem("refresh_token", data.data.data[1] as string);
       localStorage.setItem("token", data.data.data[0] as string);
-      router.replace({
-        pathname: handleRoute("/link-account/success"),
-        query: { ...router.query },
-      });
-    }  else if (
+      if (signing === "1") {
+        getCertificateList({ params: "" as string }).then((res) => {
+          const certif = JSON.parse(res.data);
+          if (certif[0].status == "Aktif") {
+            router.replace({
+              pathname: handleRoute("/link-account/success"),
+              query: { ...router.query },
+            });
+          } else {
+            router.replace({
+              pathname: handleRoute("/certificate-information"),
+              query: { ...router.query },
+            });
+          }
+        });
+      } else {
+        router.replace({
+          pathname: handleRoute("/link-account/success"),
+          query: { ...router.query },
+        });
+      }
+    } else if (
       data.status === "REJECTED" ||
       (data.status === "FULLFILLED" && !data.data.success)
     ) {
