@@ -68,7 +68,7 @@ const Login = () => {
               pathname: handleRoute("/signing"),
               query: { ...router.query },
             });
-          }else if(certif[0].status === "Revoked" || certif[0].status === "Expired" || certif[0].status === "Enroll"){
+          }else if(certif[0].status === "Revoke" || certif[0].status === "Expired" || certif[0].status === "Enroll"){
             setCertifModal(true)
           }else {
             router.replace({
