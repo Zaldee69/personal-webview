@@ -68,7 +68,7 @@ const Login = () => {
               pathname: handleRoute("/signing"),
               query: { 
                 ...router.query, 
-                redirect_url: data.data.message ? data.data.message : router.query.redirect_url, 
+                redirect_url: data.data.message.length ? data.data.message : router.query.redirect_url, 
               },
             });
           }else if(certif[0].status === "Revoke" || certif[0].status === "Expired" || certif[0].status === "Enroll"){
@@ -78,7 +78,7 @@ const Login = () => {
               pathname: handleRoute("/certificate-information"),
               query: { 
                 ...router.query, 
-                redirect_url: data.data.message ? data.data.message : router.query.redirect_url, 
+                redirect_url: data.data.message.length ? data.data.message : router.query.redirect_url, 
               },
             });
           }

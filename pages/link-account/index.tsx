@@ -69,7 +69,7 @@ const LinkAccount = (props: Props) => {
               pathname: handleRoute("/link-account/success"),
               query: {
                 ...router.query,
-                redirect_url: data.data.message
+                redirect_url: data.data.message.length
                   ? data.data.message
                   : router.query.redirect_url,
               },
@@ -79,7 +79,7 @@ const LinkAccount = (props: Props) => {
               pathname: handleRoute("/certificate-information"),
               query: {
                 ...router.query,
-                redirect_url: data.data.message
+                redirect_url: data.data.message.length
                   ? data.data.message
                   : router.query.redirect_url,
               },
@@ -91,7 +91,7 @@ const LinkAccount = (props: Props) => {
           pathname: handleRoute("/link-account/success"),
           query: {
             ...router.query,
-            redirect_url: data.data.message
+            redirect_url: data.data.message.length
               ? data.data.message
               : router.query.redirect_url,
           },
@@ -105,7 +105,7 @@ const LinkAccount = (props: Props) => {
         pathname: handleRoute("/link-account/failure"),
         query: {
           ...router.query,
-          redirect_url: data.data.message
+          redirect_url: data.data.message.length
             ? data.data.message
             : router.query.redirect_url,
         },
