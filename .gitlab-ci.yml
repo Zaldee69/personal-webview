@@ -30,7 +30,11 @@ build-development:
   before_script:
     - docker info
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+    - echo "NEXT_PUBLIC_API_URL:" $NEXT_PUBLIC_API_URL
+    - echo "NEXT_PUBLIC_DS_API_URL:" $NEXT_PUBLIC_DS_API_URL
   script:
+    - echo -e "NEXT_PUBLIC_API_URL="$NEXT_PUBLIC_API_URL > .env
+    - echo -e "NEXT_PUBLIC_DS_API_URL="$NEXT_PUBLIC_DS_API_URL > .env
     - docker build --pull -t "$IMAGE_TAG" .
     - docker push "$IMAGE_TAG"
     - echo "Registry image:" $IMAGE_TAG
@@ -130,7 +134,11 @@ build-staging:
   before_script:
     - docker info
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+    - echo "NEXT_PUBLIC_API_URL:" $NEXT_PUBLIC_API_URL
+    - echo "NEXT_PUBLIC_DS_API_URL:" $NEXT_PUBLIC_DS_API_URL
   script:
+    - echo -e "NEXT_PUBLIC_API_URL="$NEXT_PUBLIC_API_URL > .env
+    - echo -e "NEXT_PUBLIC_DS_API_URL="$NEXT_PUBLIC_DS_API_URL > .env
     - docker build --pull -t "$IMAGE_TAG" .
     - docker push "$IMAGE_TAG"
     - echo "Registry image:" $IMAGE_TAG
