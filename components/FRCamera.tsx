@@ -153,7 +153,7 @@ const FRCamera = ({setIsFRSuccess, setModal} : Props) => {
             capture()
             return {shouldRepeat: true, delay: 15}
           }}
-          isPlaying={true}
+          isPlaying={isPlaying}
           size={45}
           strokeWidth={4}
           duration={5}
