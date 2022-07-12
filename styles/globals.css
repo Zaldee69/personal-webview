@@ -11,9 +11,8 @@
       0px 0px 1px rgba(9, 30, 66, 0.31);
   }
   .btn-pin-form {
-    @apply w-14 h-14 mx-auto rounded-full text-3xl font-poppins text-neutral800 active:text-primary active:shadow-none active:bg-blue50 transition-colors select-none hover:cursor-pointer flex justify-center items-center;
-    box-shadow: 0px 1px 1px rgba(9, 30, 66, 0.25),
-      0px 0px 1px rgba(9, 30, 66, 0.31);
+    @apply w-14 h-14 mx-auto rounded-full text-3xl font-poppins text-neutral800 active:text-primary active:shadow-none active:bg-blue50 transition-colors select-none hover:cursor-pointer flex disabled:cursor-not-allowed disabled:active:bg-neutral40 disabled:bg-neutral40 disabled:text-neutral800 justify-center items-center;
+    box-shadow: 0px 1px 1px rgba(9, 30, 66, 0.25), 0px 0px 1px rgba(9, 30, 66, 0.31);
   }
   .btn-pin-form-invisible {
     @apply select-none hover:cursor-default;

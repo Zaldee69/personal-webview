@@ -12,6 +12,9 @@ interface IPropsPinFormComponent {
   isResetAfterSubmit?: boolean;
   isErrorAfterSubmit?: boolean;
   isErrorAfterSubmitMessage?: string;
+  isButtonNumberDisabled?: boolean;
+  isError?: boolean;
+  isErrorMessage?: string;
 }
 
 type TNumbers = Array<0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9>;
@@ -122,13 +125,14 @@ const PinFormComponent = (props: IPropsPinFormComponent): JSX.Element => {
           ></div>
         ))}
       </div>
-      {shouldShowErrorAfterSubmit ? (
+      {props.isError && (
+        <p className="text-red300 text-xs mt-3 text-center font-poppins">
+          {props.isErrorMessage || "checkstep error"}
+        </p>
+      )}
+      {shouldShowErrorAfterSubmit && (
         <p className="text-red300 text-xs mt-3 text-center font-poppins">
           {props.isErrorAfterSubmitMessage || "there is something wrong"}
-        </p>
-      ) : (
-        <p className="text-red300 text-xs mt-3 text-center font-poppins invisible">
-          error-message-invisible
         </p>
       )}
       <div className="grid grid-cols-3 gap-4 mt-4">
@@ -139,6 +143,7 @@ const PinFormComponent = (props: IPropsPinFormComponent): JSX.Element => {
                 key={i}
                 className="btn-pin-form"
                 onClick={(e) => onClickNumberHandler(e, num)}
+                disabled={props.isButtonNumberDisabled}
               >
                 {num}
               </button>

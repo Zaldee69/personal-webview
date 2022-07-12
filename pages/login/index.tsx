@@ -50,6 +50,12 @@ const Login = () => {
 
   useEffect(() => {
     if (data.status === "FULLFILLED" && data.data.success) {
+      let queryWithDynamicRedirectURL = {
+        ...router.query,
+      };
+      if (data.data.message.length > 0) {
+        queryWithDynamicRedirectURL["redirect_url"] = data.data.message;
+      }
       localStorage.setItem("token", data.data.data[0] as string);
       localStorage.setItem("refresh_token", data.data.data[1] as string);
       getCertificateList({ params: company_id as string }).then((res) => {
@@ -66,14 +72,18 @@ const Login = () => {
           if (certif[0].status == "Aktif") {
             router.replace({
               pathname: handleRoute("/signing"),
-              query: { ...router.query },
+              query: { 
+                ...queryWithDynamicRedirectURL 
+              },
             });
           }else if(certif[0].status === "Revoke" || certif[0].status === "Expired" || certif[0].status === "Enroll"){
             setCertifModal(true)
           }else {
             router.replace({
               pathname: handleRoute("/certificate-information"),
-              query: { ...router.query },
+              query: { 
+                ...queryWithDynamicRedirectURL 
+              },
             });
           }
         }

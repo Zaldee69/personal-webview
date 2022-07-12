@@ -59,6 +59,12 @@ const LinkAccount = (props: Props) => {
 
   useEffect(() => {
     if (data.status === "FULLFILLED" && data.data.success) {
+      let queryWithDynamicRedirectURL = {
+        ...router.query,
+      };
+      if (data.data.message.length > 0) {
+        queryWithDynamicRedirectURL["redirect_url"] = data.data.message;
+      }
       localStorage.setItem("refresh_token", data.data.data[1] as string);
       localStorage.setItem("token", data.data.data[0] as string);
       if (signing === "1") {
@@ -67,19 +73,19 @@ const LinkAccount = (props: Props) => {
           if (certif[0].status == "Aktif") {
             router.replace({
               pathname: handleRoute("/link-account/success"),
-              query: { ...router.query },
+              query: { ...queryWithDynamicRedirectURL },
             });
           } else {
             router.replace({
               pathname: handleRoute("/certificate-information"),
-              query: { ...router.query },
+              query: { ...queryWithDynamicRedirectURL },
             });
           }
         });
       } else {
         router.replace({
           pathname: handleRoute("/link-account/success"),
-          query: { ...router.query },
+          query: { ...queryWithDynamicRedirectURL },
         });
       }
     } else if (
@@ -88,7 +94,9 @@ const LinkAccount = (props: Props) => {
     ) {
       router.replace({
         pathname: handleRoute("/link-account/failure"),
-        query: { ...router.query },
+        query: {
+          ...router.query,
+        },
       });
     }
   }, [data.status]);
