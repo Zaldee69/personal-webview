@@ -2,17 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Aguafina+Script&family=Allan&family=Architects+Daughter&family=Berkshire+Swash&family=Give+You+Glory&family=Miss+Fajardose&display=swap');
-
+@import url("https://fonts.googleapis.com/css2?family=Aguafina+Script&family=Allan&family=Architects+Daughter&family=Berkshire+Swash&family=Give+You+Glory&family=Miss+Fajardose&display=swap");
 
 @layer components {
   .card-pin-form {
     @apply bg-white rounded-xl px-4 sm:px-11 pt-3 sm:pt-8 pb-4 sm:pb-9;
-    box-shadow: 0px 8px 12px rgba(9, 30, 66, 0.1), 0px 0px 1px rgba(9, 30, 66, 0.31);
+    box-shadow: 0px 8px 12px rgba(9, 30, 66, 0.1),
+      0px 0px 1px rgba(9, 30, 66, 0.31);
   }
   .btn-pin-form {
     @apply w-14 h-14 mx-auto rounded-full text-3xl font-poppins text-neutral800 active:text-primary active:shadow-none active:bg-blue50 transition-colors select-none hover:cursor-pointer flex justify-center items-center;
-    box-shadow: 0px 1px 1px rgba(9, 30, 66, 0.25), 0px 0px 1px rgba(9, 30, 66, 0.31);
+    box-shadow: 0px 1px 1px rgba(9, 30, 66, 0.25),
+      0px 0px 1px rgba(9, 30, 66, 0.31);
   }
   .btn-pin-form-invisible {
     @apply select-none hover:cursor-default;
@@ -113,13 +114,13 @@ input[type="checkbox"] {
 .tooltip {
   position: relative;
   display: inline-block;
-  border-bottom: 1px dotted #6B778C;
+  border-bottom: 1px dotted #6b778c;
 }
 
 .tooltip .tooltiptext {
   visibility: hidden;
   width: 160px;
-  background-color: #6B778C;
+  background-color: #6b778c;
   color: #fff;
   text-align: center;
   border-radius: 6px;
@@ -138,27 +139,33 @@ input[type="checkbox"] {
   margin-top: -5px;
   border-width: 5px;
   border-style: solid;
-  border-color: transparent #6B778C transparent transparent;
+  border-color: transparent #6b778c transparent transparent;
 }
 
 .tooltip:hover .tooltiptext {
   visibility: visible;
 }
 
-
-.kfAyjk, .sc-bczRLJ, .hqAQls {
+.kfAyjk,
+.sc-bczRLJ,
+.hqAQls {
   justify-content: center;
   gap: 5px;
   margin-top: 10px;
 }
 
-
 /* override react toastify style */
 
 .Toastify__toast-success .Toastify__toast-icon {
-  color: #57D9A3;
+  color: #57d9a3;
 }
 
 .Toastify__toast-error .Toastify__toast-icon {
-  color: #FF5630;
+  color: #ff5630;
+}
+
+/* override countdown circle timer style */
+
+#countdown-timer-fr svg {
+  filter: drop-shadow(3px 5px 5px rgb(0 0 0 / 0.6));
 }
