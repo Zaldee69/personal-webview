@@ -67,8 +67,8 @@ const FRCamera = ({setIsFRSuccess, setModal} : Props) => {
   const onPlay = () => {
     setIsPlaying(true);
   };
-  // const count = parseInt(localStorage.getItem("count" ) as string) 
-  // localStorage.setItem("count", count ? count.toString() : "0")
+  const count = parseInt(localStorage.getItem("count" ) as string) 
+  localStorage.setItem("count", count ? count.toString() : "0")
 
 
   const capture = React.useCallback(() => {
@@ -153,7 +153,7 @@ const FRCamera = ({setIsFRSuccess, setModal} : Props) => {
             capture()
             return {shouldRepeat: true, delay: 15}
           }}
-          isPlaying={true}
+          isPlaying={isPlaying}
           size={45}
           strokeWidth={4}
           duration={5}
