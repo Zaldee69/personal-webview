@@ -155,9 +155,7 @@ const Login = () => {
               className="m-5 text-center font-poppins text-primary"
               target="_blank"
               rel="noopener noreferrer"
-              href={`https://${
-                process.env.REDIRECT_URL_PREFIX || "dev"
-              }-corporate.tilaka.id/ca-corporate-portal/public/reset-pass-req.xhtml`}
+              href={`${process.env.NEXT_PUBLIC_PORTAL_URL}/public/reset-pass-req.xhtml`}
             >
               Lupa Kata Sandi
             </a>
