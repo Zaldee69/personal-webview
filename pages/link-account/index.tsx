@@ -181,9 +181,7 @@ const LinkAccount = (props: Props) => {
             <a
               target="_blank"
               rel="noopener noreferrer"
-              href={`https://${
-                process.env.REDIRECT_URL_PREFIX || "dev"
-              }-corporate.tilaka.id/ca-corporate-portal/public/reset-pass-req.xhtml`}
+              href={`${process.env.NEXT_PUBLIC_PORTAL_URL}/public/reset-pass-req.xhtml`}
               className="font-poppins text-primary text-xs"
             >
               Lupa Kata Sandi
@@ -198,9 +196,7 @@ const LinkAccount = (props: Props) => {
             <a
               target="_blank"
               rel="noopener noreferrer"
-              href={`https://${
-                process.env.REDIRECT_URL_PREFIX || "dev"
-              }-corporate.tilaka.id/ca-corporate-portal/public/forgot-tilaka-name.xhtml`}
+              href={`${process.env.NEXT_PUBLIC_PORTAL_URL}/public/forgot-tilaka-name.xhtml`}
               className="font-poppins text-primary text-xs"
             >
               Lupa Tilaka Name

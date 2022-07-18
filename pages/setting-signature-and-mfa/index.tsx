@@ -32,7 +32,7 @@ type Tform = {
 function SettingSignatureAndMFA({}: Props) {
   const [form, formSetter] = useState<Tform>({
     signature_type: 1,
-    signature_font_type: "signature_font_type_allan",
+    signature_font_type: "",
     mfa_method: "fr",
   });
   const [imageURL, setImageURL] = useState<string>();
@@ -101,9 +101,9 @@ function SettingSignatureAndMFA({}: Props) {
         signature_type == 1 ? (imageURL as string) : signature_image,
     };
 
-    if (signature_type == 0 && sigPad.current.isEmpty()) {
+    if (signature_type == 0 && sigPad.current.isEmpty() || signature_type == 1 && !imageURL) {
       toast.dismiss("info");
-      toast("Tanda tangan goresan tidak boleh kosong!", {
+      toast(`${signature_type === 0 ? "Tanda tangan goresan tidak boleh kosong!" : "Anda harus memilih salah satu tipe font"}`, {
         type: "error",
         toastId: "error",
         position: "top-center",
@@ -160,17 +160,17 @@ function SettingSignatureAndMFA({}: Props) {
             });
           }
         });
-    }
 
-    restSetDefaultMFA({
-      payload: {
-        mfa_type,
-      },
-    }).then((res) => {
-      return res
-    }).catch((err) => {
-      {}
-    })
+        restSetDefaultMFA({
+          payload: {
+            mfa_type,
+          },
+        }).then((res) => {
+          return res
+        }).catch((err) => {
+          {}
+        })
+    }
   };
 
   return (
