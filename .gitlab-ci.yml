@@ -32,9 +32,11 @@ build-development:
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
     - echo "NEXT_PUBLIC_API_URL:" $NEXT_PUBLIC_API_URL
     - echo "NEXT_PUBLIC_DS_API_URL:" $NEXT_PUBLIC_DS_API_URL
+    - echo "NEXT_PUBLIC_PORTAL_URL:" $NEXT_PUBLIC_PORTAL_URL
   script:
     - echo -e "NEXT_PUBLIC_API_URL="$NEXT_PUBLIC_API_URL > .env
-    - echo -e "NEXT_PUBLIC_DS_API_URL="$NEXT_PUBLIC_DS_API_URL > .env
+    - echo -e "NEXT_PUBLIC_DS_API_URL="$NEXT_PUBLIC_DS_API_URL >> .env
+    - echo -e "NEXT_PUBLIC_PORTAL_URL="$NEXT_PUBLIC_PORTAL_URL >> .env
     - docker build --pull -t "$IMAGE_TAG" .
     - docker push "$IMAGE_TAG"
     - echo "Registry image:" $IMAGE_TAG
@@ -136,9 +138,11 @@ build-staging:
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
     - echo "NEXT_PUBLIC_API_URL:" $NEXT_PUBLIC_API_URL
     - echo "NEXT_PUBLIC_DS_API_URL:" $NEXT_PUBLIC_DS_API_URL
+    - echo "NEXT_PUBLIC_PORTAL_URL:" $NEXT_PUBLIC_PORTAL_URL
   script:
     - echo -e "NEXT_PUBLIC_API_URL="$NEXT_PUBLIC_API_URL > .env
-    - echo -e "NEXT_PUBLIC_DS_API_URL="$NEXT_PUBLIC_DS_API_URL > .env
+    - echo -e "NEXT_PUBLIC_DS_API_URL="$NEXT_PUBLIC_DS_API_URL >> .env
+    - echo -e "NEXT_PUBLIC_PORTAL_URL="$NEXT_PUBLIC_PORTAL_URL >> .env
     - docker build --pull -t "$IMAGE_TAG" .
     - docker push "$IMAGE_TAG"
     - echo "Registry image:" $IMAGE_TAG
