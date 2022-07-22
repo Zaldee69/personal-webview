@@ -121,16 +121,20 @@ const Liveness = () => {
             type: "error",
             autoClose: 5000,
             position: "top-center",
+            toastId: "errToast1",
           });
-          if (res.message === "Anda berada di tahap pengisian formulir")
-            router.push(handleRoute("form"), {
+          if (res.message === "Anda berada di tahap pengisian formulir") {
+            toast.dismiss("errToast1");
+            router.push({
+              pathname: handleRoute("form"),
               query: { ...routerQuery, request_id: router.query.request_id },
             });
-          else
+          } else {
             router.push({
               pathname: handleRoute("liveness-failure"),
               query: { ...routerQuery, request_id: router.query.request_id },
             });
+          }
         }
       })
       .catch((err) => {
