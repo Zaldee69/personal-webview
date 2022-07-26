@@ -77,10 +77,10 @@ const PinFormDedicatedChannel = (props: Props) => {
         if (res.success) {
           setIsConfirmMode(false);
           if (redirect_url) {
-            const searchParams = new URLSearchParams(redirect_url);
+            const searchParams = new URLSearchParams(
+              redirect_url + "?register_id=" + registration_id
+            );
             // Set params
-            registration_id &&
-              searchParams.set("register_id", `${registration_id}`);
             res.data.status && searchParams.set("status", `${res.data.status}`);
             // Redirect topmost window
             window.top!.location.href = decodeURIComponent(
