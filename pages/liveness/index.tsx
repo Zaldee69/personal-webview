@@ -123,12 +123,22 @@ const Liveness = () => {
             position: "top-center",
             toastId: "errToast1",
           });
-          if (res.message === "Anda berada di tahap pengisian formulir") {
+          if (
+            res.message === "Anda berada di tahap pengisian formulir" ||
+            res.data.status === "D"
+          ) {
             toast.dismiss("errToast1");
-            router.push({
-              pathname: handleRoute("form"),
-              query: { ...routerQuery, request_id: router.query.request_id },
-            });
+            if (res.data.pin_form) {
+              router.replace({
+                pathname: handleRoute("kyc/pinform"),
+                query: { ...routerQuery, request_id: router.query.request_id },
+              });
+            } else {
+              router.push({
+                pathname: handleRoute("form"),
+                query: { ...routerQuery, request_id: router.query.request_id },
+              });
+            }
           } else {
             router.push({
               pathname: handleRoute("liveness-failure"),
@@ -189,10 +199,17 @@ const Liveness = () => {
       if (result.success) {
         toast.dismiss("verification");
         removeStorage();
-        router.push({
-          pathname: handleRoute("form"),
-          query: { ...routerQuery, request_id: router.query.request_id },
-        });
+        if (result.data.pin_form) {
+          router.replace({
+            pathname: handleRoute("kyc/pinform"),
+            query: { ...routerQuery, request_id: router.query.request_id },
+          });
+        } else {
+          router.push({
+            pathname: handleRoute("form"),
+            query: { ...routerQuery, request_id: router.query.request_id },
+          });
+        }
       } else {
         toast.dismiss("verification");
         const attempt =
