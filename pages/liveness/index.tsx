@@ -131,7 +131,10 @@ const Liveness = () => {
             if (res.data.pin_form) {
               router.replace({
                 pathname: handleRoute("kyc/pinform"),
-                query: { ...routerQuery, request_id: router.query.request_id },
+                query: {
+                  ...routerQuery,
+                  registration_id: router.query.request_id,
+                },
               });
             } else {
               router.push({
@@ -202,7 +205,7 @@ const Liveness = () => {
         if (result.data.pin_form) {
           router.replace({
             pathname: handleRoute("kyc/pinform"),
-            query: { ...routerQuery, request_id: router.query.request_id },
+            query: { ...routerQuery, registration_id: router.query.request_id },
           });
         } else {
           router.push({
