@@ -4,7 +4,9 @@ import EyeIcon from "./../../public/icons/EyeIcon";
 import EyeIconOff from "./../../public/icons/EyeIconOff";
 import { useRouter } from "next/router";
 import Head from "next/head";
-import { assetPrefix } from '../../next.config'
+import { assetPrefix } from "../../next.config";
+import { GetServerSideProps } from "next";
+import { handleRoute } from "@/utils/handleRoute";
 
 type Props = {};
 
@@ -200,6 +202,17 @@ const LinkAccount = (props: Props) => {
       </div>
     </>
   );
+};
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const params = context.query;
+  const queryString = new URLSearchParams(params as any).toString();
+  return {
+    redirect: {
+      permanent: false,
+      destination: handleRoute("/?" + queryString),
+    },
+  };
 };
 
 export default LinkAccount;

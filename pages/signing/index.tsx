@@ -2,7 +2,7 @@ import { Viewer } from "@/components/Viewer";
 import { useDispatch, useSelector } from "react-redux";
 import { getDocument } from "@/redux/slices/documentSlice";
 import { addFont, addScratch } from "@/redux/slices/signatureSlice";
-import { Router, useRouter } from "next/router";
+import { useRouter } from "next/router";
 import { AppDispatch, RootState } from "@/redux/app/store";
 import { TDocumentProps } from "@/interface/interface";
 import { PinInput } from "react-input-pin-code";
@@ -19,11 +19,13 @@ import SignaturePad from "@/components/SignaturePad";
 import Footer from "@/components/Footer";
 import { setAuthToken } from "@/config/API";
 import html2canvas from "html2canvas";
-import {
-  getUserName
-} from "infrastructure/rest/b2b";
+import { getUserName } from "infrastructure/rest/b2b";
 import { assetPrefix } from "../../next.config";
-import { handleRoute } from './../../utils/handleRoute';
+import { handleRoute } from "./../../utils/handleRoute";
+import { GetServerSideProps } from "next";
+import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
+import { RestKycCheckStep } from "infrastructure";
+import { serverSideRenderReturnConditions } from "@/utils/serverSideRenderReturnConditions";
 
 type TFontSig =
   | "signature_font_type_allan"
@@ -50,27 +52,30 @@ const Signing = () => {
   const [openScratchesModal, setOpenScratchesModal] = useState<boolean>(false);
   const [selectFontModal, setSelectFontModal] = useState<boolean>(false);
   const [otpModal, setOtpModal] = useState<boolean>(false);
-  const [data, setData] = useState<string>()
+  const [data, setData] = useState<string>();
   const router = useRouter();
   const routerIsReady = router.isReady;
   const pathname = router.pathname;
-  const { company_id, request_id, transaction_id} = router.query;
+  const { company_id, request_id, transaction_id } = router.query;
 
   const dispatch: AppDispatch = useDispatch();
   const res = useSelector((state: RootState) => state.document);
 
-  
-
   useEffect(() => {
     const token = localStorage.getItem("token");
-    const count = parseInt(localStorage.getItem("count" ) as string) 
-    localStorage.setItem("count", count ? count.toString() : "0")
+    const count = parseInt(localStorage.getItem("count") as string);
+    localStorage.setItem("count", count ? count.toString() : "0");
     if (routerIsReady) {
       getUserName({}).then((res) => {
-        const data = JSON.parse(res.data)
-        setData(data.name)
-      })
-      dispatch(getDocument({ company_id, transaction_id : request_id as string || transaction_id  as string } as TDocumentProps));
+        const data = JSON.parse(res.data);
+        setData(data.name);
+      });
+      dispatch(
+        getDocument({
+          company_id,
+          transaction_id: (request_id as string) || (transaction_id as string),
+        } as TDocumentProps)
+      );
       if (res.response.status === "REJECTED") {
         localStorage.removeItem("token");
       }
@@ -149,6 +154,35 @@ const Signing = () => {
   );
 };
 
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const cQuery = context.query;
+  const uuid =
+    cQuery.transaction_id || cQuery.request_id || cQuery.registration_id;
+
+  const checkStepResult: {
+    res?: TKycCheckStepResponseData;
+    err?: {
+      response: {
+        data: {
+          success: boolean;
+          message: string;
+          data: { errors: string[] };
+        };
+      };
+    };
+  } = await RestKycCheckStep({
+    payload: { registerId: uuid as string },
+  })
+    .then((res) => {
+      return { res };
+    })
+    .catch((err) => {
+      return { err };
+    });
+
+  return serverSideRenderReturnConditions({ context, checkStepResult });
+};
+
 export default Signing;
 
 const Configuration: React.FC<{
@@ -166,13 +200,21 @@ const Configuration: React.FC<{
     <div className="flex flex-row items-center shadow-xl z-10 left-0 fixed py-2 w-full top-0 bg-[rgb(223,225,230)] justify-center gap-10">
       <div className="flex flex-col  ">
         <button onClick={() => setOpenScratchesModal(!openScratchesModal)}>
-          <Image width={25} height={25} src={`${assetPrefix}/images/goresan.svg`} />
+          <Image
+            width={25}
+            height={25}
+            src={`${assetPrefix}/images/goresan.svg`}
+          />
           <p className="text-[#727272] text-base  ">Goresan</p>
         </button>
       </div>
       <div className="flex flex-col">
         <button onClick={() => setSelectFontModal(!selectFontModal)}>
-          <Image width={25} height={25} src={`${assetPrefix}/images/font.svg`} />
+          <Image
+            width={25}
+            height={25}
+            src={`${assetPrefix}/images/font.svg`}
+          />
           <p className="text-[#727272] text-base ">Font</p>
         </button>
       </div>
@@ -181,8 +223,8 @@ const Configuration: React.FC<{
 };
 
 const FRModal: React.FC<Active | any> = ({ modal, setModal }) => {
-  const router = useRouter()
-  const routerQuery = router.query
+  const router = useRouter();
+  const routerQuery = router.query;
   const [isFRSuccess, setIsFRSuccess] = useState<boolean>(false);
 
   useEffect(() => {
@@ -205,14 +247,18 @@ const FRModal: React.FC<Active | any> = ({ modal, setModal }) => {
               Tanda Tangan Berhasil
             </p>
             <div className="my-10">
-              <Image width={150} height={150} src={`${assetPrefix}/images/successFR.svg`} />
+              <Image
+                width={150}
+                height={150}
+                src={`${assetPrefix}/images/successFR.svg`}
+              />
             </div>
 
             <button
               onClick={() => {
                 setModal(!modal);
                 setIsFRSuccess(false);
-                if(routerQuery.redirect_url){
+                if (routerQuery.redirect_url) {
                   window.location.replace(routerQuery.redirect_url as string);
                 }
               }}
@@ -271,7 +317,13 @@ const ChooseFontModal: React.FC<Active> = ({ modal, setModal, tilakaName }) => {
           Pilih Font
         </p>
         <div className="mt-5 flex flex-col gap-5">
-          <div className={`grid  ${tilakaName?.length as number > 15 ? "grid-cols gap-5" : "grid-col-2"} gap-3 mt-5`}>
+          <div
+            className={`grid  ${
+              (tilakaName?.length as number) > 15
+                ? "grid-cols gap-5"
+                : "grid-col-2"
+            } gap-3 mt-5`}
+          >
             <label className="relative flex justify-center items-center">
               <input
                 type="radio"
@@ -412,17 +464,17 @@ const ChooseScratchModal: React.FC<Active> = ({ modal, setModal }) => {
 };
 
 const OTPModal: React.FC<Active> = ({ modal, setModal }) => {
-  const [successSigning, setSuccessSigning] = useState<boolean>(false)
+  const [successSigning, setSuccessSigning] = useState<boolean>(false);
   const document = useSelector((state: RootState) => state.document);
   const signature = useSelector((state: RootState) => state.signature);
   const router = useRouter();
-  const {transaction_id, request_id, ...restRouterQuery} = router.query
+  const { transaction_id, request_id, ...restRouterQuery } = router.query;
 
   const [values, setValues] = useState(["", "", "", "", "", ""]);
 
   useEffect(() => {
-    if(modal && !successSigning){
-        restGetOtp({})
+    if (modal && !successSigning) {
+      restGetOtp({})
         .then((res) => {
           toast(`Kode OTP telah dikirim ke Email anda`, {
             type: "info",
@@ -463,36 +515,39 @@ const OTPModal: React.FC<Active> = ({ modal, setModal }) => {
         tilakey: "",
         company_id: "",
         api_id: "",
-        trx_id: transaction_id as string || request_id as string
+        trx_id: (transaction_id as string) || (request_id as string),
       },
-    }).then((res) => {
-      setSuccessSigning(true)
-      toast.dismiss("loading")
-      localStorage.setItem("count", "0")
-    }).catch((err) => {
-      toast.dismiss("loading")
-      if(err.request.status === 401){
-        router.replace({
-          pathname: "/login",
-          query: { ...router.query },
-        });
-      }else {
-        toast.error("Kode OTP salah", { icon: <XIcon /> });
-        setValues(["", "", "", "", "", ""])
-        const newCount = parseInt(localStorage.getItem("count" ) as string) + 1
-        localStorage.setItem("count", newCount.toString())
-        const count = parseInt(localStorage.getItem("count" ) as string) 
-        if(count >= 5){
-          localStorage.removeItem("token")
-          localStorage.setItem("count", "0")
-          restLogout()
+    })
+      .then((res) => {
+        setSuccessSigning(true);
+        toast.dismiss("loading");
+        localStorage.setItem("count", "0");
+      })
+      .catch((err) => {
+        toast.dismiss("loading");
+        if (err.request.status === 401) {
           router.replace({
+            pathname: "/login",
+            query: { ...router.query },
+          });
+        } else {
+          toast.error("Kode OTP salah", { icon: <XIcon /> });
+          setValues(["", "", "", "", "", ""]);
+          const newCount =
+            parseInt(localStorage.getItem("count") as string) + 1;
+          localStorage.setItem("count", newCount.toString());
+          const count = parseInt(localStorage.getItem("count") as string);
+          if (count >= 5) {
+            localStorage.removeItem("token");
+            localStorage.setItem("count", "0");
+            restLogout();
+            router.replace({
               pathname: "/login",
               query: { ...router.query },
             });
+          }
         }
-      }
-    })
+      });
   };
 
   return modal ? (
@@ -501,21 +556,26 @@ const OTPModal: React.FC<Active> = ({ modal, setModal }) => {
       className="fixed z-50 flex items-start transition-all duration-1000 pb-3 justify-center w-full left-0 top-0 h-full "
     >
       <div className="bg-white max-w-md mt-20 pt-5 px-2 pb-3 rounded-md w-full mx-5">
-        {
-          successSigning ? (
-            <div className="flex flex-col  items-center">
+        {successSigning ? (
+          <div className="flex flex-col  items-center">
             <p className="font-poppins block text-center  whitespace-nowrap  font-semibold ">
               Tanda Tangan Berhasil
             </p>
             <div className="my-10">
-              <Image width={150} height={150} src={`${assetPrefix}/images/successFR.svg`} />
+              <Image
+                width={150}
+                height={150}
+                src={`${assetPrefix}/images/successFR.svg`}
+              />
             </div>
 
             <button
               onClick={() => {
                 setModal(false);
-                if(restRouterQuery.redirect_url){
-                  window.location.replace(restRouterQuery.redirect_url as string);
+                if (restRouterQuery.redirect_url) {
+                  window.location.replace(
+                    restRouterQuery.redirect_url as string
+                  );
                 }
               }}
               className="bg-primary btn  text-white font-poppins w-full mt-5 mx-auto rounded-sm h-9"
@@ -523,42 +583,44 @@ const OTPModal: React.FC<Active> = ({ modal, setModal }) => {
               TUTUP
             </button>
           </div>
-          ) : (
-            <>
-          <p className="font-poppins block text-center pb-5  whitespace-nowrap  font-semibold ">
-          Goresan
-        </p>
-        <span className="font-poppins block text-center pb-5  ">
-          Masukkan 6 digit OTP
-        </span>
-        <PinInput
-          containerStyle={{ alignItems: "center", gap: 5, marginTop: "10px" }}
-          inputStyle={{ alignItems: "center", gap: 5, marginTop: "10px" }}
-          placeholder=""
-          size="lg"
-          values={values}
-          onChange={(value, index, values) => setValues(values)}
-        />
-        <button
-          disabled={values.join("").length < 6}
-          onClick={onClickHandler}
-          className="bg-primary btn mt-16 disabled:opacity-50 text-white font-poppins w-full mx-auto rounded-sm h-9"
-        >
-          TERAPKAN
-        </button>
-        <button
-          onClick={() => {
-            setValues(["", "", "", "", "", ""])
-            setModal(!modal)
-          }}
-          className="  text-[#97A0AF]  font-poppins w-full mt-4  mx-auto rounded-sm h-9"
-        >
-          BATAL
-        </button>
-            </>
-          )
-        }
-        
+        ) : (
+          <>
+            <p className="font-poppins block text-center pb-5  whitespace-nowrap  font-semibold ">
+              Goresan
+            </p>
+            <span className="font-poppins block text-center pb-5  ">
+              Masukkan 6 digit OTP
+            </span>
+            <PinInput
+              containerStyle={{
+                alignItems: "center",
+                gap: 5,
+                marginTop: "10px",
+              }}
+              inputStyle={{ alignItems: "center", gap: 5, marginTop: "10px" }}
+              placeholder=""
+              size="lg"
+              values={values}
+              onChange={(value, index, values) => setValues(values)}
+            />
+            <button
+              disabled={values.join("").length < 6}
+              onClick={onClickHandler}
+              className="bg-primary btn mt-16 disabled:opacity-50 text-white font-poppins w-full mx-auto rounded-sm h-9"
+            >
+              TERAPKAN
+            </button>
+            <button
+              onClick={() => {
+                setValues(["", "", "", "", "", ""]);
+                setModal(!modal);
+              }}
+              className="  text-[#97A0AF]  font-poppins w-full mt-4  mx-auto rounded-sm h-9"
+            >
+              BATAL
+            </button>
+          </>
+        )}
       </div>
     </div>
   ) : null;

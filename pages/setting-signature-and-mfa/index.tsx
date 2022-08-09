@@ -1,9 +1,9 @@
 import {
   restSetDefaultSignature,
   restSetDefaultMFA,
-  getUserName
+  getUserName,
 } from "infrastructure/rest/b2b";
-import {  useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import SignaturePad from "../../components/SignaturePad";
 import InfoIcon from "../../public/icons/InfoIcon";
 import html2canvas from "html2canvas";
@@ -11,8 +11,11 @@ import { toast } from "react-toastify";
 import XIcon from "@/public/icons/XIcon";
 import { useRouter } from "next/router";
 import Head from "next/head";
-import {TUserData} from "@/interface/interface"
 import { handleRoute } from "@/utils/handleRoute";
+import { GetServerSideProps } from "next";
+import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
+import { RestKycCheckStep } from "infrastructure";
+import { serverSideRenderReturnConditions } from "@/utils/serverSideRenderReturnConditions";
 
 type Props = {};
 
@@ -36,7 +39,7 @@ function SettingSignatureAndMFA({}: Props) {
     mfa_method: "fr",
   });
   const [imageURL, setImageURL] = useState<string>();
-  const [data, setData] = useState<string>()
+  const [data, setData] = useState<string>();
   let ref: any = null;
   const sigPad = useRef<any>();
   const router = useRouter();
@@ -47,7 +50,7 @@ function SettingSignatureAndMFA({}: Props) {
     formSetter({ ...form, [e.currentTarget.name]: e.currentTarget.value });
     ref = e.currentTarget;
 
-    if(ref.name !== "mfa_method"){
+    if (ref.name !== "mfa_method") {
       convertToDataURL();
     }
   };
@@ -55,20 +58,19 @@ function SettingSignatureAndMFA({}: Props) {
   useEffect(() => {
     if (router.isReady) {
       getUserName({}).then((res) => {
-      const data = JSON.parse(res.data)
-      setData(data.name)
-    })
-    } 
+        const data = JSON.parse(res.data);
+        setData(data.name);
+      });
+    }
   }, [router.isReady]);
-
 
   //Convert HTML element to base64 png
   const convertToDataURL = async () => {
     const canvas = await html2canvas(ref.parentNode.children[1], {
       height: 60,
-      backgroundColor : "rgba(0, 0, 0, 0)"
+      backgroundColor: "rgba(0, 0, 0, 0)",
     });
-    canvas.style.backgroundColor = "rgba(0, 0, 0, 0)"
+    canvas.style.backgroundColor = "rgba(0, 0, 0, 0)";
     const image = canvas.toDataURL("image/png");
     setImageURL(image);
   };
@@ -101,14 +103,24 @@ function SettingSignatureAndMFA({}: Props) {
         signature_type == 1 ? (imageURL as string) : signature_image,
     };
 
-    if (signature_type == 0 && sigPad.current.isEmpty() || signature_type == 1 && !imageURL) {
+    if (
+      (signature_type == 0 && sigPad.current.isEmpty()) ||
+      (signature_type == 1 && !imageURL)
+    ) {
       toast.dismiss("info");
-      toast(`${signature_type === 0 ? "Tanda tangan goresan tidak boleh kosong!" : "Anda harus memilih salah satu tipe font"}`, {
-        type: "error",
-        toastId: "error",
-        position: "top-center",
-        icon: XIcon,
-      });
+      toast(
+        `${
+          signature_type === 0
+            ? "Tanda tangan goresan tidak boleh kosong!"
+            : "Anda harus memilih salah satu tipe font"
+        }`,
+        {
+          type: "error",
+          toastId: "error",
+          position: "top-center",
+          icon: XIcon,
+        }
+      );
     } else {
       restSetDefaultSignature({
         payload,
@@ -161,15 +173,18 @@ function SettingSignatureAndMFA({}: Props) {
           }
         });
 
-        restSetDefaultMFA({
-          payload: {
-            mfa_type,
-          },
-        }).then((res) => {
-          return res
-        }).catch((err) => {
-          {}
+      restSetDefaultMFA({
+        payload: {
+          mfa_type,
+        },
+      })
+        .then((res) => {
+          return res;
         })
+        .catch((err) => {
+          {
+          }
+        });
     }
   };
 
@@ -224,7 +239,11 @@ function SettingSignatureAndMFA({}: Props) {
             <SignaturePad sigPad={sigPad} />
           </div>
           <div className={form.signature_type == 1 ? undefined : "hidden"}>
-            <div className={`grid  ${data?.length as number > 15 ? "grid-cols gap-5" : "grid-col-2"} gap-3 mt-5`}>
+            <div
+              className={`grid  ${
+                (data?.length as number) > 15 ? "grid-cols gap-5" : "grid-col-2"
+              } gap-3 mt-5`}
+            >
               <label className="relative flex items-center justify-center">
                 <input
                   type="radio"
@@ -436,5 +455,34 @@ function SettingSignatureAndMFA({}: Props) {
     </>
   );
 }
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const cQuery = context.query;
+  const uuid =
+    cQuery.transaction_id || cQuery.request_id || cQuery.registration_id;
+
+  const checkStepResult: {
+    res?: TKycCheckStepResponseData;
+    err?: {
+      response: {
+        data: {
+          success: boolean;
+          message: string;
+          data: { errors: string[] };
+        };
+      };
+    };
+  } = await RestKycCheckStep({
+    payload: { registerId: uuid as string },
+  })
+    .then((res) => {
+      return { res };
+    })
+    .catch((err) => {
+      return { err };
+    });
+
+  return serverSideRenderReturnConditions({ context, checkStepResult });
+};
 
 export default SettingSignatureAndMFA;

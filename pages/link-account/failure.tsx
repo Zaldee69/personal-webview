@@ -1,4 +1,8 @@
 import { handleRoute } from "@/utils/handleRoute";
+import { serverSideRenderReturnConditions } from "@/utils/serverSideRenderReturnConditions";
+import { RestKycCheckStep } from "infrastructure";
+import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
+import { GetServerSideProps } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -19,6 +23,7 @@ const LinkAccountFailure = (props: Props) => {
           src={`${assetPrefix}/images/linkAccountFailure.svg`}
           width="196px"
           height="196px"
+          alt="liveness-failure-ill"
         />
       </div>
       <div className="mt-14">
@@ -46,6 +51,35 @@ const LinkAccountFailure = (props: Props) => {
       </div>
     </div>
   );
+};
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const cQuery = context.query;
+  const uuid =
+    cQuery.transaction_id || cQuery.request_id || cQuery.registration_id;
+
+  const checkStepResult: {
+    res?: TKycCheckStepResponseData;
+    err?: {
+      response: {
+        data: {
+          success: boolean;
+          message: string;
+          data: { errors: string[] };
+        };
+      };
+    };
+  } = await RestKycCheckStep({
+    payload: { registerId: uuid as string },
+  })
+    .then((res) => {
+      return { res };
+    })
+    .catch((err) => {
+      return { err };
+    });
+
+  return serverSideRenderReturnConditions({ context, checkStepResult });
 };
 
 export default LinkAccountFailure;

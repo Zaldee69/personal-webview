@@ -1,3 +1,4 @@
+import { setKycCheckstepTokenToLocalStorage } from "@/utils/setKycCheckstepTokenToLocalStorage";
 import axios from "axios";
 import {
   TKycCheckStepRequestData,
@@ -23,12 +24,7 @@ export const RestKycCheckStep = ({
       headers: {},
     })
     .then((res) => {
-      console.log(res.data);
-      if (res.data.data?.token) {
-        localStorage.setItem("kyc_checkstep_token", res.data.data.token);
-      } else {
-        localStorage.removeItem("kyc_checkstep_token");
-      }
+      setKycCheckstepTokenToLocalStorage(res.data.data?.token || null);
       return res.data;
     })
     .catch((err) => {
