@@ -1,5 +1,6 @@
 import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
 import { GetServerSidePropsContext, PreviewData } from "next";
+import { assetPrefix } from "next.config";
 import { ParsedUrlQuery } from "querystring";
 import { handleRoute } from "./handleRoute";
 
@@ -22,11 +23,10 @@ export const serverSideRenderReturnConditions = ({
   context,
   checkStepResult,
 }: IserverSideRenderReturnConditions) => {
+  const currentPathnameWithoutParams = context.resolvedUrl.split("?")[0];
   const cQuery = context.query;
   const uuid =
     cQuery.transaction_id || cQuery.request_id || cQuery.registration_id;
-
-  console.log(checkStepResult.err?.response.data);
 
   if (checkStepResult.err) {
     if (checkStepResult?.err.response?.data?.data?.errors?.[0]) {
@@ -40,6 +40,14 @@ export const serverSideRenderReturnConditions = ({
         if (checkStepResult.res.data.pin_form) {
           const params = { ...cQuery, registration_id: uuid };
           const queryString = new URLSearchParams(params as any).toString();
+
+          if (
+            currentPathnameWithoutParams === `${assetPrefix}/kyc/pinform` ||
+            currentPathnameWithoutParams === "/kyc/pinform"
+          ) {
+            return { props: {} };
+          }
+
           return {
             redirect: {
               permanent: false,
@@ -52,6 +60,14 @@ export const serverSideRenderReturnConditions = ({
         } else {
           const params = { ...cQuery, request_id: uuid };
           const queryString = new URLSearchParams(params as any).toString();
+
+          if (
+            currentPathnameWithoutParams === `${assetPrefix}/form` ||
+            currentPathnameWithoutParams === "/form"
+          ) {
+            return { props: {} };
+          }
+
           return {
             redirect: {
               permanent: false,
@@ -65,6 +81,14 @@ export const serverSideRenderReturnConditions = ({
       } else if (checkStepResult.res.data.status === "B") {
         const params = { ...cQuery, request_id: uuid };
         const queryString = new URLSearchParams(params as any).toString();
+
+        if (
+          currentPathnameWithoutParams === `${assetPrefix}/guide` ||
+          currentPathnameWithoutParams === "/guide"
+        ) {
+          return { props: {} };
+        }
+
         return {
           redirect: {
             permanent: false,
@@ -80,6 +104,14 @@ export const serverSideRenderReturnConditions = ({
       ) {
         const params = { ...cQuery, request_id: uuid };
         const queryString = new URLSearchParams(params as any).toString();
+
+        if (
+          currentPathnameWithoutParams === `${assetPrefix}/liveness-failure` ||
+          currentPathnameWithoutParams === "/liveness-failure"
+        ) {
+          return { props: {} };
+        }
+
         return {
           redirect: {
             permanent: false,
