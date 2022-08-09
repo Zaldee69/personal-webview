@@ -84,7 +84,10 @@ export const serverSideRenderReturnConditions = ({
 
         if (
           currentPathnameWithoutParams === `${assetPrefix}/guide` ||
-          currentPathnameWithoutParams === "/guide"
+          currentPathnameWithoutParams === "/guide" ||
+          // not redirect when status is equal to "B" and currentPathnameWithoutParams is equal to '/liveness-fail'
+          currentPathnameWithoutParams === `${assetPrefix}/liveness-fail` ||
+          currentPathnameWithoutParams === "/liveness-fail"
         ) {
           return { props: {} };
         }
