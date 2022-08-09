@@ -4,7 +4,9 @@ import { toast } from "react-toastify";
 import XIcon from "../../public/icons/XIcon";
 import Head from "next/head";
 import ReCAPTCHA from "react-google-recaptcha";
-import { assetPrefix } from "../../next.config"
+import { assetPrefix } from "../../next.config";
+import { GetServerSideProps } from "next";
+import { handleRoute } from "@/utils/handleRoute";
 
 type Props = {};
 
@@ -58,6 +60,7 @@ const ForgotTilakaName = (props: Props) => {
               src={`${assetPrefix}/images/forgotTilakaName.svg`}
               width="205px"
               height="205px"
+              alt="forgot-ill"
             />
           </div>
 
@@ -114,6 +117,17 @@ const ForgotTilakaName = (props: Props) => {
   );
 };
 
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const params = context.query;
+  const queryString = new URLSearchParams(params as any).toString();
+  return {
+    redirect: {
+      permanent: false,
+      destination: handleRoute("/?" + queryString),
+    },
+  };
+};
+
 export default ForgotTilakaName;
 
 const ModalSuccess: React.FC<{
@@ -130,7 +144,12 @@ const ModalSuccess: React.FC<{
           Email Telah Dikirim
         </p>
         <div className="mt-5 text-center">
-          <Image src={`${assetPrefix}/images/checkCircle.svg`} width="53px" height="53px" />
+          <Image
+            src={`${assetPrefix}/images/checkCircle.svg`}
+            width="53px"
+            height="53px"
+            alt="check-ill"
+          />
         </div>
         <p className="text-neutral800 text-base font-normal mt-8 font-poppins text-center">
           Silahkan periksa email Anda untuk melihat informasi Tilaka Name.

@@ -16,7 +16,10 @@ import { useRouter } from "next/router";
 import { handleRoute } from "./../../utils/handleRoute";
 import Image from "next/image";
 import { assetPrefix } from "../../next.config";
-import { restLogout } from "infrastructure/rest/b2b";
+import { RestKycCheckStep } from "infrastructure";
+import { GetServerSideProps } from "next";
+import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
+import { serverSideRenderReturnConditions } from "@/utils/serverSideRenderReturnConditions";
 
 type Props = {
   channel_id: string;
@@ -24,14 +27,14 @@ type Props = {
 };
 
 type ModalProps = {
-  certifModal : boolean,
-  setCertifModal: React.Dispatch<React.SetStateAction<boolean>>
-}
+  certifModal: boolean;
+  setCertifModal: React.Dispatch<React.SetStateAction<boolean>>;
+};
 
 const Login = () => {
   const [password, setPassword] = useState<string>("");
   const [tilakaName, setTilakaName] = useState("");
-  const [certifModal, setCertifModal] = useState<boolean>(false)
+  const [certifModal, setCertifModal] = useState<boolean>(false);
   const [type, setType] = useState<{ password: string }>({
     password: "password",
   });
@@ -46,7 +49,7 @@ const Login = () => {
       setAuthToken({ channel_id, pathname } as Props);
       setTilakaName(tilaka_name as string);
     }
-  }, [router.isReady]);
+  }, [router.isReady]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (data.status === "FULLFILLED" && data.data.success) {
@@ -72,17 +75,21 @@ const Login = () => {
           if (certif[0].status == "Aktif") {
             router.replace({
               pathname: handleRoute("/signing"),
-              query: { 
-                ...queryWithDynamicRedirectURL 
+              query: {
+                ...queryWithDynamicRedirectURL,
               },
             });
-          }else if(certif[0].status === "Revoke" || certif[0].status === "Expired" || certif[0].status === "Enroll"){
-            setCertifModal(true)
-          }else {
+          } else if (
+            certif[0].status === "Revoke" ||
+            certif[0].status === "Expired" ||
+            certif[0].status === "Enroll"
+          ) {
+            setCertifModal(true);
+          } else {
             router.replace({
               pathname: handleRoute("/certificate-information"),
-              query: { 
-                ...queryWithDynamicRedirectURL 
+              query: {
+                ...queryWithDynamicRedirectURL,
               },
             });
           }
@@ -90,7 +97,7 @@ const Login = () => {
       });
     }
     toastCaller(data);
-  }, [data.status]);
+  }, [data.status]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const onChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
@@ -112,7 +119,7 @@ const Login = () => {
   };
   return (
     <>
-    <CertifModal setCertifModal={setCertifModal} certifModal={certifModal} />
+      <CertifModal setCertifModal={setCertifModal} certifModal={certifModal} />
       <Head>
         <title>Tilaka</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
@@ -120,7 +127,7 @@ const Login = () => {
       <div className="px-5 pt-8 max-w-screen-sm sm:w-full md:w-4/5 mx-auto">
         <div className="flex flex-col gap-5 mt-10 items-center">
           <div className="h-14 w-14 font-semibold flex  text-xl items-center justify-center name text-white bg-[#64bac3] rounded-full">
-            {tilakaName[0]?.toUpperCase()}
+            {tilakaName?.[0]?.toUpperCase()}
           </div>
           <span className="font-bold text-xl text-[#172b4d] font-poppins">
             Hai, {tilaka_name}
@@ -174,30 +181,66 @@ const Login = () => {
   );
 };
 
-const CertifModal = ({certifModal, setCertifModal} : ModalProps) => {
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const cQuery = context.query;
+  const uuid =
+    cQuery.transaction_id || cQuery.request_id || cQuery.registration_id;
+
+  const checkStepResult: {
+    res?: TKycCheckStepResponseData;
+    err?: {
+      response: {
+        data: {
+          success: boolean;
+          message: string;
+          data: { errors: string[] };
+        };
+      };
+    };
+  } = await RestKycCheckStep({
+    payload: { registerId: uuid as string },
+  })
+    .then((res) => {
+      return { res };
+    })
+    .catch((err) => {
+      return { err };
+    });
+
+  return serverSideRenderReturnConditions({ context, checkStepResult });
+};
+
+export default Login;
+
+const CertifModal = ({ certifModal, setCertifModal }: ModalProps) => {
   return certifModal ? (
     <div
       style={{ backgroundColor: "rgba(0, 0, 0, .5)" }}
       className="fixed z-50 flex items-start transition-all duration-1000 pb-3 justify-center w-full left-0 top-0 h-full "
     >
       <div className="bg-white max-w-md mt-20 pt-5 px-2 pb-3 rounded-xl w-full mx-5">
-      <p className="text-center font-poppins font-semibold" >Anda Tidak Memiliki Sertifikat</p>
-      <div className="flex flex-col justify-center" >
-      <Image src={`${assetPrefix}/images/certif.svg`}  width={100} height={100} />
-        <p className="text-center font-poppins mt-5" >
-        Sertifikat Anda telah kadaluarsa
-      atau telah dicabut. Mohon membuat sertifikat baru untuk melakukan penandatanganan.
+        <p className="text-center font-poppins font-semibold">
+          Anda Tidak Memiliki Sertifikat
         </p>
-      </div>
-      <button
-          className="bg-primary btn mt-8 disabled:opacity-50 text-white font-poppins w-full mx-auto rounded-sm h-9"
-        >
+        <div className="flex flex-col justify-center">
+          <Image
+            src={`${assetPrefix}/images/certif.svg`}
+            width={100}
+            height={100}
+            alt="cert"
+          />
+          <p className="text-center font-poppins mt-5">
+            Sertifikat Anda telah kadaluarsa atau telah dicabut. Mohon membuat
+            sertifikat baru untuk melakukan penandatanganan.
+          </p>
+        </div>
+        <button className="bg-primary btn mt-8 disabled:opacity-50 text-white font-poppins w-full mx-auto rounded-sm h-9">
           BUAT SERTIFIKAT BARU
         </button>
         <button
           onClick={() => {
             // restLogout()
-            setCertifModal(false)
+            setCertifModal(false);
           }}
           className="  text-[#97A0AF]  font-poppins w-full mt-4  mx-auto rounded-sm h-9"
         >
@@ -205,7 +248,5 @@ const CertifModal = ({certifModal, setCertifModal} : ModalProps) => {
         </button>
       </div>
     </div>
-  ) : null
+  ) : null;
 };
-
-export default Login;

@@ -1,7 +1,10 @@
 import { handleRoute } from "@/utils/handleRoute";
+import { serverSideRenderReturnConditions } from "@/utils/serverSideRenderReturnConditions";
+import { RestKycCheckStep } from "infrastructure";
+import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
+import { GetServerSideProps } from "next";
 import Head from "next/head";
 import Image from "next/image";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import React from "react";
 import Footer from "../../components/Footer";
@@ -44,6 +47,35 @@ const LivenessFailure = () => {
       </div>
     </>
   );
+};
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const cQuery = context.query;
+  const uuid =
+    cQuery.transaction_id || cQuery.request_id || cQuery.registration_id;
+
+  const checkStepResult: {
+    res?: TKycCheckStepResponseData;
+    err?: {
+      response: {
+        data: {
+          success: boolean;
+          message: string;
+          data: { errors: string[] };
+        };
+      };
+    };
+  } = await RestKycCheckStep({
+    payload: { registerId: uuid as string },
+  })
+    .then((res) => {
+      return { res };
+    })
+    .catch((err) => {
+      return { err };
+    });
+
+  return serverSideRenderReturnConditions({ context, checkStepResult });
 };
 
 export default LivenessFailure;

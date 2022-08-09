@@ -1,10 +1,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import EyeIcon from "./../../public/icons/EyeIcon";
 import EyeIconOff from "./../../public/icons/EyeIconOff";
-import { toast } from "react-toastify";
-import XIcon from "../../public/icons/XIcon";
 import { useRouter } from "next/router";
 import { AppDispatch, RootState } from "@/redux/app/store";
 import { useDispatch, useSelector } from "react-redux";
@@ -14,6 +11,10 @@ import { TLoginProps } from "@/interface/interface";
 import { assetPrefix } from "../../next.config";
 import { handleRoute } from "./../../utils/handleRoute";
 import { getCertificateList } from "infrastructure/rest/b2b";
+import { GetServerSideProps } from "next";
+import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
+import { RestKycCheckStep } from "infrastructure";
+import { serverSideRenderReturnConditions } from "@/utils/serverSideRenderReturnConditions";
 
 type Props = {};
 
@@ -221,6 +222,35 @@ const LinkAccount = (props: Props) => {
       </div>
     </>
   );
+};
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const cQuery = context.query;
+  const uuid =
+    cQuery.transaction_id || cQuery.request_id || cQuery.registration_id;
+
+  const checkStepResult: {
+    res?: TKycCheckStepResponseData;
+    err?: {
+      response: {
+        data: {
+          success: boolean;
+          message: string;
+          data: { errors: string[] };
+        };
+      };
+    };
+  } = await RestKycCheckStep({
+    payload: { registerId: uuid as string },
+  })
+    .then((res) => {
+      return { res };
+    })
+    .catch((err) => {
+      return { err };
+    });
+
+  return serverSideRenderReturnConditions({ context, checkStepResult });
 };
 
 export default LinkAccount;

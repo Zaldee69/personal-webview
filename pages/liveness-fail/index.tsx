@@ -9,6 +9,10 @@ import { AppDispatch } from "@/redux/app/store";
 import { useDispatch } from "react-redux";
 import { setIsDone } from "@/redux/slices/livenessSlice";
 import { handleRoute } from "@/utils/handleRoute";
+import { GetServerSideProps } from "next";
+import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
+import { RestKycCheckStep } from "infrastructure";
+import { serverSideRenderReturnConditions } from "@/utils/serverSideRenderReturnConditions";
 
 const LivenessFail = () => {
   const router = useRouter();
@@ -89,6 +93,35 @@ const LivenessFail = () => {
       </div>
     </>
   );
+};
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const cQuery = context.query;
+  const uuid =
+    cQuery.transaction_id || cQuery.request_id || cQuery.registration_id;
+
+  const checkStepResult: {
+    res?: TKycCheckStepResponseData;
+    err?: {
+      response: {
+        data: {
+          success: boolean;
+          message: string;
+          data: { errors: string[] };
+        };
+      };
+    };
+  } = await RestKycCheckStep({
+    payload: { registerId: uuid as string },
+  })
+    .then((res) => {
+      return { res };
+    })
+    .catch((err) => {
+      return { err };
+    });
+
+  return serverSideRenderReturnConditions({ context, checkStepResult });
 };
 
 export default LivenessFail;

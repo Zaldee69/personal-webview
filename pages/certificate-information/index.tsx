@@ -4,76 +4,84 @@ import { useEffect } from "react";
 import { AppDispatch, RootState } from "@/redux/app/store";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/router";
-import { RestRegisteredCertificate, RestConfirmCertificate } from "infrastructure/rest/b2b";
+import {
+  RestRegisteredCertificate,
+  RestConfirmCertificate,
+} from "infrastructure/rest/b2b";
 import { toast } from "react-toastify";
 import { TConfirmCertificateRequestData } from "infrastructure/rest/b2b/types";
 import { handleRoute } from "@/utils/handleRoute";
+import { GetServerSideProps } from "next";
+import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
+import { RestKycCheckStep } from "infrastructure";
+import { serverSideRenderReturnConditions } from "@/utils/serverSideRenderReturnConditions";
 
-function CertificateInformation({ }: Props) {
-
+function CertificateInformation({}: Props) {
   const dispatch: AppDispatch = useDispatch();
   const { certificate } = useSelector((state: RootState) => state.certificate);
   const router = useRouter();
   const { company_id } = router.query;
 
-
   const getRegisteredCertificate = () => {
     const body = {
       company_id: company_id as string,
-    }
-    RestRegisteredCertificate(body).then((res) => {
-      if (res?.data) {
-        const result = JSON.parse(res.data[0])
-        dispatch(setCertificate(result))
-      }
-    }).catch((_) => {
-      toast("Gagal mengecek sertifikat", {
-        type: "error",
-        toastId: "error",
-        position: "top-center",
-      });
-    })
-  }
-
-  useEffect(() => {
-    if (!router.isReady) return
-    getRegisteredCertificate()
-  }, [router.isReady])
-
-  const handleConfirm = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault()
-    const body: TConfirmCertificateRequestData = {
-      company_id: company_id as string,
-      serial_number: certificate.serialNumber
-    }
-    RestConfirmCertificate(body).then((res) => {
-      if (res.success) {
-        toast(`Sukses mengaktifkan sertifikat`, {
-          type: 'success',
-          position: 'top-center',
-          autoClose: 3000,
-        })
-        setTimeout(() => {
-          router.replace({
-            pathname: handleRoute('setting-signature-and-mfa'),
-            query: { ...router.query },
-          });
-        }, 1000);
-
-      } else {
-        toast(`${res.message}`, {
+    };
+    RestRegisteredCertificate(body)
+      .then((res) => {
+        if (res?.data) {
+          const result = JSON.parse(res.data[0]);
+          dispatch(setCertificate(result));
+        }
+      })
+      .catch((_) => {
+        toast("Gagal mengecek sertifikat", {
           type: "error",
           toastId: "error",
           position: "top-center",
         });
-      }
-    }).catch((_) => {
-      toast("Gagal mengaktifkan sertifikat", {
-        type: "error",
-        toastId: "error",
-        position: "top-center",
       });
-    })
+  };
+
+  useEffect(() => {
+    if (!router.isReady) return;
+    getRegisteredCertificate();
+  }, [router.isReady]);
+
+  const handleConfirm = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    const body: TConfirmCertificateRequestData = {
+      company_id: company_id as string,
+      serial_number: certificate.serialNumber,
+    };
+    RestConfirmCertificate(body)
+      .then((res) => {
+        if (res.success) {
+          toast(`Sukses mengaktifkan sertifikat`, {
+            type: "success",
+            position: "top-center",
+            autoClose: 3000,
+          });
+          setTimeout(() => {
+            router.replace({
+              pathname: handleRoute("setting-signature-and-mfa"),
+              query: { ...router.query },
+            });
+          }, 1000);
+        } else {
+          toast(`${res.message}`, {
+            type: "error",
+            toastId: "error",
+            position: "top-center",
+          });
+        }
+      })
+      .catch((_) => {
+        toast("Gagal mengaktifkan sertifikat", {
+          type: "error",
+          toastId: "error",
+          position: "top-center",
+        });
+      });
   };
   return (
     <div className="bg-white p-4 font-poppins">
@@ -88,11 +96,15 @@ function CertificateInformation({ }: Props) {
           <p className="text-sm text-neutral800 font-normal w-24 pr-2">
             Negara
           </p>
-          <p className="text-sm text-neutral800 font-medium">{certificate.negara}</p>
+          <p className="text-sm text-neutral800 font-medium">
+            {certificate.negara}
+          </p>
         </div>
         <div className="flex items-center">
           <p className="text-sm text-neutral800 font-normal w-24 pr-2">Nama</p>
-          <p className="text-sm text-neutral800 font-medium">{certificate.nama}</p>
+          <p className="text-sm text-neutral800 font-medium">
+            {certificate.nama}
+          </p>
         </div>
         <div className="flex items-center">
           <p className="text-sm text-neutral800 font-normal w-24 pr-2">
@@ -137,5 +149,34 @@ function CertificateInformation({ }: Props) {
     </div>
   );
 }
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const cQuery = context.query;
+  const uuid =
+    cQuery.transaction_id || cQuery.request_id || cQuery.registration_id;
+
+  const checkStepResult: {
+    res?: TKycCheckStepResponseData;
+    err?: {
+      response: {
+        data: {
+          success: boolean;
+          message: string;
+          data: { errors: string[] };
+        };
+      };
+    };
+  } = await RestKycCheckStep({
+    payload: { registerId: uuid as string },
+  })
+    .then((res) => {
+      return { res };
+    })
+    .catch((err) => {
+      return { err };
+    });
+
+  return serverSideRenderReturnConditions({ context, checkStepResult });
+};
 
 export default CertificateInformation;
