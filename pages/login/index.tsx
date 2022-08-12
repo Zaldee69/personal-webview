@@ -6,7 +6,6 @@ import EyeIconOff from "@/public/icons/EyeIconOff";
 import { AppDispatch, RootState } from "@/redux/app/store";
 import { useDispatch, useSelector } from "react-redux";
 import { login } from "@/redux/slices/loginSlice";
-import { setAuthToken } from "@/config/API";
 import { TLoginProps } from "@/interface/interface";
 import Head from "next/head";
 import toastCaller from "@/utils/toastCaller";
@@ -42,11 +41,9 @@ const Login = () => {
   const data = useSelector((state: RootState) => state.login);
   const router = useRouter();
   const { channel_id, tilaka_name, company_id, transaction_id } = router.query;
-  const { pathname } = router;
 
   useEffect(() => {
     if (router.isReady) {
-      setAuthToken({ channel_id, pathname } as Props);
       setTilakaName(tilaka_name as string);
     }
   }, [router.isReady]); // eslint-disable-line react-hooks/exhaustive-deps

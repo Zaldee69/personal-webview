@@ -52,6 +52,7 @@ export type TDocumentResponse = {
 export type TDocumentProps = {
   transaction_id: string;
   company_id: string;
+  token: string
 };
 
 export type TUserData = {

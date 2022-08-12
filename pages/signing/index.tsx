@@ -17,7 +17,6 @@ import Head from "next/head";
 import FRCamera from "@/components/FRCamera";
 import SignaturePad from "@/components/SignaturePad";
 import Footer from "@/components/Footer";
-import { setAuthToken } from "@/config/API";
 import html2canvas from "html2canvas";
 import { getUserName } from "infrastructure/rest/b2b";
 import { assetPrefix } from "../../next.config";
@@ -41,11 +40,6 @@ interface Active {
   tilakaName?: string;
 }
 
-interface Props {
-  token: string;
-  pathname: string;
-}
-
 const Signing = () => {
   const [totalPages, setTotalPages] = useState<number>(0);
   const [openFRModal, setopenFRModal] = useState<boolean>(false);
@@ -55,7 +49,6 @@ const Signing = () => {
   const [data, setData] = useState<string>();
   const router = useRouter();
   const routerIsReady = router.isReady;
-  const pathname = router.pathname;
   const { company_id, request_id, transaction_id } = router.query;
 
   const dispatch: AppDispatch = useDispatch();
@@ -74,6 +67,7 @@ const Signing = () => {
         getDocument({
           company_id,
           transaction_id: (request_id as string) || (transaction_id as string),
+          token
         } as TDocumentProps)
       );
       if (res.response.status === "REJECTED") {
@@ -86,7 +80,6 @@ const Signing = () => {
         query: { ...router.query },
       });
     }
-    setAuthToken({ token, pathname } as Props);
   }, [routerIsReady]);
 
   return (

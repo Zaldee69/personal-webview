@@ -22,7 +22,8 @@ const initialState: TDocumentResponse = {
 
 export const getDocument = createAsyncThunk(
   "personal/document",
-  async ({ transaction_id, company_id }: TDocumentProps) => {
+  async ({ transaction_id, company_id, token }: TDocumentProps) => {
+    API.defaults.headers.common["Authorization"] =`Bearer ${token}`
     const res = API.post("receiveDocument", {
       transaction_id,
       company_id,
