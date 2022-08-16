@@ -6,13 +6,14 @@
 
 @layer components {
   .card-pin-form {
-    @apply bg-white rounded-xl px-4 sm:px-11 pt-3 sm:pt-8 pb-4 sm:pb-9;
+    @apply bg-white rounded-xl px-4 sm:px-11 pt-3 sm:pt-8 pb-4 sm:pb-9 relative;
     box-shadow: 0px 8px 12px rgba(9, 30, 66, 0.1),
       0px 0px 1px rgba(9, 30, 66, 0.31);
   }
   .btn-pin-form {
     @apply w-14 h-14 mx-auto rounded-full text-3xl font-poppins text-neutral800 active:text-primary active:shadow-none active:bg-blue50 transition-colors select-none hover:cursor-pointer flex disabled:cursor-not-allowed disabled:active:bg-neutral40 disabled:bg-neutral40 disabled:text-neutral800 justify-center items-center;
-    box-shadow: 0px 1px 1px rgba(9, 30, 66, 0.25), 0px 0px 1px rgba(9, 30, 66, 0.31);
+    box-shadow: 0px 1px 1px rgba(9, 30, 66, 0.25),
+      0px 0px 1px rgba(9, 30, 66, 0.31);
   }
   .btn-pin-form-invisible {
     @apply select-none hover:cursor-default;
@@ -34,20 +35,19 @@
   height: 90%;
 }
 
-
-@media only screen and (max-width: 375px)  {
+@media only screen and (max-width: 375px) {
   .percent {
     width: 85%;
     height: 90%;
   }
 }
-@media only screen and (max-width: 350px)  {
+@media only screen and (max-width: 350px) {
   .percent {
     width: 95%;
     height: 90%;
   }
 }
-@media only screen and (max-width: 320px)  {
+@media only screen and (max-width: 320px) {
   .percent {
     width: 100%;
     height: 90%;
@@ -186,8 +186,6 @@ input[type="checkbox"] {
 /* override countdown circle timer style */
 
 #countdown-timer-fr svg {
-  background-color: rgb(0 0 0 / 0.2) ;
+  background-color: rgb(0 0 0 / 0.2);
   border-radius: 50%;
 }
-
-

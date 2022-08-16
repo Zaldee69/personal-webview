@@ -56,57 +56,70 @@ const PinFormDedicatedChannel = (props: Props) => {
     if (pin !== pinConfirm) {
       setPinConfirmErrorAfterSubmit({
         isError: true,
-        message: "PIN does not match",
+        message: "PIN tidak sesuai",
       });
       return;
     }
 
     setPinConfirmErrorAfterSubmit({ isError: false, message: "" });
 
-    const tilakaName = user_identifier || "";
-    const password = pin;
+    // const tilakaName = user_identifier || "";
+    // const password = pin;
 
-    RestKycFinalForm({
-      payload: {
-        tilakaName,
-        password,
-        registerId: registration_id as string,
-      },
-    })
-      .then((res) => {
-        if (res.success) {
-          setIsConfirmMode(false);
-          if (redirect_url) {
-            const searchParams = new URLSearchParams(
-              redirect_url + "?register_id=" + registration_id
-            );
-            // Set params
-            res.data.status && searchParams.set("status", `${res.data.status}`);
-            // Redirect topmost window
-            window.top!.location.href = decodeURIComponent(
-              searchParams.toString()
-            );
-          }
-        } else {
-          setPinConfirmError({
-            isError: true,
-            message: res?.message || "gagal",
-          });
-        }
-      })
-      .catch((err) => {
-        if (err.response?.data?.data?.errors?.[0]) {
-          setPinConfirmError({
-            isError: true,
-            message: `${err.response?.data?.message}, ${err.response?.data?.data?.errors?.[0]}`,
-          });
-        } else {
-          setPinConfirmError({
-            isError: true,
-            message: err.response?.data?.message || "gagal",
-          });
-        }
-      });
+    // RestKycFinalForm({
+    //   payload: {
+    //     tilakaName,
+    //     password,
+    //     registerId: registration_id as string,
+    //   },
+    // })
+    //   .then((res) => {
+    //     if (res.success) {
+    //       setIsConfirmMode(false);
+    //       if (redirect_url) {
+    //         const searchParams = new URLSearchParams(
+    //           redirect_url + "?register_id=" + registration_id
+    //         );
+    //         // Set params
+    //         res.data.status && searchParams.set("status", `${res.data.status}`);
+    //         // Redirect topmost window
+    //         window.top!.location.href = decodeURIComponent(
+    //           searchParams.toString()
+    //         );
+    //       }
+    //     } else {
+    //       setPinConfirmError({
+    //         isError: true,
+    //         message: res?.message || "gagal",
+    //       });
+    //     }
+    //   })
+    //   .catch((err) => {
+    //     if (err.response?.data?.data?.errors?.[0]) {
+    //       setPinConfirmError({
+    //         isError: true,
+    //         message: `${err.response?.data?.message}, ${err.response?.data?.data?.errors?.[0]}`,
+    //       });
+    //     } else {
+    //       setPinConfirmError({
+    //         isError: true,
+    //         message: err.response?.data?.message || "gagal",
+    //       });
+    //     }
+    //   });
+  };
+  const onClickCancel = (_: React.SyntheticEvent) => {
+    const searchParams = new URLSearchParams(redirect_url + "?status=Cancel");
+    // Redirect topmost window
+    window.top!.location.href = decodeURIComponent(searchParams.toString());
+  };
+  const onClickBack = (_: React.SyntheticEvent) => {
+    setPin("");
+    setPinError({ isError: false, message: "" });
+    setPinConfirmError({ isError: false, message: "" });
+    setPinConfirmErrorAfterSubmit({ isError: false, message: "" });
+    setIsConfirmMode(false);
+    setIsRequestCheckStatus(false);
   };
 
   useEffect(() => {
@@ -153,7 +166,8 @@ const PinFormDedicatedChannel = (props: Props) => {
         <div className="max-w- w-full" style={{ maxWidth: "331px" }}>
           <PinFormComponent
             key="pinFormConfirmKey"
-            title={`Confirm PIN`}
+            title="Konfirmasi PIN Baru"
+            subTitle="Pastikan Konfirmasi PIN sudah sesuai"
             digitLength={digitLength}
             isRandom={isRandom}
             onClickNumberHandlerCallback={onClickNumberHandlerConfirmCallback}
@@ -164,13 +178,24 @@ const PinFormDedicatedChannel = (props: Props) => {
             isErrorAfterSubmitMessage={pinConfirmErrorAfterSubmit.message}
             isError={pinConfirmError.isError}
             isErrorMessage={pinConfirmError.message}
+            cancelLink={{
+              show: redirect_url ? true : false,
+              title: "Batal Buat PIN Baru",
+              onClickCancelCallback: onClickCancel,
+            }}
+            showPoweredByTilaka
+            backButton={{
+              show: true,
+              onClickBackCallback: onClickBack,
+            }}
           />
         </div>
       ) : (
         <div className="max-w- w-full" style={{ maxWidth: "331px" }}>
           <PinFormComponent
             key="pinFormKey"
-            title={`Set ${digitLength}-digit PIN`}
+            title="Buat PIN Baru"
+            subTitle="Hindari angka yang mudah ditebak, seperti angka berulang atau berurutan"
             digitLength={digitLength}
             isRandom={isRandom}
             onClickNumberHandlerCallback={onClickNumberHandlerCallback}
@@ -180,6 +205,12 @@ const PinFormDedicatedChannel = (props: Props) => {
             isError={pinError.isError}
             isErrorMessage={pinError.message}
             isButtonNumberDisabled={isRequestCheckStatus}
+            cancelLink={{
+              show: redirect_url ? true : false,
+              title: "Batal Buat PIN Baru",
+              onClickCancelCallback: onClickCancel,
+            }}
+            showPoweredByTilaka
           />
         </div>
       )}
