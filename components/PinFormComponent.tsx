@@ -1,9 +1,13 @@
 import { shuffleArray } from "@/utils/shuffleArray";
 import React, { useEffect, useState } from "react";
+import ArrowLeftIcon from "@/public/icons/ArrowLeftIcon";
 import DeleteIcon from "@/public/icons/DeleteIcon";
+import Image from "next/image";
+import { assetPrefix } from "next.config";
 
 interface IPropsPinFormComponent {
   title: string;
+  subTitle?: string;
   digitLength: number;
   isRandom: boolean;
   onClickNumberHandlerCallback: (value: number) => void;
@@ -15,6 +19,16 @@ interface IPropsPinFormComponent {
   isButtonNumberDisabled?: boolean;
   isError?: boolean;
   isErrorMessage?: string;
+  cancelLink?: {
+    show?: boolean;
+    title?: string;
+    onClickCancelCallback?: (event: React.SyntheticEvent) => void;
+  };
+  showPoweredByTilaka?: boolean;
+  backButton?: {
+    show?: boolean;
+    onClickBackCallback?: (event: React.SyntheticEvent) => void;
+  };
 }
 
 type TNumbers = Array<0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9>;
@@ -89,7 +103,7 @@ const PinFormComponent = (props: IPropsPinFormComponent): JSX.Element => {
     }
 
     return;
-  }, [values, onDelete]);
+  }, [values, onDelete]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (submitted && props.isResetAfterSubmit && !props.isErrorAfterSubmit) {
       setTimeout(() => {
@@ -101,15 +115,28 @@ const PinFormComponent = (props: IPropsPinFormComponent): JSX.Element => {
     }
     setSubmitted(false);
     return;
-  }, [submitted, props.isResetAfterSubmit, props.isErrorAfterSubmit]);
+  }, [submitted, props.isResetAfterSubmit, props.isErrorAfterSubmit]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!shouldRender) null;
 
   return (
     <div className="card-pin-form">
+      {props.backButton?.show && (
+        <button
+          onClick={props.backButton.onClickBackCallback}
+          className="absolute top-7 left-7 hover:opacity-80"
+        >
+          <ArrowLeftIcon />
+        </button>
+      )}
       <p className="text-center text-neutral800 text-base font-semibold font-poppins">
         {props.title}
       </p>
+      {props.subTitle && (
+        <p className="text-center text-neutral200 text-xs font-normal font-poppins mt-2.5">
+          {props.subTitle}
+        </p>
+      )}
       <div className="flex items-center justify-center mt-8">
         {digitArr.map((e, i) => (
           <div
@@ -157,6 +184,26 @@ const PinFormComponent = (props: IPropsPinFormComponent): JSX.Element => {
           );
         })}
       </div>
+      {props.cancelLink?.show && (
+        <div className="mt-7 text-center">
+          <p
+            onClick={props.cancelLink.onClickCancelCallback}
+            className="text-primary text-sm font-semibold font-poppins hover:opacity-80 hover:cursor-pointer"
+          >
+            {props.cancelLink.title}
+          </p>
+        </div>
+      )}
+      {props.showPoweredByTilaka && (
+        <div className="mt-7 flex justify-center">
+          <Image
+            src={`${assetPrefix}/images/poweredByTilaka.svg`}
+            alt="powered-by-tilaka"
+            width="80px"
+            height="41.27px"
+          />
+        </div>
+      )}
     </div>
   );
 };
