@@ -109,6 +109,15 @@ const PinFormDedicatedChannel = (props: Props) => {
       });
   };
 
+  const onClickBack = (_: React.SyntheticEvent) => {
+    setPin("");
+    setPinError({ isError: false, message: "" });
+    setPinConfirmError({ isError: false, message: "" });
+    setPinConfirmErrorAfterSubmit({ isError: false, message: "" });
+    setIsConfirmMode(false);
+    setIsRequestCheckStatus(false);
+  };
+
   useEffect(() => {
     if (!router.isReady) return;
     setShouldRender(true);
@@ -153,7 +162,8 @@ const PinFormDedicatedChannel = (props: Props) => {
         <div className="max-w- w-full" style={{ maxWidth: "331px" }}>
           <PinFormComponent
             key="pinFormConfirmKey"
-            title={`Confirm PIN`}
+            title={`Konfirmasi PIN`}
+            subTitle="Pastikan Konfirmasi PIN sudah sesuai"
             digitLength={digitLength}
             isRandom={isRandom}
             onClickNumberHandlerCallback={onClickNumberHandlerConfirmCallback}
@@ -164,13 +174,18 @@ const PinFormDedicatedChannel = (props: Props) => {
             isErrorAfterSubmitMessage={pinConfirmErrorAfterSubmit.message}
             isError={pinConfirmError.isError}
             isErrorMessage={pinConfirmError.message}
+            backButton={{
+              show: true,
+              onClickBackCallback: onClickBack,
+            }}
+            showPoweredByTilaka
           />
         </div>
       ) : (
         <div className="max-w- w-full" style={{ maxWidth: "331px" }}>
           <PinFormComponent
             key="pinFormKey"
-            title={`Set ${digitLength}-digit PIN`}
+            title={`Buat PIN`}
             digitLength={digitLength}
             isRandom={isRandom}
             onClickNumberHandlerCallback={onClickNumberHandlerCallback}
@@ -180,6 +195,8 @@ const PinFormDedicatedChannel = (props: Props) => {
             isError={pinError.isError}
             isErrorMessage={pinError.message}
             isButtonNumberDisabled={isRequestCheckStatus}
+            subTitle="Buat 6-digit PIN untuk menggunakan layanan Tanda Tangan Digital dengan aman"
+            showPoweredByTilaka
           />
         </div>
       )}
