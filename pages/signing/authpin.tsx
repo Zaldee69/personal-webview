@@ -13,10 +13,12 @@ const AuthPinForm = (props: Props) => {
     random,
     user,
     id,
+    redirect_url,
   }: NextParsedUrlQuery & {
     random?: "1";
     user?: string;
     id?: string;
+    redirect_url?: string;
   } = router.query;
   const isRandom: boolean = random === "1";
   const [shouldRender, setShouldRender] = useState<boolean>(false);
@@ -47,6 +49,9 @@ const AuthPinForm = (props: Props) => {
           position: "top-center",
         });
         setIsRequestCheckStatus(false);
+        if (redirect_url) {
+          window.top!.location.href = decodeURIComponent(redirect_url);
+        }
       } else {
         setPinError({
           isError: true,
@@ -99,6 +104,7 @@ const AuthPinForm = (props: Props) => {
             isError={pinError.isError}
             isErrorMessage={pinError.message}
             isButtonNumberDisabled={isRequestCheckStatus}
+            showPoweredByTilaka
           />
         </div>
     </div>
