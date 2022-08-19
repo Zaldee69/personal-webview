@@ -1,8 +1,12 @@
 import PinFormComponent from "@/components/PinFormComponent";
-import { RestKycCheckStep, RestKycFinalForm } from "infrastructure";
+import { serverSideRenderReturnConditions } from "@/utils/serverSideRenderReturnConditions";
+import { RestKycCheckStep } from "infrastructure";
+import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
+import { RestPersonalResetPassword } from "infrastructure/rest/personal";
+import { GetServerSideProps } from "next";
 import { NextParsedUrlQuery } from "next/dist/server/request-meta";
 import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 type Props = {};
 
@@ -10,17 +14,14 @@ const PinFormDedicatedChannel = (props: Props) => {
   const router = useRouter();
   const {
     random,
-    user_identifier,
-    registration_id,
+    token,
     redirect_url,
   }: NextParsedUrlQuery & {
     random?: "1";
-    user_identifier?: string;
-    registration_id?: string;
+    token?: string;
     redirect_url?: string;
   } = router.query;
   const isRandom: boolean = random === "1";
-  const [shouldRender, setShouldRender] = useState<boolean>(false);
   const [pin, setPin] = useState<string>("");
   const [pinError, setPinError] = useState<{
     isError: boolean;
@@ -52,62 +53,6 @@ const PinFormDedicatedChannel = (props: Props) => {
   const onClickDeleteHandlerConfirmCallback = () => {
     setPinConfirmError({ isError: false, message: "" });
   };
-  const submitFormConfirmCallback = (pinConfirm: string) => {
-    if (pin !== pinConfirm) {
-      setPinConfirmErrorAfterSubmit({
-        isError: true,
-        message: "PIN tidak sesuai",
-      });
-      return;
-    }
-
-    setPinConfirmErrorAfterSubmit({ isError: false, message: "" });
-
-    // const tilakaName = user_identifier || "";
-    // const password = pin;
-
-    // RestKycFinalForm({
-    //   payload: {
-    //     tilakaName,
-    //     password,
-    //     registerId: registration_id as string,
-    //   },
-    // })
-    //   .then((res) => {
-    //     if (res.success) {
-    //       setIsConfirmMode(false);
-    //       if (redirect_url) {
-    //         const searchParams = new URLSearchParams(
-    //           redirect_url + "?register_id=" + registration_id
-    //         );
-    //         // Set params
-    //         res.data.status && searchParams.set("status", `${res.data.status}`);
-    //         // Redirect topmost window
-    //         window.top!.location.href = decodeURIComponent(
-    //           searchParams.toString()
-    //         );
-    //       }
-    //     } else {
-    //       setPinConfirmError({
-    //         isError: true,
-    //         message: res?.message || "gagal",
-    //       });
-    //     }
-    //   })
-    //   .catch((err) => {
-    //     if (err.response?.data?.data?.errors?.[0]) {
-    //       setPinConfirmError({
-    //         isError: true,
-    //         message: `${err.response?.data?.message}, ${err.response?.data?.data?.errors?.[0]}`,
-    //       });
-    //     } else {
-    //       setPinConfirmError({
-    //         isError: true,
-    //         message: err.response?.data?.message || "gagal",
-    //       });
-    //     }
-    //   });
-  };
   const onClickCancel = (_: React.SyntheticEvent) => {
     const searchParams = new URLSearchParams(redirect_url + "?status=Cancel");
     // Redirect topmost window
@@ -121,49 +66,57 @@ const PinFormDedicatedChannel = (props: Props) => {
     setIsConfirmMode(false);
     setIsRequestCheckStatus(false);
   };
+  const submitFormConfirmCallback = (pinConfirm: string) => {
+    if (pin !== pinConfirm) {
+      setPinConfirmErrorAfterSubmit({
+        isError: true,
+        message: "PIN tidak sesuai",
+      });
+      return;
+    }
 
-  useEffect(() => {
-    if (!router.isReady) return;
-    setShouldRender(true);
-    setIsRequestCheckStatus(true);
-    RestKycCheckStep({
-      payload: { registerId: registration_id as string },
+    setPinConfirmErrorAfterSubmit({ isError: false, message: "" });
+
+    const password = pin;
+
+    RestPersonalResetPassword({
+      payload: {
+        password,
+        token: token as string,
+      },
     })
       .then((res) => {
         if (res.success) {
-          setPinError({ isError: false, message: "pengecekan step berhasil" });
-          setIsRequestCheckStatus(false);
+          setIsConfirmMode(false);
+          if (redirect_url) {
+            window.top!.location.href = decodeURIComponent(redirect_url);
+          }
         } else {
-          setPinError({
+          setPinConfirmError({
             isError: true,
-            message: res?.message || "pengecekan step tidak sukses",
+            message: res?.message || "gagal",
           });
-          setIsRequestCheckStatus(true);
         }
       })
       .catch((err) => {
         if (err.response?.data?.data?.errors?.[0]) {
-          setPinError({
+          setPinConfirmError({
             isError: true,
-            message: err.response?.data?.data?.errors?.[0],
+            message: `${err.response?.data?.message}, ${err.response?.data?.data?.errors?.[0]}`,
           });
-          setIsRequestCheckStatus(true);
         } else {
-          setPinError({
+          setPinConfirmError({
             isError: true,
-            message: err.response?.data?.message || "pengecekan step gagal",
+            message: err.response?.data?.message || "gagal",
           });
-          setIsRequestCheckStatus(true);
         }
       });
-  }, [router.isReady, registration_id]);
-
-  if (!shouldRender) return;
+  };
 
   return (
     <div className="flex justify-center items-center min-h-screen">
       {isConfirmMode ? (
-        <div className="max-w- w-full" style={{ maxWidth: "331px" }}>
+        <div className="w-full" style={{ maxWidth: "331px" }}>
           <PinFormComponent
             key="pinFormConfirmKey"
             title="Konfirmasi PIN Baru"
@@ -191,7 +144,7 @@ const PinFormDedicatedChannel = (props: Props) => {
           />
         </div>
       ) : (
-        <div className="max-w- w-full" style={{ maxWidth: "331px" }}>
+        <div className="w-full" style={{ maxWidth: "331px" }}>
           <PinFormComponent
             key="pinFormKey"
             title="Buat PIN Baru"
@@ -216,6 +169,35 @@ const PinFormDedicatedChannel = (props: Props) => {
       )}
     </div>
   );
+};
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const cQuery = context.query;
+  const uuid =
+    cQuery.transaction_id || cQuery.request_id || cQuery.registration_id;
+
+  const checkStepResult: {
+    res?: TKycCheckStepResponseData;
+    err?: {
+      response: {
+        data: {
+          success: boolean;
+          message: string;
+          data: { errors: string[] };
+        };
+      };
+    };
+  } = await RestKycCheckStep({
+    payload: { registerId: uuid as string },
+  })
+    .then((res) => {
+      return { res };
+    })
+    .catch((err) => {
+      return { err };
+    });
+
+  return serverSideRenderReturnConditions({ context, checkStepResult });
 };
 
 export default PinFormDedicatedChannel;
