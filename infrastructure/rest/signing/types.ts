@@ -21,3 +21,21 @@ export interface TSigningResponseData {
     message: string;
     data: any;
 }
+
+export interface TSigningAuthPINRequestData {
+    pin: string;
+    user: string;
+    id: string;
+}
+
+export interface TSignedPDFResponseData {
+    signing_id: string;
+    pdf: string;
+}
+
+export interface TSigningAuthPINResponseData {
+    success: boolean;
+    message: string;
+    request_id: string;
+    signed_pdf: TSignedPDFResponseData[]
+}
