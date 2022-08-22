@@ -8,3 +8,24 @@ export type TPersonalResetPasswordResponseData = {
   message: string;
   data: null;
 };
+
+export type TPersonalRequestChangePasswordRequestData = {
+  request_id: string;
+  password: string;
+};
+
+export type TPersonalRequestChangePasswordResponseData = {
+  success: boolean;
+  message: string;
+  data: string[] | null;
+};
+
+export type TPersonalChangePasswordRequestData = {
+  request_id: string;
+  password: string;
+};
+
+export type TPersonalChangePasswordResponseData = {
+  success: boolean;
+  message: string;
+};
