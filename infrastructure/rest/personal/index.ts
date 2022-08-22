@@ -10,7 +10,7 @@ import {
 } from "./types";
 
 const BASE_URL =
-  process.env.NEXT_PUBLIC_PERSONAL_API_URL || "http://10.117.1.151:8080";
+  process.env.NEXT_PUBLIC_PERSONAL_API_URL || "https://dev-api.tilaka.id";
 
 export const RestPersonalResetPassword = ({
   payload,
@@ -19,7 +19,7 @@ export const RestPersonalResetPassword = ({
 }): Promise<TPersonalResetPasswordResponseData> => {
   return axios
     .post<TPersonalResetPasswordResponseData>(
-      `${BASE_URL}/v1/personal/resetPassword`,
+      `${BASE_URL}/resetPassword`,
       payload
     )
     .then((res) => res.data)
@@ -35,7 +35,7 @@ export const RestPersonalRequestChangePassword = ({
 }): Promise<TPersonalRequestChangePasswordResponseData> => {
   return axios
     .post<TPersonalRequestChangePasswordResponseData>(
-      `${BASE_URL}/v1/personal/requestChangePassword`,
+      `${BASE_URL}/requestChangePassword`,
       payload
     )
     .then((res) => {
@@ -54,7 +54,7 @@ export const RestPersonalChangePassword = ({
 }): Promise<TPersonalChangePasswordResponseData> => {
   return axios
     .post<TPersonalChangePasswordResponseData>(
-      `${BASE_URL}/v1/personal/changePassword`,
+      `${BASE_URL}/changePassword`,
       payload,
       {
         headers: {
