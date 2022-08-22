@@ -30,7 +30,7 @@ export const RestSigningAuthPIN = ({
   payload: TSigningAuthPINRequestData;
 }): Promise<TSigningAuthPINResponseData> => {
   return axios.post<TSigningAuthPINResponseData>(
-    `${BASE_URL}/signing/authpin`,
+    `${BASE_URL}/signing-authpin`,
     {
       pin: payload.pin
     },
