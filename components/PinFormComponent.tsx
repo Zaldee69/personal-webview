@@ -115,7 +115,7 @@ const PinFormComponent = (props: IPropsPinFormComponent): JSX.Element => {
     }
     setSubmitted(false);
     return;
-  }, [submitted, props.isResetAfterSubmit, props.isErrorAfterSubmit]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [props.isErrorAfterSubmit]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!shouldRender) null;
 
