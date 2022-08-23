@@ -18,7 +18,7 @@ export type TKycCheckStepResponseData = {
   data: {
     status: TStepStatus;
     token?: string;
-    pin_form?: boolean; // shown when status === 'D'
+    pin_form?: boolean; // shown when status === 'D' || status === 'F'
   };
 };
 

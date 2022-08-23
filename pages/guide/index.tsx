@@ -50,10 +50,20 @@ const Guide = () => {
                 icon: <XIcon />,
               }
             );
-            router.push({
-              pathname: handleRoute("liveness-failure"),
-              query: { ...restRouterQuery, request_id },
-            });
+            if (
+              res.data.status === "F" &&
+              res.data.pin_form &&
+              restRouterQuery.redirect_url
+            ) {
+              window.top!.location.href = decodeURIComponent(
+                restRouterQuery.redirect_url as string
+              );
+            } else {
+              router.push({
+                pathname: handleRoute("liveness-failure"),
+                query: { ...restRouterQuery, request_id },
+              });
+            }
           } else {
             toast.dismiss("kycCheckStepRequestToast");
             toast.success(res?.message || "pengecekan step berhasil", {
