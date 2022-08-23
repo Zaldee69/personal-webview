@@ -63,6 +63,12 @@ const ChangePinDedicatedChannel = (props: Props) => {
   const onClickDeleteHandlerConfirmCallback = () => {
     setPinConfirmError({ isError: false, message: "" });
   };
+  const onClickNumberHandlerOldPinCallback = (value: number) => {
+    setOldPinErrorAfterSubmit({ isError: false, message: "" });
+  };
+  const onClickDeleteHandlerOldPinCallback = () => {
+    setOldPinErrorAfterSubmit({ isError: false, message: "" });
+  };
   const onClickBack = () => {
     setPin("");
     setPinError({ isError: false, message: "" });
@@ -140,8 +146,8 @@ const ChangePinDedicatedChannel = (props: Props) => {
       setPinCounter(1);
     }
   };
-  const submitFormOldPinCallback = async (pinConfirm: string) => {
-    await RestPersonalRequestChangePassword({
+  const submitFormOldPinCallback = (pinConfirm: string) => {
+    RestPersonalRequestChangePassword({
       payload: { request_id: request_id as string, password: pinConfirm },
     })
       .then((res) => {
@@ -183,8 +189,8 @@ const ChangePinDedicatedChannel = (props: Props) => {
             subTitle={`Demi keamanan, masukkan PIN lama yang masih digunakan`}
             digitLength={digitLength}
             isRandom={isRandom}
-            onClickNumberHandlerCallback={onClickNumberHandlerConfirmCallback}
-            onClickDeleteHandlerCallback={onClickDeleteHandlerConfirmCallback}
+            onClickNumberHandlerCallback={onClickNumberHandlerOldPinCallback}
+            onClickDeleteHandlerCallback={onClickDeleteHandlerOldPinCallback}
             submitFormCallback={submitFormOldPinCallback}
             isResetAfterSubmit={true}
             isErrorAfterSubmit={oldPinErrorAfterSubmit.isError}
