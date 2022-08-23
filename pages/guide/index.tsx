@@ -87,7 +87,7 @@ const Guide = () => {
         <title>Panduan Liveness</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
-      <div className="px-5 pt-8 sm:w-full md:w-4/5 mx-auto ">
+      <div className=" py-10 max-w-sm mx-auto px-2 pt-8 sm:w-full md:w-4/5 ">
         <h2 className="font-poppins text-xl font-semibold">Liveness</h2>
         <span className="font-poppins text-sm block mt-4">
           Mohon perhatikan hal-hal berikut saat pengambilan wajah untuk

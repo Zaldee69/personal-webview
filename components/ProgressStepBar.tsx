@@ -24,20 +24,14 @@ const ProgressStepBar: React.FC<Props> = ({
   currentActionIndex
 }) => {
   return (
-    <div className="mt-10">
+    <div className="mt-10 px-10">
         <div className="step-wrapper">
-        <div className="progress" id="progress"></div>
+        <div className={`progress ${currentActionIndex >= 1 ? "active" : ""}`} id="progress"></div>
       <div className={`progress-step ${currentActionIndex >= 0 ? "active" : ""}`}>
         <ProgressDot step={1} currentActionIndex={currentActionIndex}/>
       </div>
       <div className={`progress-step ${currentActionIndex >= 1 ? "active" : ""}`}>
         <ProgressDot step={2} currentActionIndex={currentActionIndex}/>
-      </div>
-      <div className={`progress-step ${currentActionIndex >= 2 ? "active" : ""}`}>
-        <ProgressDot step={3} currentActionIndex={currentActionIndex}/>  
-      </div>
-      <div className={`progress-step ${currentActionIndex >= 3 ? "active" : ""}`}>
-        <ProgressDot step={4} currentActionIndex={currentActionIndex}/>
       </div>
     </div>
     </div>
