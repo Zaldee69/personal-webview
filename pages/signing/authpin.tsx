@@ -36,7 +36,6 @@ const AuthPinForm = (props: Props) => {
   const onClickDeleteHandlerCallback = () => {};
   const submitFormCallback = (pin: string) => {
     setPin(pin);
-
     RestSigningAuthPIN({payload: {
       user : user || "",
       pin,
@@ -57,7 +56,12 @@ const AuthPinForm = (props: Props) => {
           isError: true,
           message: res?.message || "proses gagal",
         });
-        setIsRequestCheckStatus(true);
+        if(res?.message === 'penandatanganan dokumen gagal. pin sudah salah 3 kali' && redirect_url){
+          setTimeout(() => {
+            window.top!.location.href = decodeURIComponent(redirect_url);
+          }, 2000) 
+        }
+
       }
     }).catch((err) => {
       if (err.response?.data?.data?.errors?.[0]) {
@@ -101,8 +105,8 @@ const AuthPinForm = (props: Props) => {
             onClickDeleteHandlerCallback={onClickDeleteHandlerCallback}
             submitFormCallback={submitFormCallback}
             isResetAfterSubmit
-            isError={pinError.isError}
-            isErrorMessage={pinError.message}
+            isErrorAfterSubmit={pinError.isError}
+            isErrorAfterSubmitMessage={pinError.message}
             isButtonNumberDisabled={isRequestCheckStatus}
             showPoweredByTilaka
           />
