@@ -147,10 +147,20 @@ const Liveness = () => {
               });
             }
           } else {
-            router.push({
-              pathname: handleRoute("liveness-failure"),
-              query: { ...routerQuery, request_id: router.query.request_id },
-            });
+            if (
+              res.data.status === "F" &&
+              res.data.pin_form &&
+              routerQuery.redirect_url
+            ) {
+              window.top!.location.href = decodeURIComponent(
+                routerQuery.redirect_url as string
+              );
+            } else {
+              router.push({
+                pathname: handleRoute("liveness-failure"),
+                query: { ...routerQuery, request_id: router.query.request_id },
+              });
+            }
           }
         }
       })
@@ -262,13 +272,19 @@ const Liveness = () => {
                 }
               );
               setTimeout(() => {
-                router.push({
-                  pathname: handleRoute("liveness-fail"),
-                  query: {
-                    ...routerQuery,
-                    request_id: router.query.request_id,
-                  },
-                });
+                if (result.data.pin_form && routerQuery.redirect_url) {
+                  window.top!.location.href = decodeURIComponent(
+                    routerQuery.redirect_url as string
+                  );
+                } else {
+                  router.push({
+                    pathname: handleRoute("liveness-fail"),
+                    query: {
+                      ...routerQuery,
+                      request_id: router.query.request_id,
+                    },
+                  });
+                }
               }, 5000);
               setIsSuccessState(false);
             }

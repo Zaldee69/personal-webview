@@ -109,6 +109,20 @@ export const serverSideRenderReturnConditions = ({
         const queryString = new URLSearchParams(params as any).toString();
 
         if (
+          checkStepResult.res.data.status === "F" &&
+          checkStepResult.res.data.pin_form &&
+          cQuery.redirect_url
+        ) {
+          return {
+            redirect: {
+              permanent: false,
+              destination: cQuery.redirect_url,
+            },
+            props: {},
+          };
+        }
+
+        if (
           currentPathnameWithoutParams === `${assetPrefix}/liveness-failure` ||
           currentPathnameWithoutParams === "/liveness-failure"
         ) {

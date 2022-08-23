@@ -29,7 +29,7 @@ const LivenessFailure = () => {
             width={200}
             height={200}
           />
-          <div className="flex flex-col gap-10 ">
+          <div className="flex flex-col items-center gap-10 ">
             <p className="text-center font-poppins  text-neutral ">
               Mohon mengisi Formulir yang dikirim ke email Anda untuk
               melanjutkan proses aktivasi akun
