@@ -74,11 +74,11 @@ const Camera: React.FC<Props> = ({
         // async: true,
         modelBasePath: assetPrefix ? `${assetPrefix}/models` : '/models',
         filter: { enabled: false, equalization: false },
-        face: { enabled: true, detector: { rotation: false }, mesh: { enabled: true }, iris: { enabled: false }, description: { enabled: false }, emotion: { enabled: false } },
+        face: { enabled: true, detector: { rotation: true }, mesh: { enabled: true }, iris: { enabled: true }, description: { enabled: true }, emotion: { enabled: false } },
         body: { enabled: false },
         hand: { enabled: false },
         object: { enabled: false },
-        gesture: { enabled: false },
+        gesture: { enabled: true },
       };
       const { Human } = await import("@vladmandic/human/dist/human.esm.js");
       human = new Human(humanConfig); // create instance of human with overrides from user configuration
@@ -104,51 +104,63 @@ const Camera: React.FC<Props> = ({
         const roll = interpolated.face[0].rotation.angle.roll * (180 / Math.PI);
         const yaw = interpolated.face[0].rotation.angle.yaw * (180 / Math.PI);
         const pitch = interpolated.face[0].rotation.angle.pitch * (180 / Math.PI);
+        const distance = interpolated.face[0].iris;
+        let blink_left_eye : boolean = false;
+        let blink_right_eye : boolean = false;
+        let mouth_score : number = 0;
+        let look_left : boolean = false;
+        let look_right : boolean = false;
+        let look_center : boolean = false;
+        interpolated.gesture.forEach((item : any) => {
+          if (item.gesture == "blink left eye") {
+            blink_left_eye = true;
+          } else if (item.gesture == "blink right eye") {
+            blink_right_eye = true;
+          } else if (item.gesture.substring(0,5) == "mouth") {
+            const mouth = item.gesture.split(" ", 3);
+            mouth_score = parseFloat(mouth[1])/100;
+          } else if (item.gesture == "facing left") {
+            look_left = true;
+          } else if (item.gesture == "facing right") {
+            look_right = true;
+          } else if (item.gesture == "facing center") {
+            look_center = true;
+          }
+          console.log(mouth_score)
+    1   });
         if (actionList[currentActionIndex] == "look_straight") {
           setProgress(0);
-          if ((roll > -10) && (roll < 10)) {
-            if ((yaw > -10) && (yaw < 10)) {
-              if ((pitch > -10) && (pitch < 10)) {
-                let done = await isIndexDone(currentActionIndex);
-                if (!done) {
-                  await setIndexDone(currentActionIndex);
-                  setProgress(100);
-                  await captureButtonRef.current.click();
-                  clicked = true;
-                }
-              }
+          if(look_center && distance < 23){
+            let done = await isIndexDone(currentActionIndex);
+            if (!done) {
+              await setIndexDone(currentActionIndex);
+              setProgress(100);
+              await captureButtonRef.current.click();
+              clicked = true;
             }
           }
         } else if (actionList[currentActionIndex] == "look_left") {
           setProgress(0);
-          if ((roll > -20) && (roll < 20)) {
-            if ((pitch > -20) && (pitch < 20)) {
-              if ((yaw < -29) && (yaw > -35)) {
-                let done = await isIndexDone(currentActionIndex);
-                if (!done) {
-                  await setIndexDone(currentActionIndex);
-                  setProgress(100);
-                  ++currentActionIndex;
-                  await captureButtonRef.current.click();
-                  clicked = true;
-                }
-              }
+          if(look_left && distance < 23){
+            let done = await isIndexDone(currentActionIndex);
+            if (!done) {
+              await setIndexDone(currentActionIndex);
+              setProgress(100);
+              await captureButtonRef.current.click();
+              clicked = true;
+              ++currentActionIndex;
             }
           }
         } else if (actionList[currentActionIndex] == "look_right") {
           setProgress(0);
-          if ((roll > -20) && (roll < 20)) {
-            if ((pitch > -20) && (pitch < 20)) {
-              if ((yaw > 29) && (yaw < 35)) {
-                let done = await isIndexDone(currentActionIndex);
-                if (!done) {
-                  await setIndexDone(currentActionIndex);
-                  setProgress(100);
-                  ++currentActionIndex;
-                  await captureButtonRef.current.click();
-                  clicked = true;
-                }
-              }
+          if(look_right && distance < 23){
+            let done = await isIndexDone(currentActionIndex);
+            if (!done) {
+              await setIndexDone(currentActionIndex);
+              setProgress(100);
+              await captureButtonRef.current.click();
+              clicked = true;
+              ++currentActionIndex;
             }
           }
         } else if (actionList[currentActionIndex] == "look_up") {
@@ -183,7 +195,31 @@ const Camera: React.FC<Props> = ({
               }
             }
           }
-        }
+        } else if (actionList[currentActionIndex] == "mouth_open") {
+          setProgress(0);
+          if(mouth_score >= 0.7){
+            let done = await isIndexDone(currentActionIndex);
+            if (!done) {
+              await setIndexDone(currentActionIndex);
+              setProgress(100);
+              ++currentActionIndex;
+              await captureButtonRef.current.click();
+              clicked = true;
+            }
+          }
+        } else if (actionList[currentActionIndex] == "blink") {
+          setProgress(0);
+          if((blink_left_eye || blink_right_eye) && distance < 23){
+            let done = await isIndexDone(currentActionIndex);
+            if (!done) {
+              await setIndexDone(currentActionIndex);
+              setProgress(100);
+              ++currentActionIndex;
+              await captureButtonRef.current.click();
+              clicked = true;
+            }
+          }
+        } 
       }
     }
     if (clicked) {

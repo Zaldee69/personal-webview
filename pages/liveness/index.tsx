@@ -33,19 +33,23 @@ const Liveness = () => {
   const images = useSelector((state: RootState) => state.liveness.images);
   const isDone = useSelector((state: RootState) => state.liveness.isDone);
 
+  const currentIndex = actionList[currentActionIndex] ===  "look_straight" ? "hadap-depan" : actionList[currentActionIndex] === "mouth_open"  ? "buka-mulut" : actionList[currentActionIndex] === "blink" ? "pejam" : "hadap-depan"
+
   const actionText = () => {
     switch (actionList[currentActionIndex]) {
       case "look_straight":
-        return "depan";
+        return "Wajah menghadap ke depan";
       case "look_up":
-        return "atas";
+        return "Wajah menghadap ke  atas";
       case "look_down":
-        return "bawah";
+        return "Wajah menghadap ke bawah";
       case "look_left":
-        return "kiri";
-      case "look_right":
-        return "kanan";
-      default:
+        return "Wajah menghadap ke kiri";
+      case "mouth_open":
+        return "Buka mulut dengan lebar";
+      case "blink":
+        return "Pejamkan kedua mata selama 3 detik";
+        default:  
         return "";
     }
   };
@@ -321,15 +325,18 @@ const Liveness = () => {
           setCurrentActionIndex={setCurrentActionIndex}
           currentStep="Liveness Detection"
         />
-        <ProgressStepBar currentActionIndex={currentActionIndex} />
+        <div className="mt-5 flex justify-center" >
+        <Image src={`/images/${currentIndex}.svg`} width={50} height={50} />
+        </div>
         <div className="flex items-center justify-center mt-5 flex-col">
           <span className="font-poppins font-medium">
-            Wajah menghadap ke {actionText()}
+            {actionText()}
           </span>
-          <span className="text-center font-poppins text-sm text-neutral">
+          <span className="text-center font-poppins text-sm mt-7 text-neutral">
             Mohon jangan bergerak selama proses pengambilan wajah
           </span>
         </div>
+        <ProgressStepBar currentActionIndex={currentActionIndex} />
         <Footer />
       </div>
     </>
