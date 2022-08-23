@@ -33,9 +33,11 @@ const AuthPinForm = (props: Props) => {
   const digitLength: number = 6;
 
   const onClickNumberHandlerCallback = (value: number) => {};
-  const onClickDeleteHandlerCallback = () => {};
+  const onClickDeleteHandlerCallback = () => {
+    setPinError({isError: false, message: ""})
+  };
   const submitFormCallback = (pin: string) => {
-    setPin(pin);
+    setPin(pin);    
     RestSigningAuthPIN({payload: {
       user : user || "",
       pin,
@@ -43,10 +45,6 @@ const AuthPinForm = (props: Props) => {
     }}).then((res) => {
       if (res.success) {
         setPinError({ isError: false, message: res?.message || "penandatanganan dokumen berhasil" });
-        toast(`Penandatanganan Dokumen Berhasil`, {
-          type: "success",
-          position: "top-center",
-        });
         setIsRequestCheckStatus(false);
         if (redirect_url) {
           window.top!.location.href = decodeURIComponent(redirect_url);
