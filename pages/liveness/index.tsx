@@ -19,6 +19,7 @@ import Footer from "../../components/Footer";
 import ProgressStepBar from "../../components/ProgressStepBar";
 import { resetImages, setActionList } from "@/redux/slices/livenessSlice";
 import { handleRoute } from "@/utils/handleRoute";
+import { assetPrefix } from "../../next.config";
 
 const Liveness = () => {
   const router = useRouter();
@@ -26,12 +27,15 @@ const Liveness = () => {
 
   const [isSuccessState, setIsSuccessState] = useState<boolean>(false);
   let [currentActionIndex, setCurrentActionIndex] = useState(0);
+  const [failedMessage, setFailedMessage] = useState<string>("");
+
 
   const actionList = useSelector(
     (state: RootState) => state.liveness.actionList
   );
   const images = useSelector((state: RootState) => state.liveness.images);
   const isDone = useSelector((state: RootState) => state.liveness.isDone);
+
 
   const currentIndex = actionList[currentActionIndex] ===  "look_straight" ? "hadap-depan" : actionList[currentActionIndex] === "mouth_open"  ? "buka-mulut" : actionList[currentActionIndex] === "blink" ? "pejam" : "hadap-depan"
 
@@ -45,6 +49,8 @@ const Liveness = () => {
         return "Wajah menghadap ke bawah";
       case "look_left":
         return "Wajah menghadap ke kiri";
+      case "look_right":
+        return "Wajah menghadap ke kanan";
       case "mouth_open":
         return "Buka mulut dengan lebar";
       case "blink":
@@ -185,6 +191,8 @@ const Liveness = () => {
       isLoading: true,
       position: "top-center",
     });
+
+    setFailedMessage("")
 
     try {
       const body: TKycVerificationRequestData = {
@@ -340,19 +348,32 @@ const Liveness = () => {
           currentActionIndex={currentActionIndex}
           setCurrentActionIndex={setCurrentActionIndex}
           currentStep="Liveness Detection"
+          setFailedMessage={setFailedMessage}
         />
         <div className="mt-5 flex justify-center" >
-        <Image src={`/images/${currentIndex}.svg`} width={50} height={50} />
+          {
+            actionList.length === 2 && (
+              <Image src={`${assetPrefix}/images/${currentIndex}.svg`} width={50} height={50} />
+            )
+          }
         </div>
         <div className="flex items-center justify-center mt-5 flex-col">
           <span className="font-poppins font-medium">
             {actionText()}
           </span>
-          <span className="text-center font-poppins text-sm mt-7 text-neutral">
-            Mohon jangan bergerak selama proses pengambilan wajah
-          </span>
+          {
+            failedMessage ? (
+              <span className="text-center font-poppins text-sm mt-7 text-red300">
+              {failedMessage}
+              </span>
+            ) : (
+              <span className="text-center font-poppins text-sm mt-7 text-neutral">
+                Mohon jangan bergerak selama proses pengambilan wajah
+              </span>
+            )
+          }
         </div>
-        <ProgressStepBar currentActionIndex={currentActionIndex} />
+        <ProgressStepBar actionList={actionList} currentActionIndex={currentActionIndex} />
         <Footer />
       </div>
     </>

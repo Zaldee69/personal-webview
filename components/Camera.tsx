@@ -23,12 +23,14 @@ interface Props {
   currentStep: string
   currentActionIndex: number
   setCurrentActionIndex: Dispatch<SetStateAction<number>>
+  setFailedMessage:  Dispatch<SetStateAction<string>>
 }
 
 const Camera: React.FC<Props> = ({
   currentStep,
   currentActionIndex,
   setCurrentActionIndex,
+  setFailedMessage
 }) => {
   const constraint: Constraint = {
     width: 1280,
@@ -126,7 +128,6 @@ const Camera: React.FC<Props> = ({
           } else if (item.gesture == "facing center") {
             look_center = true;
           }
-          console.log(mouth_score)
     1   });
         if (actionList[currentActionIndex] == "look_straight") {
           setProgress(0);
@@ -138,6 +139,8 @@ const Camera: React.FC<Props> = ({
               await captureButtonRef.current.click();
               clicked = true;
             }
+          } else if(distance > 23) {
+            setFailedMessage("Dekatkan wajah ke kamera");
           }
         } else if (actionList[currentActionIndex] == "look_left") {
           setProgress(0);
@@ -150,6 +153,16 @@ const Camera: React.FC<Props> = ({
               clicked = true;
               ++currentActionIndex;
             }
+          } else if (distance > 23) {
+            setFailedMessage("Dekatkan wajah ke kamera");
+          } else if (roll > 30) {
+            setFailedMessage("Wajah terlalu ke kiri");
+          } else if (roll < -30) {
+            setFailedMessage("Wajah terlalu ke kanan");
+          } else if (roll > 20 && roll < 30) {
+            setFailedMessage("Wajah kurang ke kanan");
+          } else if (roll < -20 && roll > -30) {
+            setFailedMessage("Wajah kurang ke kiri");
           }
         } else if (actionList[currentActionIndex] == "look_right") {
           setProgress(0);
@@ -162,6 +175,18 @@ const Camera: React.FC<Props> = ({
               clicked = true;
               ++currentActionIndex;
             }
+          } else if (distance > 23) {
+            setFailedMessage("Dekatkan wajah ke kamera");
+          } else if (roll > 30) {
+            setFailedMessage("Wajah terlalu ke kiri");
+          } else if (roll < -30) {
+            setFailedMessage("Wajah terlalu ke kanan");
+          } else if (roll > 20 && roll < 30) {
+            setFailedMessage("Wajah kurang ke kanan");
+          } else if (roll < -20 && roll > -30) {
+            setFailedMessage("Wajah kurang ke kiri");
+          } else if (distance > 30) {
+            setFailedMessage("Terlalu jauh");
           }
         } else if (actionList[currentActionIndex] == "look_up") {
           setProgress(0);
@@ -176,8 +201,33 @@ const Camera: React.FC<Props> = ({
                   await captureButtonRef.current.click();
                   clicked = true;
                 }
+              } else if (distance > 23) {
+                setFailedMessage("Dekatkan wajah ke kamera");
+              } else if (pitch > -39) {
+                setFailedMessage("Wajah terlalu ke bawah");
+              } else if (pitch < -41) {
+                setFailedMessage("Wajah terlalu ke atas");
+              } else if (pitch > -41 && pitch < -39) {
+                setFailedMessage("Wajah kurang ke atas");
+              } else if (pitch < -39 && pitch > -41) {
+                setFailedMessage("Wajah kurang ke bawah");
               }
             }
+          } else if (distance > 23) {
+            setFailedMessage("Dekatkan wajah ke kamera");
+            setError(true);
+          } else if (roll > 30) {
+            setFailedMessage("Wajah terlalu ke kiri");
+            setError(true);
+          } else if (roll < -30) {
+            setFailedMessage("Wajah terlalu ke kanan");
+            setError(true);
+          } else if (roll > 20 && roll < 30) {
+            setFailedMessage("Wajah kurang ke kanan");
+            setError(true);
+          } else if (roll < -20 && roll > -30) {
+            setFailedMessage("Wajah kurang ke kiri");
+            setError(true);
           }
         } else if (actionList[currentActionIndex] == "look_down") {
           setProgress(0);
@@ -192,8 +242,38 @@ const Camera: React.FC<Props> = ({
                   await captureButtonRef.current.click();
                   clicked = true;
                 }
+              } else if (distance > 23) {
+                setFailedMessage("Dekatkan wajah ke kamera");
+                setError(true);
+              } else if (pitch > 29) {
+                setFailedMessage("Wajah terlalu ke bawah");
+                setError(true);
+              } else if (pitch < 41) {
+                setFailedMessage("Wajah terlalu ke atas");
+                setError(true);
+              } else if (pitch > 41 && pitch < 29) {
+                setFailedMessage("Wajah kurang ke atas");
+                setError(true);
+              } else if (pitch < 29 && pitch > 41) {
+                setFailedMessage("Wajah kurang ke bawah");
+                setError(true);
               }
             }
+          } else if (distance > 23) {
+            setFailedMessage("Dekatkan wajah ke kamera");
+            setError(true);
+          } else if (roll > 30) {
+            setFailedMessage("Wajah terlalu ke kiri");
+            setError(true);
+          } else if (roll < -30) {
+            setFailedMessage("Wajah terlalu ke kanan");
+            setError(true);
+          } else if (roll > 20 && roll < 30) {
+            setFailedMessage("Wajah kurang ke kanan");
+            setError(true);
+          } else if (roll < -20 && roll > -30) {
+            setFailedMessage("Wajah kurang ke kiri");
+            setError(true);
           }
         } else if (actionList[currentActionIndex] == "mouth_open") {
           setProgress(0);
@@ -206,6 +286,12 @@ const Camera: React.FC<Props> = ({
               await captureButtonRef.current.click();
               clicked = true;
             }
+          }  else if (distance > 23) {
+            setFailedMessage("Dekatkan wajah ke kamera");
+            setError(true);
+          } else {
+            setFailedMessage("Buka mulut lebih besar");
+            setError(true);
           }
         } else if (actionList[currentActionIndex] == "blink") {
           setProgress(0);
@@ -218,6 +304,12 @@ const Camera: React.FC<Props> = ({
               await captureButtonRef.current.click();
               clicked = true;
             }
+          } else if (distance > 23) {
+            setFailedMessage("Dekatkan wajah ke kamera");
+            setError(true);
+          } else {
+            setFailedMessage("Pejamkan mata 3 detik");
+            setError(true);
           }
         } 
       }
