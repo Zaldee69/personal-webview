@@ -55,8 +55,12 @@ const AuthPinForm = (props: Props) => {
           message: res?.message || "proses gagal",
         });
         if(res?.message === 'penandatanganan dokumen gagal. pin sudah salah 3 kali' && redirect_url){
+          const searchParams = new URLSearchParams(
+            redirect_url + "?status=Blocked"
+          );
+          // Redirect topmost window
           setTimeout(() => {
-            window.top!.location.href = decodeURIComponent(redirect_url);
+            window.top!.location.href = decodeURIComponent(searchParams.toString());
           }, 2000) 
         }
 
