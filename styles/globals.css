@@ -63,7 +63,7 @@
   align-items: center;
 }
 
-.step-wrapper {
+.step-wrapper, .step-wrapper2 {
   position: relative;
   padding: 10px 20px;
   display: flex;
@@ -84,10 +84,26 @@
   width: 8%;
   left: 19%;
 }
+.step-wrapper2::before,
+.progress2 {
+  content: "";
+  position: absolute;
+  top: 50%;
+  height: 1px;
+  transform: translateY(-50%);
+  background-color: #DAE6F8;;
+  width: 85%;
+}
 
 .progress {
   background: #DAE6F8;
   width: 63%;
+  transition: 0.5s;
+}
+
+.progress2 {
+  background: #DAE6F8;
+  width: 0;
   transition: 0.5s;
 }
 
@@ -105,6 +121,10 @@
   background: #0052CC;
   color: #fff;
   transition: 0.5s;
+}
+
+.aktif {
+  background: #0052CC;
 }
 
 input[type="checkbox"] {
