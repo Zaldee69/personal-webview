@@ -1,10 +1,19 @@
 import PinFormComponent from "@/components/PinFormComponent";
 import { RestKycCheckStep, RestKycFinalForm } from "infrastructure";
+import { RestPersonalSetPassword } from "infrastructure/rest/personal";
 import { NextParsedUrlQuery } from "next/dist/server/request-meta";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 
 type Props = {};
+
+type TUrlQuery = {
+  random?: "1";
+  user_identifier?: string;
+  registration_id?: string;
+  redirect_url?: string;
+  token?: string; // for setPassword after success manual form
+};
 
 const PinFormDedicatedChannel = (props: Props) => {
   const router = useRouter();
@@ -13,12 +22,8 @@ const PinFormDedicatedChannel = (props: Props) => {
     user_identifier,
     registration_id,
     redirect_url,
-  }: NextParsedUrlQuery & {
-    random?: "1";
-    user_identifier?: string;
-    registration_id?: string;
-    redirect_url?: string;
-  } = router.query;
+    token,
+  }: NextParsedUrlQuery & TUrlQuery = router.query;
   const isRandom: boolean = random === "1";
   const [shouldRender, setShouldRender] = useState<boolean>(false);
   const [pin, setPin] = useState<string>("");
@@ -66,47 +71,77 @@ const PinFormDedicatedChannel = (props: Props) => {
     const tilakaName = user_identifier || "";
     const password = pin;
 
-    RestKycFinalForm({
-      payload: {
-        tilakaName,
-        password,
-        registerId: registration_id as string,
-      },
-    })
-      .then((res) => {
-        if (res.success) {
-          setIsConfirmMode(false);
-          if (redirect_url) {
-            const searchParams = new URLSearchParams(
-              redirect_url + "?register_id=" + registration_id
-            );
-            // Set params
-            res.data.status && searchParams.set("status", `${res.data.status}`);
-            // Redirect topmost window
-            window.top!.location.href = decodeURIComponent(
-              searchParams.toString()
-            );
-          }
-        } else {
-          setPinConfirmError({
-            isError: true,
-            message: res?.message || "gagal",
-          });
-        }
+    if (token) {
+      RestPersonalSetPassword({
+        payload: {
+          register_id: registration_id as string,
+          token: token,
+          password,
+        },
       })
-      .catch((err) => {
-        if (err.response?.data?.data?.errors?.[0]) {
-          setPinConfirmError({
-            isError: true,
-            message: `${err.response?.data?.message}, ${err.response?.data?.data?.errors?.[0]}`,
-          });
-        } else {
+        .then((res) => {
+          if (res.success) {
+            setIsConfirmMode(false);
+            if (redirect_url) {
+              window.top!.location.href = decodeURIComponent(redirect_url);
+            }
+          } else {
+            setPinConfirmError({
+              isError: true,
+              message: res?.message || "gagal",
+            });
+          }
+        })
+        .catch((err) => {
           setPinConfirmError({
             isError: true,
             message: err.response?.data?.message || "gagal",
           });
-        }
-      });
+        });
+    } else {
+      RestKycFinalForm({
+        payload: {
+          tilakaName,
+          password,
+          registerId: registration_id as string,
+        },
+      })
+        .then((res) => {
+          if (res.success) {
+            setIsConfirmMode(false);
+            if (redirect_url) {
+              const searchParams = new URLSearchParams(
+                redirect_url + "?register_id=" + registration_id
+              );
+              // Set params
+              res.data.status &&
+                searchParams.set("status", `${res.data.status}`);
+              // Redirect topmost window
+              window.top!.location.href = decodeURIComponent(
+                searchParams.toString()
+              );
+            }
+          } else {
+            setPinConfirmError({
+              isError: true,
+              message: res?.message || "gagal",
+            });
+          }
+        })
+        .catch((err) => {
+          if (err.response?.data?.data?.errors?.[0]) {
+            setPinConfirmError({
+              isError: true,
+              message: `${err.response?.data?.message}, ${err.response?.data?.data?.errors?.[0]}`,
+            });
+          } else {
+            setPinConfirmError({
+              isError: true,
+              message: err.response?.data?.message || "gagal",
+            });
+          }
+        });
+    }
   };
 
   const onClickBack = (_: React.SyntheticEvent) => {

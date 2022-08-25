@@ -29,3 +29,15 @@ export type TPersonalChangePasswordResponseData = {
   success: boolean;
   message: string;
 };
+
+export type TPersonalSetPasswordRequestData = {
+  register_id: string;
+  token: string;
+  password: string;
+};
+
+export type TPersonalSetPasswordResponseData = {
+  success: boolean;
+  message: string;
+  data: null;
+};
