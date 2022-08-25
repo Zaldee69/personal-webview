@@ -29,15 +29,10 @@
 
 - **CLIENT_SIDE_CHECKSTEP**
 
-  - **\_WITHOUT_REDIRECT_MECHANISM**
-
-    1. `/form`
-    2. `/kyc/pinform`
-
-  - **\_WITH_REDIRECT_MECHANISM**
-
-    1. `/guide`
-    2. `/liveness`
+  1. `/guide`
+  2. `/liveness`
+  3. `/form`
+  4. `/kyc/pinform`
 
 - **\_NO_CHECKSTEP**
 
@@ -52,7 +47,7 @@
 
 ### Penjelasan Label
 
-> **CLIENT_SIDE_CHECKSTEP** mengecek di sisi client, akan ada redirect mechanism sesuai status (jika masuk ke kategori **\_WITH_REDIRECT_MECHANISM**) dan menampilkan notifikasi ketika pengecekan berhasil ataupun gagal. Tidak ada redirect mechanism ketika halaman masuk ke kategori **\_WITHOUT_REDIRECT_MECHANISM**. Logic menyesuaikan, tiap-tiap halaman bisa memiliki logic pengecekan yang berbeda.
+> **CLIENT_SIDE_CHECKSTEP** mengecek di sisi client, akan ada redirect mechanism sesuai status dan menampilkan notifikasi ketika pengecekan berhasil ataupun gagal. Logic menyesuaikan, tiap-tiap halaman bisa memiliki logic pengecekan yang berbeda.
 
 > **SERVER_SIDE_CHECKSTEP** hanya meredirect sesuai status ketika pengecekan berhasil, ketika gagal tidak ada notifikasi dan halaman tidak akan diredirect. Logic strict, tiap-tiap halaman memiliki logic pnegecekan yang sama.
 
@@ -70,13 +65,13 @@
 
 - **F** => `/liveness-failure?request_id=` atau ke `redirect_url` yang di kirim lewat parameter
 
+- **S** => `redirect_url` yang dikirim lewat parameter, beserta parameter berikut `?register_id=<uuid>&status=<status>`
+
 ### Status yang tidak dicek oleh SERVER_SIDE_CHECKSTEP lalu tidak diredirect
 
 - **A** => ?
 
 - **C** => ?
-
-- **S** => ?
 
 ## Catatan
 

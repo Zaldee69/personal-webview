@@ -1,4 +1,5 @@
 import PinFormComponent from "@/components/PinFormComponent";
+import { handleRoute } from "@/utils/handleRoute";
 import { RestKycCheckStep, RestKycFinalForm } from "infrastructure";
 import { RestPersonalSetPassword } from "infrastructure/rest/personal";
 import { NextParsedUrlQuery } from "next/dist/server/request-meta";
@@ -23,6 +24,7 @@ const PinFormDedicatedChannel = (props: Props) => {
     registration_id,
     redirect_url,
     token,
+    ...restRouterQuery
   }: NextParsedUrlQuery & TUrlQuery = router.query;
   const isRandom: boolean = random === "1";
   const [shouldRender, setShouldRender] = useState<boolean>(false);
@@ -162,8 +164,53 @@ const PinFormDedicatedChannel = (props: Props) => {
     })
       .then((res) => {
         if (res.success) {
-          setPinError({ isError: false, message: "pengecekan step berhasil" });
           setIsRequestCheckStatus(false);
+          if (res.data.status === "D") {
+            // ketika res.data.pin_form === true, tidak akan redirect kemana-mana, karena sudah benar dihalaman ini.
+            if (!res.data.pin_form) {
+              router.push({
+                pathname: handleRoute("form"),
+                query: {
+                  ...restRouterQuery,
+                  request_id: registration_id,
+                  redirect_url,
+                },
+              });
+            }
+          } else if (res.data.status === "E" || res.data.status === "F") {
+            if (res.data.status === "F" && res.data.pin_form && redirect_url) {
+              window.top!.location.href = decodeURIComponent(
+                redirect_url as string
+              );
+            } else {
+              router.push({
+                pathname: handleRoute("liveness-failure"),
+                query: {
+                  ...restRouterQuery,
+                  request_id: registration_id,
+                  redirect_url,
+                },
+              });
+            }
+          } else if (res.data.status === "S") {
+            const params = {
+              register_id: registration_id,
+              status: res.data.status,
+            };
+            const queryString = new URLSearchParams(params as any).toString();
+            console.log(redirect_url);
+            if (redirect_url) {
+              window.top!.location.href = decodeURIComponent(
+                redirect_url + "?" + queryString
+              );
+            } else {
+              setPinError({
+                isError: true,
+                message: res?.message || "pengecekan step berhasil",
+              });
+              setIsRequestCheckStatus(true);
+            }
+          }
         } else {
           setPinError({
             isError: true,
@@ -187,7 +234,7 @@ const PinFormDedicatedChannel = (props: Props) => {
           setIsRequestCheckStatus(true);
         }
       });
-  }, [router.isReady, registration_id]);
+  }, [router.isReady, registration_id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!shouldRender) return;
 

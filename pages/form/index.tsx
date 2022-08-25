@@ -192,15 +192,73 @@ const Form: React.FC = () => {
 
   useEffect(() => {
     if (!router.isReady) return;
-    if (!request_id) return;
     toast.info("pengecekan step...", { toastId: "kycCheckStepRequestToast" });
     RestKycCheckStep({ payload: { registerId: request_id as string } })
       .then((res) => {
         if (res.success) {
-          toast.dismiss("kycCheckStepRequestToast");
-          toast.success(res?.message || "pengecekan step berhasil", {
-            icon: <CheckOvalIcon />,
-          });
+          if (res.data.status === "D") {
+            toast.dismiss("kycCheckStepRequestToast");
+            toast.success(res?.message || "pengecekan step berhasil", {
+              icon: <CheckOvalIcon />,
+            });
+            // ketika res.data.pin_form === false, tidak akan redirect kemana-mana, karena sudah benar dihalaman ini.
+            if (res.data.pin_form) {
+              router.replace({
+                pathname: handleRoute("kyc/pinform"),
+                query: { ...restRouterQuery, registration_id: request_id },
+              });
+            }
+          } else if (res.data.status === "E" || res.data.status === "F") {
+            toast.dismiss("kycCheckStepRequestToast");
+            toast.error(
+              res?.message ||
+                "pengecekan step berhasil, tetapi proses ekyc bermasalah",
+              {
+                icon: <XIcon />,
+              }
+            );
+            if (
+              res.data.status === "F" &&
+              res.data.pin_form &&
+              restRouterQuery.redirect_url
+            ) {
+              window.top!.location.href = decodeURIComponent(
+                restRouterQuery.redirect_url as string
+              );
+            } else {
+              router.push({
+                pathname: handleRoute("liveness-failure"),
+                query: { ...restRouterQuery, request_id },
+              });
+            }
+          } else if (res.data.status === "S") {
+            toast.dismiss("kycCheckStepRequestToast");
+            const params = {
+              register_id: request_id,
+              status: res.data.status,
+            };
+            const queryString = new URLSearchParams(params as any).toString();
+            if (restRouterQuery.redirect_url) {
+              window.top!.location.href = decodeURIComponent(
+                restRouterQuery.redirect_url + "?" + queryString
+              );
+            } else {
+              toast.success(res?.message || "pengecekan step berhasil", {
+                icon: <CheckOvalIcon />,
+              });
+            }
+          } else if (res.data.status === "B") {
+            toast.dismiss("kycCheckStepRequestToast");
+            router.push({
+              pathname: handleRoute("guide"),
+              query: { ...restRouterQuery, request_id },
+            });
+          } else {
+            toast.dismiss("kycCheckStepRequestToast");
+            toast.success(res?.message || "pengecekan step berhasil", {
+              icon: <CheckOvalIcon />,
+            });
+          }
         } else {
           toast.dismiss("kycCheckStepRequestToast");
           toast.error(res?.message || "pengecekan step tidak sukses", {
@@ -220,7 +278,7 @@ const Form: React.FC = () => {
           });
         }
       });
-  }, [router.isReady, request_id]);
+  }, [router.isReady, request_id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <>
@@ -235,6 +293,7 @@ const Form: React.FC = () => {
             width={200}
             height={200}
             src={`${assetPrefix}/images/form.svg`}
+            alt="imgform"
           />
         </div>
         <span className="font-poppins text-left block mt-5">
