@@ -29,15 +29,20 @@ const Liveness = () => {
   let [currentActionIndex, setCurrentActionIndex] = useState(0);
   const [failedMessage, setFailedMessage] = useState<string>("");
 
-
   const actionList = useSelector(
     (state: RootState) => state.liveness.actionList
   );
   const images = useSelector((state: RootState) => state.liveness.images);
   const isDone = useSelector((state: RootState) => state.liveness.isDone);
 
-
-  const currentIndex = actionList[currentActionIndex] ===  "look_straight" ? "hadap-depan" : actionList[currentActionIndex] === "mouth_open"  ? "buka-mulut" : actionList[currentActionIndex] === "blink" ? "pejam" : "hadap-depan"
+  const currentIndex =
+    actionList[currentActionIndex] === "look_straight"
+      ? "hadap-depan"
+      : actionList[currentActionIndex] === "mouth_open"
+      ? "buka-mulut"
+      : actionList[currentActionIndex] === "blink"
+      ? "pejam"
+      : "hadap-depan";
 
   const actionText = () => {
     switch (actionList[currentActionIndex]) {
@@ -55,7 +60,7 @@ const Liveness = () => {
         return "Buka mulut dengan lebar";
       case "blink":
         return "Pejamkan kedua mata selama 3 detik";
-        default:  
+      default:
         return "";
     }
   };
@@ -82,50 +87,70 @@ const Liveness = () => {
           res.data.status !== "F" &&
           res.data.status !== "E"
         ) {
-          RestKycGenerateAction(body)
-            .then((result) => {
-              if (result?.data) {
-                const payload = ["look_straight"].concat(
-                  result.data.actionList
-                );
-                dispatch(setActionList(payload));
-                toast(`${result.message}`, {
-                  type: "success",
-                  position: "top-center",
-                  autoClose: 3000,
-                });
-                toast.dismiss("generateAction");
-              } else {
-                throw new Error(result.message);
-              }
-            })
-            .catch((error) => {
-              toast.dismiss("generateAction");
-              const msg = error.response?.data?.data?.errors?.[0];
-              if (msg) {
-                if (
-                  msg === "Proses ekyc untuk registrationId ini telah sukses"
-                ) {
-                  toast(`${msg}`, {
+          // this scope for status A B C S
+          if (res.data.status === "S") {
+            toast.dismiss("generateAction");
+            const params = {
+              register_id: routerQuery.request_id,
+              status: res.data.status,
+            };
+            const queryString = new URLSearchParams(params as any).toString();
+            if (routerQuery.redirect_url) {
+              window.top!.location.href = decodeURIComponent(
+                routerQuery.redirect_url + "?" + queryString
+              );
+            } else {
+              toast.success(res?.message || "pengecekan step berhasil", {
+                icon: <CheckOvalIcon />,
+              });
+            }
+          } else {
+            RestKycGenerateAction(body)
+              .then((result) => {
+                if (result?.data) {
+                  const payload = ["look_straight"].concat(
+                    result.data.actionList
+                  );
+                  dispatch(setActionList(payload));
+                  toast(`${result.message}`, {
                     type: "success",
                     position: "top-center",
                     autoClose: 3000,
                   });
+                  toast.dismiss("generateAction");
                 } else {
-                  toast.error(msg, {
-                    icon: <XIcon />,
-                  });
+                  throw new Error(result.message);
                 }
-              } else {
-                toast.error(
-                  error.response?.data?.message || "Generate Action gagal",
-                  {
-                    icon: <XIcon />,
+              })
+              .catch((error) => {
+                toast.dismiss("generateAction");
+                const msg = error.response?.data?.data?.errors?.[0];
+                if (msg) {
+                  if (
+                    msg === "Proses ekyc untuk registrationId ini telah sukses"
+                  ) {
+                    toast(`${msg}`, {
+                      type: "success",
+                      position: "top-center",
+                      autoClose: 3000,
+                    });
+                  } else {
+                    toast.error(msg, {
+                      icon: <XIcon />,
+                    });
                   }
-                );
-              }
-            });
+                } else {
+                  toast.error(
+                    error.response?.data?.message || "Generate Action gagal",
+                    {
+                      icon: <XIcon />,
+                    }
+                  );
+                }
+              });
+          }
         } else {
+          // this scope for status D F E
           toast.dismiss("generateAction");
           toast(`${res.message || "Tidak merespon!"}`, {
             type: "error",
@@ -192,7 +217,7 @@ const Liveness = () => {
       position: "top-center",
     });
 
-    setFailedMessage("")
+    setFailedMessage("");
 
     try {
       const body: TKycVerificationRequestData = {
@@ -350,30 +375,31 @@ const Liveness = () => {
           currentStep="Liveness Detection"
           setFailedMessage={setFailedMessage}
         />
-        <div className="mt-5 flex justify-center" >
-          {
-            actionList.length === 2 && (
-              <Image src={`${assetPrefix}/images/${currentIndex}.svg`} width={50} height={50} />
-            )
-          }
+        <div className="mt-5 flex justify-center">
+          {actionList.length === 2 && (
+            <Image
+              src={`${assetPrefix}/images/${currentIndex}.svg`}
+              width={50}
+              height={50}
+            />
+          )}
         </div>
         <div className="flex items-center justify-center mt-5 flex-col">
-          <span className="font-poppins font-medium">
-            {actionText()}
-          </span>
-          {
-            failedMessage ? (
-              <span className="text-center font-poppins text-sm mt-7 text-red300">
+          <span className="font-poppins font-medium">{actionText()}</span>
+          {failedMessage ? (
+            <span className="text-center font-poppins text-sm mt-7 text-red300">
               {failedMessage}
-              </span>
-            ) : (
-              <span className="text-center font-poppins text-sm mt-7 text-neutral">
-                Mohon jangan bergerak selama proses pengambilan wajah
-              </span>
-            )
-          }
+            </span>
+          ) : (
+            <span className="text-center font-poppins text-sm mt-7 text-neutral">
+              Mohon jangan bergerak selama proses pengambilan wajah
+            </span>
+          )}
         </div>
-        <ProgressStepBar actionList={actionList} currentActionIndex={currentActionIndex} />
+        <ProgressStepBar
+          actionList={actionList}
+          currentActionIndex={currentActionIndex}
+        />
         <Footer />
       </div>
     </>

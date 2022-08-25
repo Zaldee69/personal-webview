@@ -138,8 +138,28 @@ export const serverSideRenderReturnConditions = ({
             // kyc_checkstep_token: checkStepResult.res?.data?.token || null,
           },
         };
+      } else if (checkStepResult.res.data.status === "S") {
+        const params = {
+          register_id: uuid,
+          status: checkStepResult.res.data.status,
+        };
+        const queryString = new URLSearchParams(params as any).toString();
+
+        if (cQuery.redirect_url) {
+          return {
+            redirect: {
+              permanent: false,
+              destination: cQuery.redirect_url + "?" + queryString,
+            },
+            props: {},
+          };
+        }
+
+        return {
+          props: {},
+        };
       } else {
-        // ?
+        return { props: {} };
       }
     } else {
       // ?

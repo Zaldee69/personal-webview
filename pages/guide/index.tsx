@@ -64,6 +64,22 @@ const Guide = () => {
                 query: { ...restRouterQuery, request_id },
               });
             }
+          } else if (res.data.status === "S") {
+            toast.dismiss("kycCheckStepRequestToast");
+            const params = {
+              register_id: request_id,
+              status: res.data.status,
+            };
+            const queryString = new URLSearchParams(params as any).toString();
+            if (restRouterQuery.redirect_url) {
+              window.top!.location.href = decodeURIComponent(
+                restRouterQuery.redirect_url + "?" + queryString
+              );
+            } else {
+              toast.success(res?.message || "pengecekan step berhasil", {
+                icon: <CheckOvalIcon />,
+              });
+            }
           } else {
             toast.dismiss("kycCheckStepRequestToast");
             toast.success(res?.message || "pengecekan step berhasil", {
