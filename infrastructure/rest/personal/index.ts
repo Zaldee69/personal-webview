@@ -7,6 +7,8 @@ import {
   TPersonalRequestChangePasswordResponseData,
   TPersonalResetPasswordRequestData,
   TPersonalResetPasswordResponseData,
+  TPersonalSetPasswordRequestData,
+  TPersonalSetPasswordResponseData,
 } from "./types";
 
 const BASE_URL =
@@ -64,6 +66,19 @@ export const RestPersonalChangePassword = ({
         },
       }
     )
+    .then((res) => res.data)
+    .catch((err) => {
+      throw err;
+    });
+};
+
+export const RestPersonalSetPassword = ({
+  payload,
+}: {
+  payload: TPersonalSetPasswordRequestData;
+}): Promise<TPersonalSetPasswordResponseData> => {
+  return axios
+    .post<TPersonalSetPasswordResponseData>(`${BASE_URL}/setPassword`, payload)
     .then((res) => res.data)
     .catch((err) => {
       throw err;
