@@ -35,7 +35,7 @@ const LivenessFailure = () => {
               melanjutkan proses aktivasi akun
             </p>
             {routerQuery.redirect_url && (
-              <a href={handleRoute(routerQuery.redirect_url as string)}>
+              <a href={routerQuery.redirect_url as string}>
                 <span className="text-center font-semibold font-poppins underline-offset-1	underline  text-primary">
                   Kembali ke Halaman Utama
                 </span>

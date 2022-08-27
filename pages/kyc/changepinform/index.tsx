@@ -6,6 +6,7 @@ import {
   RestPersonalChangePassword,
   RestPersonalRequestChangePassword,
 } from "infrastructure/rest/personal";
+import { TPersonalRequestChangePasswordResponseData } from "infrastructure/rest/personal/types";
 import { GetServerSideProps } from "next";
 import { NextParsedUrlQuery } from "next/dist/server/request-meta";
 import { useRouter } from "next/router";
@@ -128,7 +129,9 @@ const ChangePinDedicatedChannel = (props: Props) => {
         }
       });
   };
-  const wrongOldPinOperation = () => {
+  const wrongOldPinOperation = (
+    res: TPersonalRequestChangePasswordResponseData | null
+  ) => {
     setOldPinErrorAfterSubmit({
       isError: true,
       message: "PIN salah",
@@ -137,7 +140,10 @@ const ChangePinDedicatedChannel = (props: Props) => {
     localStorage.setItem("pinCounter", pinCounter.toString());
     if (pinCounter >= 3) {
       const searchParams = new URLSearchParams(
-        redirect_url + "?status=Blocked"
+        redirect_url +
+          (res !== null && res?.data?.length
+            ? `?user_identifier=${res?.data?.[2]}&request_id=${res?.data?.[1]}&status=${res?.data?.[0]}`
+            : `?status=Blocked`)
       );
       // Redirect topmost window
       window.top!.location.href = decodeURIComponent(searchParams.toString());
@@ -154,14 +160,14 @@ const ChangePinDedicatedChannel = (props: Props) => {
         if (res.success) {
           setIsNewPinMode(true);
         } else {
-          wrongOldPinOperation();
+          wrongOldPinOperation(res);
         }
       })
       .catch((err) => {
         if (err.response?.data?.data?.errors?.[0]) {
-          wrongOldPinOperation();
+          wrongOldPinOperation(null);
         } else {
-          wrongOldPinOperation();
+          wrongOldPinOperation(null);
         }
       });
   };
