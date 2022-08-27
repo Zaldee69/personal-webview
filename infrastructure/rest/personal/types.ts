@@ -28,6 +28,7 @@ export type TPersonalChangePasswordRequestData = {
 export type TPersonalChangePasswordResponseData = {
   success: boolean;
   message: string;
+  data: Array<string>;
 };
 
 export type TPersonalSetPasswordRequestData = {
