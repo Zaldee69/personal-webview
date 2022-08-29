@@ -73,6 +73,10 @@
   justify-content: space-between;
 }
 
+.step-wrapper {
+  width: 70%
+}
+
 .step-wrapper::before,
 .progress {
   content: "";
