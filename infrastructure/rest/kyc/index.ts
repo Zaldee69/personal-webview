@@ -11,8 +11,7 @@ import {
   TKycVerificationResponseData,
 } from "./types";
 
-const BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "https://dev-register.tilaka.id";
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://dev-register.tilaka.id";
 
 export const RestKycCheckStep = ({
   payload,
