@@ -46,9 +46,6 @@ const ChangePinDedicatedChannel = (props: Props) => {
   }>({ isError: false, message: "" });
   const [isConfirmMode, setIsConfirmMode] = useState<boolean>(false);
   const [isNewPinMode, setIsNewPinMode] = useState<boolean>(false);
-  const [pinCounter, setPinCounter] = useState<number>(1);
-
-  const defaultPIN = "111111";
 
   const digitLength: number = 6;
 
@@ -91,7 +88,6 @@ const ChangePinDedicatedChannel = (props: Props) => {
       return;
     }
 
-    localStorage.setItem("pinCounter", "1");
     setPinConfirmErrorAfterSubmit({ isError: false, message: "" });
 
     const password = pin;
@@ -129,29 +125,6 @@ const ChangePinDedicatedChannel = (props: Props) => {
         }
       });
   };
-  const wrongOldPinOperation = (
-    res: TPersonalRequestChangePasswordResponseData | null
-  ) => {
-    setOldPinErrorAfterSubmit({
-      isError: true,
-      message: "PIN salah",
-    });
-    setPinCounter(pinCounter + 1);
-    localStorage.setItem("pinCounter", pinCounter.toString());
-    if (pinCounter >= 3) {
-      const searchParams = new URLSearchParams(
-        redirect_url +
-          (res !== null && res?.data?.length
-            ? `?user_identifier=${res?.data?.[2]}&request_id=${res?.data?.[1]}&status=${res?.data?.[0]}`
-            : `?status=Blocked`)
-      );
-      // Redirect topmost window
-      window.top!.location.href = decodeURIComponent(searchParams.toString());
-      // Reset pinCounter
-      localStorage.setItem("pinCounter", "1");
-      setPinCounter(1);
-    }
-  };
   const submitFormOldPinCallback = (pinConfirm: string) => {
     RestPersonalRequestChangePassword({
       payload: { request_id: request_id as string, password: pinConfirm },
@@ -160,14 +133,40 @@ const ChangePinDedicatedChannel = (props: Props) => {
         if (res.success) {
           setIsNewPinMode(true);
         } else {
-          wrongOldPinOperation(res);
+          // if res.message contains the word "password", then we consider a pin error
+          if (res.message.toLowerCase().includes("password")) {
+            setOldPinErrorAfterSubmit({
+              isError: true,
+              message: "PIN salah",
+            });
+          } else {
+            setOldPinErrorAfterSubmit({
+              isError: true,
+              message: res.message || "tidak berhasil",
+            });
+          }
+          if (res?.data !== null && redirect_url) {
+            const searchParams = new URLSearchParams(
+              redirect_url +
+                `?user_identifier=${res?.data?.[2]}&request_id=${res?.data?.[1]}&status=${res?.data?.[0]}`
+            );
+            window.top!.location.href = decodeURIComponent(
+              searchParams.toString()
+            );
+          }
         }
       })
       .catch((err) => {
         if (err.response?.data?.data?.errors?.[0]) {
-          wrongOldPinOperation(null);
+          setOldPinErrorAfterSubmit({
+            isError: true,
+            message: err.response?.data?.data?.errors?.[0] || "ada yang salah",
+          });
         } else {
-          wrongOldPinOperation(null);
+          setOldPinErrorAfterSubmit({
+            isError: true,
+            message: err.response?.data?.message || "ada yang salah",
+          });
         }
       });
   };
@@ -175,12 +174,6 @@ const ChangePinDedicatedChannel = (props: Props) => {
   useEffect(() => {
     if (!router.isReady) return;
     setShouldRender(true);
-    const counter = localStorage.getItem("pinCounter");
-    if (!counter) {
-      localStorage.setItem("pinCounter", "1");
-    } else {
-      setPinCounter(parseInt(counter as string));
-    }
   }, [router.isReady]);
 
   if (!shouldRender) return;
