@@ -166,7 +166,6 @@ const PinFormDedicatedChannel = (props: Props) => {
         if (res.success) {
           setIsRequestCheckStatus(false);
           if (res.data.status === "D") {
-            // ketika res.data.pin_form === true, tidak akan redirect kemana-mana, karena sudah benar dihalaman ini.
             if (!res.data.pin_form) {
               router.push({
                 pathname: handleRoute("form"),
@@ -176,12 +175,31 @@ const PinFormDedicatedChannel = (props: Props) => {
                   redirect_url,
                 },
               });
+            } else {
+              // should stay.
+              return;
             }
           } else if (res.data.status === "E" || res.data.status === "F") {
-            if (res.data.status === "F" && res.data.pin_form && redirect_url) {
-              window.top!.location.href = decodeURIComponent(
-                redirect_url as string
-              );
+            if (res.data.status === "F") {
+              if (!res.data.pin_form) {
+                if (redirect_url) {
+                  window.top!.location.href = decodeURIComponent(
+                    redirect_url as string
+                  );
+                } else {
+                  router.push({
+                    pathname: handleRoute("liveness-failure"),
+                    query: {
+                      ...restRouterQuery,
+                      request_id: registration_id,
+                      redirect_url,
+                    },
+                  });
+                }
+              } else {
+                // should stay.
+                return;
+              }
             } else {
               router.push({
                 pathname: handleRoute("liveness-failure"),
@@ -198,7 +216,6 @@ const PinFormDedicatedChannel = (props: Props) => {
               status: res.data.status,
             };
             const queryString = new URLSearchParams(params as any).toString();
-            console.log(redirect_url);
             if (redirect_url) {
               window.top!.location.href = decodeURIComponent(
                 redirect_url + "?" + queryString
