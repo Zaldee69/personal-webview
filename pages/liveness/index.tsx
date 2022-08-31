@@ -183,8 +183,12 @@ const Liveness = () => {
               res.data.pin_form &&
               routerQuery.redirect_url
             ) {
+              const searchParams = new URLSearchParams(
+                routerQuery.redirect_url +
+                  `?status=${res.data.status}&register_id=${router.query.request_id}`
+              );
               window.top!.location.href = decodeURIComponent(
-                routerQuery.redirect_url as string
+                searchParams.toString()
               );
             } else {
               router.push({
@@ -306,8 +310,12 @@ const Liveness = () => {
               );
               setTimeout(() => {
                 if (result.data.pin_form && routerQuery.redirect_url) {
+                  const searchParams = new URLSearchParams(
+                    routerQuery.redirect_url +
+                      `?status=${status}&register_id=${router.query.request_id}`
+                  );
                   window.top!.location.href = decodeURIComponent(
-                    routerQuery.redirect_url as string
+                    searchParams.toString()
                   );
                 } else {
                   router.push({
