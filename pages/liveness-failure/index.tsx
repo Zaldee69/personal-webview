@@ -13,6 +13,10 @@ import { assetPrefix } from "../../next.config";
 const LivenessFailure = () => {
   const router = useRouter();
   const routerQuery = router.query;
+  const uuid =
+    routerQuery.transaction_id ||
+    routerQuery.request_id ||
+    routerQuery.registration_id;
   return (
     <>
       <Head>
@@ -30,12 +34,13 @@ const LivenessFailure = () => {
             height={200}
           />
           <div className="flex flex-col items-center gap-10 ">
-            <p className="text-center font-poppins  text-neutral ">
-              Mohon mengisi Formulir yang dikirim ke email Anda untuk
-              melanjutkan proses aktivasi akun
+            <p className="text-center font-poppins  text-neutral">
+              Tautan sudah tidak tersedia
             </p>
             {routerQuery.redirect_url && (
-              <a href={routerQuery.redirect_url as string}>
+              <a
+                href={`${routerQuery.redirect_url}?status=F&register_id=${uuid}`}
+              >
                 <span className="text-center font-semibold font-poppins underline-offset-1	underline  text-primary">
                   Kembali ke Halaman Utama
                 </span>

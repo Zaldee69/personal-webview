@@ -63,7 +63,7 @@ const PinFormDedicatedChannel = (props: Props) => {
     if (pin !== pinConfirm) {
       setPinConfirmErrorAfterSubmit({
         isError: true,
-        message: "PIN does not match",
+        message: "PIN tidak sesuai",
       });
       return;
     }

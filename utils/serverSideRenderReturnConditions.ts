@@ -116,7 +116,7 @@ export const serverSideRenderReturnConditions = ({
           return {
             redirect: {
               permanent: false,
-              destination: cQuery.redirect_url,
+              destination: `${cQuery.redirect_url}?status=${checkStepResult.res.data.status}&register_id=${uuid}`,
             },
             props: {},
           };
