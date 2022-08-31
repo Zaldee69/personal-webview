@@ -11,7 +11,7 @@ let result: any;
 let dom: any;
 let isDone: any;
 let human: any = undefined;
-
+let blinkCount : number = 1
 
 interface Constraint {
   width: number;
@@ -293,8 +293,10 @@ const Camera: React.FC<Props> = ({
         } else if (actionList[currentActionIndex] == "blink") {
           setProgress(0);
           if((blink_left_eye || blink_right_eye)){
+            blinkCount++
+            console.log(blinkCount)
             let done = await isIndexDone(currentActionIndex);
-            if (!done) {
+            if (!done && blinkCount > 35) {
               await setIndexDone(currentActionIndex);
               setProgress(100);
               ++currentActionIndex;
@@ -304,6 +306,7 @@ const Camera: React.FC<Props> = ({
           } else {
             setFailedMessage("Pejamkan mata 3 detik");
             setError(true);
+            blinkCount = 1
           }
         } 
       }
