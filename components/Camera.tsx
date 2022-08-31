@@ -102,6 +102,7 @@ const Camera: React.FC<Props> = ({
     let clicked = false;
     if (result) {
       const interpolated = await human.next(result);
+
       if ((interpolated.face.length > 0) && (interpolated.face[0].rotation != undefined) && (captureButtonRef.current != null)) {
         const roll = interpolated.face[0].rotation.angle.roll * (180 / Math.PI);
         const yaw = interpolated.face[0].rotation.angle.yaw * (180 / Math.PI);
@@ -130,16 +131,21 @@ const Camera: React.FC<Props> = ({
           }
     1   });
         if (actionList[currentActionIndex] == "look_straight") {
-          setProgress(0);
           if(look_center && distance < 25){
-            let done = await isIndexDone(currentActionIndex);
-            if (!done) {
-              await setIndexDone(currentActionIndex);
-              setProgress(100);
-              await captureButtonRef.current.click();
-              clicked = true;
+          if (roll > -10 && roll < 10 && distance < 25) {
+            if (yaw > -10 && yaw < 10 && distance < 25) {
+              if (pitch > -10 && pitch < 10 && distance < 25) {
+                let done = await isIndexDone(currentActionIndex);
+                if (!done) {
+                  await setIndexDone(currentActionIndex);
+                  setProgress(100);
+                  await captureButtonRef.current.click();
+                  clicked = true;
+                }
+              }
             }
-          } 
+          }
+        }
         } else if (actionList[currentActionIndex] == "look_left") {
           setProgress(0);
           if(look_left && distance < 25){
