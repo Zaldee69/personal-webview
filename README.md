@@ -8,24 +8,22 @@
 
 ## Halaman
 
-### Label berseta Path halaman (total 22 halaman)
+### Label berseta Path halaman (total 25 halaman)
 
 - **SERVER_SIDE_CHECKSTEP**
 
   1. `/certificate-information`
   2. `/certificate-information`
   3. `/form/success`
-  4. `/kyc/changepinform`
-  5. `/kyc/resetpinform`
-  6. `/link-account`
-  7. `/link-account/failure`
-  8. `/link-account/success`
-  9. `/liveness-fail`
-  10. `/liveness-failure`
-  11. `/login`
-  12. `/setting-signature-and-mfa`
-  13. `/signing`
-  14. `/`
+  4. `/link-account`
+  5. `/link-account/failure`
+  6. `/link-account/success`
+  7. `/liveness-fail`
+  8. `/liveness-failure`
+  9. `/login`
+  10. `/setting-signature-and-mfa`
+  11. `/signing`
+  12. `/`
 
 - **CLIENT_SIDE_CHECKSTEP**
 
@@ -37,6 +35,10 @@
 - **\_NO_CHECKSTEP**
 
   1. `/signing/authpin`
+  2. `/kyc/changepinform`
+  3. `/kyc/resetpinform`
+  4. `/kyc/re-enroll`
+  5. `/kyc/revoke`
 
 - **\_UNUSED_PAGE**
 
@@ -75,6 +77,6 @@
 
 ## Catatan
 
-> untuk **CLIENT_SIDE_CHECKSTEP**, jika token tersedia diresponse maka `kyc_checkstep_token` akan di set di localStorage. lalu untuk SERVER_SIDE_CHECKSTEP, jika token tersedia diresponse maka `kyc_checkstep_token` tidak akan di set di localStorage.
+> untuk **CLIENT_SIDE_CHECKSTEP**, jika token tersedia diresponse maka `kyc_checkstep_token` akan di set di localStorage. lalu untuk **SERVER_SIDE_CHECKSTEP**, jika token tersedia diresponse maka `kyc_checkstep_token` tidak akan di set di localStorage.
 
 > **SERVER_SIDE_CHECKSTEP** mengenal parameter `registration_id`, `transaction_id` dan `request_id` sebagai **uuid**.
