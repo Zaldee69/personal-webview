@@ -85,7 +85,12 @@ const PinFormDedicatedChannel = (props: Props) => {
           if (res.success) {
             setIsConfirmMode(false);
             if (redirect_url) {
-              window.top!.location.href = decodeURIComponent(redirect_url);
+              const searchParams = new URLSearchParams(
+                redirect_url + `?status=F&register_id=${registration_id}`
+              );
+              window.top!.location.href = decodeURIComponent(
+                searchParams.toString()
+              );
             }
           } else {
             setPinConfirmError({
