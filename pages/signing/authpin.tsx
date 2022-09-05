@@ -34,84 +34,101 @@ const AuthPinForm = (props: Props) => {
 
   const onClickNumberHandlerCallback = (value: number) => {};
   const onClickDeleteHandlerCallback = () => {
-    setPinError({isError: false, message: ""})
+    setPinError({ isError: false, message: "" });
   };
   const submitFormCallback = (pin: string) => {
-    setPin(pin);    
-    RestSigningAuthPIN({payload: {
-      user : user || "",
-      pin,
-      id: id || "",
-    }}).then((res) => {
-      if (res.success) {
-        setPinError({ isError: false, message: res?.message || "penandatanganan dokumen berhasil" });
-        setIsRequestCheckStatus(false);
-        if (redirect_url) {
-          window.top!.location.href = decodeURIComponent(redirect_url);
-        }
-      } else {
-        setPinError({
-          isError: true,
-          message: res?.message || "proses gagal",
-        });
-        if(res?.message === 'penandatanganan dokumen gagal. pin sudah salah 3 kali' && redirect_url){
-          const searchParams = new URLSearchParams(`${redirect_url}?user_identifier=${user}&signing_id=${id}&status=Blocked`
-          );
-          // Redirect topmost window
-          setTimeout(() => {
-            window.top!.location.href = decodeURIComponent(searchParams.toString());
-          }, 2000) 
-        }
-
-      }
-    }).catch((err) => {
-      if (err.response?.data?.data?.errors?.[0]) {
-        setPinError({
-          isError: true,
-          message: `${err.response?.data?.message}, ${err.response?.data?.data?.errors?.[0]}`,
-        });
-      } else {
-        setPinError({
-          isError: true,
-          message: err.response?.data?.message || "proses gagal",
-        });
-      }
+    setPin(pin);
+    RestSigningAuthPIN({
+      payload: {
+        user: user || "",
+        pin,
+        id: id || "",
+      },
     })
+      .then((res) => {
+        if (res.success) {
+          setPinError({
+            isError: false,
+            message: res?.message || "penandatanganan dokumen berhasil",
+          });
+          setIsRequestCheckStatus(false);
+          if (redirect_url) {
+            const searchParams = new URLSearchParams(
+              `${redirect_url}?user_identifier=${user}&signing_id=${id}&status=Sukses`
+            );
+            window.top!.location.href = decodeURIComponent(
+              searchParams.toString()
+            );
+          }
+        } else {
+          setPinError({
+            isError: true,
+            message: res?.message || "proses gagal",
+          });
+          if (
+            res?.message ===
+              "penandatanganan dokumen gagal. pin sudah salah 3 kali" &&
+            redirect_url
+          ) {
+            const searchParams = new URLSearchParams(
+              `${redirect_url}?user_identifier=${user}&signing_id=${id}&status=Blocked`
+            );
+            setTimeout(() => {
+              window.top!.location.href = decodeURIComponent(
+                searchParams.toString()
+              );
+            }, 2000);
+          }
+        }
+      })
+      .catch((err) => {
+        if (err.response?.data?.data?.errors?.[0]) {
+          setPinError({
+            isError: true,
+            message: `${err.response?.data?.message}, ${err.response?.data?.data?.errors?.[0]}`,
+          });
+        } else {
+          setPinError({
+            isError: true,
+            message: err.response?.data?.message || "proses gagal",
+          });
+        }
+      });
   };
 
   useEffect(() => {
     if (!router.isReady) return;
     setShouldRender(true);
-    if(!user || !id){
+    if (!user || !id) {
       setPinError({
         isError: true,
-        message: 'user atau id dibutuhkan',
-      })
+        message: "user atau id dibutuhkan",
+      });
       setIsRequestCheckStatus(true);
     }
-  }, [router.isReady]);
+  }, [router.isReady]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!shouldRender) return;
 
   return (
     <div className="flex justify-center items-center min-h-screen">
-        <div className="max-w- w-full" style={{ maxWidth: "331px" }}>
-          <PinFormComponent
-            key="pinFormKey"
-            title={'PIN'}
-            subTitle={`Masukkan ${digitLength}-digit PIN untuk konfirmasi tanda tangan`}
-            digitLength={digitLength}
-            isRandom={isRandom}
-            onClickNumberHandlerCallback={onClickNumberHandlerCallback}
-            onClickDeleteHandlerCallback={onClickDeleteHandlerCallback}
-            submitFormCallback={submitFormCallback}
-            isResetAfterSubmit
-            isErrorAfterSubmit={pinError.isError}
-            isErrorAfterSubmitMessage={pinError.message}
-            isButtonNumberDisabled={isRequestCheckStatus}
-            showPoweredByTilaka
-          />
-        </div>
+      <div className="max-w- w-full" style={{ maxWidth: "331px" }}>
+        <PinFormComponent
+          key="pinFormKey"
+          title={"PIN"}
+          subTitle={`Masukkan ${digitLength}-digit PIN untuk konfirmasi tanda tangan`}
+          digitLength={digitLength}
+          isRandom={isRandom}
+          onClickNumberHandlerCallback={onClickNumberHandlerCallback}
+          onClickDeleteHandlerCallback={onClickDeleteHandlerCallback}
+          submitFormCallback={submitFormCallback}
+          isResetAfterSubmit
+          isErrorAfterSubmit={pinError.isError}
+          isErrorAfterSubmitMessage={pinError.message}
+          isButtonNumberDisabled={isRequestCheckStatus}
+          showPoweredByTilaka
+        />
+      </div>
     </div>
   );
 };

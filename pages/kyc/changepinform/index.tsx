@@ -97,7 +97,12 @@ const ChangePinDedicatedChannel = (props: Props) => {
         if (res.success) {
           setIsConfirmMode(false);
           if (redirect_url) {
-            window.top!.location.href = decodeURIComponent(redirect_url);
+            const searchParams = new URLSearchParams(
+              `${redirect_url}?user_identifier=${res?.data?.[2]}&request_id=${res?.data?.[1]}&status=${res?.data?.[0]}`
+            );
+            window.top!.location.href = decodeURIComponent(
+              searchParams.toString()
+            );
           }
         } else {
           setPinConfirmError({
