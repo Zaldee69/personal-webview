@@ -6,7 +6,7 @@ export type TPersonalResetPasswordRequestData = {
 export type TPersonalResetPasswordResponseData = {
   success: boolean;
   message: string;
-  data: null;
+  data: string[] | null;
 };
 
 export type TPersonalRequestChangePasswordRequestData = {
@@ -28,7 +28,7 @@ export type TPersonalChangePasswordRequestData = {
 export type TPersonalChangePasswordResponseData = {
   success: boolean;
   message: string;
-  data: Array<string>;
+  data: string[] | null;
 };
 
 export type TPersonalSetPasswordRequestData = {
