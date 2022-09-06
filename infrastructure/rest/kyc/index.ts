@@ -1,4 +1,5 @@
 import { setKycCheckstepTokenToLocalStorage } from "@/utils/setKycCheckstepTokenToLocalStorage";
+import { setTokenToLocalStorage } from "@/utils/token"
 import axios from "axios";
 import {
   TKycCheckStepRequestData,
@@ -9,6 +10,10 @@ import {
   TKycGenerateActionResponseData,
   TKycVerificationRequestData,
   TKycVerificationResponseData,
+  TKycGenerateActionRevokeRequestData,
+  TKycGenerateActionRevokeResponseData,
+  TKycVerificationRevokeRequestData,
+  TKycVerificationRevokeResponseData,
 } from "./types";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://dev-register.tilaka.id";
@@ -88,3 +93,40 @@ export const RestKycVerification = (
       throw err;
     });
 };
+
+export const RestKycGenerateRevokeAction = (
+  body: TKycGenerateActionRevokeRequestData
+): Promise<TKycGenerateActionRevokeResponseData> => {
+  return axios.post<TKycGenerateActionRevokeResponseData>(
+    `${BASE_URL}/api/revoke/generateaction`,
+    body,
+  )
+  .then((res) => {
+    setTokenToLocalStorage(res.data.data?.token || null, "cert_revoke_token")
+    return res.data;
+  })
+  .catch((err) => {
+    throw err;
+  })
+}
+
+export const RestKycVerificationRevoke = (
+  body: TKycVerificationRevokeRequestData
+): Promise<TKycVerificationRevokeResponseData> => {
+  return axios.post<TKycVerificationRevokeResponseData>(
+    `${BASE_URL}/api/revoke/verificationbiometric`,
+    body,
+    {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem(
+          "cert_revoke_token"
+        )}`,
+        "Content-Type": "application/json",
+      },
+    }
+  )
+  .then((res) =>res.data)
+  .catch((err) => {
+    throw err;
+  })
+}

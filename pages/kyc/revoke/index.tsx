@@ -3,14 +3,29 @@ import Footer from "@/components/Footer";
 import ProgressStepBar from "@/components/ProgressStepBar";
 import Head from "next/head";
 import Image from "next/image";
-import { Fragment, useState } from "react";
+import { toast } from "react-toastify";
+import XIcon from "@/public/icons/XIcon";
+import { Fragment, useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Loading from "@/components/Loading";
 import { assetPrefix } from "next.config";
+import { actionText } from "@/utils/actionText"
+import { AppDispatch, RootState } from "@/redux/app/store";
+import { useDispatch, useSelector } from "react-redux";
+import { RestKycGenerateRevokeAction, RestKycVerificationRevoke } from "../../../infrastructure";
+import { resetImages, setActionList } from "@/redux/slices/livenessSlice";
+import { TKycVerificationRevokeRequestData } from "infrastructure/rest/kyc/types";
+import { handleRoute } from "@/utils/handleRoute";
 
 const RevokeMekari = () => {
   let [currentActionIndex, setCurrentActionIndex] = useState(0);
   const [failedMessage, setFailedMessage] = useState<string>("");
+
+  const actionList = useSelector(
+    (state: RootState) => state.liveness.actionList
+  );
+  const images = useSelector((state: RootState) => state.liveness.images);
+  const isDone = useSelector((state: RootState) => state.liveness.isDone);
 
   const router = useRouter();
   const routerQuery = router.query;
@@ -18,6 +33,167 @@ const RevokeMekari = () => {
     routerQuery.status === "done"
       ? "Terima kasih telah mengikuti proses Liveness. Hasil dinilai berdasarkan keaslian serta kesesuaian foto dengan aksi yang diminta."
       : "Pastikan wajah di dalam garis panduan dan ikuti petunjuk dengan benar";
+
+  const dispatch: AppDispatch = useDispatch();
+
+  const generateAction = () => {
+    const body = {
+      revokeId: routerQuery.revoke_id as string,
+    }
+    RestKycGenerateRevokeAction(body)
+    .then((result) => {
+      if (result?.data) {
+        const payload = ["look_straight"].concat(
+          result.data.actionList
+        );
+        dispatch(setActionList(payload));
+      } else {
+        throw new Error(result.message);
+      }
+    })
+    .catch((error) => {
+      toast.dismiss("generateAction");
+      const msg = error.response?.data?.data?.errors?.[0];
+      const status = error.response?.data?.data?.status;
+      if (msg) {
+          toast.error(msg, {
+            icon: <XIcon />,
+          });
+          if(status === "F"){
+            if(routerQuery.redirect_url){
+              setTimeout(() => {
+                const searchParams = new URLSearchParams(
+                  `${routerQuery.redirect_url}?status=Gagal&revoke_id=${routerQuery.revoke_id}&user_identifier=${routerQuery.user}`
+                )
+                window.top!.location.href = decodeURIComponent(
+                  searchParams.toString()
+                );
+              }, 3000)
+            }
+          } else if (status === "S"){
+            if(routerQuery.redirect_url){
+              setTimeout(() => {
+                const searchParams = new URLSearchParams(
+                  `${routerQuery.redirect_url}?status=Sukses&revoke_id=${routerQuery.revoke_id}&user_identifier=${routerQuery.user}`
+                )
+                window.top!.location.href = decodeURIComponent(
+                  searchParams.toString()
+                );
+              }, 3000)
+            }
+          }
+      } else {
+        toast.error(
+          error.response?.data?.message || "Generate Action gagal",
+          {
+            icon: <XIcon />,
+          }
+        );
+      }
+    });
+  }
+
+  const verifyLiveness = async () => {
+    toast(`Mengecek status...`, {
+      type: "info",
+      toastId: "verification",
+      isLoading: true,
+      position: "top-center",
+    });
+
+    setFailedMessage("");
+
+    try {
+      const body: TKycVerificationRevokeRequestData = {
+        revokeId: router.query.revoke_id as string,
+        image_selfie: "",
+      };
+
+      const imageActions = images.filter(
+        (image) =>
+          image.action !== "look_straight"
+      );
+      imageActions.forEach((image, index) => {
+        body[`image_action${++index}` as keyof TKycVerificationRevokeRequestData] =
+          image.value;
+      });
+      const imageSelfie = images.filter(
+        (image) => image.action === "look_straight"
+      )[0];
+
+      body.image_selfie = imageSelfie.value;
+
+      const result = await RestKycVerificationRevoke(body)
+      if(result.success) {
+        toast.dismiss("verification")
+        removeStorage()
+        if(routerQuery.redirect_url){
+          setTimeout(() => {
+            const searchParams = new URLSearchParams(
+              `${routerQuery.redirect_url}?status=Sukses&revoke_id=${routerQuery.revoke_id}&user_identifier=${result.data.user}`
+            )
+            window.top!.location.href = decodeURIComponent(
+              searchParams.toString()
+            );
+          }, 3000)
+        }
+      } else {
+        toast.dismiss('verification')
+        if(result.data.status === "F") {
+          if(routerQuery.redirect_url){
+            setTimeout(() => {
+              const searchParams = new URLSearchParams(
+                `${routerQuery.redirect_url}?status=Gagal&revoke_id=${routerQuery.revoke_id}&user_identifier=${result.data.user}`
+              )
+              window.top!.location.href = decodeURIComponent(
+                searchParams.toString()
+              );
+            }, 3000)
+          }
+        } else {
+          router.push({
+            pathname: handleRoute(assetPrefix ? "liveness-fail" : "/liveness-fail"),
+            query: {
+              ...routerQuery,
+            },
+          });
+        }
+
+      }
+    } catch (e: any) {
+        toast.dismiss("verification")
+        const msg = e.response?.data?.data?.errors?.[0];
+        if (msg) {
+            toast.error(msg, {
+              icon: <XIcon />,
+            });
+        } else {
+          toast.error(
+            e.response?.data?.message || "Verifikasi gagal",
+            {
+              icon: <XIcon />,
+            }
+          );
+        }
+      
+    }
+  }
+
+  const removeStorage = () => {
+    localStorage.removeItem("cert-revoke-token");
+  };
+
+  useEffect(() => {
+    if (!isDone) return;
+    verifyLiveness();
+  }, [isDone]);
+
+  useEffect(() => {
+    if (!router.isReady) return;
+    generateAction();
+    dispatch(resetImages());
+  }, [router.isReady]);
+  
 
   return (
     <Fragment>
@@ -61,8 +237,7 @@ const RevokeMekari = () => {
               routerQuery.status === "done" ? "hidden" : null
             }`}
           >
-            {/* {actionText(actionList)} */}
-            Menghadap Ke Depan
+            {actionText(actionList[currentActionIndex])}
           </span>
           {failedMessage ? (
             <span className="text-center font-poppins text-sm mt-7 text-red300">
@@ -79,7 +254,7 @@ const RevokeMekari = () => {
           )}
         </div>
         <ProgressStepBar
-          actionList={["mouth_open", "blink"]}
+          actionList={actionList}
           currentActionIndex={currentActionIndex}
         />
         <Footer />

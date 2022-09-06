@@ -55,7 +55,7 @@ const LivenessFail = () => {
     } else {
       return (
         <Link
-          href={{ pathname: handleRoute(`/guide`), query: { ...router.query } }}
+          href={{ pathname: router.query.revoke_id ? handleRoute('/kyc/revoke') : handleRoute(`/guide`), query: { ...router.query } }}
         >
           <button className="bg-primary btn md:mx-auto md:block md:w-1/4 text-white font-poppins w-full mx-auto rounded-sm h-9">
             ULANGI

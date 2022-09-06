@@ -70,3 +70,36 @@ export type TKycVerificationResponseData = {
     numFailedLivenessCheck?: number;
   };
 };
+
+export type TKycGenerateActionRevokeRequestData = {
+  revokeId: string;
+};
+
+export type TKycGenerateActionRevokeResponseData = {
+  success: boolean;
+  message: string;
+  data: {
+    actionList: string[];
+    token: string;
+  };
+};
+
+export type TKycVerificationRevokeRequestData = {
+  revokeId: string;
+  image_selfie: string;
+  image_action1?: string;
+  image_action2?: string;
+  image_action3?: string;
+};
+
+export type TKycVerificationRevokeResponseData = {
+  success: boolean;
+  message: string;
+  data: {
+    matchLiveness: boolean;
+    matchSelfie: boolean;
+    status: string;
+    reason: string;
+    user: string;
+  };
+};
