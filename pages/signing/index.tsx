@@ -27,12 +27,12 @@ import { RestKycCheckStep } from "infrastructure";
 import { serverSideRenderReturnConditions } from "@/utils/serverSideRenderReturnConditions";
 
 type TFontSig =
-  | "signature_font_type_allan"
-  | "signature_font_type_aguafinaScript"
-  | "signature_font_type_architectsDaughter"
-  | "signature_font_type_giveYouGlory"
-  | "signature_font_type_berkshireSwash"
-  | "signature_font_type_missFajardose";
+  | "Adine-Kirnberg"
+  | "champignonaltswash"
+  | "FormalScript"
+  | "HerrVonMuellerhoff-Regular"
+  | "MrsSaintDelafield-Regular"
+  | "SCRIPTIN";
 
 interface Active {
   modal: boolean;
@@ -198,7 +198,7 @@ const Configuration: React.FC<{
             height={25}
             src={`${assetPrefix}/images/goresan.svg`}
           />
-          <p className="text-[#727272] text-base  ">Goresan</p>
+          <p className="text-[#727272] text-base font-poppins ">Goresan</p>
         </button>
       </div>
       <div className="flex flex-col">
@@ -208,7 +208,7 @@ const Configuration: React.FC<{
             height={25}
             src={`${assetPrefix}/images/font.svg`}
           />
-          <p className="text-[#727272] text-base ">Font</p>
+          <p className="text-[#727272] text-base font-poppins ">Font</p>
         </button>
       </div>
     </div>
@@ -285,7 +285,7 @@ const FRModal: React.FC<Active | any> = ({ modal, setModal }) => {
 const ChooseFontModal: React.FC<Active> = ({ modal, setModal, tilakaName }) => {
   const dispatch: AppDispatch = useDispatch();
   const [form, formSetter] = useState<TFontSig | string>(
-    "signature_font_type_aguafinaScript"
+    "champignonaltswash"
   );
   const [sig, setSig] = useState<any>();
   const handleFormOnChange = (e: React.FormEvent<HTMLInputElement>): void => {
@@ -321,12 +321,12 @@ const ChooseFontModal: React.FC<Active> = ({ modal, setModal, tilakaName }) => {
               <input
                 type="radio"
                 name="signature_font_type"
-                value="signature_font_type_allan"
+                value="Adine-Kirnberg"
                 onChange={handleFormOnChange}
-                checked={form === "signature_font_type_allan"}
+                checked={form === "Adine-Kirnberg"}
                 className="appearance-none border border-_B6B6B6 checked:border-_1A73E8 rounded-md w-full h-12"
               />
-              <p className="text-2xl font-allan bg-transparent text-_030326 absolute w-fit text-center">
+              <p className="text-2xl Adine-Kirnberg bg-transparent text-_030326 absolute w-fit text-center">
                 {tilakaName}
               </p>
             </label>
@@ -334,12 +334,12 @@ const ChooseFontModal: React.FC<Active> = ({ modal, setModal, tilakaName }) => {
               <input
                 type="radio"
                 name="signature_font_type"
-                value="signature_font_type_aguafinaScript"
+                value="champignonaltswash"
                 onChange={handleFormOnChange}
-                checked={form === "signature_font_type_aguafinaScript"}
+                checked={form === "champignonaltswash"}
                 className="appearance-none border border-_B6B6B6 checked:border-_1A73E8 rounded-md w-full h-12"
               />
-              <p className="text-2xl font-aguafinaScript text-_030326 absolute w-fit text-center">
+              <p className="text-2xl champignonaltswash text-_030326 absolute w-fit text-center">
                 {tilakaName}
               </p>
             </label>
@@ -347,12 +347,12 @@ const ChooseFontModal: React.FC<Active> = ({ modal, setModal, tilakaName }) => {
               <input
                 type="radio"
                 name="signature_font_type"
-                value="signature_font_type_architectsDaughter"
+                value="FormalScript"
                 onChange={handleFormOnChange}
-                checked={form === "signature_font_type_architectsDaughter"}
+                checked={form === "FormalScript"}
                 className="appearance-none border border-_B6B6B6 checked:border-_1A73E8 rounded-md w-full h-12"
               />
-              <p className="text-lg font-architectsDaughter text-_030326 absolute w-fit text-center">
+              <p className="text-lg FormalScript text-_030326 absolute w-fit text-center">
                 {tilakaName}
               </p>
             </label>
@@ -360,12 +360,12 @@ const ChooseFontModal: React.FC<Active> = ({ modal, setModal, tilakaName }) => {
               <input
                 type="radio"
                 name="signature_font_type"
-                value="signature_font_type_giveYouGlory"
+                value="HerrVonMuellerhoff-Regular"
                 onChange={handleFormOnChange}
-                checked={form === "signature_font_type_giveYouGlory"}
+                checked={form === "HerrVonMuellerhoff-Regular"}
                 className="appearance-none border border-_B6B6B6 checked:border-_1A73E8 rounded-md w-full h-12"
               />
-              <p className="text-base font-giveYouGlory text-_030326 absolute w-fit text-center">
+              <p className="text-base HerrVonMuellerhoff-Regular text-_030326 absolute w-fit text-center">
                 {tilakaName}
               </p>
             </label>
@@ -373,12 +373,12 @@ const ChooseFontModal: React.FC<Active> = ({ modal, setModal, tilakaName }) => {
               <input
                 type="radio"
                 name="signature_font_type"
-                value="signature_font_type_berkshireSwash"
+                value="MrsSaintDelafield-Regular"
                 onChange={handleFormOnChange}
-                checked={form === "signature_font_type_berkshireSwash"}
+                checked={form === "MrsSaintDelafield-Regular"}
                 className="appearance-none border border-_B6B6B6 checked:border-_1A73E8 rounded-md w-full h-12"
               />
-              <p className="text-2xl font-berkshireSwash text-_030326 absolute w-fit text-center">
+              <p className="text-2xl MrsSaintDelafield-Regular text-_030326 absolute w-fit text-center">
                 {tilakaName}
               </p>
             </label>
@@ -386,12 +386,12 @@ const ChooseFontModal: React.FC<Active> = ({ modal, setModal, tilakaName }) => {
               <input
                 type="radio"
                 name="signature_font_type"
-                value="signature_font_type_missFajardose"
+                value="SCRIPTIN"
                 onChange={handleFormOnChange}
-                checked={form === "signature_font_type_missFajardose"}
+                checked={form === "SCRIPTIN"}
                 className="appearance-none border border-_B6B6B6 checked:border-_1A73E8 rounded-md w-full h-12"
               />
-              <p className="text-2xl font-missFajardose text-_030326 absolute w-fit text-center">
+              <p className="text-2xl SCRIPTIN text-_030326 absolute w-fit text-center">
                 {tilakaName}
               </p>
             </label>

@@ -5,15 +5,6 @@ module.exports = {
   ],
   theme: {
     extend: {
-      fontFamily: {
-        poppins: ["Poppins", "sans-serif"],
-        allan: ["Allan", "cursive"],
-        aguafinaScript: ["Aguafina Script", "cursive"],
-        architectsDaughter: ["Architects Daughter", "cursive"],
-        giveYouGlory: ["Give You Glory", "cursive"],
-        berkshireSwash: ["Berkshire Swash", "cursive"],
-        missFajardose: ["Miss Fajardose", "cursive"],
-      },
       maxWidth: { "352px": "352px" },
     },
     colors: {

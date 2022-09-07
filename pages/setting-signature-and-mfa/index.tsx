@@ -22,12 +22,12 @@ type Props = {};
 type Tform = {
   signature_type: 0 | 1;
   signature_font_type?:
-    | "signature_font_type_allan"
-    | "signature_font_type_aguafinaScript"
-    | "signature_font_type_architectsDaughter"
-    | "signature_font_type_giveYouGlory"
-    | "signature_font_type_berkshireSwash"
-    | "signature_font_type_missFajardose"
+    | "Adine-Kirnberg"
+    | "champignonaltswash"
+    | "FormalScript"
+    | "HerrVonMuellerhoff-Regular"
+    | "MrsSaintDelafield-Regular"
+    | "SCRIPTIN"
     | "";
   mfa_method: "fr" | "otp" | "otp_ponsel";
 };
@@ -248,14 +248,14 @@ function SettingSignatureAndMFA({}: Props) {
                 <input
                   type="radio"
                   name="signature_font_type"
-                  value="signature_font_type_allan"
+                  value="Adine-Kirnberg"
                   onChange={handleFormOnChange}
                   checked={
-                    form.signature_font_type === "signature_font_type_allan"
+                    form.signature_font_type === "Adine-Kirnberg"
                   }
                   className="appearance-none border border-_B6B6B6 checked:border-_1A73E8 rounded-md w-full h-12"
                 />
-                <p className="text-2xl font-allan text-_030326 absolute w-fit text-center">
+                <p className="text-2xl Adine-Kirnberg text-_030326 absolute w-fit text-center">
                   {data}
                 </p>
               </label>
@@ -263,15 +263,15 @@ function SettingSignatureAndMFA({}: Props) {
                 <input
                   type="radio"
                   name="signature_font_type"
-                  value="signature_font_type_aguafinaScript"
+                  value="champignonaltswash"
                   onChange={handleFormOnChange}
                   checked={
                     form.signature_font_type ===
-                    "signature_font_type_aguafinaScript"
+                    "champignonaltswash"
                   }
                   className="appearance-none border border-_B6B6B6 checked:border-_1A73E8 rounded-md w-full h-12"
                 />
-                <p className="text-2xl font-aguafinaScript text-_030326 absolute w-fit text-center">
+                <p className="h-full champignonaltswash text-_030326 absolute w-fit text-center">
                   {data}
                 </p>
               </label>
@@ -279,15 +279,15 @@ function SettingSignatureAndMFA({}: Props) {
                 <input
                   type="radio"
                   name="signature_font_type"
-                  value="signature_font_type_architectsDaughter"
+                  value="FormalScript"
                   onChange={handleFormOnChange}
                   checked={
                     form.signature_font_type ===
-                    "signature_font_type_architectsDaughter"
+                    "FormalScript"
                   }
                   className="appearance-none border border-_B6B6B6 checked:border-_1A73E8 rounded-md w-full h-12"
                 />
-                <p className="text-lg font-architectsDaughter text-_030326 absolute w-fit text-center">
+                <p className="text-lg FormalScript text-_030326 absolute w-fit text-center">
                   {data}
                 </p>
               </label>
@@ -295,15 +295,15 @@ function SettingSignatureAndMFA({}: Props) {
                 <input
                   type="radio"
                   name="signature_font_type"
-                  value="signature_font_type_giveYouGlory"
+                  value="HerrVonMuellerhoff-Regular"
                   onChange={handleFormOnChange}
                   checked={
                     form.signature_font_type ===
-                    "signature_font_type_giveYouGlory"
+                    "HerrVonMuellerhoff-Regular"
                   }
                   className="appearance-none border border-_B6B6B6 checked:border-_1A73E8 rounded-md w-full h-12"
                 />
-                <p className="text-base font-giveYouGlory text-_030326 absolute w-fit text-center">
+                <p className="h-full HerrVonMuellerhoff-Regular text-_030326 absolute w-fit text-center">
                   {data}
                 </p>
               </label>
@@ -311,15 +311,15 @@ function SettingSignatureAndMFA({}: Props) {
                 <input
                   type="radio"
                   name="signature_font_type"
-                  value="signature_font_type_berkshireSwash"
+                  value="MrsSaintDelafield-Regular"
                   onChange={handleFormOnChange}
                   checked={
                     form.signature_font_type ===
-                    "signature_font_type_berkshireSwash"
+                    "MrsSaintDelafield-Regular"
                   }
                   className="appearance-none border border-_B6B6B6 checked:border-_1A73E8 rounded-md w-full h-12"
                 />
-                <p className="text-2xl font-berkshireSwash text-_030326 absolute w-fit text-center">
+                <p className="h-full MrsSaintDelafield-Regular text-_030326 absolute w-fit text-center">
                   {data}
                 </p>
               </label>
@@ -327,15 +327,15 @@ function SettingSignatureAndMFA({}: Props) {
                 <input
                   type="radio"
                   name="signature_font_type"
-                  value="signature_font_type_missFajardose"
+                  value="SCRIPTIN"
                   onChange={handleFormOnChange}
                   checked={
                     form.signature_font_type ===
-                    "signature_font_type_missFajardose"
+                    "SCRIPTIN"
                   }
                   className="appearance-none border border-_B6B6B6 checked:border-_1A73E8 rounded-md w-full h-12"
                 />
-                <p className="text-2xl font-missFajardose text-_030326 absolute w-fit text-center">
+                <p className="h-full SCRIPTIN text-_030326 absolute w-fit text-center">
                   {data}
                 </p>
               </label>
