@@ -2,7 +2,87 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url("https://fonts.googleapis.com/css2?family=Aguafina+Script&family=Allan&family=Architects+Daughter&family=Berkshire+Swash&family=Give+You+Glory&family=Miss+Fajardose&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap');
+
+@font-face {
+  font-family: Adine-Kirnberg;
+  src:
+      url("../public/fonts/Adine-Kirnberg.ttf");
+}
+
+@font-face {
+  font-family: champignonaltswash;
+  src:
+      url("../public/fonts/champignonaltswash.ttf");
+}
+
+@font-face {
+  font-family: FormalScript;
+  src:
+      url("../public/fonts/FormalScript.ttf");
+}
+
+@font-face {
+  font-family: HerrVonMuellerhoff-Regular;
+  src:
+      url("../public/fonts/HerrVonMuellerhoff-Regular.ttf");
+}
+
+@font-face {
+  font-family: MrsSaintDelafield-Regular;
+  src:
+      url("../public/fonts/MrsSaintDelafield-Regular.ttf");
+}
+
+@font-face {
+  font-family: SCRIPTIN;
+  src: url("../public/fonts/SCRIPTIN.ttf");
+}
+
+.font-poppins {
+  font-family: 'Poppins', sans-serif;
+}
+
+.Adine-Kirnberg {
+  font-family: Adine-Kirnberg;
+  font-size: 25px;
+  display: flex;
+  align-items: center;
+}
+
+.champignonaltswash {
+  font-family: champignonaltswash;
+  font-size: 25px;
+  display: flex;
+  align-items: center;
+}
+
+.FormalScript {
+  font-family: FormalScript;
+  font-size: 25px;
+  display: flex;
+  align-items: center;
+}
+
+.HerrVonMuellerhoff-Regular {
+  font-family: HerrVonMuellerhoff-Regular;
+  font-size: 25px;
+  display: flex;
+  align-items: center;
+}
+
+.MrsSaintDelafield-Regular {
+  font-family: MrsSaintDelafield-Regular;
+  font-size: 25px;
+  display: flex;
+  align-items: center;
+}
+
+.SCRIPTIN {
+  font-family: SCRIPTIN;
+  font-size: 25px;
+  align-items: center;
+}
 
 @layer components {
   .card-pin-form {
