@@ -55,6 +55,7 @@ const RevokeMekari = () => {
       toast.dismiss("generateAction");
       const msg = error.response?.data?.data?.errors?.[0];
       const status = error.response?.data?.data?.status;
+      const user = error.response?.data?.data?.user;
       if (msg) {
           toast.error(msg, {
             icon: <XIcon />,
@@ -63,7 +64,7 @@ const RevokeMekari = () => {
             if(routerQuery.redirect_url){
               setTimeout(() => {
                 const searchParams = new URLSearchParams(
-                  `${routerQuery.redirect_url}?status=Gagal&revoke_id=${routerQuery.revoke_id}&user_identifier=${routerQuery.user}`
+                  `${routerQuery.redirect_url}?status=Gagal&revoke_id=${routerQuery.revoke_id}${user ? `&user_identifier=${user}` : ''}`
                 )
                 window.top!.location.href = decodeURIComponent(
                   searchParams.toString()
@@ -74,7 +75,7 @@ const RevokeMekari = () => {
             if(routerQuery.redirect_url){
               setTimeout(() => {
                 const searchParams = new URLSearchParams(
-                  `${routerQuery.redirect_url}?status=Sukses&revoke_id=${routerQuery.revoke_id}&user_identifier=${routerQuery.user}`
+                  `${routerQuery.redirect_url}?status=Sukses&revoke_id=${routerQuery.revoke_id}${user ? `&user_identifier=${user}` : ''}`
                 )
                 window.top!.location.href = decodeURIComponent(
                   searchParams.toString()
