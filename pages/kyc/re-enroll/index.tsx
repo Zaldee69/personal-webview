@@ -9,8 +9,12 @@ import Loading from "@/components/Loading";
 import { assetPrefix } from "next.config";
 
 const ReEnrollMekari = () => {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   let [currentActionIndex, setCurrentActionIndex] = useState(0);
   const [failedMessage, setFailedMessage] = useState<string>("");
+  const [progress, setProgress] = useState(0);
+  const [isStepDone, setStepDone] = useState<boolean>(false)
+  const [isCameraLoaded, setIsCameraLoaded] = useState<boolean>(true)
 
   const router = useRouter();
   const routerQuery = router.query;
@@ -34,10 +38,14 @@ const ReEnrollMekari = () => {
           </div>
         ) : (
           <Camera
-            currentActionIndex={currentActionIndex}
-            setCurrentActionIndex={setCurrentActionIndex}
-            currentStep="Liveness Detection"
-            setFailedMessage={setFailedMessage}
+          currentActionIndex={currentActionIndex}
+          setCurrentActionIndex={setCurrentActionIndex}
+          currentStep="Liveness Detection"
+          setFailedMessage={setFailedMessage}
+          progress={progress}
+          setProgress={setProgress}
+          isCameraLoaded={isCameraLoaded}
+          setIsCameraLoaded={setIsCameraLoaded}
           />
         )}
         <div className="mt-5 flex justify-center">
