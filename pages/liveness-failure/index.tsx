@@ -1,3 +1,4 @@
+import { concateRedirectUrlParams } from "@/utils/concateRedirectUrlParams";
 import { handleRoute } from "@/utils/handleRoute";
 import { serverSideRenderReturnConditions } from "@/utils/serverSideRenderReturnConditions";
 import { RestKycCheckStep } from "infrastructure";
@@ -17,6 +18,11 @@ const LivenessFailure = () => {
     routerQuery.transaction_id ||
     routerQuery.request_id ||
     routerQuery.registration_id;
+  const params = {
+    status: "F",
+    register_id: uuid,
+  };
+  const queryString = new URLSearchParams(params as any).toString();
   return (
     <>
       <Head>
@@ -39,7 +45,10 @@ const LivenessFailure = () => {
             </p>
             {routerQuery.redirect_url && (
               <a
-                href={`${routerQuery.redirect_url}?status=F&register_id=${uuid}`}
+                href={concateRedirectUrlParams(
+                  routerQuery.redirect_url as string,
+                  queryString
+                )}
               >
                 <span className="text-center font-semibold font-poppins underline-offset-1	underline  text-primary">
                   Kembali ke Halaman Utama

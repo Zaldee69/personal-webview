@@ -9,6 +9,7 @@ import { GetServerSideProps } from "next";
 import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
 import { RestKycCheckStep } from "infrastructure";
 import { serverSideRenderReturnConditions } from "@/utils/serverSideRenderReturnConditions";
+import { concateRedirectUrlParams } from "@/utils/concateRedirectUrlParams";
 
 type Props = {};
 
@@ -55,7 +56,7 @@ const LinkAccountSuccess = (props: Props) => {
       </div>
       {!isSigning && routerQuery.redirect_url && (
         <div className="mt-20 text-primary text-base font-medium font-poppins underline hover:cursor-pointer">
-          <a href={routerQuery.redirect_url}>
+          <a href={concateRedirectUrlParams(routerQuery.redirect_url, "")}>
             <a>Kembali ke Halaman Utama</a>
           </a>
         </div>

@@ -1,4 +1,5 @@
 import PinFormComponent from "@/components/PinFormComponent";
+import { concateRedirectUrlParams } from "@/utils/concateRedirectUrlParams";
 import { handleRoute } from "@/utils/handleRoute";
 import { RestKycCheckStep, RestKycFinalForm } from "infrastructure";
 import { RestPersonalSetPassword } from "infrastructure/rest/personal";
@@ -85,11 +86,14 @@ const PinFormDedicatedChannel = (props: Props) => {
           if (res.success) {
             setIsConfirmMode(false);
             if (redirect_url) {
-              const searchParams = new URLSearchParams(
-                redirect_url + `?status=F&register_id=${registration_id}`
-              );
-              window.top!.location.href = decodeURIComponent(
-                searchParams.toString()
+              const params = {
+                register_id: registration_id,
+                status: "F",
+              };
+              const queryString = new URLSearchParams(params as any).toString();
+              window.top!.location.href = concateRedirectUrlParams(
+                redirect_url as string,
+                queryString
               );
             }
           } else {
@@ -117,15 +121,14 @@ const PinFormDedicatedChannel = (props: Props) => {
           if (res.success) {
             setIsConfirmMode(false);
             if (redirect_url) {
-              const searchParams = new URLSearchParams(
-                redirect_url + "?register_id=" + registration_id
-              );
-              // Set params
-              res.data.status &&
-                searchParams.set("status", `${res.data.status}`);
-              // Redirect topmost window
-              window.top!.location.href = decodeURIComponent(
-                searchParams.toString()
+              const params = {
+                register_id: registration_id,
+                status: res.data.status,
+              };
+              const queryString = new URLSearchParams(params as any).toString();
+              window.top!.location.href = concateRedirectUrlParams(
+                redirect_url as string,
+                queryString
               );
             }
           } else {
@@ -188,8 +191,16 @@ const PinFormDedicatedChannel = (props: Props) => {
             if (res.data.status === "F") {
               if (!res.data.pin_form) {
                 if (redirect_url) {
-                  window.top!.location.href = decodeURIComponent(
-                    redirect_url as string
+                  const params = {
+                    register_id: registration_id,
+                    status: res.data.status,
+                  };
+                  const queryString = new URLSearchParams(
+                    params as any
+                  ).toString();
+                  window.top!.location.href = concateRedirectUrlParams(
+                    redirect_url as string,
+                    queryString
                   );
                 } else {
                   router.push({
@@ -222,8 +233,9 @@ const PinFormDedicatedChannel = (props: Props) => {
             };
             const queryString = new URLSearchParams(params as any).toString();
             if (redirect_url) {
-              window.top!.location.href = decodeURIComponent(
-                redirect_url + "?" + queryString
+              window.top!.location.href = concateRedirectUrlParams(
+                redirect_url as string,
+                queryString
               );
             } else {
               setPinError({

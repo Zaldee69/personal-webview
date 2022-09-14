@@ -20,6 +20,7 @@ import ProgressStepBar from "../../components/ProgressStepBar";
 import { resetImages, setActionList } from "@/redux/slices/livenessSlice";
 import { handleRoute } from "@/utils/handleRoute";
 import { assetPrefix } from "../../next.config";
+import { concateRedirectUrlParams } from "@/utils/concateRedirectUrlParams";
 
 const Liveness = () => {
   const router = useRouter();
@@ -96,8 +97,9 @@ const Liveness = () => {
             };
             const queryString = new URLSearchParams(params as any).toString();
             if (routerQuery.redirect_url) {
-              window.top!.location.href = decodeURIComponent(
-                routerQuery.redirect_url + "?" + queryString
+              window.top!.location.href = concateRedirectUrlParams(
+                routerQuery.redirect_url as string,
+                queryString
               );
             } else {
               toast.success(res?.message || "pengecekan step berhasil", {
@@ -183,12 +185,14 @@ const Liveness = () => {
               res.data.pin_form &&
               routerQuery.redirect_url
             ) {
-              const searchParams = new URLSearchParams(
-                routerQuery.redirect_url +
-                  `?status=${res.data.status}&register_id=${router.query.request_id}`
-              );
-              window.top!.location.href = decodeURIComponent(
-                searchParams.toString()
+              const params = {
+                status: res.data.status,
+                register_id: routerQuery.request_id,
+              };
+              const queryString = new URLSearchParams(params as any).toString();
+              window.top!.location.href = concateRedirectUrlParams(
+                routerQuery.redirect_url as string,
+                queryString
               );
             } else {
               router.push({
@@ -310,12 +314,16 @@ const Liveness = () => {
               );
               setTimeout(() => {
                 if (result.data.pin_form && routerQuery.redirect_url) {
-                  const searchParams = new URLSearchParams(
-                    routerQuery.redirect_url +
-                      `?status=${status}&register_id=${router.query.request_id}`
-                  );
-                  window.top!.location.href = decodeURIComponent(
-                    searchParams.toString()
+                  const params = {
+                    status: status,
+                    register_id: routerQuery.request_id,
+                  };
+                  const queryString = new URLSearchParams(
+                    params as any
+                  ).toString();
+                  window.top!.location.href = concateRedirectUrlParams(
+                    routerQuery.redirect_url as string,
+                    queryString
                   );
                 } else {
                   router.push({

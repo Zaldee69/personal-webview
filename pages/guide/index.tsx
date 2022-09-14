@@ -8,6 +8,7 @@ import { RestKycCheckStep } from "infrastructure";
 import { toast } from "react-toastify";
 import CheckOvalIcon from "@/public/icons/CheckOvalIcon";
 import XIcon from "@/public/icons/XIcon";
+import { concateRedirectUrlParams } from "@/utils/concateRedirectUrlParams";
 
 const Guide = () => {
   const router = useRouter();
@@ -55,8 +56,14 @@ const Guide = () => {
               res.data.pin_form &&
               restRouterQuery.redirect_url
             ) {
-              window.top!.location.href = decodeURIComponent(
-                restRouterQuery.redirect_url as string
+              const params = {
+                register_id: request_id,
+                status: res.data.status,
+              };
+              const queryString = new URLSearchParams(params as any).toString();
+              window.top!.location.href = concateRedirectUrlParams(
+                restRouterQuery.redirect_url as string,
+                queryString
               );
             } else {
               router.push({
@@ -72,8 +79,9 @@ const Guide = () => {
             };
             const queryString = new URLSearchParams(params as any).toString();
             if (restRouterQuery.redirect_url) {
-              window.top!.location.href = decodeURIComponent(
-                restRouterQuery.redirect_url + "?" + queryString
+              window.top!.location.href = concateRedirectUrlParams(
+                restRouterQuery.redirect_url as string,
+                queryString
               );
             } else {
               toast.success(res?.message || "pengecekan step berhasil", {

@@ -1,4 +1,5 @@
 import PinFormComponent from "@/components/PinFormComponent";
+import { concateRedirectUrlParams } from "@/utils/concateRedirectUrlParams";
 import { RestPersonalResetPassword } from "infrastructure/rest/personal";
 import { NextParsedUrlQuery } from "next/dist/server/request-meta";
 import { useRouter } from "next/router";
@@ -50,8 +51,14 @@ const PinFormDedicatedChannel = (props: Props) => {
     setPinConfirmError({ isError: false, message: "" });
   };
   const onClickCancel = (_: React.SyntheticEvent) => {
-    const searchParams = new URLSearchParams(redirect_url + "?status=Cancel");
-    window.top!.location.href = decodeURIComponent(searchParams.toString());
+    const params = {
+      status: "Cancel",
+    };
+    const queryString = new URLSearchParams(params as any).toString();
+    window.top!.location.href = concateRedirectUrlParams(
+      redirect_url as string,
+      queryString
+    );
   };
   const onClickBack = (_: React.SyntheticEvent) => {
     setPin("");
@@ -84,11 +91,14 @@ const PinFormDedicatedChannel = (props: Props) => {
         if (res.success) {
           setIsConfirmMode(false);
           if (redirect_url) {
-            const searchParams = new URLSearchParams(
-              `${redirect_url}?user_identifier=${res.data?.[1]}&status=${res.data?.[0]}`
-            );
-            window.top!.location.href = decodeURIComponent(
-              searchParams.toString()
+            const params = {
+              user_identifier: res.data?.[1],
+              status: res.data?.[0],
+            };
+            const queryString = new URLSearchParams(params as any).toString();
+            window.top!.location.href = concateRedirectUrlParams(
+              redirect_url as string,
+              queryString
             );
           }
         } else {

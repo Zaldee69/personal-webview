@@ -1,4 +1,5 @@
 import PinFormComponent from "@/components/PinFormComponent";
+import { concateRedirectUrlParams } from "@/utils/concateRedirectUrlParams";
 import {
   RestPersonalChangePassword,
   RestPersonalRequestChangePassword,
@@ -70,9 +71,14 @@ const ChangePinDedicatedChannel = (props: Props) => {
     setIsConfirmMode(false);
   };
   const onClickCancel = (_: React.SyntheticEvent) => {
-    const searchParams = new URLSearchParams(redirect_url + "?status=Cancel");
-    // Redirect topmost window
-    window.top!.location.href = decodeURIComponent(searchParams.toString());
+    const params = {
+      status: "Cancel",
+    };
+    const queryString = new URLSearchParams(params as any).toString();
+    window.top!.location.href = concateRedirectUrlParams(
+      redirect_url as string,
+      queryString
+    );
   };
   const submitFormConfirmCallback = (pinConfirm: string) => {
     if (pin !== pinConfirm) {
@@ -97,11 +103,15 @@ const ChangePinDedicatedChannel = (props: Props) => {
         if (res.success) {
           setIsConfirmMode(false);
           if (redirect_url) {
-            const searchParams = new URLSearchParams(
-              `${redirect_url}?user_identifier=${res?.data?.[2]}&request_id=${res?.data?.[1]}&status=${res?.data?.[0]}`
-            );
-            window.top!.location.href = decodeURIComponent(
-              searchParams.toString()
+            const params = {
+              user_identifier: res?.data?.[2],
+              request_id: res?.data?.[1],
+              status: res?.data?.[0],
+            };
+            const queryString = new URLSearchParams(params as any).toString();
+            window.top!.location.href = concateRedirectUrlParams(
+              redirect_url as string,
+              queryString
             );
           }
         } else {
@@ -146,12 +156,15 @@ const ChangePinDedicatedChannel = (props: Props) => {
             });
           }
           if (res?.data !== null && redirect_url) {
-            const searchParams = new URLSearchParams(
-              redirect_url +
-                `?user_identifier=${res?.data?.[2]}&request_id=${res?.data?.[1]}&status=${res?.data?.[0]}`
-            );
-            window.top!.location.href = decodeURIComponent(
-              searchParams.toString()
+            const params = {
+              user_identifier: res?.data?.[2],
+              request_id: res?.data?.[1],
+              status: res?.data?.[0],
+            };
+            const queryString = new URLSearchParams(params as any).toString();
+            window.top!.location.href = concateRedirectUrlParams(
+              redirect_url as string,
+              queryString
             );
           }
         }

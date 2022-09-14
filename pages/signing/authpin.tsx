@@ -4,6 +4,7 @@ import { NextParsedUrlQuery } from "next/dist/server/request-meta";
 import { useRouter } from "next/router";
 import { toast } from "react-toastify";
 import React, { useEffect, useState } from "react";
+import { concateRedirectUrlParams } from "@/utils/concateRedirectUrlParams";
 
 type Props = {};
 
@@ -53,11 +54,15 @@ const AuthPinForm = (props: Props) => {
           });
           setIsRequestCheckStatus(false);
           if (redirect_url) {
-            const searchParams = new URLSearchParams(
-              `${redirect_url}?user_identifier=${user}&signing_id=${id}&status=Sukses`
-            );
-            window.top!.location.href = decodeURIComponent(
-              searchParams.toString()
+            const params = {
+              user_identifier: user,
+              signing_id: id,
+              status: "Sukses",
+            };
+            const queryString = new URLSearchParams(params as any).toString();
+            window.top!.location.href = concateRedirectUrlParams(
+              redirect_url as string,
+              queryString
             );
           }
         } else {
@@ -70,12 +75,16 @@ const AuthPinForm = (props: Props) => {
               "penandatanganan dokumen gagal. pin sudah salah 3 kali" &&
             redirect_url
           ) {
-            const searchParams = new URLSearchParams(
-              `${redirect_url}?user_identifier=${user}&signing_id=${id}&status=Blocked`
-            );
+            const params = {
+              user_identifier: user,
+              signing_id: id,
+              status: "Blocked",
+            };
+            const queryString = new URLSearchParams(params as any).toString();
             setTimeout(() => {
-              window.top!.location.href = decodeURIComponent(
-                searchParams.toString()
+              window.top!.location.href = concateRedirectUrlParams(
+                redirect_url as string,
+                queryString
               );
             }, 2000);
           }
