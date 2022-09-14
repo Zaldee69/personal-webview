@@ -9,13 +9,17 @@ import { Fragment, useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Loading from "@/components/Loading";
 import { assetPrefix } from "next.config";
-import { actionText } from "@/utils/actionText"
+import { actionText } from "@/utils/actionText";
 import { AppDispatch, RootState } from "@/redux/app/store";
 import { useDispatch, useSelector } from "react-redux";
-import { RestKycGenerateRevokeAction, RestKycVerificationRevoke } from "../../../infrastructure";
+import {
+  RestKycGenerateRevokeAction,
+  RestKycVerificationRevoke,
+} from "../../../infrastructure";
 import { resetImages, setActionList } from "@/redux/slices/livenessSlice";
 import { TKycVerificationRevokeRequestData } from "infrastructure/rest/kyc/types";
 import { handleRoute } from "@/utils/handleRoute";
+import { concateRedirectUrlParams } from "@/utils/concateRedirectUrlParams";
 
 const RevokeMekari = () => {
   let [currentActionIndex, setCurrentActionIndex] = useState(0);
@@ -39,60 +43,70 @@ const RevokeMekari = () => {
   const generateAction = () => {
     const body = {
       revokeId: routerQuery.revoke_id as string,
-    }
+    };
     RestKycGenerateRevokeAction(body)
-    .then((result) => {
-      if (result?.data) {
-        const payload = ["look_straight"].concat(
-          result.data.actionList
-        );
-        dispatch(setActionList(payload));
-      } else {
-        throw new Error(result.message);
-      }
-    })
-    .catch((error) => {
-      toast.dismiss("generateAction");
-      const msg = error.response?.data?.data?.errors?.[0];
-      const status = error.response?.data?.data?.status;
-      const user = error.response?.data?.data?.user;
-      if (msg) {
+      .then((result) => {
+        if (result?.data) {
+          const payload = ["look_straight"].concat(result.data.actionList);
+          dispatch(setActionList(payload));
+        } else {
+          throw new Error(result.message);
+        }
+      })
+      .catch((error) => {
+        toast.dismiss("generateAction");
+        const msg = error.response?.data?.data?.errors?.[0];
+        const status = error.response?.data?.data?.status;
+        const user = error.response?.data?.data?.user;
+        if (msg) {
           toast.error(msg, {
             icon: <XIcon />,
           });
-          if(status === "F"){
-            if(routerQuery.redirect_url){
+          if (status === "F") {
+            if (routerQuery.redirect_url) {
               setTimeout(() => {
-                const searchParams = new URLSearchParams(
-                  `${routerQuery.redirect_url}?status=Gagal&revoke_id=${routerQuery.revoke_id}${user ? `&user_identifier=${user}` : ''}`
-                )
-                window.top!.location.href = decodeURIComponent(
-                  searchParams.toString()
+                const params = {
+                  status: "Gagal",
+                  revoke_id: routerQuery.revoke_id,
+                  user_identifier: user ? user : "",
+                };
+                const queryString = new URLSearchParams(
+                  params as any
+                ).toString();
+                window.top!.location.href = concateRedirectUrlParams(
+                  routerQuery.redirect_url as string,
+                  queryString
                 );
-              }, 3000)
+              }, 3000);
             }
-          } else if (status === "S"){
-            if(routerQuery.redirect_url){
+          } else if (status === "S") {
+            if (routerQuery.redirect_url) {
               setTimeout(() => {
-                const searchParams = new URLSearchParams(
-                  `${routerQuery.redirect_url}?status=Sukses&revoke_id=${routerQuery.revoke_id}${user ? `&user_identifier=${user}` : ''}`
-                )
-                window.top!.location.href = decodeURIComponent(
-                  searchParams.toString()
+                const params = {
+                  status: "Sukses",
+                  revoke_id: routerQuery.revoke_id,
+                  user_identifier: user ? user : "",
+                };
+                const queryString = new URLSearchParams(
+                  params as any
+                ).toString();
+                window.top!.location.href = concateRedirectUrlParams(
+                  routerQuery.redirect_url as string,
+                  queryString
                 );
-              }, 3000)
+              }, 3000);
             }
           }
-      } else {
-        toast.error(
-          error.response?.data?.message || "Generate Action gagal",
-          {
-            icon: <XIcon />,
-          }
-        );
-      }
-    });
-  }
+        } else {
+          toast.error(
+            error.response?.data?.message || "Generate Action gagal",
+            {
+              icon: <XIcon />,
+            }
+          );
+        }
+      });
+  };
 
   const verifyLiveness = async () => {
     toast(`Mengecek status...`, {
@@ -111,12 +125,12 @@ const RevokeMekari = () => {
       };
 
       const imageActions = images.filter(
-        (image) =>
-          image.action !== "look_straight"
+        (image) => image.action !== "look_straight"
       );
       imageActions.forEach((image, index) => {
-        body[`image_action${++index}` as keyof TKycVerificationRevokeRequestData] =
-          image.value;
+        body[
+          `image_action${++index}` as keyof TKycVerificationRevokeRequestData
+        ] = image.value;
       });
       const imageSelfie = images.filter(
         (image) => image.action === "look_straight"
@@ -124,61 +138,67 @@ const RevokeMekari = () => {
 
       body.image_selfie = imageSelfie.value;
 
-      const result = await RestKycVerificationRevoke(body)
-      if(result.success) {
-        toast.dismiss("verification")
-        removeStorage()
-        if(routerQuery.redirect_url){
+      const result = await RestKycVerificationRevoke(body);
+      if (result.success) {
+        toast.dismiss("verification");
+        removeStorage();
+        if (routerQuery.redirect_url) {
           setTimeout(() => {
-            const searchParams = new URLSearchParams(
-              `${routerQuery.redirect_url}?status=Sukses&revoke_id=${routerQuery.revoke_id}&user_identifier=${result.data.user}`
-            )
-            window.top!.location.href = decodeURIComponent(
-              searchParams.toString()
+            const params = {
+              status: "Sukses",
+              revoke_id: routerQuery.revoke_id,
+              user_identifier: result.data.user,
+            };
+            const queryString = new URLSearchParams(params as any).toString();
+            window.top!.location.href = concateRedirectUrlParams(
+              routerQuery.redirect_url as string,
+              queryString
             );
-          }, 3000)
+          }, 3000);
         }
       } else {
-        toast.dismiss('verification')
-        if(result.data.status === "F") {
-          if(routerQuery.redirect_url){
+        toast.dismiss("verification");
+        if (result.data.status === "F") {
+          if (routerQuery.redirect_url) {
             setTimeout(() => {
-              const searchParams = new URLSearchParams(
-                `${routerQuery.redirect_url}?status=Gagal&revoke_id=${routerQuery.revoke_id}&user_identifier=${result.data.user}`
-              )
-              window.top!.location.href = decodeURIComponent(
-                searchParams.toString()
+              const params = {
+                status: "Gagal",
+                revoke_id: routerQuery.revoke_id,
+                user_identifier: result.data.user,
+              };
+              const queryString = new URLSearchParams(params as any).toString();
+
+              window.top!.location.href = concateRedirectUrlParams(
+                routerQuery.redirect_url as string,
+                queryString
               );
-            }, 3000)
+            }, 3000);
           }
         } else {
           router.push({
-            pathname: handleRoute(assetPrefix ? "liveness-fail" : "/liveness-fail"),
+            pathname: handleRoute(
+              assetPrefix ? "liveness-fail" : "/liveness-fail"
+            ),
             query: {
               ...routerQuery,
             },
           });
         }
-
       }
     } catch (e: any) {
-        toast.dismiss("verification")
-        const msg = e.response?.data?.data?.errors?.[0];
-        if (msg) {
-            toast.error(msg, {
-              icon: <XIcon />,
-            });
-        } else {
-          toast.error(
-            e.response?.data?.message || "Verifikasi gagal",
-            {
-              icon: <XIcon />,
-            }
-          );
-        }
-      
+      toast.dismiss("verification");
+      const msg = e.response?.data?.data?.errors?.[0];
+      if (msg) {
+        toast.error(msg, {
+          icon: <XIcon />,
+        });
+      } else {
+        toast.error(e.response?.data?.message || "Verifikasi gagal", {
+          icon: <XIcon />,
+        });
+      }
     }
-  }
+  };
 
   const removeStorage = () => {
     localStorage.removeItem("cert-revoke-token");
@@ -194,7 +214,6 @@ const RevokeMekari = () => {
     generateAction();
     dispatch(resetImages());
   }, [router.isReady]);
-  
 
   return (
     <Fragment>

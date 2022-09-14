@@ -2,6 +2,7 @@ import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
 import { GetServerSidePropsContext, PreviewData } from "next";
 import { assetPrefix } from "next.config";
 import { ParsedUrlQuery } from "querystring";
+import { concateRedirectUrlParams } from "./concateRedirectUrlParams";
 import { handleRoute } from "./handleRoute";
 
 interface IserverSideRenderReturnConditions {
@@ -116,7 +117,10 @@ export const serverSideRenderReturnConditions = ({
           return {
             redirect: {
               permanent: false,
-              destination: `${cQuery.redirect_url}?status=${checkStepResult.res.data.status}&register_id=${uuid}`,
+              destination: concateRedirectUrlParams(
+                cQuery.redirect_url as string,
+                `status=${checkStepResult.res.data.status}%26register_id=${uuid}`
+              ),
             },
             props: {},
           };
@@ -149,7 +153,10 @@ export const serverSideRenderReturnConditions = ({
           return {
             redirect: {
               permanent: false,
-              destination: cQuery.redirect_url + "?" + queryString,
+              destination: concateRedirectUrlParams(
+                cQuery.redirect_url as string,
+                queryString
+              ),
             },
             props: {},
           };

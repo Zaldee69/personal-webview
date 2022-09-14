@@ -1,3 +1,4 @@
+import { concateRedirectUrlParams } from "@/utils/concateRedirectUrlParams";
 import { serverSideRenderReturnConditions } from "@/utils/serverSideRenderReturnConditions";
 import { RestKycCheckStep } from "infrastructure";
 import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
@@ -36,7 +37,12 @@ const FormSuccess = (props: Props) => {
       </div>
       <div className="mt-20 text-primary text-base font-medium font-poppins underline hover:cursor-pointer">
         {routerQuery.redirect_url && (
-          <a href={routerQuery.redirect_url as string}>
+          <a
+            href={concateRedirectUrlParams(
+              routerQuery.redirect_url as string,
+              ""
+            )}
+          >
             Kembali ke Halaman Utama
           </a>
         )}

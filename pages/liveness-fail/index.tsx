@@ -13,6 +13,7 @@ import { GetServerSideProps } from "next";
 import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
 import { RestKycCheckStep } from "infrastructure";
 import { serverSideRenderReturnConditions } from "@/utils/serverSideRenderReturnConditions";
+import { concateRedirectUrlParams } from "@/utils/concateRedirectUrlParams";
 
 const LivenessFail = () => {
   const router = useRouter();
@@ -23,7 +24,9 @@ const LivenessFail = () => {
     setGagalCounter(0);
     sessionStorage.removeItem("tlk-counter");
     if (router.query.redirect_url) {
-      window.location.replace(router.query.redirect_url as string);
+      window.location.replace(
+        concateRedirectUrlParams(router.query.redirect_url as string, "")
+      );
     } else {
       router.replace({
         pathname: handleRoute("/"),
@@ -55,7 +58,12 @@ const LivenessFail = () => {
     } else {
       return (
         <Link
-          href={{ pathname: router.query.revoke_id ? handleRoute('/kyc/revoke') : handleRoute(`/guide`), query: { ...router.query } }}
+          href={{
+            pathname: router.query.revoke_id
+              ? handleRoute("/kyc/revoke")
+              : handleRoute(`/guide`),
+            query: { ...router.query },
+          }}
         >
           <button className="bg-primary btn md:mx-auto md:block md:w-1/4 text-white font-poppins w-full mx-auto rounded-sm h-9">
             ULANGI

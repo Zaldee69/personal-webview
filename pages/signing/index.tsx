@@ -25,6 +25,7 @@ import { GetServerSideProps } from "next";
 import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
 import { RestKycCheckStep } from "infrastructure";
 import { serverSideRenderReturnConditions } from "@/utils/serverSideRenderReturnConditions";
+import { concateRedirectUrlParams } from "@/utils/concateRedirectUrlParams";
 
 type TFontSig =
   | "Adine-Kirnberg"
@@ -67,7 +68,7 @@ const Signing = () => {
         getDocument({
           company_id,
           transaction_id: (request_id as string) || (transaction_id as string),
-          token
+          token,
         } as TDocumentProps)
       );
       if (res.response.status === "REJECTED") {
@@ -252,7 +253,12 @@ const FRModal: React.FC<Active | any> = ({ modal, setModal }) => {
                 setModal(!modal);
                 setIsFRSuccess(false);
                 if (routerQuery.redirect_url) {
-                  window.location.replace(routerQuery.redirect_url as string);
+                  window.location.replace(
+                    concateRedirectUrlParams(
+                      routerQuery.redirect_url as string,
+                      ""
+                    )
+                  );
                 }
               }}
               className="bg-primary btn  text-white font-poppins w-full mt-5 mx-auto rounded-sm h-9"
@@ -284,9 +290,7 @@ const FRModal: React.FC<Active | any> = ({ modal, setModal }) => {
 
 const ChooseFontModal: React.FC<Active> = ({ modal, setModal, tilakaName }) => {
   const dispatch: AppDispatch = useDispatch();
-  const [form, formSetter] = useState<TFontSig | string>(
-    "champignonaltswash"
-  );
+  const [form, formSetter] = useState<TFontSig | string>("champignonaltswash");
   const [sig, setSig] = useState<any>();
   const handleFormOnChange = (e: React.FormEvent<HTMLInputElement>): void => {
     formSetter(e.currentTarget.value);
@@ -567,7 +571,10 @@ const OTPModal: React.FC<Active> = ({ modal, setModal }) => {
                 setModal(false);
                 if (restRouterQuery.redirect_url) {
                   window.location.replace(
-                    restRouterQuery.redirect_url as string
+                    concateRedirectUrlParams(
+                      restRouterQuery.redirect_url as string,
+                      ""
+                    )
                   );
                 }
               }}

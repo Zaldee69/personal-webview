@@ -12,6 +12,7 @@ import XIcon from "@/public/icons/XIcon";
 import CheckOvalIcon from "@/public/icons/CheckOvalIcon";
 import { assetPrefix } from "../../next.config";
 import { handleRoute } from "@/utils/handleRoute";
+import { concateRedirectUrlParams } from "@/utils/concateRedirectUrlParams";
 interface InputType {
   password: string | number;
   confirmPassword: string | number;
@@ -222,8 +223,9 @@ const Form: React.FC = () => {
               res.data.pin_form &&
               restRouterQuery.redirect_url
             ) {
-              window.top!.location.href = decodeURIComponent(
-                restRouterQuery.redirect_url as string
+              window.top!.location.href = concateRedirectUrlParams(
+                restRouterQuery.redirect_url as string,
+                ""
               );
             } else {
               router.push({
@@ -239,8 +241,9 @@ const Form: React.FC = () => {
             };
             const queryString = new URLSearchParams(params as any).toString();
             if (restRouterQuery.redirect_url) {
-              window.top!.location.href = decodeURIComponent(
-                restRouterQuery.redirect_url + "?" + queryString
+              window.top!.location.href = concateRedirectUrlParams(
+                restRouterQuery.redirect_url as string,
+                queryString
               );
             } else {
               toast.success(res?.message || "pengecekan step berhasil", {
