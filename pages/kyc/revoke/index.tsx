@@ -19,11 +19,16 @@ import {
 import { resetImages, setActionList } from "@/redux/slices/livenessSlice";
 import { TKycVerificationRevokeRequestData } from "infrastructure/rest/kyc/types";
 import { handleRoute } from "@/utils/handleRoute";
+import SkeletonLoading from "@/components/SkeletonLoading";
 import { concateRedirectUrlParams } from "@/utils/concateRedirectUrlParams";
 
 const RevokeMekari = () => {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   let [currentActionIndex, setCurrentActionIndex] = useState(0);
   const [failedMessage, setFailedMessage] = useState<string>("");
+  const [progress, setProgress] = useState(0);
+  const [isStepDone, setStepDone] = useState<boolean>(false)
+  const [isCameraLoaded, setIsCameraLoaded] = useState<boolean>(true)
 
   const actionList = useSelector(
     (state: RootState) => state.liveness.actionList
@@ -31,14 +36,35 @@ const RevokeMekari = () => {
   const images = useSelector((state: RootState) => state.liveness.images);
   const isDone = useSelector((state: RootState) => state.liveness.isDone);
 
+  const currentIndex =
+    actionList[currentActionIndex] === "look_straight"
+      ? "hadap-depan"
+      : actionList[currentActionIndex] === "mouth_open"
+      ? "buka-mulut"
+      : actionList[currentActionIndex] === "blink"
+      ? "pejam"
+      : "hadap-depan";
+
   const router = useRouter();
   const routerQuery = router.query;
-  const subTtile: string =
-    routerQuery.status === "done"
+  const subtitle: string =
+      isLoading
       ? "Terima kasih telah mengikuti proses Liveness. Hasil dinilai berdasarkan keaslian serta kesesuaian foto dengan aksi yang diminta."
       : "Pastikan wajah di dalam garis panduan dan ikuti petunjuk dengan benar";
 
   const dispatch: AppDispatch = useDispatch();
+
+  useEffect(() => {
+    const track: any = document.querySelector(".track");
+    if(progress === 100){
+      track?.classList?.add("white-stroke")
+      setTimeout(() => {
+        setStepDone(true)
+        track?.classList?.remove("white-stroke")
+      }, 2000)
+    }
+    
+  }, [progress])
 
   const generateAction = () => {
     const body = {
@@ -109,13 +135,8 @@ const RevokeMekari = () => {
   };
 
   const verifyLiveness = async () => {
-    toast(`Mengecek status...`, {
-      type: "info",
-      toastId: "verification",
-      isLoading: true,
-      position: "top-center",
-    });
 
+    setIsLoading(true)
     setFailedMessage("");
 
     try {
@@ -157,9 +178,10 @@ const RevokeMekari = () => {
           }, 3000);
         }
       } else {
-        toast.dismiss("verification");
-        if (result.data.status === "F") {
-          if (routerQuery.redirect_url) {
+        toast.dismiss('verification')
+        if(result.data.status === "F") {
+          setIsLoading(false);
+          if(routerQuery.redirect_url){
             setTimeout(() => {
               const params = {
                 status: "Gagal",
@@ -186,19 +208,24 @@ const RevokeMekari = () => {
         }
       }
     } catch (e: any) {
-      toast.dismiss("verification");
-      const msg = e.response?.data?.data?.errors?.[0];
-      if (msg) {
-        toast.error(msg, {
-          icon: <XIcon />,
-        });
-      } else {
-        toast.error(e.response?.data?.message || "Verifikasi gagal", {
-          icon: <XIcon />,
-        });
-      }
+      setIsLoading(false);
+        toast.dismiss("verification")
+        const msg = e.response?.data?.data?.errors?.[0];
+        if (msg) {
+            toast.error(msg, {
+              icon: <XIcon />,
+            });
+        } else {
+          toast.error(
+            e.response?.data?.message || "Verifikasi gagal",
+            {
+              icon: <XIcon />,
+            }
+          );
+        }
+      
     }
-  };
+  }
 
   const removeStorage = () => {
     localStorage.removeItem("cert-revoke-token");
@@ -215,71 +242,110 @@ const RevokeMekari = () => {
     dispatch(resetImages());
   }, [router.isReady]);
 
+  console.log(actionList[currentActionIndex])
+  
+
   return (
-    <Fragment>
-      <Head>
-        <title>Liveness</title>
-        <meta name="viewport" content="initial-scale=1.0, width=device-width" />
-      </Head>
-      <div className="py-10 max-w-sm mx-auto px-2">
-        <h1 className="font-poppins font-semibold mb-3 ">Liveness</h1>
-        <span className="font-poppins text-sm ">{subTtile}</span>
-        {routerQuery.status === "done" ? (
-          <div className="mt-10 rounded-md h-[250px] flex justify-center items-center sm:w-full md:w-full">
-            <Loading title="Please Wait" />
+    <>
+    <Head>
+      <title>Liveness</title>
+      <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+    </Head>
+    <div className="py-10 max-w-sm mx-auto px-2">
+    <h2 className="font-poppins text-xl font-semibold">
+      { isCameraLoaded ?  <SkeletonLoading width="w-2/5" /> : "Liveness" }
+    </h2>
+      <span className="font-poppins text-sm mt-5 block">
+        { isCameraLoaded ? <SkeletonLoading width="w-full" isDouble /> : subtitle }
+      </span>
+      {
+        isLoading ? (
+          <div className="mt-5 rounded-md h-[350px] flex justify-center items-center sm:w-full md:w-full">
+            <Loading title="Mohon menunggu" />
           </div>
         ) : (
-          <Camera
-            currentActionIndex={currentActionIndex}
-            setCurrentActionIndex={setCurrentActionIndex}
-            currentStep="Liveness Detection"
-            setFailedMessage={setFailedMessage}
+          <div className="relative" >
+                <div className={`rounded-md ${!isCameraLoaded && "hidden"} z-[9999] ease-in duration-300 absolute bg-[#E6E6E6] w-full h-[350px] flex justify-center items-center`}>
+                  <Loading title="Mohon menunggu" />
+                </div>
+                <Camera
+                 currentActionIndex={currentActionIndex}
+                 setCurrentActionIndex={setCurrentActionIndex}
+                 currentStep="Liveness Detection"
+                 setFailedMessage={setFailedMessage}
+                 progress={progress}
+                 setProgress={setProgress}
+                 isCameraLoaded={isCameraLoaded}
+                 setIsCameraLoaded={setIsCameraLoaded}
+               />
+          </div>
+        )
+      }
+      {
+        !isStepDone && actionList.length > 1 ? (
+          <>
+            <div className="mt-5 flex justify-center">
+              {!isCameraLoaded && (
+                <Image
+                  src={`${assetPrefix}/images/${isStepDone ? "hadap-depan" : currentIndex}.svg`}
+                  width={50}
+                  height={50}
+                  alt="1"
+                />
+              )}
+            </div>
+            <div className="flex items-center justify-center mt-5 flex-col">
+              <span className={` ${isCameraLoaded && "mt-14" } font-poppins w-full text-center font-medium`}>{ isCameraLoaded ? <SkeletonLoading width="w-full" /> : "Wajah menghadap depan"}</span>
+            <span className="text-center font-poppins text-sm w-full mt-7 text-neutral">
+                  { isCameraLoaded ? <SkeletonLoading width="w-full" isDouble /> : "Mohon jangan bergerak selama proses pengambilan wajah"}
+               </span>
+            </div>
+          </> ) : (
+          <div>
+            {
+              !isLoading && (
+                <>
+                  <div className="mt-5 flex justify-center">
+                    {actionList.length === 2 && (
+                      <Image
+                        src={`${assetPrefix}/images/${isStepDone ? "hadap-depan" : currentIndex}.svg`}
+                        width={50}
+                        height={50}
+                        alt="2"
+                      />
+                    )}
+                  </div>
+                  <div className="flex items-center justify-center mt-5 flex-col">
+                    <span className="font-poppins font-medium">{actionText(actionList[currentActionIndex])}</span>
+                    {failedMessage ? (
+                      <span className="text-center font-poppins text-sm mt-7 text-red300">
+                        {failedMessage}
+                      </span>
+                    ) : (
+                      <span className="text-center font-poppins text-sm mt-7 text-neutral">
+                        {actionList.length > 1 && "Mohon jangan bergerak selama proses pengambilan wajah"}
+                      </span>
+                    )}
+                  </div>
+                </>
+              )
+            }
+            </div>
+          )
+      }
+      {
+        isCameraLoaded ? (
+          <div className="w-2/5 h-[5px] mx-auto mt-10 border-b-2 border-[#E6E6E6] " ></div>
+        ) : (
+          <ProgressStepBar
+            actionList={actionList}
+            currentActionIndex={isStepDone ? currentActionIndex : 0}
           />
-        )}
-        <div className="mt-5 flex justify-center">
-          {routerQuery.status !== "done" && (
-            <Image
-              src={`${assetPrefix}/images/hadap-depan.svg`}
-              width={50}
-              height={50}
-              alt="action"
-            />
-          )}
-          {/* {
-            actionList.length === 2 && (
-              <Image src={`${assetPrefix}/images/${currentIndex}.svg`} width={50} height={50} />
-            )
-          } */}
-        </div>
-        <div className="flex items-center justify-center mt-5 flex-col">
-          <span
-            className={`font-poppins font-medium ${
-              routerQuery.status === "done" ? "hidden" : null
-            }`}
-          >
-            {actionText(actionList[currentActionIndex])}
-          </span>
-          {failedMessage ? (
-            <span className="text-center font-poppins text-sm mt-7 text-red300">
-              {failedMessage}
-            </span>
-          ) : (
-            <span
-              className={`text-center font-poppins text-sm mt-7 text-neutral ${
-                routerQuery.status === "done" ? "hidden" : null
-              }`}
-            >
-              Mohon jangan bergerak selama proses pengambilan wajah
-            </span>
-          )}
-        </div>
-        <ProgressStepBar
-          actionList={actionList}
-          currentActionIndex={currentActionIndex}
-        />
-        <Footer />
-      </div>
-    </Fragment>
+        )
+      }
+      <Footer />
+    </div>
+  </>
   );
 };
 

@@ -6,12 +6,19 @@ import { assetPrefix } from '../next.config'
 import { AppDispatch, RootState } from "@/redux/app/store";
 import CircularProgressBar from "./CircularProgressBar";
 import { setImages, setIsDone } from "@/redux/slices/livenessSlice";
+import openMouthHandler from "@/utils/openMouthHandler";
+import blinkHandler from "@/utils/blinkHandler";
+import lookLeftHandler from "@/utils/lookLeftHandler";
+import lookRightHandler from "@/utils/lookRightHandler";
+import lookUpHandler from "@/utils/lookUpHandler";
+import lookDownHandler from "@/utils/lookDownHandler";
+
 
 let result: any;
 let dom: any;
 let isDone: any;
 let human: any = undefined;
-let blinkCount : number = 1
+let count : number = 1
 
 interface Constraint {
   width: number;
@@ -22,15 +29,24 @@ interface Constraint {
 interface Props {
   currentStep: string
   currentActionIndex: number
+  progress: number
+  isCameraLoaded: boolean
+  setProgress: Dispatch<SetStateAction<number>>
   setCurrentActionIndex: Dispatch<SetStateAction<number>>
   setFailedMessage:  Dispatch<SetStateAction<string>>
+  setIsCameraLoaded:  Dispatch<SetStateAction<boolean>>
 }
 
 const Camera: React.FC<Props> = ({
   currentStep,
   currentActionIndex,
   setCurrentActionIndex,
-  setFailedMessage
+  setFailedMessage, 
+  progress,
+  setProgress,
+  isCameraLoaded,
+  setIsCameraLoaded
+
 }) => {
   const constraint: Constraint = {
     width: 1280,
@@ -42,17 +58,18 @@ const Camera: React.FC<Props> = ({
   const webcamRef = useRef<Webcam | null>(null);
   const _isMounted = useRef(true);
 
+
   const actionList = useSelector((state: RootState) => state.liveness.actionList);
 
 
   const [currentActionState, setCurrentActionState] = useState('look_straight');
   const [isCurrentStepDone, setIsCurrentStepDone] = useState(false);
   const [successState, setIsSuccessState] = useState(false);
-  const [error, setError] = useState(false);
-  const [progress, setProgress] = useState(0);
+  const [error, setError] = useState<boolean>(false);
   const [image, setImage] = useState("");
+  const [percent, setPercent] = useState<number>(0)
   const dispatch: AppDispatch = useDispatch();
-
+  
 
 
   const isIndexDone = async (i: any) => {
@@ -67,6 +84,16 @@ const Camera: React.FC<Props> = ({
       checkCamera();
     }
   }, []);
+
+  const wrongActionSetter = (error: boolean, message: string) => {
+    setFailedMessage(message)
+    setError(error)
+  }
+
+  const progressSetter = (number: number) => {
+    setPercent(number)
+    setProgress(number)
+  }
 
 
   useEffect(() => {
@@ -102,8 +129,11 @@ const Camera: React.FC<Props> = ({
     let clicked = false;
     if (result) {
       const interpolated = await human.next(result);
+      const progressCircleClass: any = document.querySelector(".progress-circle");
+      const progressCircleLength: number = progressCircleClass?.style?.strokeDashoffset
+      const capture =  captureButtonRef.current
 
-      if ((interpolated.face.length > 0) && (interpolated.face[0].rotation != undefined) && (captureButtonRef.current != null)) {
+      if ((interpolated.face.length > 0) && (interpolated.face[0].rotation != undefined) && (capture != null)) {
         const roll = interpolated.face[0].rotation.angle.roll * (180 / Math.PI);
         const yaw = interpolated.face[0].rotation.angle.yaw * (180 / Math.PI);
         const pitch = interpolated.face[0].rotation.angle.pitch * (180 / Math.PI);
@@ -129,185 +159,43 @@ const Camera: React.FC<Props> = ({
           } else if (item.gesture == "facing center") {
             look_center = true;
           }
-    1   });
+        });
         if (actionList[currentActionIndex] == "look_straight") {
           if(look_center && distance < 25){
-          if (roll > -10 && roll < 10 && distance < 25) {
-            if (yaw > -10 && yaw < 10 && distance < 25) {
-              if (pitch > -10 && pitch < 10 && distance < 25) {
-                let done = await isIndexDone(currentActionIndex);
-                if (!done) {
-                  await setIndexDone(currentActionIndex);
-                  setProgress(100);
-                  await captureButtonRef.current.click();
-                  clicked = true;
+            if (roll > -10 && roll < 10 && distance < 25) {
+              if (yaw > -10 && yaw < 10 && distance < 25) {
+                if (pitch > -10 && pitch < 10 && distance < 25) {
+                  let done = await isIndexDone(currentActionIndex);
+                  if (!done) {
+                    await setIndexDone(currentActionIndex);
+                    capture.click();
+                    clicked = true;
+                    progressSetter(100)
+                  }
                 }
               }
             }
           }
-        }
         } else if (actionList[currentActionIndex] == "look_left") {
-          setProgress(0);
-          if(look_left && distance < 25){
-            let done = await isIndexDone(currentActionIndex);
-            if (!done) {
-              await setIndexDone(currentActionIndex);
-              setProgress(100);
-              await captureButtonRef.current.click();
-              clicked = true;
-              ++currentActionIndex;
-            }
-          } else if (roll > 30) {
-            setFailedMessage("Wajah terlalu ke kiri");
-          } else if (roll < -30) {
-            setFailedMessage("Wajah terlalu ke kanan");
-          } else if (roll > 20 && roll < 30) {
-            setFailedMessage("Wajah kurang ke kanan");
-          } else if (roll < -20 && roll > -30) {
-            setFailedMessage("Wajah kurang ke kiri");
-          }
+          progressSetter(0)
+          lookLeftHandler({look_left, distance, roll, progressSetter, capture, clicked, currentActionIndex, isIndexDone, setIndexDone, wrongActionSetter})
         } else if (actionList[currentActionIndex] == "look_right") {
-          setProgress(0);
-          if(look_right && distance < 25){
-            let done = await isIndexDone(currentActionIndex);
-            if (!done) {
-              await setIndexDone(currentActionIndex);
-              setProgress(100);
-              await captureButtonRef.current.click();
-              clicked = true;
-              ++currentActionIndex;
-            }
-          } else if (roll > 30) {
-            setFailedMessage("Wajah terlalu ke kiri");
-          } else if (roll < -30) {
-            setFailedMessage("Wajah terlalu ke kanan");
-          } else if (roll > 20 && roll < 30) {
-            setFailedMessage("Wajah kurang ke kanan");
-          } else if (roll < -20 && roll > -30) {
-            setFailedMessage("Wajah kurang ke kiri");
-          } else if (distance > 30) {
-            setFailedMessage("Terlalu jauh");
-          }
+          progressSetter(0)
+          lookRightHandler({look_right, distance, roll, progressSetter, capture, clicked, currentActionIndex, isIndexDone, setIndexDone, wrongActionSetter})
         } else if (actionList[currentActionIndex] == "look_up") {
-          setProgress(0);
-          if ((roll > -20) && (roll < 20)) {
-            if ((yaw > -20) && (yaw < 20)) {
-              if ((pitch < -19) && (pitch > -31)) {
-                let done = await isIndexDone(currentActionIndex);
-                if (!done) {
-                  await setIndexDone(currentActionIndex);
-                  setProgress(100);
-                  ++currentActionIndex;
-                  await captureButtonRef.current.click();
-                  clicked = true;
-                }
-              } else if (distance > 23) {
-                setFailedMessage("Dekatkan wajah ke kamera");
-              } else if (pitch > -39) {
-                setFailedMessage("Wajah terlalu ke bawah");
-              } else if (pitch < -41) {
-                setFailedMessage("Wajah terlalu ke atas");
-              } else if (pitch > -41 && pitch < -39) {
-                setFailedMessage("Wajah kurang ke atas");
-              } else if (pitch < -39 && pitch > -41) {
-                setFailedMessage("Wajah kurang ke bawah");
-              }
-            }
-          } else if (distance > 23) {
-            setFailedMessage("Dekatkan wajah ke kamera");
-            setError(true);
-          } else if (roll > 30) {
-            setFailedMessage("Wajah terlalu ke kiri");
-            setError(true);
-          } else if (roll < -30) {
-            setFailedMessage("Wajah terlalu ke kanan");
-            setError(true);
-          } else if (roll > 20 && roll < 30) {
-            setFailedMessage("Wajah kurang ke kanan");
-            setError(true);
-          } else if (roll < -20 && roll > -30) {
-            setFailedMessage("Wajah kurang ke kiri");
-            setError(true);
-          }
+          progressSetter(0)
+          lookUpHandler({distance, roll, yaw, pitch, progressSetter, capture, clicked, currentActionIndex, isIndexDone, setIndexDone, wrongActionSetter})
         } else if (actionList[currentActionIndex] == "look_down") {
-          setProgress(0);
-          if ((roll > -20) && (roll < 20)) {
-            if ((yaw > -20) && (yaw < 20)) {
-              if ((pitch > 29) && (pitch < 35)) {
-                let done = await isIndexDone(currentActionIndex);
-                if (!done) {
-                  await setIndexDone(currentActionIndex);
-                  setProgress(100);
-                  ++currentActionIndex;
-                  await captureButtonRef.current.click();
-                  clicked = true;
-                }
-              } else if (distance > 23) {
-                setFailedMessage("Dekatkan wajah ke kamera");
-                setError(true);
-              } else if (pitch > 29) {
-                setFailedMessage("Wajah terlalu ke bawah");
-                setError(true);
-              } else if (pitch < 41) {
-                setFailedMessage("Wajah terlalu ke atas");
-                setError(true);
-              } else if (pitch > 41 && pitch < 29) {
-                setFailedMessage("Wajah kurang ke atas");
-                setError(true);
-              } else if (pitch < 29 && pitch > 41) {
-                setFailedMessage("Wajah kurang ke bawah");
-                setError(true);
-              }
-            }
-          } else if (distance > 23) {
-            setFailedMessage("Dekatkan wajah ke kamera");
-            setError(true);
-          } else if (roll > 30) {
-            setFailedMessage("Wajah terlalu ke kiri");
-            setError(true);
-          } else if (roll < -30) {
-            setFailedMessage("Wajah terlalu ke kanan");
-            setError(true);
-          } else if (roll > 20 && roll < 30) {
-            setFailedMessage("Wajah kurang ke kanan");
-            setError(true);
-          } else if (roll < -20 && roll > -30) {
-            setFailedMessage("Wajah kurang ke kiri");
-            setError(true);
-          }
+          progressSetter(0)
+          lookDownHandler({distance, roll, yaw, pitch, progressSetter, capture, clicked, currentActionIndex, isIndexDone, setIndexDone, wrongActionSetter})
         } else if (actionList[currentActionIndex] == "mouth_open") {
-          setProgress(0);
-          if(mouth_score >= 0.7){
-            let done = await isIndexDone(currentActionIndex);
-            if (!done) {
-              await setIndexDone(currentActionIndex);
-              setProgress(100);
-              ++currentActionIndex;
-              await captureButtonRef.current.click();
-              clicked = true;
-            }
-          }  else {
-            setFailedMessage("Buka mulut lebih besar");
-            setError(true);
-          }
+          progressSetter(0)
+          Math.round(progressCircleLength) < 5 && count < 33 ? count++ : count
+          openMouthHandler({mouth_score, wrongActionSetter, progressSetter, count, isIndexDone, setIndexDone, currentActionIndex, clicked, capture})
         } else if (actionList[currentActionIndex] == "blink") {
-          setProgress(0);
-          if((blink_left_eye || blink_right_eye)){
-            blinkCount++
-            console.log(blinkCount)
-            let done = await isIndexDone(currentActionIndex);
-            if (!done && blinkCount > 35) {
-              await setIndexDone(currentActionIndex);
-              setProgress(100);
-              ++currentActionIndex;
-              await captureButtonRef.current.click();
-              clicked = true;
-            }
-          } else {
-            setFailedMessage("Pejamkan mata 3 detik");
-            setError(true);
-            blinkCount = 1
-          }
+          progressSetter(0)
+          Math.round(progressCircleLength) < 5 && count < 35 ? count++ : count
+          blinkHandler({blink_left_eye,blink_right_eye, wrongActionSetter, progressSetter, count, isIndexDone, setIndexDone, currentActionIndex, clicked, capture})
         } 
       }
     }
@@ -317,6 +205,7 @@ const Camera: React.FC<Props> = ({
       setTimeout(drawLoop, 30); // use to slow down refresh from max refresh rate to target of 30 fps
     }
   }
+  
 
   const onPlay = async () => {
     isDone = new Array(actionList.length);
@@ -325,6 +214,7 @@ const Camera: React.FC<Props> = ({
     }
     await detectionLoop();
     await drawLoop();
+    setIsSuccessState(false)
   }
 
   const checkCamera = async () => {
@@ -393,9 +283,18 @@ const Camera: React.FC<Props> = ({
     }
   };
 
+  useEffect(() => {
+    const progressCircle: any = document.querySelector(".progress-circle");
+    progressCircle.style.display = "none"
+    setTimeout(() => {
+      progressCircle.style.display = "block"
+    }, 1500)
+  }, [])
+
+
   return (
     <div className="relative">
-      <Webcam
+          <Webcam
         style={{ height: "350px", objectFit: "cover" }}
         className="mt-10 rounded-md sm:w-full md:w-full"
         screenshotQuality={1}
@@ -409,10 +308,11 @@ const Camera: React.FC<Props> = ({
         minScreenshotHeight={720}
         onLoadedMetadata={(e) => onPlay()}
         videoConstraints={constraint}
+        onUserMedia={() => setIsCameraLoaded(false)}
       />
-      <div className="circle-container">
-        <CircularProgressBar percent={progress} error={error} />
-      </div>
+          <div className={`circle-container`}>
+            <CircularProgressBar percent={percent} error={error} />
+          </div>
       <button
         ref={captureButtonRef}
         onClick={(e) => capture(e)}
