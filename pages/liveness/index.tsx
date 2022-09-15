@@ -427,7 +427,7 @@ const Liveness = () => {
               <div className="mt-5 flex justify-center">
                 {!isCameraLoaded && (
                   <Image
-                    src={`${assetPrefix}/images/${isStepDone ? "hadap-depan" : currentIndex}.svg`}
+                    src={`${assetPrefix}/images/${!isStepDone ? "hadap-depan" : currentIndex}.svg`}
                     width={50}
                     height={50}
                     alt="1"
@@ -448,7 +448,7 @@ const Liveness = () => {
                     <div className="mt-5 flex justify-center">
                       {actionList.length === 2 && (
                         <Image
-                          src={`${assetPrefix}/images/${isStepDone ? "hadap-depan" : currentIndex}.svg`}
+                          src={`${assetPrefix}/images/${currentIndex}.svg`}
                           width={50}
                           height={50}
                           alt="2"
