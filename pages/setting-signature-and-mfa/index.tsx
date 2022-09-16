@@ -135,7 +135,10 @@ function SettingSignatureAndMFA({}: Props) {
             setTimeout(() => {
               toast.dismiss("success");
               router.replace({
-                pathname: handleRoute("/signing"),
+                pathname:
+                  router.query.v2 === "1"
+                    ? handleRoute("/signing/v2")
+                    : handleRoute("/signing"),
                 query: { ...router.query },
               });
             }, 3000);
@@ -250,9 +253,7 @@ function SettingSignatureAndMFA({}: Props) {
                   name="signature_font_type"
                   value="Adine-Kirnberg"
                   onChange={handleFormOnChange}
-                  checked={
-                    form.signature_font_type === "Adine-Kirnberg"
-                  }
+                  checked={form.signature_font_type === "Adine-Kirnberg"}
                   className="appearance-none border border-_B6B6B6 checked:border-_1A73E8 rounded-md w-full h-12"
                 />
                 <p className="text-2xl Adine-Kirnberg text-_030326 absolute w-fit text-center">
@@ -265,10 +266,7 @@ function SettingSignatureAndMFA({}: Props) {
                   name="signature_font_type"
                   value="champignonaltswash"
                   onChange={handleFormOnChange}
-                  checked={
-                    form.signature_font_type ===
-                    "champignonaltswash"
-                  }
+                  checked={form.signature_font_type === "champignonaltswash"}
                   className="appearance-none border border-_B6B6B6 checked:border-_1A73E8 rounded-md w-full h-12"
                 />
                 <p className="h-full champignonaltswash text-_030326 absolute w-fit text-center">
@@ -281,10 +279,7 @@ function SettingSignatureAndMFA({}: Props) {
                   name="signature_font_type"
                   value="FormalScript"
                   onChange={handleFormOnChange}
-                  checked={
-                    form.signature_font_type ===
-                    "FormalScript"
-                  }
+                  checked={form.signature_font_type === "FormalScript"}
                   className="appearance-none border border-_B6B6B6 checked:border-_1A73E8 rounded-md w-full h-12"
                 />
                 <p className="text-lg FormalScript text-_030326 absolute w-fit text-center">
@@ -298,8 +293,7 @@ function SettingSignatureAndMFA({}: Props) {
                   value="HerrVonMuellerhoff-Regular"
                   onChange={handleFormOnChange}
                   checked={
-                    form.signature_font_type ===
-                    "HerrVonMuellerhoff-Regular"
+                    form.signature_font_type === "HerrVonMuellerhoff-Regular"
                   }
                   className="appearance-none border border-_B6B6B6 checked:border-_1A73E8 rounded-md w-full h-12"
                 />
@@ -314,8 +308,7 @@ function SettingSignatureAndMFA({}: Props) {
                   value="MrsSaintDelafield-Regular"
                   onChange={handleFormOnChange}
                   checked={
-                    form.signature_font_type ===
-                    "MrsSaintDelafield-Regular"
+                    form.signature_font_type === "MrsSaintDelafield-Regular"
                   }
                   className="appearance-none border border-_B6B6B6 checked:border-_1A73E8 rounded-md w-full h-12"
                 />
@@ -329,10 +322,7 @@ function SettingSignatureAndMFA({}: Props) {
                   name="signature_font_type"
                   value="SCRIPTIN"
                   onChange={handleFormOnChange}
-                  checked={
-                    form.signature_font_type ===
-                    "SCRIPTIN"
-                  }
+                  checked={form.signature_font_type === "SCRIPTIN"}
                   className="appearance-none border border-_B6B6B6 checked:border-_1A73E8 rounded-md w-full h-12"
                 />
                 <p className="h-full SCRIPTIN text-_030326 absolute w-fit text-center">
