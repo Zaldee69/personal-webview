@@ -18,23 +18,23 @@ type Props = {
 
 const blinkHandler = async ({blink_left_eye, blink_right_eye,count,progressSetter,isIndexDone,setIndexDone, currentActionIndex,clicked,capture,wrongActionSetter}: Props) => {
   if((blink_left_eye || blink_right_eye)){
-    blinkCount >= 35 ? blinkCount : blinkCount++
+    blinkCount >= 30 ? blinkCount : blinkCount++
     if(blinkCount >= 10 && blinkCount <= 19){
       progressSetter(30);
       wrongActionSetter(false, "")
     }else if(blinkCount >= 20 && blinkCount <= 29){
       progressSetter(65);
       wrongActionSetter(false, "")
-    }else if(blinkCount === 35) {
+    }else if(blinkCount === 30) {
       progressSetter(100);
       wrongActionSetter(false, "")
       let done = await isIndexDone(currentActionIndex);
-      if (!done && count === 35 && blinkCount >= 35) {
-        progressSetter(100);
-           setIndexDone(currentActionIndex);
-          ++currentActionIndex;
-          capture.click()
-          clicked = true;
+      if (!done) {
+        await new Promise(resolve => setTimeout(resolve, 500));
+        setIndexDone(currentActionIndex);
+        ++currentActionIndex;
+        capture.click()
+        clicked = true;
       }
     }
   } else {

@@ -95,6 +95,17 @@ const Camera: React.FC<Props> = ({
     setProgress(number)
   }
 
+  useEffect(() => {
+    const progressCircle : any = document.querySelector(".progress-circle");
+    if(currentActionState === "mouth_open" || currentActionState === "look_straight"){
+      progressCircle.style.transition = "2s"
+    }else {
+      setTimeout(() => {
+        progressCircle.style.transition = "1s"
+      }, 2000)
+    }
+4  }, [currentActionState]);
+
 
   useEffect(() => {
     const initHuman = async () => {
@@ -167,6 +178,7 @@ const Camera: React.FC<Props> = ({
                 if (pitch > -10 && pitch < 10 && distance < 25) {
                   let done = await isIndexDone(currentActionIndex);
                   if (!done) {
+                    await new Promise(resolve => setTimeout(resolve, 500));
                     await setIndexDone(currentActionIndex);
                     capture.click();
                     clicked = true;
@@ -178,24 +190,22 @@ const Camera: React.FC<Props> = ({
           }
         } else if (actionList[currentActionIndex] == "look_left") {
           progressSetter(0)
-          lookLeftHandler({look_left, distance, roll, progressSetter, capture, clicked, currentActionIndex, isIndexDone, setIndexDone, wrongActionSetter})
+          await lookLeftHandler({look_left, distance, roll, progressSetter, capture, clicked, currentActionIndex, isIndexDone, setIndexDone, wrongActionSetter})
         } else if (actionList[currentActionIndex] == "look_right") {
           progressSetter(0)
-          lookRightHandler({look_right, distance, roll, progressSetter, capture, clicked, currentActionIndex, isIndexDone, setIndexDone, wrongActionSetter})
+          await lookRightHandler({look_right, distance, roll, progressSetter, capture, clicked, currentActionIndex, isIndexDone, setIndexDone, wrongActionSetter})
         } else if (actionList[currentActionIndex] == "look_up") {
           progressSetter(0)
-          lookUpHandler({distance, roll, yaw, pitch, progressSetter, capture, clicked, currentActionIndex, isIndexDone, setIndexDone, wrongActionSetter})
+          await lookUpHandler({distance, roll, yaw, pitch, progressSetter, capture, clicked, currentActionIndex, isIndexDone, setIndexDone, wrongActionSetter})
         } else if (actionList[currentActionIndex] == "look_down") {
           progressSetter(0)
-          lookDownHandler({distance, roll, yaw, pitch, progressSetter, capture, clicked, currentActionIndex, isIndexDone, setIndexDone, wrongActionSetter})
+          await lookDownHandler({distance, roll, yaw, pitch, progressSetter, capture, clicked, currentActionIndex, isIndexDone, setIndexDone, wrongActionSetter})
         } else if (actionList[currentActionIndex] == "mouth_open") {
           progressSetter(0)
-          Math.round(progressCircleLength) < 5 && count < 33 ? count++ : count
-          openMouthHandler({mouth_score, wrongActionSetter, progressSetter, count, isIndexDone, setIndexDone, currentActionIndex, clicked, capture})
+          await openMouthHandler({mouth_score, wrongActionSetter, progressSetter, count, isIndexDone, setIndexDone, currentActionIndex, clicked, capture})
         } else if (actionList[currentActionIndex] == "blink") {
           progressSetter(0)
-          Math.round(progressCircleLength) < 5 && count < 35 ? count++ : count
-          blinkHandler({blink_left_eye,blink_right_eye, wrongActionSetter, progressSetter, count, isIndexDone, setIndexDone, currentActionIndex, clicked, capture})
+          await blinkHandler({blink_left_eye,blink_right_eye, wrongActionSetter, progressSetter, count, isIndexDone, setIndexDone, currentActionIndex, clicked, capture})
         } 
       }
     }
