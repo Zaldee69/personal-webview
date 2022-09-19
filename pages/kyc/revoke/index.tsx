@@ -285,7 +285,7 @@ const RevokeMekari = () => {
             <div className="mt-5 flex justify-center">
               {!isCameraLoaded && (
                 <Image
-                  src={`${assetPrefix}/images/${isStepDone ? "hadap-depan" : currentIndex}.svg`}
+                  src={`${assetPrefix}/images/${!isStepDone ? "hadap-depan" : currentIndex}.svg`}
                   width={50}
                   height={50}
                   alt="1"

@@ -43,12 +43,26 @@ const ReEnrollMekari = () => {
       ? "pejam"
       : "hadap-depan";
 
+      
+
   const router = useRouter();
   const routerQuery = router.query;
   const subtitle: string =
     isLoading
       ? "Terima kasih telah mengikuti proses Liveness. Hasil dinilai berdasarkan keaslian serta kesesuaian foto dengan aksi yang diminta."
       : "Pastikan wajah di dalam garis panduan dan ikuti petunjuk dengan benar";
+
+      useEffect(() => {
+        const track: any = document.querySelector(".track");
+        if(progress === 100){
+          track?.classList?.add("white-stroke")
+          setTimeout(() => {
+            setStepDone(true)
+            track?.classList?.remove("white-stroke")
+          }, 2000)
+        }
+        
+      }, [progress])
   
   const dispatch: AppDispatch = useDispatch();
 
@@ -358,7 +372,7 @@ const ReEnrollMekari = () => {
               <div className="mt-5 flex justify-center">
                 {!isCameraLoaded && (
                   <Image
-                    src={`${assetPrefix}/images/${currentIndex}.svg`}
+                  src={`${assetPrefix}/images/${!isStepDone ? "hadap-depan" : currentIndex}.svg`}
                     width={50}
                     height={50}
                     alt="1"
@@ -410,7 +424,7 @@ const ReEnrollMekari = () => {
           ) : (
             <ProgressStepBar
               actionList={actionList}
-              currentActionIndex={currentActionIndex}
+              currentActionIndex={isStepDone ? currentActionIndex : 0}
             />
           )
         }
