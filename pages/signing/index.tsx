@@ -386,7 +386,7 @@ const ChooseFontModal: React.FC<Active> = ({ modal, setModal, tilakaName }) => {
                 {tilakaName}
               </p>
             </label>
-            <label className="relative flex justify-center items-center">
+            <label className="relative flex justify-center">
               <input
                 type="radio"
                 name="signature_font_type"
