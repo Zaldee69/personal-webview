@@ -216,7 +216,7 @@ const Configuration: React.FC<{
   );
 };
 
-const FRModal: React.FC<Active | any> = ({ modal, setModal }) => {
+export const FRModal: React.FC<Active | any> = ({ modal, setModal }) => {
   const router = useRouter();
   const routerQuery = router.query;
   const [isFRSuccess, setIsFRSuccess] = useState<boolean>(false);
@@ -460,7 +460,7 @@ const ChooseScratchModal: React.FC<Active> = ({ modal, setModal }) => {
   ) : null;
 };
 
-const OTPModal: React.FC<Active> = ({ modal, setModal }) => {
+export const OTPModal: React.FC<Active> = ({ modal, setModal }) => {
   const [successSigning, setSuccessSigning] = useState<boolean>(false);
   const document = useSelector((state: RootState) => state.document);
   const signature = useSelector((state: RootState) => state.signature);

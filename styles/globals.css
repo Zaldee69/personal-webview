@@ -2,36 +2,31 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap");
 
 @font-face {
   font-family: Adine-Kirnberg;
-  src:
-      url("../public/fonts/Adine-Kirnberg.ttf");
+  src: url("../public/fonts/Adine-Kirnberg.ttf");
 }
 
 @font-face {
   font-family: champignonaltswash;
-  src:
-      url("../public/fonts/champignonaltswash.ttf");
+  src: url("../public/fonts/champignonaltswash.ttf");
 }
 
 @font-face {
   font-family: FormalScript;
-  src:
-      url("../public/fonts/FormalScript.ttf");
+  src: url("../public/fonts/FormalScript.ttf");
 }
 
 @font-face {
   font-family: HerrVonMuellerhoff-Regular;
-  src:
-      url("../public/fonts/HerrVonMuellerhoff-Regular.ttf");
+  src: url("../public/fonts/HerrVonMuellerhoff-Regular.ttf");
 }
 
 @font-face {
   font-family: MrsSaintDelafield-Regular;
-  src:
-      url("../public/fonts/MrsSaintDelafield-Regular.ttf");
+  src: url("../public/fonts/MrsSaintDelafield-Regular.ttf");
 }
 
 @font-face {
@@ -40,7 +35,7 @@
 }
 
 .font-poppins {
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
 }
 
 .Adine-Kirnberg {
@@ -143,7 +138,8 @@
   align-items: center;
 }
 
-.step-wrapper, .step-wrapper2 {
+.step-wrapper,
+.step-wrapper2 {
   position: relative;
   padding: 10px 20px;
   display: flex;
@@ -154,7 +150,7 @@
 }
 
 .step-wrapper {
-  width: 70%
+  width: 70%;
 }
 
 .step-wrapper::before,
@@ -164,7 +160,7 @@
   top: 50%;
   height: 1px;
   transform: translateY(-50%);
-  background-color: #DAE6F8;;
+  background-color: #dae6f8;
   width: 8%;
   left: 19%;
 }
@@ -175,22 +171,21 @@
   top: 50%;
   height: 1px;
   transform: translateY(-50%);
-  background-color: #DAE6F8;;
+  background-color: #dae6f8;
   width: 85%;
 }
 
 .progress {
-  background: #DAE6F8;
+  background: #dae6f8;
   width: 63%;
   transition: 0.5s;
 }
 
 .progress2 {
-  background: #DAE6F8;
+  background: #dae6f8;
   width: 0;
   transition: 0.5s;
 }
-
 
 .progress-step {
   width: 1.5rem;
@@ -202,18 +197,18 @@
 }
 
 .active {
-  background: #0052CC;
+  background: #0052cc;
   color: #fff;
   transition: 0.5s;
 }
 
 .aktif {
-  background: #0052CC;
+  background: #0052cc;
 }
 
 input[type="checkbox"] {
-  width: 40px;
-  height: 25px;
+  width: 24px;
+  height: 24px;
   border-radius: 5px;
 }
 
@@ -280,4 +275,3 @@ input[type="checkbox"] {
 .white-stroke {
   stroke: #fff !important;
 }
-
