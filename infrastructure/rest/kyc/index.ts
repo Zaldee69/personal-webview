@@ -14,6 +14,12 @@ import {
   TKycGenerateActionRevokeResponseData,
   TKycVerificationRevokeRequestData,
   TKycVerificationRevokeResponseData,
+  TKycCheckStepIssueRequestData,
+  TKycCheckStepIssueResponseData,
+  TKycGenerateActionIssueRequestData,
+  TKycGenerateActionIssueResponseData,
+  TKycVerificationIssueRequestData,
+  TKycVerificationIssueResponseData
 } from "./types";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://dev-register.tilaka.id";
@@ -130,3 +136,55 @@ export const RestKycVerificationRevoke = (
     throw err;
   })
 }
+
+export const RestKycCheckStepIssue = (
+  body: TKycCheckStepIssueRequestData
+):  Promise<TKycCheckStepIssueResponseData> => {
+  return axios
+    .post<TKycCheckStepIssueResponseData>(`${BASE_URL}/api/kyc/checkstepissue`, body)
+    .then((res) => {
+      if(res.data.data?.token){
+        setTokenToLocalStorage(res.data.data?.token || null, 'kyc_reenroll_token');
+      }
+      return res.data;
+    })
+    .catch((err) => {
+      throw err;
+    });
+};
+
+export const RestKycGenerateActionIssue = (
+  body: TKycGenerateActionIssueRequestData
+): Promise<TKycGenerateActionIssueResponseData> => {
+  return axios
+    .post<TKycGenerateActionIssueResponseData>(
+      `${BASE_URL}/api/kyc/generateactionissue`,
+      body,
+    )
+    .then((res) => res.data)
+    .catch((err) => {
+      throw err;
+    });
+};
+
+export const RestKycVerificationIssue = (
+  body: TKycVerificationIssueRequestData
+): Promise<TKycVerificationIssueResponseData> => {
+  return axios
+    .post<TKycVerificationIssueResponseData>(
+      `${BASE_URL}/api/kyc/verificationissue`,
+      body,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem(
+            "kyc_reenroll_token"
+          )}`,
+          "Content-Type": "application/json",
+        },
+      }
+    )
+    .then((res) => res.data)
+    .catch((err) => {
+      throw err;
+    });
+};

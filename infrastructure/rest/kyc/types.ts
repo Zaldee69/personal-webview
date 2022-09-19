@@ -103,3 +103,44 @@ export type TKycVerificationRevokeResponseData = {
     user: string;
   };
 };
+
+export type TKycCheckStepIssueRequestData = {
+  issueId: string;
+};
+
+export type TKycCheckStepIssueResponseData = {
+  success: boolean;
+  message: string;
+  data: {
+    status: TStepStatus;
+    token?: string;
+  };
+};
+
+export type TKycGenerateActionIssueRequestData = {
+  issueId: string;
+};
+
+export type TKycGenerateActionIssueResponseData = {
+  success: boolean;
+  message: string;
+  data: {
+    actionList: string[];
+  };
+};
+
+export type TKycVerificationIssueRequestData = {
+  issueId: string;
+  image_selfie: string;
+  image_action1: string;
+  image_action2?: string;
+  image_action3?: string;
+};
+
+export type TKycVerificationIssueResponseData = {
+  success: boolean;
+  message: string;
+  data: {
+    status: string;
+  };
+};
