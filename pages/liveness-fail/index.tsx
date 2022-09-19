@@ -34,6 +34,12 @@ const LivenessFail = () => {
     }
   };
 
+  const setPathName = (routerQuery: any) => {
+    if(routerQuery.revoke_id) return handleRoute('/kyc/revoke')
+    if(routerQuery.issue_id) return handleRoute('/kyc/re-enroll')
+    return handleRoute("/guide")
+  }
+
   useEffect(() => {
     if (gagalCounter > 2) localStorage.removeItem("tlk-counter");
   }, [gagalCounter]);
@@ -59,9 +65,7 @@ const LivenessFail = () => {
       return (
         <Link
           href={{
-            pathname: router.query.revoke_id
-              ? handleRoute("/kyc/revoke")
-              : handleRoute(`/guide`),
+            pathname: setPathName(router.query),
             query: { ...router.query },
           }}
         >
