@@ -2,13 +2,13 @@ import React, { useRef, useState, useEffect } from "react";
 import { CountdownCircleTimer } from "react-countdown-circle-timer";
 import Webcam from "react-webcam";
 import { RootState } from "@/redux/app/store";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { restSigning } from "infrastructure/rest/signing";
 import { restLogout } from "infrastructure/rest/b2b";
 import { useRouter } from "next/router";
 import { toast } from "react-toastify";
 import XIcon from "@/public/icons/XIcon";
-import { handleRoute } from './../utils/handleRoute';
+import { handleRoute } from "./../utils/handleRoute";
 
 interface Constraint {
   width: number;
@@ -17,24 +17,35 @@ interface Constraint {
 }
 
 interface Props {
-  setIsFRSuccess: React.Dispatch<React.SetStateAction<boolean>>
+  setIsFRSuccess: React.Dispatch<React.SetStateAction<boolean>>;
   setModal: React.Dispatch<React.SetStateAction<boolean>>;
+  signingFailedRedirectTo?: string;
+  tokenIdentifier?: string;
+  countIdentifier?: string;
 }
 
 let dom: any;
 
-const FRCamera = ({setIsFRSuccess, setModal} : Props) => {
+const FRCamera = ({
+  setIsFRSuccess,
+  setModal,
+  signingFailedRedirectTo = handleRoute("/login"),
+  tokenIdentifier = "token",
+  countIdentifier = "count",
+}: Props) => {
   const constraint: Constraint = {
     width: 1280,
     height: 720,
     facingMode: "user",
   };
 
+  const dispatch = useDispatch();
+
   const document = useSelector((state: RootState) => state.document);
   const signature = useSelector((state: RootState) => state.signature);
 
   const router = useRouter();
-  const {transaction_id, request_id} = router.query
+  const { transaction_id, request_id } = router.query;
 
   const [successState, setIsSuccessState] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -67,9 +78,8 @@ const FRCamera = ({setIsFRSuccess, setModal} : Props) => {
   const onPlay = () => {
     setIsPlaying(true);
   };
-  const count = parseInt(localStorage.getItem("count" ) as string) 
-  localStorage.setItem("count", count ? count.toString() : "0")
-
+  const count = parseInt(localStorage.getItem(countIdentifier) as string);
+  localStorage.setItem(countIdentifier, count ? count.toString() : "0");
 
   const capture = React.useCallback(() => {
     toast(`Mencocokkan wajah...`, {
@@ -78,7 +88,7 @@ const FRCamera = ({setIsFRSuccess, setModal} : Props) => {
       isLoading: true,
       position: "top-center",
     });
-    const imageSrc = webcamRef?.current?.getScreenshot()
+    const imageSrc = webcamRef?.current?.getScreenshot();
     restSigning({
       payload: {
         file_name: new Date().getTime().toString(),
@@ -89,57 +99,67 @@ const FRCamera = ({setIsFRSuccess, setModal} : Props) => {
         face_image: imageSrc?.split(",")[1] as string,
         coordinate_x: document.response.data.posX,
         coordinate_y: document.response.data.posY,
-        signature_image: signature.data.font || signature.data.scratch || document.response.data.tandaTangan,
+        signature_image:
+          signature.data.font ||
+          signature.data.scratch ||
+          document.response.data.tandaTangan,
         page_number: document.response.data.page_number,
         qr_content: "",
         tilakey: "",
         company_id: "",
         api_id: "",
-        trx_id: transaction_id as string || request_id as string
+        trx_id: (transaction_id as string) || (request_id as string),
       },
-    }).then((res) => {
-      if(res.success){
-        localStorage.setItem("count", "0")
-        toast.dismiss("info")
-        toast(`Pencocokan berhasil`, {
-          type: "success",
-          position: "top-center",
-        });
-        setIsFRSuccess(true)
-      }else if(!res.success) {
-        toast.dismiss("info")
-        toast.error(res.message, { icon: <XIcon /> });
-        setModal(false)
-      }
-    }).catch((err) => {
-      if(err.request.status === 401){
-        router.replace({
-          pathname: handleRoute("/login"),
-          query: { ...router.query },
-        });
-      }else {
-        setModal(false)
-        setTimeout(() => {
-        setModal(true)
-        },100)
-        toast.dismiss("info")
-        toast.error("Wajah tidak cocok", { icon: <XIcon /> });
-        const newCount = parseInt(localStorage.getItem("count" ) as string) + 1
-        localStorage.setItem("count", newCount.toString())
-        const count = parseInt(localStorage.getItem("count" ) as string)
-        setModal(false)
-        if(count >= 5){
-          localStorage.removeItem("token")
-          localStorage.setItem("count", "0")
-          restLogout()
+    })
+      .then((res) => {
+        if (res.success) {
+          localStorage.setItem(countIdentifier, "0");
+          toast.dismiss("info");
+          toast(`Pencocokan berhasil`, {
+            type: "success",
+            position: "top-center",
+          });
+          setIsFRSuccess(true);
+        } else if (!res.success) {
+          toast.dismiss("info");
+          toast.error(res.message, { icon: <XIcon /> });
+          setModal(false);
+        }
+      })
+      .catch((err) => {
+        toast.dismiss("info");
+        if (err.request.status === 401) {
+          localStorage.removeItem(tokenIdentifier);
+          localStorage.setItem(countIdentifier, "0");
           router.replace({
-            pathname: handleRoute("/login"),
+            pathname: signingFailedRedirectTo,
             query: { ...router.query },
           });
+        } else {
+          setModal(false);
+          setTimeout(() => {
+            setModal(true);
+          }, 100);
+          toast.error("Wajah tidak cocok", { icon: <XIcon /> });
+          const newCount =
+            parseInt(localStorage.getItem(countIdentifier) as string) + 1;
+          localStorage.setItem(countIdentifier, newCount.toString());
+          const count = parseInt(
+            localStorage.getItem(countIdentifier) as string
+          );
+          setModal(false);
+          if (count >= 5) {
+            localStorage.removeItem(tokenIdentifier);
+            localStorage.setItem(countIdentifier, "0");
+            restLogout();
+            router.replace({
+              pathname: signingFailedRedirectTo,
+              query: { ...router.query },
+            });
+          }
         }
-      }
-    })
-  }, [webcamRef]);
+      });
+  }, [webcamRef]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     checkCamera();
@@ -147,11 +167,14 @@ const FRCamera = ({setIsFRSuccess, setModal} : Props) => {
 
   return (
     <div className="relative">
-      <div id="countdown-timer-fr" className="absolute text-white right-3 top-3">
+      <div
+        id="countdown-timer-fr"
+        className="absolute text-white right-3 top-3"
+      >
         <CountdownCircleTimer
           onComplete={() => {
-            capture()
-            return {shouldRepeat: true, delay: 15}
+            capture();
+            return { shouldRepeat: true, delay: 15 };
           }}
           isPlaying={isPlaying}
           size={45}

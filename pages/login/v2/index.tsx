@@ -37,6 +37,7 @@ const Login = () => {
   const [type, setType] = useState<{ password: string }>({
     password: "password",
   });
+  const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
   const dispatch: AppDispatch = useDispatch();
   const data = useSelector((state: RootState) => state.login);
   const router = useRouter();
@@ -49,16 +50,19 @@ const Login = () => {
   }, [router.isReady]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    if (data.status === "FULLFILLED" && data.data.success) {
+    if (isSubmitted && data.status === "FULLFILLED" && data.data.success) {
       let queryWithDynamicRedirectURL = {
         ...router.query,
       };
       if (data.data.message.length > 0) {
         queryWithDynamicRedirectURL["redirect_url"] = data.data.message;
       }
-      localStorage.setItem("token", data.data.data[0] as string);
-      localStorage.setItem("refresh_token", data.data.data[1] as string);
-      getCertificateList({ params: company_id as string }).then((res) => {
+      localStorage.setItem("token_v2", data.data.data[0] as string);
+      localStorage.setItem("refresh_token_v2", data.data.data[1] as string);
+      getCertificateList({
+        params: company_id as string,
+        token: localStorage.getItem("token_v2"),
+      }).then((res) => {
         const certif = JSON.parse(res.data);
         if (!transaction_id) {
           toast.dismiss("success");
@@ -93,8 +97,8 @@ const Login = () => {
           }
         }
       });
+      toastCaller(data);
     }
-    toastCaller(data);
   }, [data.status]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const onChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -106,6 +110,7 @@ const Login = () => {
     e.preventDefault();
     dispatch(login({ password, ...router.query } as TLoginProps));
     setPassword("");
+    setIsSubmitted(true);
   };
 
   const handleShowPwd = (e: React.MouseEvent<HTMLButtonElement>) => {

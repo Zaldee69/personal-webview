@@ -46,12 +46,13 @@ export const restSetDefaultMFA = ({
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
-      })
-      .then((res) => res.data)
-      .catch((err) => {
-        throw err;
-      });
-  }
+      }
+    )
+    .then((res) => res.data)
+    .catch((err) => {
+      throw err;
+    });
+};
 
 export const RestConfirmCertificate = (
   body: TConfirmCertificateRequestData
@@ -60,32 +61,33 @@ export const RestConfirmCertificate = (
     .post<TConfirmCertificateResponseData>(`${BASE_URL}/confirm`, body, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
-        "Content-Type": "application/json"
-      }
+        "Content-Type": "application/json",
+      },
     })
-    .then((res) =>  res.data )
-    .catch((err) => { 
+    .then((res) => res.data)
+    .catch((err) => {
       throw err;
-      })
-}
+    });
+};
 
 export const RestRegisteredCertificate = (
   body: TGetRegisteredCertificateRequestData
 ): Promise<TGetRegisteredCertificateResponseData> => {
   return axios
-    .get<TGetRegisteredCertificateResponseData>(`${BASE_URL}/registered?companyid=${body.company_id}`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-        "Content-Type": "application/json"
+    .get<TGetRegisteredCertificateResponseData>(
+      `${BASE_URL}/registered?companyid=${body.company_id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          "Content-Type": "application/json",
+        },
       }
-    })
-    .then((res) =>  res.data )
-    .catch((err) => { 
+    )
+    .then((res) => res.data)
+    .catch((err) => {
       throw err;
-     })
-}
-
-
+    });
+};
 
 export const restGetOtp = ({}: {}): Promise<any> => {
   return axios
@@ -119,13 +121,15 @@ export const getUserName = ({}: {}): Promise<any> => {
 
 export const getCertificateList = ({
   params,
+  token = localStorage.getItem("token"),
 }: {
-  params : string
+  params: string;
+  token?: string | null;
 }): Promise<any> => {
   return axios
     .get(`${BASE_URL}/certificationlist`, {
       headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        Authorization: `Bearer ${token}`,
       },
     })
     .then((res) => {
@@ -136,12 +140,12 @@ export const getCertificateList = ({
     });
 };
 
-export const restLogout = ()  : Promise<any> => {
-  const token =localStorage.getItem("refresh_token")
+export const restLogout = (): Promise<any> => {
+  const token = localStorage.getItem("refresh_token");
   return axios
-  .post(`${BASE_URL}/personal-logout`, {
-    refresh_token : token,
-  })
-    .then(res => res)
-    .catch(err => err)
-}
+    .post(`${BASE_URL}/personal-logout`, {
+      refresh_token: token,
+    })
+    .then((res) => res)
+    .catch((err) => err);
+};
