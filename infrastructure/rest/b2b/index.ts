@@ -123,7 +123,7 @@ export const getCertificateList = ({
   params,
   token = localStorage.getItem("token"),
 }: {
-  params: string;
+  params?: string;
   token?: string | null;
 }): Promise<any> => {
   return axios
