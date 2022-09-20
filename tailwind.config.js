@@ -38,5 +38,9 @@ module.exports = {
       _030326: "#030326",
     },
   },
-  plugins: [require("@tailwindcss/forms")],
+  plugins: [
+    require("@tailwindcss/forms")({
+      strategy: "class", // https://github.com/tailwindlabs/tailwindcss-forms#using-only-global-styles-or-only-classes
+    }),
+  ],
 };
