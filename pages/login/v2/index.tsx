@@ -15,15 +15,6 @@ import { useRouter } from "next/router";
 import { handleRoute } from "./../../../utils/handleRoute";
 import Image from "next/image";
 import { assetPrefix } from "../../../next.config";
-import { RestKycCheckStep } from "infrastructure";
-import { GetServerSideProps } from "next";
-import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
-import { serverSideRenderReturnConditions } from "@/utils/serverSideRenderReturnConditions";
-
-type Props = {
-  channel_id: string;
-  pathname: string;
-};
 
 type ModalProps = {
   certifModal: boolean;
@@ -41,11 +32,11 @@ const Login = () => {
   const dispatch: AppDispatch = useDispatch();
   const data = useSelector((state: RootState) => state.login);
   const router = useRouter();
-  const { channel_id, tilaka_name, company_id, transaction_id } = router.query;
+  const { channel_id, user, id, ...restRouterQuery } = router.query;
 
   useEffect(() => {
     if (router.isReady) {
-      setTilakaName(tilaka_name as string);
+      setTilakaName(user as string);
     }
   }, [router.isReady]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -60,13 +51,12 @@ const Login = () => {
       localStorage.setItem("token_v2", data.data.data[0] as string);
       localStorage.setItem("refresh_token_v2", data.data.data[1] as string);
       getCertificateList({
-        params: company_id as string,
         token: localStorage.getItem("token_v2"),
       }).then((res) => {
         const certif = JSON.parse(res.data);
-        if (!transaction_id) {
+        if (!id) {
           toast.dismiss("success");
-          toast("Transaction ID tidak boleh kosong", {
+          toast("ID tidak boleh kosong", {
             type: "error",
             toastId: "error",
             position: "top-center",
@@ -98,6 +88,13 @@ const Login = () => {
         }
       });
       toastCaller(data);
+    } else if (data.status === "FULLFILLED" && !data.data.success) {
+      toast(data.data.message || "Ada kesalahan", {
+        type: "error",
+        toastId: "error",
+        position: "top-center",
+        icon: XIcon,
+      });
     }
   }, [data.status]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -108,7 +105,14 @@ const Login = () => {
 
   const submitHandler = (e: React.SyntheticEvent) => {
     e.preventDefault();
-    dispatch(login({ password, ...router.query } as TLoginProps));
+    dispatch(
+      login({
+        password,
+        tilaka_name: user,
+        channel_id: channel_id,
+        ...restRouterQuery,
+      } as TLoginProps)
+    );
     setPassword("");
     setIsSubmitted(true);
   };
@@ -133,7 +137,7 @@ const Login = () => {
             {tilakaName?.[0]?.toUpperCase()}
           </div>
           <span className="font-bold text-xl text-[#172b4d] font-poppins">
-            Hai, {tilaka_name}
+            Hai, {user}
           </span>
         </div>
         <form onSubmit={submitHandler}>
@@ -182,35 +186,6 @@ const Login = () => {
       </div>
     </>
   );
-};
-
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  const cQuery = context.query;
-  const uuid =
-    cQuery.transaction_id || cQuery.request_id || cQuery.registration_id;
-
-  const checkStepResult: {
-    res?: TKycCheckStepResponseData;
-    err?: {
-      response: {
-        data: {
-          success: boolean;
-          message: string;
-          data: { errors: string[] };
-        };
-      };
-    };
-  } = await RestKycCheckStep({
-    payload: { registerId: uuid as string },
-  })
-    .then((res) => {
-      return { res };
-    })
-    .catch((err) => {
-      return { err };
-    });
-
-  return serverSideRenderReturnConditions({ context, checkStepResult });
 };
 
 export default Login;
