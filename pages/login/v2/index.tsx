@@ -110,7 +110,6 @@ const Login = () => {
         password,
         tilaka_name: user,
         channel_id: channel_id,
-        ...restRouterQuery,
       } as TLoginProps)
     );
     setPassword("");
