@@ -217,7 +217,7 @@ const CertifModal = ({ certifModal, setCertifModal }: ModalProps) => {
         </button>
         <button
           onClick={() => {
-            // restLogout()
+            // restLogout({})
             setCertifModal(false);
           }}
           className="  text-[#97A0AF]  font-poppins w-full mt-4  mx-auto rounded-sm h-9"

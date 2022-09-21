@@ -151,7 +151,7 @@ const FRCamera = ({
           if (count >= 5) {
             localStorage.removeItem(tokenIdentifier);
             localStorage.setItem(countIdentifier, "0");
-            restLogout();
+            restLogout({});
             router.replace({
               pathname: signingFailedRedirectTo,
               query: { ...router.query },

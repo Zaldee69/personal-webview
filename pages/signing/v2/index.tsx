@@ -4,8 +4,9 @@ import XIcon from "@/public/icons/XIcon";
 import { RootState } from "@/redux/app/store";
 import { concateRedirectUrlParams } from "@/utils/concateRedirectUrlParams";
 import { handleRoute } from "@/utils/handleRoute";
-import { restSigning } from "infrastructure";
+import { restSigning, RestSigningDownloadSignedPDF } from "infrastructure";
 import { restGetOtp, restLogout } from "infrastructure/rest/b2b";
+import { ISignedPDF } from "infrastructure/rest/signing/types";
 import { assetPrefix } from "next.config";
 import { NextParsedUrlQuery } from "next/dist/server/request-meta";
 import Image from "next/image";
@@ -21,6 +22,12 @@ import { PinInput } from "react-input-pin-code";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 
+interface IParameterFromRequestSign {
+  user?: string;
+  id?: string;
+  channel_id?: string;
+  request_id?: string;
+}
 interface IModal {
   modal: boolean;
   setModal: Dispatch<SetStateAction<boolean>>;
@@ -43,39 +50,31 @@ const Signing = (props: TPropsSigning) => {
     isSuccess?: "0" | "1";
     redirect_url?: string;
     fr?: "1";
-  } = router.query;
+  } & IParameterFromRequestSign = router.query;
 
   const [shouldRender, setShouldRender] = useState<boolean>(false);
   const [agree, setAgree] = useState<boolean>(false);
   const [openFRModal, setopenFRModal] = useState<boolean>(false);
   const [otpModal, setOtpModal] = useState<boolean>(false);
+  const [documentList, setDocumentList] = useState<ISignedPDF[]>([]);
 
   const agreeOnChange = (e: ChangeEvent<HTMLInputElement>) => {
     setAgree(e.target.checked);
   };
 
-  const downloadOnClick = (id: string) => {
-    toast.success("Download Nama Dokumen.pdf berhasil");
+  const downloadOnClick = (pdfBase64: string, pdfName: string) => {
+    toast.success(`Download Nama ${pdfName} berhasil`, { autoClose: 1000 });
+
+    setTimeout(() => {
+      var a = document.createElement("a");
+      a.href = "data:application/pdf;base64," + pdfBase64;
+      a.download = pdfName;
+      a.click();
+    }, 2000);
   };
 
   useEffect(() => {
     const token_v2 = localStorage.getItem("token_v2");
-    if (routerIsReady) {
-      // getUserName({}).then((res) => {
-      //   const data = JSON.parse(res.data);
-      //   setData(data.name);
-      // });
-      // dispatch(
-      //   getDocument({
-      //     company_id,
-      //     transaction_id: (request_id as string) || (transaction_id as string),
-      //     token_v2,
-      //   } as TDocumentProps)
-      // );
-      // if (res.response.status === "REJECTED") {
-      //   localStorage.removeItem("token_v2");
-      // }
-    }
     if (!token_v2) {
       router.replace({
         pathname: handleRoute("/login/v2"),
@@ -83,6 +82,61 @@ const Signing = (props: TPropsSigning) => {
       });
     } else {
       setShouldRender(true);
+    }
+    if (token_v2 && routerIsReady) {
+      RestSigningDownloadSignedPDF({
+        request_id: routerQuery.request_id as string,
+      })
+        .then((res) => {
+          if (res.success) {
+            setDocumentList(res.signed_pdf);
+          } else {
+            toast(
+              res.message || "Tidak berhasil pada saat memuat list dokumen",
+              {
+                type: "error",
+                toastId: "error",
+                position: "top-center",
+                icon: XIcon,
+              }
+            );
+          }
+        })
+        .catch((err) => {
+          if (
+            err.response?.data?.message &&
+            err.response?.data?.data?.errors?.[0]
+          ) {
+            toast(
+              `${err.response?.data?.message}, ${err.response?.data?.data?.errors?.[0]}`,
+              {
+                type: "error",
+                toastId: "error",
+                position: "top-center",
+                icon: XIcon,
+              }
+            );
+          } else {
+            if (err.response.status === 401) {
+              localStorage.removeItem("token_v2");
+              localStorage.removeItem("refresh_token_v2");
+              router.replace({
+                pathname: handleRoute("/login/v2"),
+                query: { ...router.query },
+              });
+            }
+            toast(
+              err.response?.data?.message ||
+                "Kesalahan pada saat memuat list dokumen",
+              {
+                type: "error",
+                toastId: "error",
+                position: "top-center",
+                icon: XIcon,
+              }
+            );
+          }
+        });
     }
   }, [routerIsReady]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -127,55 +181,23 @@ const Signing = (props: TPropsSigning) => {
         </div>
         <div className="mt-6 mx-auto w-full" style={{ maxWidth: "360px" }}>
           <p className="font-poppins font-semibold text-sm text-neutral200 text-left">
-            12 Dokumen
+            {documentList.length} Dokumen
           </p>
           <div className="flex justify-center">
             <div
               className="mt-2 border border-neutral50 p-4 rounded-md w-full overflow-y-auto"
               style={{ maxHeight: "190px" }}
             >
-              <div className="flex items-center justify-between">
-                <p className="text-sm text-neutral800">Dokumen.pdf</p>
-                <button onClick={() => downloadOnClick("1")}>
-                  <DownloadIcon />
-                </button>
-              </div>
-              <div className="flex items-center justify-between mt-4">
-                <p className="text-sm text-neutral800">Dokumen.pdf</p>
-                <button onClick={() => downloadOnClick("1")}>
-                  <DownloadIcon />
-                </button>
-              </div>
-              <div className="flex items-center justify-between mt-4">
-                <p className="text-sm text-neutral800">Dokumen.pdf</p>
-                <button onClick={() => downloadOnClick("1")}>
-                  <DownloadIcon />
-                </button>
-              </div>
-              <div className="flex items-center justify-between mt-4">
-                <p className="text-sm text-neutral800">Dokumen.pdf</p>
-                <button onClick={() => downloadOnClick("1")}>
-                  <DownloadIcon />
-                </button>
-              </div>
-              <div className="flex items-center justify-between mt-4">
-                <p className="text-sm text-neutral800">Dokumen.pdf</p>
-                <button onClick={() => downloadOnClick("1")}>
-                  <DownloadIcon />
-                </button>
-              </div>
-              <div className="flex items-center justify-between mt-4">
-                <p className="text-sm text-neutral800">Dokumen.pdf</p>
-                <button onClick={() => downloadOnClick("1")}>
-                  <DownloadIcon />
-                </button>
-              </div>
-              <div className="flex items-center justify-between mt-4">
-                <p className="text-sm text-neutral800">Dokumen.pdf</p>
-                <button onClick={() => downloadOnClick("1")}>
-                  <DownloadIcon />
-                </button>
-              </div>
+              {documentList.map((e, i) => (
+                <div key={i} className="flex items-center justify-between">
+                  <p className="text-sm text-neutral800 truncate">
+                    {e.pdf_name}
+                  </p>
+                  <button onClick={() => downloadOnClick(e.pdf, e.pdf_name)}>
+                    <DownloadIcon />
+                  </button>
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -279,7 +301,14 @@ const SigningFailure = (props: TPropsSigningFailure) => {
   const router = useRouter();
   const routerQuery: NextParsedUrlQuery & {
     redirect_url?: string;
-  } = router.query;
+  } & IParameterFromRequestSign = router.query;
+
+  const params = {
+    user_identifier: routerQuery.user,
+    request_id: routerQuery.request_id,
+    status: "Exp",
+  };
+  const queryString = new URLSearchParams(params as any).toString();
 
   return (
     <div className="px-10 pt-16 pb-9 text-center flex flex-col justify-center min-h-screen">
@@ -307,7 +336,12 @@ const SigningFailure = (props: TPropsSigningFailure) => {
       <div className="mt-32">
         {routerQuery.redirect_url && (
           <div className="text-primary text-base font-medium font-poppins underline hover:cursor-pointer">
-            <a href={concateRedirectUrlParams(routerQuery.redirect_url, "")}>
+            <a
+              href={concateRedirectUrlParams(
+                routerQuery.redirect_url,
+                queryString
+              )}
+            >
               <a>Kembali ke Halaman Utama</a>
             </a>
           </div>
@@ -480,7 +514,7 @@ const OTPModal: React.FC<IModal> = ({ modal, setModal }) => {
           if (count >= 5) {
             localStorage.removeItem("token_v2");
             localStorage.setItem("count_v2", "0");
-            restLogout();
+            restLogout({});
             router.replace({
               pathname: "/login/v2",
               query: { ...router.query },
