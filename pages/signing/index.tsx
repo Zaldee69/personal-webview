@@ -537,7 +537,7 @@ export const OTPModal: React.FC<Active> = ({ modal, setModal }) => {
           if (count >= 5) {
             localStorage.removeItem("token");
             localStorage.setItem("count", "0");
-            restLogout();
+            restLogout({});
             router.replace({
               pathname: "/login",
               query: { ...router.query },

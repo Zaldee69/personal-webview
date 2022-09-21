@@ -25,7 +25,7 @@ const LinkAccountSuccess = (props: Props) => {
   useEffect(() => {
     if (!routerIsReady) return;
     if (!isSigning) {
-      restLogout();
+      restLogout({});
     } else {
       setTimeout(() => {
         router.replace({
