@@ -1,11 +1,13 @@
 import FRCamera from "@/components/FRCamera";
 import DownloadIcon from "@/public/icons/DownloadIcon";
 import XIcon from "@/public/icons/XIcon";
-import { RootState } from "@/redux/app/store";
 import { concateRedirectUrlParams } from "@/utils/concateRedirectUrlParams";
 import { handleRoute } from "@/utils/handleRoute";
-import { restSigning, RestSigningDownloadSignedPDF } from "infrastructure";
-import { restGetOtp, restLogout } from "infrastructure/rest/b2b";
+import {
+  RestSigningAuthPIN,
+  RestSigningDownloadSignedPDF,
+} from "infrastructure";
+import { getUserName, restGetOtp, restLogout } from "infrastructure/rest/b2b";
 import { ISignedPDF } from "infrastructure/rest/signing/types";
 import { assetPrefix } from "next.config";
 import { NextParsedUrlQuery } from "next/dist/server/request-meta";
@@ -19,7 +21,6 @@ import {
   useState,
 } from "react";
 import { PinInput } from "react-input-pin-code";
-import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 
 interface IParameterFromRequestSign {
@@ -31,7 +32,18 @@ interface IParameterFromRequestSign {
 interface IModal {
   modal: boolean;
   setModal: Dispatch<SetStateAction<boolean>>;
+  callbackSuccess: () => void;
+  callbackFailure: (
+    documentName: string,
+    siginingFailureError: { message: string; status: string }
+  ) => void;
+  documentList: ISignedPDF[];
   tilakaName?: string;
+}
+
+interface ISigningFailureError {
+  message: string;
+  status: string;
 }
 
 type TPropsSigning = {};
@@ -39,32 +51,40 @@ type TPropsSigning = {};
 type TPropsSigningSuccess = { documentCount: number };
 
 type TPropsSigningFailure = {
-  documentName: string;
-  error: { message: string };
+  documentName?: string;
+  error: ISigningFailureError;
 };
 
 const Signing = (props: TPropsSigning) => {
   const router = useRouter();
   const routerIsReady = router.isReady;
   const routerQuery: NextParsedUrlQuery & {
-    isSuccess?: "0" | "1";
     redirect_url?: string;
     fr?: "1";
   } & IParameterFromRequestSign = router.query;
 
   const [shouldRender, setShouldRender] = useState<boolean>(false);
+  const [shouldDisableSubmit, setShouldDisableSubmit] =
+    useState<boolean>(false);
   const [agree, setAgree] = useState<boolean>(false);
   const [openFRModal, setopenFRModal] = useState<boolean>(false);
   const [otpModal, setOtpModal] = useState<boolean>(false);
   const [documentList, setDocumentList] = useState<ISignedPDF[]>([]);
+  const [isSuccess, setIsSuccess] = useState<"-1" | "0" | "1">("-1");
+  const [signingFailureDocumentName, setSigningFailureDocumentName] =
+    useState<string>("");
+  const [signingFailureError, setSiginingFailureError] =
+    useState<ISigningFailureError>({
+      message: "",
+      status: "",
+    });
+  const [typeMFA, setTypeMFA] = useState<"FR" | "OTP" | null>(null);
 
   const agreeOnChange = (e: ChangeEvent<HTMLInputElement>) => {
     setAgree(e.target.checked);
   };
-
   const downloadOnClick = (pdfBase64: string, pdfName: string) => {
     toast.success(`Download Nama ${pdfName} berhasil`, { autoClose: 1000 });
-
     setTimeout(() => {
       var a = document.createElement("a");
       a.href = "data:application/pdf;base64," + pdfBase64;
@@ -72,9 +92,22 @@ const Signing = (props: TPropsSigning) => {
       a.click();
     }, 2000);
   };
+  const mfaCallbackSuccess = () => {
+    setIsSuccess("1");
+  };
+  const mfaCallbackFailure = (
+    documentName: string,
+    siginingFailureError: ISigningFailureError
+  ) => {
+    setIsSuccess("0");
+    setSigningFailureDocumentName(documentName);
+    setSiginingFailureError(siginingFailureError);
+  };
 
   useEffect(() => {
     const token_v2 = localStorage.getItem("token_v2");
+    const count = parseInt(localStorage.getItem("count_v2") as string);
+    localStorage.setItem("count_v2", count ? count.toString() : "0");
     if (!token_v2) {
       router.replace({
         pathname: handleRoute("/login/v2"),
@@ -84,22 +117,58 @@ const Signing = (props: TPropsSigning) => {
       setShouldRender(true);
     }
     if (token_v2 && routerIsReady) {
+      setShouldDisableSubmit(true);
       RestSigningDownloadSignedPDF({
         request_id: routerQuery.request_id as string,
       })
         .then((res) => {
           if (res.success) {
-            setDocumentList(res.signed_pdf);
+            setDocumentList(res.signed_pdf || []);
+            getUserName({ token: token_v2 })
+              .then((res) => {
+                const data = JSON.parse(res.data);
+                setTypeMFA(data.typeMfa);
+                setShouldDisableSubmit(false);
+              })
+              .catch((err) => {
+                if (err.request.status === 401) {
+                  restLogout({
+                    token: localStorage.getItem("refresh_token_v2"),
+                  });
+                  localStorage.removeItem("token_v2");
+                  localStorage.removeItem("refresh_token_v2");
+                  router.replace({
+                    pathname: "/login/v2",
+                    query: { ...router.query, showAutoLogoutInfo: "1" },
+                  });
+                } else {
+                  toast(
+                    err.response?.data?.message ||
+                      "Tidak berhasil pada saat memuat Signature MFA",
+                    {
+                      type: "error",
+                      toastId: "error",
+                      position: "top-center",
+                      icon: XIcon,
+                    }
+                  );
+                }
+              });
           } else {
-            toast(
-              res.message || "Tidak berhasil pada saat memuat list dokumen",
-              {
-                type: "error",
-                toastId: "error",
-                position: "top-center",
-                icon: XIcon,
-              }
-            );
+            setIsSuccess("0");
+            setSigningFailureDocumentName("");
+            if (res.signed_pdf === null) {
+              setSiginingFailureError({
+                message: "Dokumen Expired",
+                status: "Exp",
+              });
+            } else {
+              setSiginingFailureError({
+                message:
+                  res.message || "Tidak berhasil pada saat memuat list dokumen",
+                status: "Exp",
+              });
+            }
           }
         })
         .catch((err) => {
@@ -107,54 +176,63 @@ const Signing = (props: TPropsSigning) => {
             err.response?.data?.message &&
             err.response?.data?.data?.errors?.[0]
           ) {
-            toast(
-              `${err.response?.data?.message}, ${err.response?.data?.data?.errors?.[0]}`,
-              {
-                type: "error",
-                toastId: "error",
-                position: "top-center",
-                icon: XIcon,
-              }
-            );
+            setIsSuccess("0");
+            setSigningFailureDocumentName("");
+            setSiginingFailureError({
+              message: `${err.response?.data?.message}, ${err.response?.data?.data?.errors?.[0]}`,
+              status: "Exp",
+            });
           } else {
             if (err.response.status === 401) {
+              restLogout({ token: localStorage.getItem("refresh_token_v2") });
               localStorage.removeItem("token_v2");
               localStorage.removeItem("refresh_token_v2");
               router.replace({
                 pathname: handleRoute("/login/v2"),
-                query: { ...router.query },
+                query: { ...router.query, showAutoLogoutInfo: "1" },
+              });
+            } else {
+              setIsSuccess("0");
+              setSigningFailureDocumentName("");
+              setSiginingFailureError({
+                message:
+                  err.response?.data?.message ||
+                  "Kesalahan pada saat memuat list dokumen",
+                status: "Exp",
               });
             }
-            toast(
-              err.response?.data?.message ||
-                "Kesalahan pada saat memuat list dokumen",
-              {
-                type: "error",
-                toastId: "error",
-                position: "top-center",
-                icon: XIcon,
-              }
-            );
           }
         });
     }
   }, [routerIsReady]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!shouldRender) return;
-  if (routerQuery.isSuccess === "1") {
-    return <SigningSuccess documentCount={0} />;
-  } else if (routerQuery.isSuccess === "0") {
+  if (isSuccess === "1") {
+    return <SigningSuccess documentCount={documentList.length} />;
+  } else if (isSuccess === "0") {
     return (
       <SigningFailure
-        documentName="Document-1.pdf"
-        error={{ message: "Dokumen Expired" }}
+        documentName={signingFailureDocumentName}
+        error={signingFailureError}
       />
     );
   }
   return (
     <div>
-      <FRModal modal={openFRModal} setModal={setopenFRModal} />
-      <OTPModal modal={otpModal} setModal={setOtpModal} />
+      <FRModal
+        modal={openFRModal}
+        setModal={setopenFRModal}
+        callbackSuccess={mfaCallbackSuccess}
+        callbackFailure={mfaCallbackFailure}
+        documentList={documentList}
+      />
+      <OTPModal
+        modal={otpModal}
+        setModal={setOtpModal}
+        callbackSuccess={mfaCallbackSuccess}
+        callbackFailure={mfaCallbackFailure}
+        documentList={documentList}
+      />
 
       <div className="px-10 py-8 text-center flex flex-col justify-center min-h-screen">
         <div>
@@ -203,6 +281,9 @@ const Signing = (props: TPropsSigning) => {
                   </button>
                 </div>
               ))}
+              {shouldDisableSubmit && documentList.length === 0 && (
+                <p className="text-sm text-neutral800">Memuat...</p>
+              )}
             </div>
           </div>
         </div>
@@ -225,16 +306,10 @@ const Signing = (props: TPropsSigning) => {
         </div>
         <div className="mt-8">
           <button
-            disabled={!agree}
+            disabled={shouldDisableSubmit || !agree}
             className="bg-primary disabled:bg-primary70 hover:opacity-50 disabled:hover:opacity-100 text-white disabled:text-neutral200 font-poppins rounded-md px-6 py-2.5"
             onClick={() =>
-              ({
-                response: {
-                  data: { mfa: routerQuery.fr === "1" ? "fr" : "otp" },
-                },
-              }.response.data.mfa.toLowerCase() == "fr"
-                ? setopenFRModal(true)
-                : setOtpModal(true))
+              typeMFA === "FR" ? setopenFRModal(true) : setOtpModal(true)
             }
           >
             Tanda Tangan
@@ -311,7 +386,7 @@ const SigningFailure = (props: TPropsSigningFailure) => {
   const params = {
     user_identifier: routerQuery.user,
     request_id: routerQuery.request_id,
-    status: "Exp",
+    status: props.error.status,
   };
   const queryString = new URLSearchParams(params as any).toString();
 
@@ -331,7 +406,8 @@ const SigningFailure = (props: TPropsSigningFailure) => {
         </div>
         <div className="mt-3">
           <p className="font-poppins text-sm text-neutral800">
-            Proses tanda tangan Nama {props.documentName} gagal.
+            Proses tanda tangan{" "}
+            {props.documentName ? "Nama " + props.documentName : ""} gagal.
           </p>
           <p className="font-poppins text-base text-neutral800 font-medium mt-1.5">
             {props.error.message}
@@ -364,14 +440,80 @@ const SigningFailure = (props: TPropsSigningFailure) => {
   );
 };
 
-const FRModal: React.FC<IModal | any> = ({ modal, setModal }) => {
+const FRModal: React.FC<IModal> = ({
+  modal,
+  setModal,
+  callbackSuccess,
+  callbackFailure,
+  documentList,
+}) => {
   const router = useRouter();
-  const routerQuery = router.query;
+  const routerQuery: NextParsedUrlQuery & {
+    redirect_url?: string;
+    fr?: "1";
+  } & IParameterFromRequestSign = router.query;
   const [isFRSuccess, setIsFRSuccess] = useState<boolean>(false);
 
+  const signingFailure = (message: string) => {
+    callbackFailure(
+      documentList[0].pdf_name, // currently not support bulk signing, so we use docuemnt on index 0
+      { message, status: "Gagal" }
+    );
+  };
+  const captureProcessor = (base64Img: string | null | undefined) => {
+    RestSigningAuthPIN({
+      payload: {
+        face_image: base64Img?.split(",")[1] as string,
+        id: routerQuery.id as string,
+        user: routerQuery.user as string,
+      },
+      token: localStorage.getItem("token_v2"),
+    })
+      .then((res) => {
+        if (res.success) {
+          localStorage.setItem("count_v2", "0");
+          toast.dismiss("info");
+          toast(`Pencocokan berhasil`, {
+            type: "success",
+            position: "top-center",
+          });
+          setIsFRSuccess(true);
+        } else {
+          setIsFRSuccess(false);
+          toast.dismiss("info");
+          setModal(false);
+          toast.error(res.message || "Ada yang salah", { icon: <XIcon /> });
+        }
+      })
+      .catch((err) => {
+        toast.dismiss("info");
+        if (err.request.status === 401) {
+          restLogout({ token: localStorage.getItem("refresh_token_v2") });
+          localStorage.removeItem("token_v2");
+          localStorage.removeItem("refresh_token_v2");
+          router.replace({
+            pathname: "/login/v2",
+            query: { ...router.query, showAutoLogoutInfo: "1" },
+          });
+        } else {
+          toast.error("Wajah tidak cocok", { icon: <XIcon /> });
+          const newCount =
+            parseInt(localStorage.getItem("count_v2") as string) + 1;
+          localStorage.setItem("count_v2", newCount.toString());
+          const count = parseInt(localStorage.getItem("count_v2") as string);
+          if (count >= 5) {
+            signingFailure(err.response?.data?.message || "Ada yang salah");
+          }
+        }
+      });
+  };
+
   useEffect(() => {
-    if (isFRSuccess && modal) {
-      document.body.style.overflow = "hidden";
+    if (isFRSuccess) {
+      callbackSuccess();
+      if (modal) {
+        document.body.style.overflow = "hidden";
+      }
     } else {
       document.body.style.overflow = "scroll";
     }
@@ -383,91 +525,54 @@ const FRModal: React.FC<IModal | any> = ({ modal, setModal }) => {
       className="fixed z-50 flex items-start transition-all duration-1000 justify-center w-full left-0 top-0 h-full "
     >
       <div className="bg-white max-w-md mt-20 pt-5 px-2 pb-3 rounded-md w-full mx-5 ">
-        {isFRSuccess ? (
-          <div className="flex flex-col  items-center">
-            <p className="font-poppins block text-center  whitespace-nowrap  font-semibold ">
-              Tanda Tangan Berhasil
-            </p>
-            <div className="my-10">
-              <Image
-                width={150}
-                height={150}
-                src={`${assetPrefix}/images/successFR.svg`}
-                alt="success-fr-ill"
-              />
-            </div>
-
-            <button
-              onClick={() => {
-                setModal(!modal);
-                setIsFRSuccess(false);
-                if (routerQuery.redirect_url) {
-                  window.location.replace(
-                    concateRedirectUrlParams(
-                      routerQuery.redirect_url as string,
-                      ""
-                    )
-                  );
-                }
-              }}
-              className="bg-primary btn  text-white font-poppins w-full mt-5 mx-auto rounded-sm h-9 font-semibold hover:opacity-50"
-            >
-              Tutup
-            </button>
-          </div>
-        ) : (
-          <>
-            <p className="font-poppins block text-center font-semibold ">
-              Konfirmasi Tanda Tangan
-            </p>
-            <span className="font-poppins mt-2 block text-center text-sm font-normal">
-              Arahkan wajah ke kamera untuk otentikasi
-            </span>
-            <FRCamera
-              setModal={setModal}
-              setIsFRSuccess={setIsFRSuccess}
-              signingFailedRedirectTo={handleRoute("/login/v2")}
-              tokenIdentifier="token_v2"
-            />
-            <button
-              onClick={() => setModal(!modal)}
-              className="text-primary btn  bg-white font-poppins w-full mt-5 mx-auto rounded-sm h-9 font-semibold hover:opacity-50"
-            >
-              Batal
-            </button>
-          </>
-        )}
+        <>
+          <p className="font-poppins block text-center font-semibold ">
+            Konfirmasi Tanda Tangan
+          </p>
+          <span className="font-poppins mt-2 block text-center text-sm font-normal">
+            Arahkan wajah ke kamera untuk otentikasi
+          </span>
+          <FRCamera
+            setModal={setModal}
+            setIsFRSuccess={setIsFRSuccess}
+            signingFailedRedirectTo={handleRoute("/login/v2")}
+            tokenIdentifier="token_v2"
+            callbackCaptureProcessor={captureProcessor}
+          />
+          <button
+            onClick={() => setModal(!modal)}
+            className="text-primary btn  bg-white font-poppins w-full mt-5 mx-auto rounded-sm h-9 font-semibold hover:opacity-50"
+          >
+            Batal
+          </button>
+        </>
       </div>
     </div>
   ) : null;
 };
 
-const OTPModal: React.FC<IModal> = ({ modal, setModal }) => {
+const OTPModal: React.FC<IModal> = ({
+  modal,
+  setModal,
+  callbackSuccess,
+  callbackFailure,
+  documentList,
+}) => {
   const [successSigning, setSuccessSigning] = useState<boolean>(false);
-  const document = useSelector((state: RootState) => state.document);
-  const signature = useSelector((state: RootState) => state.signature);
   const router = useRouter();
-  const { transaction_id, request_id, ...restRouterQuery } = router.query;
+  const routerQuery: NextParsedUrlQuery & {
+    redirect_url?: string;
+    fr?: "1";
+  } & IParameterFromRequestSign = router.query;
 
   const [values, setValues] = useState(["", "", "", "", "", ""]);
 
-  useEffect(() => {
-    if (modal && !successSigning) {
-      restGetOtp({})
-        .then((res) => {
-          toast(`Kode OTP telah dikirim ke Email anda`, {
-            type: "info",
-            toastId: "info",
-            isLoading: false,
-            position: "top-center",
-          });
-        })
-        .catch(() => {
-          toast.error("Kode OTP gagal dikirim", { icon: <XIcon /> });
-        });
-    }
-  }, [modal]); // eslint-disable-line react-hooks/exhaustive-deps
-
+  const signingFailure = (message: string) => {
+    callbackFailure(
+      documentList[0].pdf_name, // currently not support bulk signing, so we use docuemnt on index 0
+      { message, status: "Gagal" }
+    );
+  };
   const onClickHandler = () => {
     toast(`Loading...`, {
       type: "info",
@@ -475,39 +580,36 @@ const OTPModal: React.FC<IModal> = ({ modal, setModal }) => {
       isLoading: true,
       position: "top-center",
     });
-    restSigning({
+    RestSigningAuthPIN({
       payload: {
-        file_name: new Date().getTime().toString(),
         otp_pin: values.join(""),
-        content_pdf: document.response.data.document,
-        width: document.response.data.width,
-        height: document.response.data.height,
-        face_image: "",
-        coordinate_x: document.response.data.posX,
-        coordinate_y: document.response.data.posY,
-        signature_image:
-          signature.data.font ||
-          signature.data.scratch ||
-          document.response.data.tandaTangan,
-        page_number: document.response.data.page_number,
-        qr_content: "",
-        tilakey: "",
-        company_id: "",
-        api_id: "",
-        trx_id: (transaction_id as string) || (request_id as string),
+        id: routerQuery.id as string,
+        user: routerQuery.user as string,
       },
+      token: localStorage.getItem("token_v2"),
     })
       .then((res) => {
-        setSuccessSigning(true);
-        toast.dismiss("loading");
-        localStorage.setItem("count_v2", "0");
+        if (res.success) {
+          setSuccessSigning(true);
+          toast.dismiss("loading");
+          localStorage.setItem("count_v2", "0");
+        } else {
+          setSuccessSigning(false);
+          toast.dismiss("loading");
+          setModal(false);
+          setValues(["", "", "", "", "", ""]);
+          toast.error(res.message || "Ada yang salah", { icon: <XIcon /> });
+        }
       })
       .catch((err) => {
         toast.dismiss("loading");
         if (err.request.status === 401) {
+          restLogout({ token: localStorage.getItem("refresh_token_v2") });
+          localStorage.removeItem("token_v2");
+          localStorage.removeItem("refresh_token_v2");
           router.replace({
             pathname: "/login/v2",
-            query: { ...router.query },
+            query: { ...router.query, showAutoLogoutInfo: "1" },
           });
         } else {
           toast.error("Kode OTP salah", { icon: <XIcon /> });
@@ -517,17 +619,46 @@ const OTPModal: React.FC<IModal> = ({ modal, setModal }) => {
           localStorage.setItem("count_v2", newCount.toString());
           const count = parseInt(localStorage.getItem("count_v2") as string);
           if (count >= 5) {
-            localStorage.removeItem("token_v2");
-            localStorage.setItem("count_v2", "0");
-            restLogout({});
-            router.replace({
-              pathname: "/login/v2",
-              query: { ...router.query },
-            });
+            signingFailure(err.response?.data?.message || "Ada yang salah");
           }
         }
       });
   };
+
+  useEffect(() => {
+    if (modal && !successSigning) {
+      restGetOtp({ token: localStorage.getItem("token_v2") })
+        .then((res) => {
+          toast(`Kode OTP telah dikirim ke Email anda`, {
+            type: "info",
+            toastId: "info",
+            isLoading: false,
+            position: "top-center",
+          });
+        })
+        .catch((err) => {
+          if (err.request.status === 401) {
+            restLogout({ token: localStorage.getItem("refresh_token_v2") });
+            localStorage.removeItem("token_v2");
+            localStorage.removeItem("refresh_token_v2");
+            router.replace({
+              pathname: "/login/v2",
+              query: { ...router.query, showAutoLogoutInfo: "1" },
+            });
+          } else {
+            toast.error("Kode OTP gagal dikirim", {
+              icon: <XIcon />,
+            });
+          }
+        });
+    }
+  }, [modal]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (successSigning) {
+      callbackSuccess();
+    }
+  }, [successSigning]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return modal ? (
     <div
@@ -535,75 +666,42 @@ const OTPModal: React.FC<IModal> = ({ modal, setModal }) => {
       className="fixed z-50 flex items-start transition-all duration-1000 pb-3 justify-center w-full left-0 top-0 h-full "
     >
       <div className="bg-white max-w-md mt-20 pt-5 px-2 pb-3 rounded-md w-full mx-5">
-        {successSigning ? (
-          <div className="flex flex-col  items-center">
-            <p className="font-poppins block text-center  whitespace-nowrap  font-semibold ">
-              Tanda Tangan Berhasil
-            </p>
-            <div className="my-10">
-              <Image
-                width={150}
-                height={150}
-                src={`${assetPrefix}/images/successFR.svg`}
-                alt="success-fr-ill"
-              />
-            </div>
-
-            <button
-              onClick={() => {
-                setModal(false);
-                if (restRouterQuery.redirect_url) {
-                  window.location.replace(
-                    concateRedirectUrlParams(
-                      restRouterQuery.redirect_url as string,
-                      ""
-                    )
-                  );
-                }
-              }}
-              className="bg-primary btn  text-white font-poppins w-full mt-5 mx-auto rounded-sm h-9 font-semibold hover:opacity-50"
-            >
-              Tutup
-            </button>
-          </div>
-        ) : (
-          <div className="flex flex-col">
-            <p className="font-poppins block text-center pb-5  whitespace-nowrap  font-semibold ">
-              Goresan
-            </p>
-            <span className="font-poppins block text-center pb-5  ">
-              Masukkan 6 digit OTP
-            </span>
-            <PinInput
-              containerStyle={{
-                alignItems: "center",
-                gap: 5,
-                marginTop: "10px",
-              }}
-              inputStyle={{ alignItems: "center", gap: 5, marginTop: "10px" }}
-              placeholder=""
-              size="lg"
-              values={values}
-              onChange={(value, index, values) => setValues(values)}
-            />
-            <button
-              disabled={values.join("").length < 6}
-              onClick={onClickHandler}
-              className="bg-primary btn mt-16 disabled:opacity-50 text-white font-poppins mx-auto rounded-sm py-2.5 px-6 font-semibold"
-            >
-              Konfirmasi
-            </button>
-            <button
-              onClick={() => {
-                setValues(["", "", "", "", "", ""]);
-                setModal(!modal);
-              }}
-              className="  text-primary font-poppins mt-4 hover:opacity-50 w-full mx-auto rounded-sm h-9 font-semibold"
-            >
-              Batal
-            </button>
-          </div>
-        )}
+        <div className="flex flex-col">
+          <p className="font-poppins block text-center pb-5  whitespace-nowrap  font-semibold ">
+            Goresan
+          </p>
+          <span className="font-poppins block text-center pb-5  ">
+            Masukkan 6 digit OTP
+          </span>
+          <PinInput
+            containerStyle={{
+              alignItems: "center",
+              gap: 5,
+              marginTop: "10px",
+            }}
+            inputStyle={{ alignItems: "center", gap: 5, marginTop: "10px" }}
+            placeholder=""
+            size="lg"
+            values={values}
+            onChange={(value, index, values) => setValues(values)}
+          />
+          <button
+            disabled={values.join("").length < 6}
+            onClick={onClickHandler}
+            className="bg-primary btn mt-16 disabled:opacity-50 text-white font-poppins mx-auto rounded-sm py-2.5 px-6 font-semibold"
+          >
+            Konfirmasi
+          </button>
+          <button
+            onClick={() => {
+              setValues(["", "", "", "", "", ""]);
+              setModal(!modal);
+            }}
+            className="  text-primary font-poppins mt-4 hover:opacity-50 w-full mx-auto rounded-sm h-9 font-semibold"
+          >
+            Batal
+          </button>
+        </div>
       </div>
     </div>
   ) : null;

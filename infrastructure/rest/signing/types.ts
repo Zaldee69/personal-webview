@@ -23,7 +23,9 @@ export interface TSigningResponseData {
 }
 
 export interface TSigningAuthPINRequestData {
-  pin: string;
+  pin?: string;
+  otp_pin?: string;
+  face_image?: string;
   user: string;
   id: string;
 }
@@ -51,5 +53,5 @@ export interface ISigningDownloadSignedPDFResponseData {
   message: string;
   request_id: string;
   status: "PROCESS" | "UNAUTHORIZED" | "DENIED" | "DONE";
-  signed_pdf: ISignedPDF[];
+  signed_pdf: ISignedPDF[] | null;
 }
