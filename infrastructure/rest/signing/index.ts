@@ -31,16 +31,25 @@ export const restSigning = ({
 
 export const RestSigningAuthPIN = ({
   payload,
+  token,
 }: {
   payload: TSigningAuthPINRequestData;
+  token?: string | null;
 }): Promise<TSigningAuthPINResponseData> => {
   return axios
     .post<TSigningAuthPINResponseData>(
       `${BASE_URL}/signing-authpin`,
       {
         pin: payload.pin,
+        otp_pin: payload.otp_pin,
+        face_image: payload.face_image,
       },
       {
+        headers: token
+          ? {
+              Authorization: `Bearer ${token}`,
+            }
+          : undefined,
         params: {
           user: payload.user,
           id: payload.id,

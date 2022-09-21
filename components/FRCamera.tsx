@@ -22,6 +22,7 @@ interface Props {
   signingFailedRedirectTo?: string;
   tokenIdentifier?: string;
   countIdentifier?: string;
+  callbackCaptureProcessor?: (base64Img: string | null | undefined) => void;
 }
 
 let dom: any;
@@ -32,6 +33,7 @@ const FRCamera = ({
   signingFailedRedirectTo = handleRoute("/login"),
   tokenIdentifier = "token",
   countIdentifier = "count",
+  callbackCaptureProcessor,
 }: Props) => {
   const constraint: Constraint = {
     width: 1280,
@@ -89,76 +91,80 @@ const FRCamera = ({
       position: "top-center",
     });
     const imageSrc = webcamRef?.current?.getScreenshot();
-    restSigning({
-      payload: {
-        file_name: new Date().getTime().toString(),
-        otp_pin: "",
-        content_pdf: document.response.data.document,
-        width: document.response.data.width,
-        height: document.response.data.height,
-        face_image: imageSrc?.split(",")[1] as string,
-        coordinate_x: document.response.data.posX,
-        coordinate_y: document.response.data.posY,
-        signature_image:
-          signature.data.font ||
-          signature.data.scratch ||
-          document.response.data.tandaTangan,
-        page_number: document.response.data.page_number,
-        qr_content: "",
-        tilakey: "",
-        company_id: "",
-        api_id: "",
-        trx_id: (transaction_id as string) || (request_id as string),
-      },
-    })
-      .then((res) => {
-        if (res.success) {
-          localStorage.setItem(countIdentifier, "0");
-          toast.dismiss("info");
-          toast(`Pencocokan berhasil`, {
-            type: "success",
-            position: "top-center",
-          });
-          setIsFRSuccess(true);
-        } else if (!res.success) {
-          toast.dismiss("info");
-          toast.error(res.message, { icon: <XIcon /> });
-          setModal(false);
-        }
+    if (callbackCaptureProcessor) {
+      callbackCaptureProcessor(imageSrc);
+    } else {
+      restSigning({
+        payload: {
+          file_name: new Date().getTime().toString(),
+          otp_pin: "",
+          content_pdf: document.response.data.document,
+          width: document.response.data.width,
+          height: document.response.data.height,
+          face_image: imageSrc?.split(",")[1] as string,
+          coordinate_x: document.response.data.posX,
+          coordinate_y: document.response.data.posY,
+          signature_image:
+            signature.data.font ||
+            signature.data.scratch ||
+            document.response.data.tandaTangan,
+          page_number: document.response.data.page_number,
+          qr_content: "",
+          tilakey: "",
+          company_id: "",
+          api_id: "",
+          trx_id: (transaction_id as string) || (request_id as string),
+        },
       })
-      .catch((err) => {
-        toast.dismiss("info");
-        if (err.request.status === 401) {
-          localStorage.removeItem(tokenIdentifier);
-          localStorage.setItem(countIdentifier, "0");
-          router.replace({
-            pathname: signingFailedRedirectTo,
-            query: { ...router.query },
-          });
-        } else {
-          setModal(false);
-          setTimeout(() => {
-            setModal(true);
-          }, 100);
-          toast.error("Wajah tidak cocok", { icon: <XIcon /> });
-          const newCount =
-            parseInt(localStorage.getItem(countIdentifier) as string) + 1;
-          localStorage.setItem(countIdentifier, newCount.toString());
-          const count = parseInt(
-            localStorage.getItem(countIdentifier) as string
-          );
-          setModal(false);
-          if (count >= 5) {
+        .then((res) => {
+          if (res.success) {
+            localStorage.setItem(countIdentifier, "0");
+            toast.dismiss("info");
+            toast(`Pencocokan berhasil`, {
+              type: "success",
+              position: "top-center",
+            });
+            setIsFRSuccess(true);
+          } else if (!res.success) {
+            toast.dismiss("info");
+            toast.error(res.message, { icon: <XIcon /> });
+            setModal(false);
+          }
+        })
+        .catch((err) => {
+          toast.dismiss("info");
+          if (err.request.status === 401) {
             localStorage.removeItem(tokenIdentifier);
             localStorage.setItem(countIdentifier, "0");
-            restLogout({});
             router.replace({
               pathname: signingFailedRedirectTo,
               query: { ...router.query },
             });
+          } else {
+            setModal(false);
+            setTimeout(() => {
+              setModal(true);
+            }, 100);
+            toast.error("Wajah tidak cocok", { icon: <XIcon /> });
+            const newCount =
+              parseInt(localStorage.getItem(countIdentifier) as string) + 1;
+            localStorage.setItem(countIdentifier, newCount.toString());
+            const count = parseInt(
+              localStorage.getItem(countIdentifier) as string
+            );
+            setModal(false);
+            if (count >= 5) {
+              localStorage.removeItem(tokenIdentifier);
+              localStorage.setItem(countIdentifier, "0");
+              restLogout({});
+              router.replace({
+                pathname: signingFailedRedirectTo,
+                query: { ...router.query },
+              });
+            }
           }
-        }
-      });
+        });
+    }
   }, [webcamRef]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
