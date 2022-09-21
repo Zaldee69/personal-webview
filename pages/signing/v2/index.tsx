@@ -189,7 +189,12 @@ const Signing = (props: TPropsSigning) => {
               style={{ maxHeight: "190px" }}
             >
               {documentList.map((e, i) => (
-                <div key={i} className="flex items-center justify-between">
+                <div
+                  key={i}
+                  className={`flex items-center justify-between ${
+                    i !== 0 ? "mt-4" : ""
+                  }`}
+                >
                   <p className="text-sm text-neutral800 truncate">
                     {e.pdf_name}
                   </p>
