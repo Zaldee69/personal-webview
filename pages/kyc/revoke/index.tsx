@@ -5,7 +5,7 @@ import Head from "next/head";
 import Image from "next/image";
 import { toast } from "react-toastify";
 import XIcon from "@/public/icons/XIcon";
-import { Fragment, useState, useEffect } from "react";
+import { useRef, useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Loading from "@/components/Loading";
 import { assetPrefix } from "next.config";
@@ -28,7 +28,8 @@ const RevokeMekari = () => {
   const [failedMessage, setFailedMessage] = useState<string>("");
   const [progress, setProgress] = useState(0);
   const [isStepDone, setStepDone] = useState<boolean>(false)
-  const [isCameraLoaded, setIsCameraLoaded] = useState<boolean>(true)
+  const [isGenerateAction, setIsGenerateAction] = useState<boolean>(true)
+  const [isMustReload, setIsMustReload] = useState<boolean>(false)
 
   const actionList = useSelector(
     (state: RootState) => state.liveness.actionList
@@ -53,6 +54,7 @@ const RevokeMekari = () => {
       : "Pastikan wajah di dalam garis panduan dan ikuti petunjuk dengan benar";
 
   const dispatch: AppDispatch = useDispatch();
+  const humanReadyRef = useRef<null>(null);
 
   useEffect(() => {
     const track: any = document.querySelector(".track");
@@ -75,16 +77,19 @@ const RevokeMekari = () => {
         if (result?.data) {
           const payload = ["look_straight"].concat(result.data.actionList);
           dispatch(setActionList(payload));
+          setIsGenerateAction(false)
         } else {
           throw new Error(result.message);
         }
       })
       .catch((error) => {
         toast.dismiss("generateAction");
+        setIsGenerateAction(false)
         const msg = error.response?.data?.data?.errors?.[0];
         const status = error.response?.data?.data?.status;
         const user = error.response?.data?.data?.user;
         if (msg) {
+          setIsGenerateAction(false)
           toast.error(msg, {
             icon: <XIcon />,
           });
@@ -106,6 +111,7 @@ const RevokeMekari = () => {
               }, 3000);
             }
           } else if (status === "S") {
+            setIsGenerateAction(false)
             if (routerQuery.redirect_url) {
               setTimeout(() => {
                 const params = {
@@ -242,6 +248,14 @@ const RevokeMekari = () => {
     dispatch(resetImages());
   }, [router.isReady]);
 
+  useEffect(() => {
+    setTimeout(() => {
+      const any = document.getElementById("loading")
+      console.log(any)
+      if(any !== null) setIsMustReload(true)
+    }, 15000)
+  }, [])
+
 
   return (
     <>
@@ -251,10 +265,10 @@ const RevokeMekari = () => {
     </Head>
     <div className="py-10 max-w-sm mx-auto px-2">
     <h2 className="font-poppins text-xl font-semibold">
-      { isCameraLoaded ?  <SkeletonLoading width="w-2/5" /> : "Liveness" }
+      { isGenerateAction ?  <SkeletonLoading width="w-2/5" /> : "Liveness" }
     </h2>
       <span className="font-poppins text-sm mt-5 block">
-        { isCameraLoaded ? <SkeletonLoading width="w-full" isDouble /> : subtitle }
+        { isGenerateAction ? <SkeletonLoading width="w-full" isDouble /> : subtitle }
       </span>
       {
         isLoading ? (
@@ -263,18 +277,30 @@ const RevokeMekari = () => {
           </div>
         ) : (
           <div className="relative" >
-                <div className={`rounded-md ${!isCameraLoaded && "hidden"} z-[9999] ease-in duration-300 absolute bg-[#E6E6E6] w-full h-[350px] flex justify-center items-center`}>
-                  <Loading title="Mohon menunggu" />
+              {
+                humanReadyRef.current === null && (
+                <div id="loading" className={`rounded-md z-[999] ease-in duration-300 absolute bg-[#E6E6E6] w-full h-[350px] flex justify-center items-center`}>
+                  <Loading title="Initializing" />
                 </div>
+                )
+              }
+              {
+                isMustReload && (
+                  <div className={`rounded-md z-[999] ease-in duration-300 absolute bg-[#E6E6E6] w-full h-[350px] flex justify-center items-center`}>
+                   <div className="text-center text-neutral50 font-poppins" >
+                    <p>Initializing Failed</p>
+                    <button className="text-[#000] mt-2" onClick={() => window.location.reload()} >Click here to reload page</button>
+                  </div>
+                </div>
+                )
+              }
                 <Camera
                  currentActionIndex={currentActionIndex}
                  setCurrentActionIndex={setCurrentActionIndex}
                  currentStep="Liveness Detection"
                  setFailedMessage={setFailedMessage}
-                 progress={progress}
                  setProgress={setProgress}
-                 isCameraLoaded={isCameraLoaded}
-                 setIsCameraLoaded={setIsCameraLoaded}
+                 humanReadyRef={humanReadyRef}
                />
           </div>
         )
@@ -283,7 +309,7 @@ const RevokeMekari = () => {
         !isStepDone && actionList.length > 1 ? (
           <>
             <div className="mt-5 flex justify-center">
-              {!isCameraLoaded && (
+              {!isGenerateAction && (
                 <Image
                   src={`${assetPrefix}/images/${!isStepDone ? "hadap-depan" : currentIndex}.svg`}
                   width={50}
@@ -292,14 +318,19 @@ const RevokeMekari = () => {
                 />
               )}
             </div>
-            <div className="flex items-center justify-center mt-5 flex-col">
-              <span className={` ${isCameraLoaded && "mt-14" } font-poppins w-full text-center font-medium`}>{ isCameraLoaded ? <SkeletonLoading width="w-full" /> : "Wajah menghadap depan"}</span>
-            <span className="text-center font-poppins text-sm w-full mt-7 text-neutral">
-                  { isCameraLoaded ? <SkeletonLoading width="w-full" isDouble /> : "Mohon jangan bergerak selama proses pengambilan wajah"}
-               </span>
-            </div>
+              <div className="flex items-center justify-center mt-5 flex-col">
+                <span className={`font-poppins w-full text-center font-medium`}>Wajah menghadap depan</span>
+                  <span className="text-center font-poppins text-sm w-full mt-7 text-neutral">Mohon jangan bergerak selama proses pengambilan wajah</span>
+              </div>
           </> ) : (
           <div>
+             {
+                isGenerateAction && (
+                  <div className="flex items-center justify-center mt-14 flex-col">
+                    <SkeletonLoading width="w-full" isDouble />
+                  </div>
+                )
+              }
             {
               !isLoading && (
                 <>
@@ -332,7 +363,7 @@ const RevokeMekari = () => {
           )
       }
       {
-        isCameraLoaded ? (
+        isGenerateAction ? (
           <div className="w-2/5 h-[5px] mx-auto mt-10 border-b-2 border-[#E6E6E6] " ></div>
         ) : (
           <ProgressStepBar
