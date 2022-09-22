@@ -60,7 +60,6 @@ const Signing = (props: TPropsSigning) => {
   const routerIsReady = router.isReady;
   const routerQuery: NextParsedUrlQuery & {
     redirect_url?: string;
-    fr?: "1";
   } & IParameterFromRequestSign = router.query;
 
   const [shouldRender, setShouldRender] = useState<boolean>(false);
@@ -157,11 +156,25 @@ const Signing = (props: TPropsSigning) => {
           } else {
             setIsSuccess("0");
             setSigningFailureDocumentName("");
-            if (res.signed_pdf === null) {
+            if (res.status === "DENIED") {
               setSiginingFailureError({
-                message: "Dokumen Expired",
-                status: "Exp",
+                message: res.message || "Status dokument DENIED",
+                status: res.status,
               });
+            } else if (res.status === "PROCESS") {
+              if (res.signed_pdf === null) {
+                setSiginingFailureError({
+                  message: "Dokumen Expired",
+                  status: "Exp",
+                });
+              } else {
+                setSiginingFailureError({
+                  message:
+                    res.message ||
+                    "Tidak berhasil pada saat memuat list dokumen",
+                  status: "Exp",
+                });
+              }
             } else {
               setSiginingFailureError({
                 message:
@@ -334,7 +347,14 @@ const SigningSuccess = (props: TPropsSigningSuccess) => {
   const router = useRouter();
   const routerQuery: NextParsedUrlQuery & {
     redirect_url?: string;
-  } = router.query;
+  } & IParameterFromRequestSign = router.query;
+
+  const params = {
+    user_identifier: routerQuery.user,
+    request_id: routerQuery.request_id,
+    status: "Sukses",
+  };
+  const queryString = new URLSearchParams(params as any).toString();
 
   return (
     <div className="px-10 pt-16 pb-9 text-center flex flex-col justify-center min-h-screen">
@@ -359,7 +379,12 @@ const SigningSuccess = (props: TPropsSigningSuccess) => {
       <div className="mt-32">
         {routerQuery.redirect_url && (
           <div className="text-primary text-base font-medium font-poppins underline hover:cursor-pointer">
-            <a href={concateRedirectUrlParams(routerQuery.redirect_url, "")}>
+            <a
+              href={concateRedirectUrlParams(
+                routerQuery.redirect_url,
+                queryString
+              )}
+            >
               <a>Kembali ke Halaman Utama</a>
             </a>
           </div>
@@ -483,6 +508,9 @@ const FRModal: React.FC<IModal> = ({
           toast.dismiss("info");
           setModal(false);
           toast.error(res.message || "Ada yang salah", { icon: <XIcon /> });
+          const newCount =
+            parseInt(localStorage.getItem("count_v2") as string) + 1;
+          localStorage.setItem("count_v2", newCount.toString());
         }
       })
       .catch((err) => {
@@ -599,6 +627,9 @@ const OTPModal: React.FC<IModal> = ({
           setModal(false);
           setValues(["", "", "", "", "", ""]);
           toast.error(res.message || "Ada yang salah", { icon: <XIcon /> });
+          const newCount =
+            parseInt(localStorage.getItem("count_v2") as string) + 1;
+          localStorage.setItem("count_v2", newCount.toString());
         }
       })
       .catch((err) => {
