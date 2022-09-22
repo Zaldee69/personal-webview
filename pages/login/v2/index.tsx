@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Dispatch, SetStateAction } from "react";
 import { getCertificateList } from "infrastructure/rest/b2b";
 import Footer from "@/components/Footer";
 import EyeIcon from "@/public/icons/EyeIcon";
@@ -15,6 +15,18 @@ import { useRouter } from "next/router";
 import { handleRoute } from "./../../../utils/handleRoute";
 import Image from "next/image";
 import { assetPrefix } from "../../../next.config";
+import { NextParsedUrlQuery } from "next/dist/server/request-meta";
+interface IParameterFromRequestSign {
+  user?: string;
+  id?: string;
+  channel_id?: string;
+  request_id?: string;
+}
+
+interface IModal {
+  modal: boolean;
+  setModal: Dispatch<SetStateAction<boolean>>;
+}
 
 type ModalProps = {
   certifModal: boolean;
@@ -29,14 +41,26 @@ const Login = () => {
     password: "password",
   });
   const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
+  const [autoLogoutModal, setAutoLogoutModal] = useState<boolean>(false);
   const dispatch: AppDispatch = useDispatch();
   const data = useSelector((state: RootState) => state.login);
   const router = useRouter();
-  const { channel_id, user, id, ...restRouterQuery } = router.query;
+  const {
+    channel_id,
+    user,
+    id,
+    showAutoLogoutInfo,
+  }: NextParsedUrlQuery & {
+    redirect_url?: string;
+    showAutoLogoutInfo?: string;
+  } & IParameterFromRequestSign = router.query;
 
   useEffect(() => {
     if (router.isReady) {
       setTilakaName(user as string);
+      if (showAutoLogoutInfo === "1") {
+        setAutoLogoutModal(true);
+      }
     }
   }, [router.isReady]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -126,6 +150,10 @@ const Login = () => {
   return (
     <>
       <CertifModal setCertifModal={setCertifModal} certifModal={certifModal} />
+      <AutoLogoutInfoModal
+        modal={autoLogoutModal}
+        setModal={setAutoLogoutModal}
+      />
       <Head>
         <title>Tilaka</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
@@ -223,6 +251,59 @@ const CertifModal = ({ certifModal, setCertifModal }: ModalProps) => {
         >
           BATAL
         </button>
+      </div>
+    </div>
+  ) : null;
+};
+
+const AutoLogoutInfoModal: React.FC<IModal> = ({ modal, setModal }) => {
+  const router = useRouter();
+  const routerQuery: NextParsedUrlQuery & {
+    redirect_url?: string;
+    showAutoLogoutInfo?: string;
+  } & IParameterFromRequestSign = router.query;
+  const { showAutoLogoutInfo, ...restRouterQuery } = routerQuery;
+
+  const onClose = () => {
+    setModal(false);
+    router.replace({
+      pathname: handleRoute("/login/v2"),
+      query: { ...restRouterQuery },
+    });
+  };
+
+  return modal ? (
+    <div
+      style={{ backgroundColor: "rgba(0, 0, 0, .5)" }}
+      className="fixed z-50 flex items-start transition-all duration-1000 pb-3 justify-center w-full left-0 top-0 h-full "
+    >
+      <div className="bg-white max-w-sm mt-20 pt-6 px-3 pb-3 rounded-xl w-full mx-5">
+        <div className="flex flex-col">
+          <p className="font-poppins text-center font-semibold text-base text-neutral800">
+            Anda Keluar Otomatis
+          </p>
+          <div className="flex justify-center">
+            <Image
+              src={`${assetPrefix}/images/autoLogout.svg`}
+              width="95px"
+              height="95px"
+              alt="auto-logout-ill"
+            />
+          </div>
+          <p
+            className="text-base font-normal text-neutral800 font-poppins text-center mt-2.5 mx-auto"
+            style={{ maxWidth: "330px" }}
+          >
+            Batas waktu login Anda telah habis.
+            <br /> Mohon lakukan login ulang dengan mengisi Kata Sandi.
+          </p>
+          <button
+            onClick={onClose}
+            className="text-primary font-poppins mt-4 hover:opacity-50 mx-auto rounded-sm font-semibold p-4 text-sm"
+          >
+            Tutup
+          </button>
+        </div>
       </div>
     </div>
   ) : null;
