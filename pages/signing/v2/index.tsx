@@ -511,10 +511,20 @@ const FRModal: React.FC<IModal> = ({
           const newCount =
             parseInt(localStorage.getItem("count_v2") as string) + 1;
           localStorage.setItem("count_v2", newCount.toString());
+          const count = parseInt(localStorage.getItem("count_v2") as string);
+          if (
+            count >= 5 ||
+            res.message.toLowerCase() ===
+              "penandatanganan dokumen gagal. gagal FR sudah 5 kali".toLocaleLowerCase()
+          ) {
+            signingFailure(res.message || "Ada yang salah");
+          }
         }
       })
       .catch((err) => {
+        setIsFRSuccess(false);
         toast.dismiss("info");
+        setModal(false);
         if (err.request.status === 401) {
           restLogout({ token: localStorage.getItem("refresh_token_v2") });
           localStorage.removeItem("token_v2");
@@ -524,7 +534,9 @@ const FRModal: React.FC<IModal> = ({
             query: { ...router.query, showAutoLogoutInfo: "1" },
           });
         } else {
-          toast.error("Wajah tidak cocok", { icon: <XIcon /> });
+          toast.error(err.response?.data?.message || "Wajah tidak cocok", {
+            icon: <XIcon />,
+          });
           const newCount =
             parseInt(localStorage.getItem("count_v2") as string) + 1;
           localStorage.setItem("count_v2", newCount.toString());
@@ -630,10 +642,21 @@ const OTPModal: React.FC<IModal> = ({
           const newCount =
             parseInt(localStorage.getItem("count_v2") as string) + 1;
           localStorage.setItem("count_v2", newCount.toString());
+          const count = parseInt(localStorage.getItem("count_v2") as string);
+          if (
+            count >= 5 ||
+            res.message.toLowerCase() ===
+              "penandatanganan dokumen gagal. gagal FR sudah 5 kali".toLocaleLowerCase()
+          ) {
+            signingFailure(res.message || "Ada yang salah");
+          }
         }
       })
       .catch((err) => {
+        setSuccessSigning(false);
         toast.dismiss("loading");
+        setModal(false);
+        setValues(["", "", "", "", "", ""]);
         if (err.request.status === 401) {
           restLogout({ token: localStorage.getItem("refresh_token_v2") });
           localStorage.removeItem("token_v2");
@@ -643,7 +666,9 @@ const OTPModal: React.FC<IModal> = ({
             query: { ...router.query, showAutoLogoutInfo: "1" },
           });
         } else {
-          toast.error("Kode OTP salah", { icon: <XIcon /> });
+          toast.error(err.response?.data?.message || "Kode OTP salah", {
+            icon: <XIcon />,
+          });
           setValues(["", "", "", "", "", ""]);
           const newCount =
             parseInt(localStorage.getItem("count_v2") as string) + 1;
@@ -699,7 +724,7 @@ const OTPModal: React.FC<IModal> = ({
       <div className="bg-white max-w-md mt-20 pt-5 px-2 pb-3 rounded-md w-full mx-5">
         <div className="flex flex-col">
           <p className="font-poppins block text-center pb-5  whitespace-nowrap  font-semibold ">
-            Goresan
+            Konfirmasi Tanda Tangan
           </p>
           <span className="font-poppins block text-center pb-5  ">
             Masukkan 6 digit OTP
