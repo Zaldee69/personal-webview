@@ -72,6 +72,7 @@ const Login = () => {
       if (data.data.message.length > 0) {
         queryWithDynamicRedirectURL["redirect_url"] = data.data.message;
       }
+      localStorage.setItem("count_v2", "0");
       localStorage.setItem("token_v2", data.data.data[0] as string);
       localStorage.setItem("refresh_token_v2", data.data.data[1] as string);
       getCertificateList({
