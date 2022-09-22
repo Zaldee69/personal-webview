@@ -33,12 +33,24 @@ function CertificateInformation({}: Props) {
           dispatch(setCertificate(result));
         }
       })
-      .catch((_) => {
-        toast("Gagal mengecek sertifikat", {
-          type: "error",
-          toastId: "error",
-          position: "top-center",
-        });
+      .catch((err) => {
+        switch (err.response.status) {
+          case 401:
+            // unauthorized
+            router.replace({
+              pathname: handleRoute("login"),
+              query: { ...router.query },
+            });
+            break;
+          
+          default:
+            toast("Gagal mengecek sertifikat", {
+              type: "error",
+              toastId: "error",
+              position: "top-center",
+            }); 
+            break;
+        }
       });
   };
 
@@ -75,12 +87,24 @@ function CertificateInformation({}: Props) {
           });
         }
       })
-      .catch((_) => {
-        toast("Gagal mengaktifkan sertifikat", {
-          type: "error",
-          toastId: "error",
-          position: "top-center",
-        });
+      .catch((err) => { 
+        switch (err.response.status) {
+          case 401:
+            // unauthorized
+            router.replace({
+              pathname: handleRoute("login"),
+              query: { ...router.query },
+            });
+            break;
+          
+          default:
+            toast("Gagal mengecek sertifikat", {
+              type: "error",
+              toastId: "error",
+              position: "top-center",
+            }); 
+            break;
+        }
       });
   };
   return (
