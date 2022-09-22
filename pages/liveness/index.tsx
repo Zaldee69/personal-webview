@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Head from "next/head";
 import { AppDispatch, RootState } from "@/redux/app/store";
@@ -33,8 +33,8 @@ const Liveness = () => {
   const [failedMessage, setFailedMessage] = useState<string>("");
   const [progress, setProgress] = useState(0);
   const [isStepDone, setStepDone] = useState<boolean>(false)
-  const [isCameraLoaded, setIsCameraLoaded] = useState<boolean>(true)
-
+  const [isGenerateAction, setIsGenerateAction] = useState<boolean>(true)
+  const [isMustReload, setIsMustReload] = useState<boolean>(false)
   const actionList = useSelector(
     (state: RootState) => state.liveness.actionList
   );
@@ -86,6 +86,7 @@ const Liveness = () => {
   }, [progress])
 
   const dispatch: AppDispatch = useDispatch();
+  const humanReadyRef = useRef<null>(null);
 
   const generateAction = () => {
     const body = {
@@ -139,7 +140,9 @@ const Liveness = () => {
                     autoClose: 3000,
                   });
                   toast.dismiss("generateAction");
+                  setIsGenerateAction(false)
                 } else {
+                  setIsGenerateAction(false)
                   throw new Error(result.message);
                 }
               })
@@ -155,12 +158,15 @@ const Liveness = () => {
                       position: "top-center",
                       autoClose: 3000,
                     });
+                    setIsGenerateAction(false)
                   } else {
                     toast.error(msg, {
                       icon: <XIcon />,
                     });
+                    setIsGenerateAction(false)
                   }
                 } else {
+                  setIsGenerateAction(false)
                   toast.error(
                     error.response?.data?.message || "Generate Action gagal",
                     {
@@ -172,6 +178,7 @@ const Liveness = () => {
           }
         } else {
           // this scope for status D F E
+          setIsGenerateAction(false)
           toast.dismiss("generateAction");
           toast(`${res.message || "Tidak merespon!"}`, {
             type: "error",
@@ -224,6 +231,7 @@ const Liveness = () => {
       })
       .catch((err) => {
         toast.dismiss("generateAction");
+        setIsGenerateAction(false)
         if (err.response?.data?.data?.errors?.[0]) {
           toast.error(err.response?.data?.data?.errors?.[0], {
             icon: <XIcon />,
@@ -385,6 +393,14 @@ const Liveness = () => {
     dispatch(resetImages());
   }, [router.isReady]);
 
+  useEffect(() => {
+    setTimeout(() => {
+      const any = document.getElementById("loading")
+      if(any !== null) setIsMustReload(true)
+    }, 10000)
+  }, [])
+
+  
   return (
     <>
       <Head>
@@ -393,10 +409,10 @@ const Liveness = () => {
       </Head>
       <div className="py-10 max-w-sm mx-auto px-2">
       <h2 className="font-poppins text-xl font-semibold">
-        { isCameraLoaded ?  <SkeletonLoading width="w-2/5" /> : "Liveness" }
+        { isGenerateAction ?  <SkeletonLoading width="w-2/5" /> : "Liveness" }
       </h2>
         <span className="font-poppins text-sm mt-5 block">
-          { isCameraLoaded ? <SkeletonLoading width="w-full" isDouble /> : subtitle }
+          { isGenerateAction ? <SkeletonLoading width="w-full" isDouble /> : subtitle }
         </span>
         {
           isLoading ? (
@@ -405,18 +421,30 @@ const Liveness = () => {
             </div>
           ) : (
             <div className="relative" >
-                  <div className={`rounded-md ${!isCameraLoaded && "hidden"} z-[9999] ease-in duration-300 absolute bg-[#E6E6E6] w-full h-[350px] flex justify-center items-center`}>
-                    <Loading title="Mohon menunggu" />
-                  </div>
+                   {
+                      humanReadyRef.current === null && (
+                      <div id="loading" className={`rounded-md z-[999] ease-in duration-300 absolute bg-[#E6E6E6] w-full h-[350px] flex justify-center items-center`}>
+                        <Loading title="Initializing" />
+                      </div>
+                      )
+                    }
+                    {
+                      isMustReload && (
+                        <div className={`rounded-md z-[999] ease-in duration-300 absolute bg-[#E6E6E6] w-full h-[350px] flex justify-center items-center`}>
+                        <div className="text-center text-neutral50 font-poppins" >
+                          <p>Initializing Failed</p>
+                          <button className="text-[#000] mt-2" onClick={() => window.location.reload()} >Click here to reload page</button>
+                        </div>
+                      </div>
+                      )
+                    }
                   <Camera
                    currentActionIndex={currentActionIndex}
                    setCurrentActionIndex={setCurrentActionIndex}
                    currentStep="Liveness Detection"
                    setFailedMessage={setFailedMessage}
-                   progress={progress}
                    setProgress={setProgress}
-                   isCameraLoaded={isCameraLoaded}
-                   setIsCameraLoaded={setIsCameraLoaded}
+                   humanReadyRef={humanReadyRef}
                  />
             </div>
           )
@@ -425,7 +453,7 @@ const Liveness = () => {
           !isStepDone && actionList.length > 1 ? (
             <>
               <div className="mt-5 flex justify-center">
-                {!isCameraLoaded && (
+                {!isGenerateAction && (
                   <Image
                     src={`${assetPrefix}/images/${!isStepDone ? "hadap-depan" : currentIndex}.svg`}
                     width={50}
@@ -435,13 +463,18 @@ const Liveness = () => {
                 )}
               </div>
               <div className="flex items-center justify-center mt-5 flex-col">
-                <span className={` ${isCameraLoaded && "mt-14" } font-poppins w-full text-center font-medium`}>{ isCameraLoaded ? <SkeletonLoading width="w-full" /> : "Wajah menghadap depan"}</span>
-              <span className="text-center font-poppins text-sm w-full mt-7 text-neutral">
-                    { isCameraLoaded ? <SkeletonLoading width="w-full" isDouble /> : "Mohon jangan bergerak selama proses pengambilan wajah"}
-                 </span>
+                <span className={`font-poppins w-full text-center font-medium`}>Wajah menghadap depan</span>
+                  <span className="text-center font-poppins text-sm w-full mt-7 text-neutral">Mohon jangan bergerak selama proses pengambilan wajah</span>
               </div>
             </> ) : (
             <div>
+              {
+                isGenerateAction && (
+                  <div className="flex items-center justify-center mt-14 flex-col">
+                    <SkeletonLoading width="w-full" isDouble />
+                  </div>
+                )
+              }
               {
                 !isLoading && (
                   <>
@@ -474,8 +507,8 @@ const Liveness = () => {
             )
         }
         {
-          isCameraLoaded ? (
-            <div className="w-2/5 h-[5px] mx-auto mt-10 border-b-2 border-[#E6E6E6] " ></div>
+          isGenerateAction ? (
+            <div className="w-2/5 h-[5px] mx-auto mt-5 border-b-2 border-[#E6E6E6] " ></div>
           ) : (
             <ProgressStepBar
               actionList={actionList}

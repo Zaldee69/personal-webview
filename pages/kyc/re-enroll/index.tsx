@@ -5,7 +5,7 @@ import Head from "next/head";
 import Image from "next/image";
 import { toast } from "react-toastify";
 import XIcon from "@/public/icons/XIcon";
-import { useState, useEffect } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/router";
 import Loading from "@/components/Loading";
 import { assetPrefix } from "next.config";
@@ -26,7 +26,8 @@ const ReEnrollMekari = () => {
   const [failedMessage, setFailedMessage] = useState<string>("");
   const [progress, setProgress] = useState(0);
   const [isStepDone, setStepDone] = useState<boolean>(false)
-  const [isCameraLoaded, setIsCameraLoaded] = useState<boolean>(true)
+  const [isGenerateAction, setIsGenerateAction] = useState<boolean>(true)
+  const [isMustReload, setIsMustReload] = useState<boolean>(false)
 
   const actionList = useSelector(
     (state: RootState) => state.liveness.actionList
@@ -65,6 +66,7 @@ const ReEnrollMekari = () => {
       }, [progress])
   
   const dispatch: AppDispatch = useDispatch();
+  const humanReadyRef = useRef<null>(null);
 
   const checkStep = async () => {
     const body = {
@@ -114,6 +116,7 @@ const ReEnrollMekari = () => {
     RestKycGenerateActionIssue(body)
     .then((result) => {
       if(result?.data){
+        setIsGenerateAction(false)
         const payload = ["look_straight"].concat(result.data.actionList)
         dispatch(setActionList(payload));
         setisLivenessStarted(true)
@@ -122,6 +125,7 @@ const ReEnrollMekari = () => {
       }
     })
     .catch((error) => {
+      setIsGenerateAction(false)
       const msg = error.response?.data?.data?.errors?.[0];
       const status = error.response?.data?.data?.status;
       if(msg) {
@@ -130,6 +134,7 @@ const ReEnrollMekari = () => {
         });
       }
       if(routerQuery.redirect_url && (status === "F" || status === "S")){
+        setIsGenerateAction(false)
         setTimeout(() => {
           const params = {
             issue_id: routerQuery.issue_id,
@@ -265,6 +270,14 @@ const ReEnrollMekari = () => {
     dispatch(resetImages());
   }, [router.isReady]);
 
+  useEffect(() => {
+    setTimeout(() => {
+      const any = document.getElementById("loading")
+      console.log(any)
+      if(any !== null) setIsMustReload(true)
+    }, 15000)
+  }, [])
+
   
   return (
     <>
@@ -338,10 +351,10 @@ const ReEnrollMekari = () => {
       </Head>
       <div className="py-10 max-w-sm mx-auto px-2">
       <h2 className="font-poppins text-xl font-semibold">
-        { isCameraLoaded ?  <SkeletonLoading width="w-2/5" /> : "Liveness" }
+        { isGenerateAction ?  <SkeletonLoading width="w-2/5" /> : "Liveness" }
       </h2>
         <span className="font-poppins text-sm mt-5 block">
-          { isCameraLoaded ? <SkeletonLoading width="w-full" isDouble /> : subtitle }
+          { isGenerateAction ? <SkeletonLoading width="w-full" isDouble /> : subtitle }
         </span>
         {
           isLoading ? (
@@ -350,18 +363,30 @@ const ReEnrollMekari = () => {
             </div>
           ) : (
             <div className="relative" >
-                  <div className={`rounded-md ${!isCameraLoaded && "hidden"} z-[9999] ease-in duration-300 absolute bg-[#E6E6E6] w-full h-[350px] flex justify-center items-center`}>
-                    <Loading title="Mohon menunggu" />
-                  </div>
+                     {
+                        humanReadyRef.current === null && (
+                        <div id="loading" className={`rounded-md z-[999] ease-in duration-300 absolute bg-[#E6E6E6] w-full h-[350px] flex justify-center items-center`}>
+                          <Loading title="Initializing" />
+                        </div>
+                        )
+                      }
+                      {
+                        isMustReload && (
+                          <div className={`rounded-md z-[999] ease-in duration-300 absolute bg-[#E6E6E6] w-full h-[350px] flex justify-center items-center`}>
+                          <div className="text-center text-neutral50 font-poppins" >
+                            <p>Initializing Failed</p>
+                            <button className="text-[#000] mt-2" onClick={() => window.location.reload()} >Click here to reload page</button>
+                          </div>
+                        </div>
+                        )
+                      }
                   <Camera
-                   currentActionIndex={currentActionIndex}
-                   setCurrentActionIndex={setCurrentActionIndex}
-                   currentStep="Liveness Detection"
-                   setFailedMessage={setFailedMessage}
-                   progress={progress}
-                   setProgress={setProgress}
-                   isCameraLoaded={isCameraLoaded}
-                   setIsCameraLoaded={setIsCameraLoaded}
+                     currentActionIndex={currentActionIndex}
+                     setCurrentActionIndex={setCurrentActionIndex}
+                     currentStep="Liveness Detection"
+                     setFailedMessage={setFailedMessage}
+                     setProgress={setProgress}
+                     humanReadyRef={humanReadyRef}
                  />
             </div>
           )
@@ -370,7 +395,7 @@ const ReEnrollMekari = () => {
           !isStepDone && actionList.length > 1 ? (
             <>
               <div className="mt-5 flex justify-center">
-                {!isCameraLoaded && (
+                {!isGenerateAction && (
                   <Image
                   src={`${assetPrefix}/images/${!isStepDone ? "hadap-depan" : currentIndex}.svg`}
                     width={50}
@@ -380,13 +405,18 @@ const ReEnrollMekari = () => {
                 )}
               </div>
               <div className="flex items-center justify-center mt-5 flex-col">
-                <span className={` ${isCameraLoaded && "mt-14" } font-poppins w-full text-center font-medium`}>{ isCameraLoaded ? <SkeletonLoading width="w-full" /> : "Wajah menghadap depan"}</span>
-              <span className="text-center font-poppins text-sm w-full mt-7 text-neutral">
-                    { isCameraLoaded ? <SkeletonLoading width="w-full" isDouble /> : "Mohon jangan bergerak selama proses pengambilan wajah"}
-                 </span>
+                <span className={`font-poppins w-full text-center font-medium`}>Wajah menghadap depan</span>
+                  <span className="text-center font-poppins text-sm w-full mt-7 text-neutral">Mohon jangan bergerak selama proses pengambilan wajah</span>
               </div>
             </> ) : (
             <div>
+               {
+                isGenerateAction && (
+                  <div className="flex items-center justify-center mt-14 flex-col">
+                    <SkeletonLoading width="w-full" isDouble />
+                  </div>
+                )
+              }
               {
                 !isLoading && (
                   <>
@@ -419,7 +449,7 @@ const ReEnrollMekari = () => {
             )
         }
         {
-          isCameraLoaded ? (
+          isGenerateAction ? (
             <div className="w-2/5 h-[5px] mx-auto mt-10 border-b-2 border-[#E6E6E6] " ></div>
           ) : (
             <ProgressStepBar
