@@ -28,10 +28,10 @@ interface Constraint {
 interface Props {
   currentStep: string;
   currentActionIndex: number;
-  humanReadyRef: any;
   setProgress: Dispatch<SetStateAction<number>>;
   setCurrentActionIndex: Dispatch<SetStateAction<number>>;
   setFailedMessage: Dispatch<SetStateAction<string>>;
+  setHumanReady: () => void
 }
 
 const Camera: React.FC<Props> = ({
@@ -40,7 +40,7 @@ const Camera: React.FC<Props> = ({
   setCurrentActionIndex,
   setFailedMessage,
   setProgress,
-  humanReadyRef,
+  setHumanReady
 }) => {
   const constraint: Constraint = {
     width: 1280,
@@ -126,8 +126,8 @@ const Camera: React.FC<Props> = ({
       import("@vladmandic/human/dist/human.esm.js").then((H) => {
         human = new H.default(humanConfig);
         human.load().then(() => {
-          humanReadyRef.current = true;
           console.log("ready")
+          setHumanReady()
         });
       });
     };
