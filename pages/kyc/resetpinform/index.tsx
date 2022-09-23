@@ -124,7 +124,7 @@ const PinFormDedicatedChannel = (props: Props) => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen">
+    <div className="flex justify-center items-center min-h-screen px-3 pt-3 pb-5">
       {isConfirmMode ? (
         <div className="w-full" style={{ maxWidth: "331px" }}>
           <PinFormComponent

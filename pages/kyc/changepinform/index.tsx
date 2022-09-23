@@ -192,7 +192,7 @@ const ChangePinDedicatedChannel = (props: Props) => {
   if (!shouldRender) return;
 
   return (
-    <div className="flex justify-center items-center min-h-screen">
+    <div className="flex justify-center items-center min-h-screen px-3 pt-3 pb-5">
       {!isNewPinMode ? (
         <div className="max-w-xs w-full">
           <PinFormComponent
