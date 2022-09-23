@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, Dispatch, SetStateAction } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Head from "next/head";
 import { AppDispatch, RootState } from "@/redux/app/store";
@@ -24,7 +24,12 @@ import Loading from "@/components/Loading";
 import SkeletonLoading from "@/components/SkeletonLoading";
 import { concateRedirectUrlParams } from "@/utils/concateRedirectUrlParams";
 
-let ready : boolean = false
+interface IModal {
+  modal: boolean;
+  setModal: Dispatch<SetStateAction<boolean>>;
+}
+
+let ready: boolean = false;
 
 const Liveness = () => {
   const router = useRouter();
@@ -34,9 +39,12 @@ const Liveness = () => {
   let [currentActionIndex, setCurrentActionIndex] = useState(0);
   const [failedMessage, setFailedMessage] = useState<string>("");
   const [progress, setProgress] = useState(0);
-  const [isStepDone, setStepDone] = useState<boolean>(false)
-  const [isGenerateAction, setIsGenerateAction] = useState<boolean>(true)
-  const [isMustReload, setIsMustReload] = useState<boolean>(false)
+  const [isStepDone, setStepDone] = useState<boolean>(false);
+  const [isGenerateAction, setIsGenerateAction] = useState<boolean>(true);
+  const [isMustReload, setIsMustReload] = useState<boolean>(false);
+  const [unsupportedDeviceModal, setUnsupportedDeviceModal] =
+    useState<boolean>(false);
+
   const actionList = useSelector(
     (state: RootState) => state.liveness.actionList
   );
@@ -73,28 +81,29 @@ const Liveness = () => {
     }
   };
 
-  const subtitle = isLoading ? "Terima kasih telah mengikuti proses Liveness. Hasil dinilai berdasarkan keaslian serta kesesuaian foto dengan aksi yang diminta." : "Pastikan wajah di dalam garis panduan dan ikuti petunjuk dengan benar"
+  const subtitle = isLoading
+    ? "Terima kasih telah mengikuti proses Liveness. Hasil dinilai berdasarkan keaslian serta kesesuaian foto dengan aksi yang diminta."
+    : "Pastikan wajah di dalam garis panduan dan ikuti petunjuk dengan benar";
 
   useEffect(() => {
     const track: any = document.querySelector(".track");
-    if(progress === 100){
-      track?.classList?.add("white-stroke")
+    if (progress === 100) {
+      track?.classList?.add("white-stroke");
       setTimeout(() => {
-        setStepDone(true)
-        track?.classList?.remove("white-stroke")
-      }, 2000)
+        setStepDone(true);
+        track?.classList?.remove("white-stroke");
+      }, 2000);
     }
-    
-  }, [progress])
+  }, [progress]);
 
   const dispatch: AppDispatch = useDispatch();
   const humanReadyRef = useRef<null>(null);
 
   const setHumanReady = () => {
-    ready = true
-    const loading : any = document.getElementById("loading")
-    loading.style.display = "none"
-  } 
+    ready = true;
+    const loading: any = document.getElementById("loading");
+    loading.style.display = "none";
+  };
 
   const generateAction = () => {
     const body = {
@@ -148,9 +157,9 @@ const Liveness = () => {
                     autoClose: 3000,
                   });
                   toast.dismiss("generateAction");
-                  setIsGenerateAction(false)
+                  setIsGenerateAction(false);
                 } else {
-                  setIsGenerateAction(false)
+                  setIsGenerateAction(false);
                   throw new Error(result.message);
                 }
               })
@@ -166,15 +175,15 @@ const Liveness = () => {
                       position: "top-center",
                       autoClose: 3000,
                     });
-                    setIsGenerateAction(false)
+                    setIsGenerateAction(false);
                   } else {
                     toast.error(msg, {
                       icon: <XIcon />,
                     });
-                    setIsGenerateAction(false)
+                    setIsGenerateAction(false);
                   }
                 } else {
-                  setIsGenerateAction(false)
+                  setIsGenerateAction(false);
                   toast.error(
                     error.response?.data?.message || "Generate Action gagal",
                     {
@@ -186,7 +195,7 @@ const Liveness = () => {
           }
         } else {
           // this scope for status D F E
-          setIsGenerateAction(false)
+          setIsGenerateAction(false);
           toast.dismiss("generateAction");
           toast(`${res.message || "Tidak merespon!"}`, {
             type: "error",
@@ -239,7 +248,7 @@ const Liveness = () => {
       })
       .catch((err) => {
         toast.dismiss("generateAction");
-        setIsGenerateAction(false)
+        setIsGenerateAction(false);
         if (err.response?.data?.data?.errors?.[0]) {
           toast.error(err.response?.data?.data?.errors?.[0], {
             icon: <XIcon />,
@@ -253,8 +262,7 @@ const Liveness = () => {
   };
 
   const changePage = async () => {
-
-    setIsLoading(true)
+    setIsLoading(true);
     setFailedMessage("");
 
     try {
@@ -309,10 +317,10 @@ const Liveness = () => {
             autoClose: 5000,
             position: "top-center",
           });
-            router.push({
-              pathname: handleRoute("liveness-fail"),
-              query: { ...routerQuery, request_id: router.query.request_id },
-            });
+          router.push({
+            pathname: handleRoute("liveness-fail"),
+            query: { ...routerQuery, request_id: router.query.request_id },
+          });
         } else {
           if (status) {
             if (status === "E") {
@@ -399,15 +407,18 @@ const Liveness = () => {
     if (!router.isReady) return;
     generateAction();
     dispatch(resetImages());
+    // For testing purposes
+    if (routerQuery.showUnsupportedDeviceModal === "1") {
+      setUnsupportedDeviceModal(true);
+    }
   }, [router.isReady]);
 
   useEffect(() => {
     setTimeout(() => {
-      if(!ready) setIsMustReload(true)
-    }, 15000)
-  }, [])
+      if (!ready) setIsMustReload(true);
+    }, 15000);
+  }, []);
 
-  
   return (
     <>
       <Head>
@@ -415,129 +426,207 @@ const Liveness = () => {
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
       <div className="py-10 max-w-sm mx-auto px-2">
-      <h2 className="font-poppins text-xl font-semibold">
-        { isGenerateAction ?  <SkeletonLoading width="w-2/5" /> : "Liveness" }
-      </h2>
+        <h2 className="font-poppins text-xl font-semibold">
+          {isGenerateAction ? <SkeletonLoading width="w-2/5" /> : "Liveness"}
+        </h2>
         <span className="font-poppins text-sm mt-5 block">
-          { isGenerateAction ? <SkeletonLoading width="w-full" isDouble /> : subtitle }
+          {isGenerateAction ? (
+            <SkeletonLoading width="w-full" isDouble />
+          ) : (
+            subtitle
+          )}
         </span>
-        {
-          isLoading ? (
-            <div className="mt-5 rounded-md h-[350px] flex justify-center items-center sm:w-full md:w-full">
-              <Loading title="Mohon menunggu" />
-            </div>
-          ) : (
-            <div className="relative" >
-                   {
-                      !ready && (
-                      <div id="loading" className={`rounded-md z-[999] ease-in duration-300 absolute bg-[#E6E6E6] w-full h-[350px] flex justify-center items-center`}>
-                        <Loading title="Initializing" />
-                      </div>
-                      )
-                    }
-                    {
-                      isMustReload && (
-                        <div className={`rounded-md z-[999] ease-in duration-300 absolute bg-[#E6E6E6] w-full h-[350px] flex justify-center items-center`}>
-                        <div className="text-center text-neutral50 font-poppins" >
-                          <p>Initializing Failed</p>
-                          <button className="text-[#000] mt-2" onClick={() => window.location.reload()} >Click here to reload page</button>
-                        </div>
-                      </div>
-                      )
-                    }
-                  <Camera
-                   currentActionIndex={currentActionIndex}
-                   setCurrentActionIndex={setCurrentActionIndex}
-                   currentStep="Liveness Detection"
-                   setFailedMessage={setFailedMessage}
-                   setProgress={setProgress}
-                   setHumanReady={setHumanReady}  
-                 />
-            </div>
-          )
-        }
-        {
-          !isStepDone && actionList.length > 1 || isMustReload ? (
-            <>
-              <div className="mt-5 flex justify-center">
-                {!isGenerateAction && (
-                  <Image
-                    src={`${assetPrefix}/images/${!isStepDone ? "hadap-depan" : currentIndex}.svg`}
-                    width={50}
-                    height={50}
-                    alt="1"
-                  />
-                )}
-              </div>
-              <div className="flex items-center justify-center mt-5 flex-col">
-                <span className={`font-poppins w-full text-center font-medium`}>Wajah menghadap depan</span>
-                <span id={isMustReload ? "" : "log"} className="text-center font-poppins text-sm w-full mt-7 text-neutral">Mohon jangan bergerak selama proses pengambilan wajah</span>
-              </div>
-            </> ) : (
-            <div>
-              {
-                isGenerateAction && (
-                  <div className="flex items-center justify-center mt-14 flex-col">
-                    <SkeletonLoading width="w-full" isDouble />
-                  </div>
-                )
-              }
-              {
-                !isLoading && (
-                  <>
-                    <div className="mt-5 flex justify-center">
-                      {actionList.length === 2 && (
-                        <Image
-                          src={`${assetPrefix}/images/${currentIndex}.svg`}
-                          width={50}
-                          height={50}
-                          alt="2"
-                        />
-                      )}
-                    </div>
-                    <div className="flex items-center justify-center mt-5 flex-col">
-                      <span className="font-poppins font-medium">{actionText()}</span>
-                      {failedMessage ? (
-                        <span className="text-center font-poppins text-sm mt-7 text-red300">
-                          {failedMessage}
-                        </span>
-                      ) : (
-                        <span className="text-center font-poppins text-sm mt-7 text-neutral">
-                          {actionList.length > 1 && "Mohon jangan bergerak selama proses pengambilan wajah"}
-                        </span>
-                      )}
-                    </div>
-                  </>
-                )
-              }
-              </div>
-            )
-        }
-        {
-          isGenerateAction ? (
-            <div className="w-2/5 h-[5px] mx-auto mt-5 border-b-2 border-[#E6E6E6] " ></div>
-          ) : (
-            <div>
-            {
-              isMustReload ? (
-                <ProgressStepBar
-                  actionList={actionList}
-                  currentActionIndex={0}
-                />
-              ) : (
-                <ProgressStepBar
-                  actionList={actionList}
-                  currentActionIndex={isStepDone ? currentActionIndex : 0}
-                />
-              )
-            }
+        {isLoading ? (
+          <div className="mt-5 rounded-md h-[350px] flex justify-center items-center sm:w-full md:w-full">
+            <Loading title="Mohon menunggu" />
           </div>
-          )
-        }
+        ) : (
+          <div className="relative">
+            {!ready && (
+              <div
+                id="loading"
+                className={`rounded-md z-[999] ease-in duration-300 absolute bg-[#E6E6E6] w-full h-[350px] flex justify-center items-center`}
+              >
+                <Loading title="Initializing" />
+              </div>
+            )}
+            {isMustReload && (
+              <div
+                className={`rounded-md z-[999] ease-in duration-300 absolute bg-[#E6E6E6] w-full h-[350px] flex justify-center items-center`}
+              >
+                <div className="text-center text-neutral50 font-poppins">
+                  <p>Initializing Failed</p>
+                  <button
+                    className="text-[#000] mt-2"
+                    onClick={() => window.location.reload()}
+                  >
+                    Click here to reload page
+                  </button>
+                </div>
+              </div>
+            )}
+            <Camera
+              currentActionIndex={currentActionIndex}
+              setCurrentActionIndex={setCurrentActionIndex}
+              currentStep="Liveness Detection"
+              setFailedMessage={setFailedMessage}
+              setProgress={setProgress}
+              setHumanReady={setHumanReady}
+            />
+          </div>
+        )}
+        {(!isStepDone && actionList.length > 1) || isMustReload ? (
+          <>
+            <div className="mt-5 flex justify-center">
+              {!isGenerateAction && (
+                <Image
+                  src={`${assetPrefix}/images/${
+                    !isStepDone ? "hadap-depan" : currentIndex
+                  }.svg`}
+                  width={50}
+                  height={50}
+                  alt="1"
+                />
+              )}
+            </div>
+            <div className="flex items-center justify-center mt-5 flex-col">
+              <span className={`font-poppins w-full text-center font-medium`}>
+                Wajah menghadap depan
+              </span>
+              <span
+                id={isMustReload ? "" : "log"}
+                className="text-center font-poppins text-sm w-full mt-7 text-neutral"
+              >
+                Mohon jangan bergerak selama proses pengambilan wajah
+              </span>
+            </div>
+          </>
+        ) : (
+          <div>
+            {isGenerateAction && (
+              <div className="flex items-center justify-center mt-14 flex-col">
+                <SkeletonLoading width="w-full" isDouble />
+              </div>
+            )}
+            {!isLoading && (
+              <>
+                <div className="mt-5 flex justify-center">
+                  {actionList.length === 2 && (
+                    <Image
+                      src={`${assetPrefix}/images/${currentIndex}.svg`}
+                      width={50}
+                      height={50}
+                      alt="2"
+                    />
+                  )}
+                </div>
+                <div className="flex items-center justify-center mt-5 flex-col">
+                  <span className="font-poppins font-medium">
+                    {actionText()}
+                  </span>
+                  {failedMessage ? (
+                    <span className="text-center font-poppins text-sm mt-7 text-red300">
+                      {failedMessage}
+                    </span>
+                  ) : (
+                    <span className="text-center font-poppins text-sm mt-7 text-neutral">
+                      {actionList.length > 1 &&
+                        "Mohon jangan bergerak selama proses pengambilan wajah"}
+                    </span>
+                  )}
+                </div>
+              </>
+            )}
+          </div>
+        )}
+        {isGenerateAction ? (
+          <div className="w-2/5 h-[5px] mx-auto mt-5 border-b-2 border-[#E6E6E6] "></div>
+        ) : (
+          <div>
+            {isMustReload ? (
+              <ProgressStepBar actionList={actionList} currentActionIndex={0} />
+            ) : (
+              <ProgressStepBar
+                actionList={actionList}
+                currentActionIndex={isStepDone ? currentActionIndex : 0}
+              />
+            )}
+          </div>
+        )}
         <Footer />
+        <UnsupportedDeviceModal
+          modal={unsupportedDeviceModal}
+          setModal={setUnsupportedDeviceModal}
+        />
       </div>
     </>
   );
 };
 
 export default Liveness;
+
+const UnsupportedDeviceModal: React.FC<IModal> = ({ modal, setModal }) => {
+  const copyLink = () => {
+    var copyText = document.getElementById("inputLink") as HTMLInputElement;
+    copyText.select();
+    copyText.setSelectionRange(0, 99999); // For mobile devices
+    navigator.clipboard
+      .writeText(copyText.value)
+      .then(() => {
+        toast.success("Berhasil menyalin link!");
+      })
+      .catch(() => {
+        toast.error("Gagal menyalin link!");
+      });
+  };
+  const getCurrentURL = (): string => window.location.href;
+  return modal ? (
+    <div
+      style={{ backgroundColor: "rgba(0, 0, 0, .5)", zIndex: "999" }}
+      className="fixed z-50 flex items-start transition-all duration-1000 pb-3 justify-center w-full left-0 top-0 h-full"
+    >
+      <div
+        className="bg-white mt-20 pt-6 px-3.5 pb-9 rounded-xl w-full mx-5"
+        style={{ maxWidth: "352px" }}
+      >
+        <div className="flex flex-col">
+          <p className="font-poppins text-center font-semibold text-base text-neutral800">
+            Perangkat Tidak Mendukung
+          </p>
+          <p className="text-base font-normal text-neutral800 font-poppins text-center mt-6 mx-auto px-8">
+            Tidak terdeteksi kamera pada perangkat ini. Lanjutkan proses
+            Liveness dengan mengakses link berikut pada perangkat lain.
+          </p>
+          <label className="mt-10">
+            <p className="pl-4 pb-2 font-popping text-neutral200 text-sm font-semibold">
+              Link Pendaftaran
+            </p>
+            <div className="flex items-center border border-neutral50 rounded-md overflow-hidden">
+              <div className="px-3 border-r border-neutral50 self-stretch flex">
+                <Image
+                  src="/images/link.svg"
+                  width="20px"
+                  height="10px"
+                  alt="link-ill"
+                />
+              </div>
+
+              <input
+                id="inputLink"
+                type="text"
+                className="text-neutral800 text-sm font-poppins focus:outline-none truncate px-3 self-stretch flex-1"
+                value={getCurrentURL()}
+              />
+              <button
+                onClick={copyLink}
+                className="bg-primary text-white text-sm font-poppins px-3 py-4"
+              >
+                Copy
+              </button>
+            </div>
+          </label>
+        </div>
+      </div>
+    </div>
+  ) : null;
+};
