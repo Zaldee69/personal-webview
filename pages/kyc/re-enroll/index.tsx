@@ -19,6 +19,8 @@ import { concateRedirectUrlParams } from "@/utils/concateRedirectUrlParams";
 import { resetImages, setActionList } from "@/redux/slices/livenessSlice";
 import { TKycVerificationIssueRequestData } from "infrastructure/rest/kyc/types";
 
+let ready : boolean = false
+
 const ReEnrollMekari = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isLivenessStarted, setisLivenessStarted] = useState<boolean>(false);
@@ -66,7 +68,12 @@ const ReEnrollMekari = () => {
       }, [progress])
   
   const dispatch: AppDispatch = useDispatch();
-  const humanReadyRef = useRef<null>(null);
+  
+  const setHumanReady = () => {
+    ready = true
+    const loading : any = document.getElementById("loading")
+    loading.style.display = "none"
+  } 
 
   const checkStep = async () => {
     const body = {
@@ -272,9 +279,7 @@ const ReEnrollMekari = () => {
 
   useEffect(() => {
     setTimeout(() => {
-      const any = document.getElementById("loading")
-      console.log(any)
-      if(any !== null) setIsMustReload(true)
+      if(!ready) setIsMustReload(true)
     }, 15000)
   }, [])
 
@@ -364,7 +369,7 @@ const ReEnrollMekari = () => {
           ) : (
             <div className="relative" >
                      {
-                        humanReadyRef.current === null && (
+                        !ready && (
                         <div id="loading" className={`rounded-md z-[999] ease-in duration-300 absolute bg-[#E6E6E6] w-full h-[350px] flex justify-center items-center`}>
                           <Loading title="Initializing" />
                         </div>
@@ -386,13 +391,13 @@ const ReEnrollMekari = () => {
                      currentStep="Liveness Detection"
                      setFailedMessage={setFailedMessage}
                      setProgress={setProgress}
-                     humanReadyRef={humanReadyRef}
+                     setHumanReady={setHumanReady}
                  />
             </div>
           )
         }
         {
-          !isStepDone && actionList.length > 1 ? (
+          !isStepDone && actionList.length > 1 || isMustReload ? (
             <>
               <div className="mt-5 flex justify-center">
                 {!isGenerateAction && (
@@ -406,7 +411,7 @@ const ReEnrollMekari = () => {
               </div>
               <div className="flex items-center justify-center mt-5 flex-col">
                 <span className={`font-poppins w-full text-center font-medium`}>Wajah menghadap depan</span>
-                  <span className="text-center font-poppins text-sm w-full mt-7 text-neutral">Mohon jangan bergerak selama proses pengambilan wajah</span>
+                <span id={isMustReload ? "" : "log"} className="text-center font-poppins text-sm w-full mt-7 text-neutral">Mohon jangan bergerak selama proses pengambilan wajah</span>
               </div>
             </> ) : (
             <div>
@@ -452,10 +457,21 @@ const ReEnrollMekari = () => {
           isGenerateAction ? (
             <div className="w-2/5 h-[5px] mx-auto mt-10 border-b-2 border-[#E6E6E6] " ></div>
           ) : (
-            <ProgressStepBar
-              actionList={actionList}
-              currentActionIndex={isStepDone ? currentActionIndex : 0}
-            />
+            <div>
+            {
+              isMustReload ? (
+                <ProgressStepBar
+                  actionList={actionList}
+                  currentActionIndex={0}
+                />
+              ) : (
+                <ProgressStepBar
+                  actionList={actionList}
+                  currentActionIndex={isStepDone ? currentActionIndex : 0}
+                />
+              )
+            }
+          </div>
           )
         }
         <Footer />

@@ -24,6 +24,8 @@ import Loading from "@/components/Loading";
 import SkeletonLoading from "@/components/SkeletonLoading";
 import { concateRedirectUrlParams } from "@/utils/concateRedirectUrlParams";
 
+let ready : boolean = false
+
 const Liveness = () => {
   const router = useRouter();
   const routerQuery = router.query;
@@ -87,6 +89,12 @@ const Liveness = () => {
 
   const dispatch: AppDispatch = useDispatch();
   const humanReadyRef = useRef<null>(null);
+
+  const setHumanReady = () => {
+    ready = true
+    const loading : any = document.getElementById("loading")
+    loading.style.display = "none"
+  } 
 
   const generateAction = () => {
     const body = {
@@ -395,9 +403,8 @@ const Liveness = () => {
 
   useEffect(() => {
     setTimeout(() => {
-      const any = document.getElementById("loading")
-      if(any !== null) setIsMustReload(true)
-    }, 10000)
+      if(!ready) setIsMustReload(true)
+    }, 15000)
   }, [])
 
   
@@ -422,7 +429,7 @@ const Liveness = () => {
           ) : (
             <div className="relative" >
                    {
-                      humanReadyRef.current === null && (
+                      !ready && (
                       <div id="loading" className={`rounded-md z-[999] ease-in duration-300 absolute bg-[#E6E6E6] w-full h-[350px] flex justify-center items-center`}>
                         <Loading title="Initializing" />
                       </div>
@@ -444,13 +451,13 @@ const Liveness = () => {
                    currentStep="Liveness Detection"
                    setFailedMessage={setFailedMessage}
                    setProgress={setProgress}
-                   humanReadyRef={humanReadyRef}
+                   setHumanReady={setHumanReady}  
                  />
             </div>
           )
         }
         {
-          !isStepDone && actionList.length > 1 ? (
+          !isStepDone && actionList.length > 1 || isMustReload ? (
             <>
               <div className="mt-5 flex justify-center">
                 {!isGenerateAction && (
@@ -464,7 +471,7 @@ const Liveness = () => {
               </div>
               <div className="flex items-center justify-center mt-5 flex-col">
                 <span className={`font-poppins w-full text-center font-medium`}>Wajah menghadap depan</span>
-                  <span className="text-center font-poppins text-sm w-full mt-7 text-neutral">Mohon jangan bergerak selama proses pengambilan wajah</span>
+                <span id={isMustReload ? "" : "log"} className="text-center font-poppins text-sm w-full mt-7 text-neutral">Mohon jangan bergerak selama proses pengambilan wajah</span>
               </div>
             </> ) : (
             <div>
@@ -510,10 +517,21 @@ const Liveness = () => {
           isGenerateAction ? (
             <div className="w-2/5 h-[5px] mx-auto mt-5 border-b-2 border-[#E6E6E6] " ></div>
           ) : (
-            <ProgressStepBar
-              actionList={actionList}
-              currentActionIndex={isStepDone ? currentActionIndex : 0}
-            />
+            <div>
+            {
+              isMustReload ? (
+                <ProgressStepBar
+                  actionList={actionList}
+                  currentActionIndex={0}
+                />
+              ) : (
+                <ProgressStepBar
+                  actionList={actionList}
+                  currentActionIndex={isStepDone ? currentActionIndex : 0}
+                />
+              )
+            }
+          </div>
           )
         }
         <Footer />

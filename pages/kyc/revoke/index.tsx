@@ -22,6 +22,8 @@ import { handleRoute } from "@/utils/handleRoute";
 import SkeletonLoading from "@/components/SkeletonLoading";
 import { concateRedirectUrlParams } from "@/utils/concateRedirectUrlParams";
 
+let ready : boolean = false
+
 const RevokeMekari = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   let [currentActionIndex, setCurrentActionIndex] = useState(0);
@@ -55,6 +57,12 @@ const RevokeMekari = () => {
 
   const dispatch: AppDispatch = useDispatch();
   const humanReadyRef = useRef<null>(null);
+
+  const setHumanReady = () => {
+    ready = true
+    const loading : any = document.getElementById("loading")
+    loading.style.display = "none"
+  } 
 
   useEffect(() => {
     const track: any = document.querySelector(".track");
@@ -250,12 +258,9 @@ const RevokeMekari = () => {
 
   useEffect(() => {
     setTimeout(() => {
-      const any = document.getElementById("loading")
-      console.log(any)
-      if(any !== null) setIsMustReload(true)
+      if(!ready) setIsMustReload(true)
     }, 15000)
   }, [])
-
 
   return (
     <>
@@ -278,7 +283,7 @@ const RevokeMekari = () => {
         ) : (
           <div className="relative" >
               {
-                humanReadyRef.current === null && (
+                !ready && (
                 <div id="loading" className={`rounded-md z-[999] ease-in duration-300 absolute bg-[#E6E6E6] w-full h-[350px] flex justify-center items-center`}>
                   <Loading title="Initializing" />
                 </div>
@@ -300,13 +305,13 @@ const RevokeMekari = () => {
                  currentStep="Liveness Detection"
                  setFailedMessage={setFailedMessage}
                  setProgress={setProgress}
-                 humanReadyRef={humanReadyRef}
+                 setHumanReady={setHumanReady}
                />
           </div>
         )
       }
       {
-        !isStepDone && actionList.length > 1 ? (
+        !isStepDone && actionList.length > 1 || isMustReload ? (
           <>
             <div className="mt-5 flex justify-center">
               {!isGenerateAction && (
@@ -314,13 +319,13 @@ const RevokeMekari = () => {
                   src={`${assetPrefix}/images/${!isStepDone ? "hadap-depan" : currentIndex}.svg`}
                   width={50}
                   height={50}
-                  alt="1"
+                  alt="mustreload"
                 />
               )}
             </div>
               <div className="flex items-center justify-center mt-5 flex-col">
                 <span className={`font-poppins w-full text-center font-medium`}>Wajah menghadap depan</span>
-                  <span className="text-center font-poppins text-sm w-full mt-7 text-neutral">Mohon jangan bergerak selama proses pengambilan wajah</span>
+                  <span id={isMustReload ? "" : "log"} className="text-center font-poppins text-sm w-full mt-7 text-neutral">Mohon jangan bergerak selama proses pengambilan wajah</span>
               </div>
           </> ) : (
           <div>
@@ -366,10 +371,21 @@ const RevokeMekari = () => {
         isGenerateAction ? (
           <div className="w-2/5 h-[5px] mx-auto mt-10 border-b-2 border-[#E6E6E6] " ></div>
         ) : (
-          <ProgressStepBar
-            actionList={actionList}
-            currentActionIndex={isStepDone ? currentActionIndex : 0}
-          />
+          <div>
+            {
+              isMustReload ? (
+                <ProgressStepBar
+                  actionList={actionList}
+                  currentActionIndex={0}
+                />
+              ) : (
+                <ProgressStepBar
+                  actionList={actionList}
+                  currentActionIndex={isStepDone ? currentActionIndex : 0}
+                />
+              )
+            }
+          </div>
         )
       }
       <Footer />
