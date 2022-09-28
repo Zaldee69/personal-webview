@@ -120,7 +120,7 @@ const AuthPinForm = (props: Props) => {
   if (!shouldRender) return;
 
   return (
-    <div className="flex justify-center items-center min-h-screen">
+    <div className="flex justify-center items-center min-h-screen px-3 pt-3 pb-5">
       <div className="max-w- w-full" style={{ maxWidth: "331px" }}>
         <PinFormComponent
           key="pinFormKey"
