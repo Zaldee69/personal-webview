@@ -147,7 +147,7 @@ const Camera: React.FC<Props> = ({
   }, []);
 
   useEffect(() => {
-    if (deviceState !== undefined && cameraDevicePermission !== null) {
+    if (deviceState !== undefined) {
       deviceState({ isDeviceSupportCamera, cameraDevicePermission });
     }
   }, [isDeviceSupportCamera, cameraDevicePermission]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -348,6 +348,15 @@ const Camera: React.FC<Props> = ({
           .query({ name: "camera" as PermissionName })
           .then((res) => {
             setCameraDevicePermission(res.state);
+
+            // PermissionStatus change event not working in some browsers.
+            // see: https://developer.mozilla.org/en-US/docs/Web/API/PermissionStatus/change_event#browser_compatibility
+            res.onchange = () => {
+              console.log(
+                `camera permission state has changed to ${res.state}`
+              );
+              setCameraDevicePermission(res.state);
+            };
           });
       }
     } catch (_) {
@@ -423,7 +432,17 @@ const Camera: React.FC<Props> = ({
         minScreenshotWidth={1280}
         mirrored={false}
         minScreenshotHeight={720}
-        onLoadedMetadata={(e) => onPlay()}
+        onLoadedMetadata={(e) => {
+          onPlay();
+
+          // We assume the PermissionStatus state is granted.
+          // Because metadata is loaded only when permission is granted.
+          // This is for handling browser that not support PermissionStatus change event.
+          if (cameraDevicePermission !== "granted") {
+            console.log("we assume the PermissionStatus state is granted");
+            setCameraDevicePermission("granted");
+          }
+        }}
         videoConstraints={constraint}
       />
       <div className={`circle-container`}>

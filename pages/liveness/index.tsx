@@ -415,7 +415,7 @@ const Liveness = () => {
     if (showUnsupportedDeviceModal !== null) {
       if (
         !showUnsupportedDeviceModal.isDeviceSupportCamera ||
-        showUnsupportedDeviceModal.cameraDevicePermission === "denied"
+        showUnsupportedDeviceModal.cameraDevicePermission !== "granted"
       ) {
         setUnsupportedDeviceModal(true);
       } else {
