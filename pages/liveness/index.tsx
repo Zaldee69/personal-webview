@@ -621,7 +621,7 @@ const UnsupportedDeviceModal: React.FC<IModal> = ({ modal, setModal }) => {
             <div className="flex items-center border border-neutral50 rounded-md overflow-hidden">
               <div className="px-3 border-r border-neutral50 self-stretch flex">
                 <Image
-                  src="/images/link.svg"
+                  src={`${assetPrefix}/images/link.svg`}
                   width="20px"
                   height="10px"
                   alt="link-ill"
