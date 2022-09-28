@@ -19,6 +19,11 @@ let isDone: any;
 let human: any = undefined;
 let count: number = 1;
 
+export interface IdeviceState {
+  isDeviceSupportCamera: boolean;
+  cameraDevicePermission: TcameraDevicePermission;
+}
+
 interface Constraint {
   width: number;
   height: number;
@@ -31,8 +36,11 @@ interface Props {
   setProgress: Dispatch<SetStateAction<number>>;
   setCurrentActionIndex: Dispatch<SetStateAction<number>>;
   setFailedMessage: Dispatch<SetStateAction<string>>;
-  setHumanReady: () => void
+  setHumanReady: () => void;
+  deviceState?: (state: IdeviceState) => void;
 }
+
+type TcameraDevicePermission = PermissionState | null;
 
 const Camera: React.FC<Props> = ({
   currentStep,
@@ -40,7 +48,8 @@ const Camera: React.FC<Props> = ({
   setCurrentActionIndex,
   setFailedMessage,
   setProgress,
-  setHumanReady
+  setHumanReady,
+  deviceState,
 }) => {
   const constraint: Constraint = {
     width: 1280,
@@ -59,6 +68,9 @@ const Camera: React.FC<Props> = ({
   const [currentActionState, setCurrentActionState] = useState("look_straight");
   const [isCurrentStepDone, setIsCurrentStepDone] = useState(false);
   const [successState, setIsSuccessState] = useState(false);
+  const [isDeviceSupportCamera, setIsDeviceSupportCamera] = useState(false);
+  const [cameraDevicePermission, setCameraDevicePermission] =
+    useState<TcameraDevicePermission>(null);
   const [error, setError] = useState<boolean>(false);
   const [image, setImage] = useState("");
   const [percent, setPercent] = useState<number>(0);
@@ -70,12 +82,6 @@ const Camera: React.FC<Props> = ({
   const setIndexDone = async (i: any) => {
     isDone[i] = true;
   };
-
-  useEffect(() => {
-    if (_isMounted) {
-      checkCamera();
-    }
-  }, []);
 
   const wrongActionSetter = (error: boolean, message: string) => {
     setFailedMessage(message);
@@ -107,7 +113,7 @@ const Camera: React.FC<Props> = ({
         // user configuration for human, used to fine-tune behavior
         // backend: 'webgl',
         async: true,
-        modelBasePath: assetPrefix ? `${assetPrefix}/models` : '/models',
+        modelBasePath: assetPrefix ? `${assetPrefix}/models` : "/models",
         filter: { enabled: false, equalization: false },
         face: {
           enabled: true,
@@ -121,18 +127,30 @@ const Camera: React.FC<Props> = ({
         hand: { enabled: false },
         object: { enabled: false },
         gesture: { enabled: true },
-        debug: false
+        debug: false,
       };
       import("@vladmandic/human/dist/human.esm.js").then((H) => {
         human = new H.default(humanConfig);
         human.load().then(() => {
-          console.log("ready")
-          setHumanReady()
+          console.log("ready");
+          setHumanReady();
         });
       });
     };
     initHuman();
   }, []);
+
+  useEffect(() => {
+    if (_isMounted) {
+      checkCamera();
+    }
+  }, []);
+
+  useEffect(() => {
+    if (deviceState !== undefined && cameraDevicePermission !== null) {
+      deviceState({ isDeviceSupportCamera, cameraDevicePermission });
+    }
+  }, [isDeviceSupportCamera, cameraDevicePermission]); // eslint-disable-line react-hooks/exhaustive-deps
 
   async function detectionLoop() {
     // main detection loop
@@ -315,15 +333,27 @@ const Camera: React.FC<Props> = ({
 
       if (videoInputs.length === 0) {
         setIsSuccessState(false);
+        setIsDeviceSupportCamera(false);
+        setCameraDevicePermission(null);
       } else {
         dom = {
           // grab instances of dom objects so we dont have to look them up later
           video: webcamRef.current?.video,
           canvas: null,
         };
+
+        // we assume user has a camera, then check the permission
+        setIsDeviceSupportCamera(true);
+        navigator.permissions
+          .query({ name: "camera" as PermissionName })
+          .then((res) => {
+            setCameraDevicePermission(res.state);
+          });
       }
     } catch (_) {
       setIsSuccessState(false);
+      setIsDeviceSupportCamera(false);
+      setCameraDevicePermission(null);
     }
   };
 
@@ -396,7 +426,7 @@ const Camera: React.FC<Props> = ({
         onLoadedMetadata={(e) => onPlay()}
         videoConstraints={constraint}
       />
-      <div  className={`circle-container`}>
+      <div className={`circle-container`}>
         <CircularProgressBar percent={percent} error={error} />
       </div>
       <button
