@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { getCertificateList } from "infrastructure/rest/b2b";
+import { getCertificateList, getUserName } from "infrastructure/rest/b2b";
 import Footer from "@/components/Footer";
 import EyeIcon from "@/public/icons/EyeIcon";
 import EyeIconOff from "@/public/icons/EyeIconOff";
@@ -70,11 +70,23 @@ const Login = () => {
           });
         } else {
           if (certif[0].status == "Aktif") {
-            router.replace({
-              pathname: handleRoute("/signing"),
-              query: {
-                ...queryWithDynamicRedirectURL,
-              },
+            getUserName({}).then((res) => {
+              const data = JSON.parse(res.data);
+              if(data.typeMfa == null) {
+                router.replace({
+                  pathname: handleRoute("/setting-signature-and-mfa"),
+                  query: {
+                    ...queryWithDynamicRedirectURL,
+                  },
+                });
+              } else {
+                router.replace({
+                  pathname: handleRoute("/signing"),
+                  query: {
+                    ...queryWithDynamicRedirectURL,
+                  },
+                });
+              }
             });
           } else if (
             certif[0].status === "Revoke" ||
