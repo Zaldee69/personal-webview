@@ -3,7 +3,7 @@ import { useEffect, useState, useRef, Dispatch, SetStateAction } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Head from "next/head";
 import { AppDispatch, RootState } from "@/redux/app/store";
-import Camera from "../../components/Camera";
+import Camera, { IdeviceState } from "../../components/Camera";
 import { useRouter } from "next/router";
 import { toast } from "react-toastify";
 import {
@@ -44,6 +44,8 @@ const Liveness = () => {
   const [isMustReload, setIsMustReload] = useState<boolean>(false);
   const [unsupportedDeviceModal, setUnsupportedDeviceModal] =
     useState<boolean>(false);
+  const [showUnsupportedDeviceModal, setShowUnsupportedDeviceModal] =
+    useState<IdeviceState | null>(null);
 
   const actionList = useSelector(
     (state: RootState) => state.liveness.actionList
@@ -401,17 +403,26 @@ const Liveness = () => {
   useEffect(() => {
     if (!isDone) return;
     changePage();
-  }, [isDone]);
+  }, [isDone]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!router.isReady) return;
     generateAction();
     dispatch(resetImages());
-    // For testing purposes
-    if (routerQuery.showUnsupportedDeviceModal === "1") {
-      setUnsupportedDeviceModal(true);
+  }, [router.isReady]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (showUnsupportedDeviceModal !== null) {
+      if (
+        !showUnsupportedDeviceModal.isDeviceSupportCamera ||
+        showUnsupportedDeviceModal.cameraDevicePermission === "denied"
+      ) {
+        setUnsupportedDeviceModal(true);
+      } else {
+        setUnsupportedDeviceModal(false);
+      }
     }
-  }, [router.isReady]);
+  }, [showUnsupportedDeviceModal]);
 
   useEffect(() => {
     setTimeout(() => {
@@ -472,6 +483,9 @@ const Liveness = () => {
               setFailedMessage={setFailedMessage}
               setProgress={setProgress}
               setHumanReady={setHumanReady}
+              deviceState={(state) => {
+                setShowUnsupportedDeviceModal(state);
+              }}
             />
           </div>
         )}
@@ -593,13 +607,16 @@ const UnsupportedDeviceModal: React.FC<IModal> = ({ modal, setModal }) => {
           <p className="font-poppins text-center font-semibold text-base text-neutral800">
             Perangkat Tidak Mendukung
           </p>
-          <p className="text-base font-normal text-neutral800 font-poppins text-center mt-6 mx-auto px-8">
-            Tidak terdeteksi kamera pada perangkat ini. Lanjutkan proses
-            Liveness dengan mengakses link berikut pada perangkat lain.
+          <p className="text-base font-normal text-neutral800 font-poppins text-center mt-6 mx-auto px-4">
+            Kamera tidak terdeteksi atau tidak <br />
+            diizinkan. Lanjutkan proses
+            <br />
+            Liveness dengan mengakses <br />
+            link berikut pada perangkat lain.
           </p>
           <label className="mt-10">
             <p className="pl-4 pb-2 font-popping text-neutral200 text-sm font-semibold">
-              Link Pendaftaran
+              Link Liveness
             </p>
             <div className="flex items-center border border-neutral50 rounded-md overflow-hidden">
               <div className="px-3 border-r border-neutral50 self-stretch flex">
@@ -616,6 +633,7 @@ const UnsupportedDeviceModal: React.FC<IModal> = ({ modal, setModal }) => {
                 type="text"
                 className="text-neutral800 text-sm font-poppins focus:outline-none truncate px-3 self-stretch flex-1"
                 value={getCurrentURL()}
+                readOnly
               />
               <button
                 onClick={copyLink}
