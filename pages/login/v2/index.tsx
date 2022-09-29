@@ -16,6 +16,7 @@ import { handleRoute } from "./../../../utils/handleRoute";
 import Image from "next/image";
 import { assetPrefix } from "../../../next.config";
 import { NextParsedUrlQuery } from "next/dist/server/request-meta";
+import i18n from "i18";
 interface IParameterFromRequestSign {
   user?: string;
   id?: string;
@@ -54,6 +55,8 @@ const Login = () => {
     redirect_url?: string;
     showAutoLogoutInfo?: string;
   } & IParameterFromRequestSign = router.query;
+
+  const {t}: any = i18n
 
   useEffect(() => {
     if (router.isReady) {
@@ -165,7 +168,7 @@ const Login = () => {
             {tilakaName?.[0]?.toUpperCase()}
           </div>
           <span className="font-bold text-xl text-[#172b4d] font-poppins">
-            Hai, {user}
+          {t("hi")}, {user}
           </span>
         </div>
         <form onSubmit={submitHandler}>
@@ -174,7 +177,7 @@ const Login = () => {
               className="font-poppins px-2 text-label font-light"
               htmlFor="password"
             >
-              Kata Sandi
+              {t("passwordLabel")}
             </label>
             <div className="relative flex-1">
               <input
@@ -182,7 +185,7 @@ const Login = () => {
                 value={password}
                 name="password"
                 type={type.password}
-                placeholder="Masukkan Kata Sandi"
+                placeholder={t("passwordPlaceholder")}
                 className={`font-poppins py-3 focus:outline-none border-borderColor focus:ring  placeholder:text-placeholder placeholder:font-light px-2 rounded-md border w-full`}
               />
               <button
@@ -199,15 +202,15 @@ const Login = () => {
               rel="noopener noreferrer"
               href={`${process.env.NEXT_PUBLIC_PORTAL_URL}/public/reset-pass-req.xhtml`}
             >
-              Lupa Kata Sandi
+              {t("linkAccountForgotPasswordButton")}
             </a>
           </div>
           <button
             type="submit"
             disabled={password.length < 1}
-            className="bg-primary disabled:opacity-50 mt-32 text-xl md:mx-auto md:block md:w-1/4 text-white font-poppins w-full mx-auto rounded-sm h-11"
+            className="bg-primary disabled:opacity-50 mt-32 text-xl uppercase md:mx-auto md:block md:w-1/4 text-white font-poppins w-full mx-auto rounded-sm h-11"
           >
-            MASUK
+            {t("loginCTA")}
           </button>
         </form>
         <Footer />
@@ -219,6 +222,7 @@ const Login = () => {
 export default Login;
 
 const CertifModal = ({ certifModal, setCertifModal }: ModalProps) => {
+  const {t}: any = i18n
   return certifModal ? (
     <div
       style={{ backgroundColor: "rgba(0, 0, 0, .5)" }}
@@ -226,7 +230,7 @@ const CertifModal = ({ certifModal, setCertifModal }: ModalProps) => {
     >
       <div className="bg-white max-w-md mt-20 pt-5 px-2 pb-3 rounded-xl w-full mx-5">
         <p className="text-center font-poppins font-semibold">
-          Anda Tidak Memiliki Sertifikat
+        {t("dontHaveCertifTitle")}
         </p>
         <div className="flex flex-col justify-center">
           <Image
@@ -236,21 +240,20 @@ const CertifModal = ({ certifModal, setCertifModal }: ModalProps) => {
             alt="cert"
           />
           <p className="text-center font-poppins mt-5">
-            Sertifikat Anda telah kadaluarsa atau telah dicabut. Mohon membuat
-            sertifikat baru untuk melakukan penandatanganan.
+          {t("dontHaveCertifSubtitle")}
           </p>
         </div>
-        <button className="bg-primary btn mt-8 disabled:opacity-50 text-white font-poppins w-full mx-auto rounded-sm h-9">
-          BUAT SERTIFIKAT BARU
+        <button className="bg-primary btn uppercase mt-8 disabled:opacity-50 text-white font-poppins w-full mx-auto rounded-sm h-9">
+        {t("createNewCertif")}
         </button>
         <button
           onClick={() => {
             // restLogout({})
             setCertifModal(false);
           }}
-          className="  text-[#97A0AF]  font-poppins w-full mt-4  mx-auto rounded-sm h-9"
+          className="  text-[#97A0AF] uppercase font-poppins w-full mt-4 mx-auto rounded-sm h-9"
         >
-          BATAL
+          {t("cancel")}
         </button>
       </div>
     </div>
@@ -272,6 +275,7 @@ const AutoLogoutInfoModal: React.FC<IModal> = ({ modal, setModal }) => {
       query: { ...restRouterQuery },
     });
   };
+  const {t}: any = i18n
 
   return modal ? (
     <div
@@ -281,7 +285,7 @@ const AutoLogoutInfoModal: React.FC<IModal> = ({ modal, setModal }) => {
       <div className="bg-white max-w-sm mt-20 pt-6 px-3 pb-3 rounded-xl w-full mx-5">
         <div className="flex flex-col">
           <p className="font-poppins text-center font-semibold text-base text-neutral800">
-            Anda Keluar Otomatis
+            {t("youAreLoggedOut")}
           </p>
           <div className="flex justify-center">
             <Image
@@ -295,14 +299,14 @@ const AutoLogoutInfoModal: React.FC<IModal> = ({ modal, setModal }) => {
             className="text-base font-normal text-neutral800 font-poppins text-center mt-2.5 mx-auto"
             style={{ maxWidth: "330px" }}
           >
-            Batas waktu login Anda telah habis.
-            <br /> Mohon lakukan login ulang dengan mengisi Kata Sandi.
+            {t("relogin1")}
+            <br /> {t("relogin2")}
           </p>
           <button
             onClick={onClose}
             className="text-primary font-poppins mt-4 hover:opacity-50 mx-auto rounded-sm font-semibold p-4 text-sm"
           >
-            Tutup
+            {t("close")}
           </button>
         </div>
       </div>

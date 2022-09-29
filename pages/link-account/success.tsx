@@ -10,6 +10,7 @@ import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
 import { RestKycCheckStep } from "infrastructure";
 import { serverSideRenderReturnConditions } from "@/utils/serverSideRenderReturnConditions";
 import { concateRedirectUrlParams } from "@/utils/concateRedirectUrlParams";
+import i18n from 'i18'
 
 type Props = {};
 
@@ -21,6 +22,8 @@ const LinkAccountSuccess = (props: Props) => {
     redirect_url?: string;
   } = router.query;
   const isSigning: boolean = routerQuery.signing === "1";
+
+  const {t}: any = i18n
 
   useEffect(() => {
     if (!routerIsReady) return;
@@ -39,7 +42,7 @@ const LinkAccountSuccess = (props: Props) => {
   return (
     <div className="px-10 pt-16 pb-9 text-center">
       <p className="font-poppins text-base font-semibold text-neutral800">
-        Penautan Akun Berhasil!
+        {t("linkAccountSuccessTitle")}
       </p>
       <div className="mt-20">
         <Image
@@ -51,13 +54,13 @@ const LinkAccountSuccess = (props: Props) => {
       </div>
       <div className="mt-14">
         <p className="font-poppins text-xs text-neutral200">
-          Akun Tilaka Anda telah berhasil ditautkan.
+          {t("linkAccountSuccessSubtitle")}
         </p>
       </div>
       {!isSigning && routerQuery.redirect_url && (
         <div className="mt-20 text-primary text-base font-medium font-poppins underline hover:cursor-pointer">
           <a href={concateRedirectUrlParams(routerQuery.redirect_url, "")}>
-            <a>Kembali ke Halaman Utama</a>
+            <a>{t("livenessSuccessButtonTitle")}</a>
           </a>
         </div>
       )}

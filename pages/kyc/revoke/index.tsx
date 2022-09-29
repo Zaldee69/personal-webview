@@ -2,6 +2,7 @@ import Camera from "@/components/Camera";
 import Footer from "@/components/Footer";
 import ProgressStepBar from "@/components/ProgressStepBar";
 import Head from "next/head";
+import i18n from 'i18'
 import Image from "next/image";
 import { toast } from "react-toastify";
 import XIcon from "@/public/icons/XIcon";
@@ -32,6 +33,7 @@ const RevokeMekari = () => {
   const [isStepDone, setStepDone] = useState<boolean>(false)
   const [isGenerateAction, setIsGenerateAction] = useState<boolean>(true)
   const [isMustReload, setIsMustReload] = useState<boolean>(false)
+  const {t}: any = i18n
 
   const actionList = useSelector(
     (state: RootState) => state.liveness.actionList
@@ -50,10 +52,10 @@ const RevokeMekari = () => {
 
   const router = useRouter();
   const routerQuery = router.query;
-  const subtitle: string =
-      isLoading
-      ? "Terima kasih telah mengikuti proses Liveness. Hasil dinilai berdasarkan keaslian serta kesesuaian foto dengan aksi yang diminta."
-      : "Pastikan wajah di dalam garis panduan dan ikuti petunjuk dengan benar";
+
+  const subtitle = isLoading
+    ? t("livenessVerificationSubtitle")
+    : t("livenessSubtitle");
 
   const dispatch: AppDispatch = useDispatch();
   const humanReadyRef = useRef<null>(null);
@@ -278,14 +280,14 @@ const RevokeMekari = () => {
       {
         isLoading ? (
           <div className="mt-5 rounded-md h-[350px] flex justify-center items-center sm:w-full md:w-full">
-            <Loading title="Mohon menunggu" />
+            <Loading title={t("loadingTitle")} />
           </div>
         ) : (
           <div className="relative" >
               {
                 !ready && (
                 <div id="loading" className={`rounded-md z-[999] ease-in duration-300 absolute bg-[#E6E6E6] w-full h-[350px] flex justify-center items-center`}>
-                  <Loading title="Initializing" />
+                  <Loading title={t("initializing")} />
                 </div>
                 )
               }
@@ -293,8 +295,8 @@ const RevokeMekari = () => {
                 isMustReload && (
                   <div className={`rounded-md z-[999] ease-in duration-300 absolute bg-[#E6E6E6] w-full h-[350px] flex justify-center items-center`}>
                    <div className="text-center text-neutral50 font-poppins" >
-                    <p>Initializing Failed</p>
-                    <button className="text-[#000] mt-2" onClick={() => window.location.reload()} >Click here to reload page</button>
+                    <p>{t("intializingFailed")}</p>
+                    <button className="text-[#000] mt-2" onClick={() => window.location.reload()} >{t("clickHere")}</button>
                   </div>
                 </div>
                 )
@@ -324,8 +326,8 @@ const RevokeMekari = () => {
               )}
             </div>
               <div className="flex items-center justify-center mt-5 flex-col">
-                <span className={`font-poppins w-full text-center font-medium`}>Wajah menghadap depan</span>
-                  <span id={isMustReload ? "" : "log"} className="text-center font-poppins text-sm w-full mt-7 text-neutral">Mohon jangan bergerak selama proses pengambilan wajah</span>
+                <span className={`font-poppins w-full text-center font-medium`}>{t("lookStraight")}</span>
+                  <span id={isMustReload ? "" : "log"} className="text-center font-poppins text-sm w-full mt-7 text-neutral">{t("dontMove")}</span>
               </div>
           </> ) : (
           <div>
@@ -357,7 +359,7 @@ const RevokeMekari = () => {
                       </span>
                     ) : (
                       <span className="text-center font-poppins text-sm mt-7 text-neutral">
-                        {actionList.length > 1 && "Mohon jangan bergerak selama proses pengambilan wajah"}
+                        {actionList.length > 1 && t("dontMove")}
                       </span>
                     )}
                   </div>

@@ -1,6 +1,4 @@
-import React, { Dispatch, SetStateAction } from 'react'
-
-// blink_left_eye,blink_right_eye, blinkCount, wrongActionSetter, setProgress, count, isIndexDone, setIndexDone, currentActionIndex, clicked, capture
+import i18n from "i18";
 let blinkCount : number = 1
 
 type Props = {
@@ -17,6 +15,7 @@ type Props = {
 }
 
 const blinkHandler = async ({blink_left_eye, blink_right_eye,count,progressSetter,isIndexDone,setIndexDone, currentActionIndex,clicked,capture,wrongActionSetter}: Props) => {
+  const {t}: any = i18n
   if((blink_left_eye || blink_right_eye)){
     blinkCount >= 30 ? blinkCount : blinkCount++
     if(blinkCount >= 10 && blinkCount <= 19){
@@ -38,7 +37,7 @@ const blinkHandler = async ({blink_left_eye, blink_right_eye,count,progressSette
       }
     }
   } else {
-    wrongActionSetter(true, "Pejamkan mata Anda")
+    wrongActionSetter(true, t("blinkError"))
     blinkCount = 1
     count = 1
   }

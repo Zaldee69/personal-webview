@@ -1,4 +1,5 @@
 import PinFormComponent from "@/components/PinFormComponent";
+import i18n from "i18";
 import { concateRedirectUrlParams } from "@/utils/concateRedirectUrlParams";
 import { handleRoute } from "@/utils/handleRoute";
 import { RestKycCheckStep, RestKycFinalForm } from "infrastructure";
@@ -19,6 +20,7 @@ type TUrlQuery = {
 
 const PinFormDedicatedChannel = (props: Props) => {
   const router = useRouter();
+  const {t} = i18n
   const {
     random,
     user_identifier,
@@ -64,7 +66,7 @@ const PinFormDedicatedChannel = (props: Props) => {
     if (pin !== pinConfirm) {
       setPinConfirmErrorAfterSubmit({
         isError: true,
-        message: "PIN tidak sesuai",
+        message: t("confirmPinDoesntMatch"),
       });
       return;
     }
@@ -278,8 +280,8 @@ const PinFormDedicatedChannel = (props: Props) => {
         <div className="max-w- w-full" style={{ maxWidth: "331px" }}>
           <PinFormComponent
             key="pinFormConfirmKey"
-            title={`Konfirmasi PIN`}
-            subTitle="Pastikan Konfirmasi PIN sudah sesuai"
+            title={t("confirmPinTitle")}
+            subTitle={t("confirmPinSubtitle")}
             digitLength={digitLength}
             isRandom={isRandom}
             onClickNumberHandlerCallback={onClickNumberHandlerConfirmCallback}
@@ -301,7 +303,7 @@ const PinFormDedicatedChannel = (props: Props) => {
         <div className="max-w- w-full" style={{ maxWidth: "331px" }}>
           <PinFormComponent
             key="pinFormKey"
-            title={`Buat PIN`}
+            title={t("createPinTitle")}
             digitLength={digitLength}
             isRandom={isRandom}
             onClickNumberHandlerCallback={onClickNumberHandlerCallback}
@@ -311,7 +313,7 @@ const PinFormDedicatedChannel = (props: Props) => {
             isError={pinError.isError}
             isErrorMessage={pinError.message}
             isButtonNumberDisabled={isRequestCheckStatus}
-            subTitle="Buat 6-digit PIN untuk menggunakan layanan Tanda Tangan Digital dengan aman"
+            subTitle={t("createPinSubtitle")}
             showPoweredByTilaka
           />
         </div>

@@ -1,9 +1,11 @@
 import { toast } from "react-toastify";
 import { TLoginInitialState } from "../interface/interface";
 import XIcon from './../public/icons/XIcon';
+import i18n from "i18";
 
 
 const toastCaller = (props : TLoginInitialState) => {
+  const {t}: any = i18n
     if (props.status === "PENDING") {
         toast(`Loading...`, {
           type: "info",
@@ -13,7 +15,7 @@ const toastCaller = (props : TLoginInitialState) => {
         });
       } else if (props.status === "FULLFILLED" && props.data.success) {
         toast.dismiss("info");
-        toast(`Login berhasil`, {
+        toast(`Login success`, {
           type: "success",
           toastId: "success",
           position: "top-center",
@@ -23,7 +25,7 @@ const toastCaller = (props : TLoginInitialState) => {
         (props.status === "FULLFILLED" && !props.data.success)
       ) {
         toast.dismiss("info");
-        toast(!props.data.message ? "Error" : props.data?.message[0] === "I" ? "Tilaka name / Kata sandi salah" : props.data.message , {
+        toast(!props.data.message ? "Error" : props.data?.message[0] === "I" ? t("tilakaNameOrPasswordWrong") : props.data.message , {
           type: "error",
           toastId: "error",
           position: "top-center",

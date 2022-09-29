@@ -10,6 +10,7 @@ import QuestionIcon from "./../../public/icons/QuestionIcon";
 import Head from "next/head";
 import XIcon from "@/public/icons/XIcon";
 import CheckOvalIcon from "@/public/icons/CheckOvalIcon";
+import i18n from "i18";
 import { assetPrefix } from "../../next.config";
 import { handleRoute } from "@/utils/handleRoute";
 import { concateRedirectUrlParams } from "@/utils/concateRedirectUrlParams";
@@ -50,6 +51,8 @@ const Form: React.FC = () => {
     confirmPassword: "password",
   });
 
+  const {t} : any = i18n
+
   const [isChecked, setIsCheked] = useState<boolean>(false);
   const disabled =
     !input.password ||
@@ -79,27 +82,27 @@ const Form: React.FC = () => {
       switch (name) {
         case "tilakaName":
           if (!value) {
-            stateObj[name] = "Bidang ini harus diisi";
+            stateObj[name] = t("tilakaNameErrorRequired");
           } else if (
             !/^(?=.*\d)(?=.*[a-zA-Z])[0-9a-zA-Z_]{6,15}$/.test(value)
           ) {
             stateObj[name] =
-              "Tilaka Name terdiri dari 6-15 karakter, harus berupa kombinasi alfanumerik. Spesial karakter selain garis bawah “_” tidak diperbolehkan.";
+              t("tilakaNameWrongFormat")
           }
           break;
 
         case "password":
           if (!value) {
-            stateObj[name] = "Bidang ini harus diisi";
+            stateObj[name] = t("passwordRequired");
           } else if (
             !/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])[0-9a-zA-Z@#$%^&+=]{10,40}$/.test(
               value
             )
           ) {
             stateObj[name] =
-              "Bidang ini harus berisi minimal 10 karakter dan maksimal 40 karakter termasuk satu angka, huruf kecil, huruf besar, dan karakter khusus: @#$%^&+=";
+              t("passwordWrongFormat")
           } else if (input.password && value !== input.confirmPassword) {
-            stateObj["confirmPassword"] = "Kata sandi tidak sama";
+            stateObj["confirmPassword"] = t("passwordNotMatch");
           } else {
             stateObj["confirmPassword"] = input.confirmPassword
               ? ""
@@ -109,14 +112,13 @@ const Form: React.FC = () => {
 
         case "confirmPassword":
           if (!value) {
-            stateObj[name] = "Bidang ini harus diisi";
+            stateObj[name] = t("passwordConfirmationRequired");
           } else if (
             !/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])[0-9a-zA-Z@#$%^&+=]{10,40}$/
           ) {
-            stateObj[name] =
-              "Bidang ini harus berisi minimal 10 karakter dan maksimal 40 karakter termasuk satu angka, huruf kecil, huruf besar, dan karakter khusus: @#$%^&+=";
+            stateObj[name] = t("passwordWrongFormat")
           } else if (input.password && value !== input.password) {
-            stateObj[name] = "Kata sandi tidak sama";
+            stateObj[name] = t("passwordNotMatch");
           }
           break;
 
@@ -286,11 +288,11 @@ const Form: React.FC = () => {
   return (
     <>
       <Head>
-        <title>Aktivasi Akun</title>
+        <title>{t("finalFormTitle")}</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
       <div className="px-5 pt-8 sm:w-full md:w-4/5 mx-auto">
-        <h1 className="font-poppins font-semibold text-xl">Aktivasi Akun</h1>
+        <h1 className="font-poppins font-semibold text-xl">{t("finalFormTitle")}</h1>
         <div className="flex justify-center mt-10">
           <Image
             width={200}
@@ -300,7 +302,7 @@ const Form: React.FC = () => {
           />
         </div>
         <span className="font-poppins text-left block mt-5">
-          Mohon mengisi data-data berikut sebagai proses aktivasi akun Tilaka:
+          {t("finalFormSubtitle")}
         </span>
         <form autoComplete="off" className="mt-10" onSubmit={onSubmitHandler}>
           <div className="flex flex-col">
@@ -315,9 +317,7 @@ const Form: React.FC = () => {
                 <QuestionIcon />
                 <div className="absolute left-9 -top-10  w-48   flex-col items-center hidden mb-6 group-hover:flex">
                   <span className="relative z-10 p-2 text-xs rounded-md font-poppins w-full text-white whitespace-no-wrap bg-neutral shadow-lg">
-                    Tilaka Name tidak dapat diubah dan akan digunakan sebagai
-                    username untuk pengguna masuk ke akun Tilaka dan menggunakan
-                    layanan Tilaka.
+                 {t("finalFormTooltip")}
                   </span>
                   <div className="w-3 h-3 -mt-16 mr-48 rotate-45 bg-neutral"></div>
                 </div>
@@ -329,7 +329,7 @@ const Form: React.FC = () => {
               name="tilakaName"
               autoComplete="off"
               type="text"
-              placeholder="Masukkan Tilaka Name"
+              placeholder={t("tilakaNamePlaceHolder")}
               className={`font-poppins py-3 focus:outline-none  placeholder:text-placeholder placeholder:font-light   px-2 rounded-md border border-borderColor ${
                 error.tilakaName
                   ? "border-error "
@@ -345,14 +345,14 @@ const Form: React.FC = () => {
               className="font-poppins px-2 text-label font-light"
               htmlFor="password"
             >
-              Kata Sandi
+              {t("passwordLabel")}
             </label>
             <div className="relative">
               <input
                 onChange={(e) => onChangeHandler(e)}
                 name="password"
                 type={type.password}
-                placeholder="Masukkan Kata Sandi"
+                placeholder={t("passwordPlaceholder")}
                 className={`font-poppins py-3 focus:outline-none  placeholder:text-placeholder placeholder:font-light  px-2 rounded-md border  w-full ${
                   error.password
                     ? "border-error "
@@ -375,14 +375,14 @@ const Form: React.FC = () => {
               className="font-poppins px-2 text-label font-light"
               htmlFor="retype-password"
             >
-              Konfirmasi Kata Sandi
+              {t("passwordConfirmationLabel")}
             </label>
             <div className="relative">
               <input
                 onChange={(e) => onChangeHandler(e)}
                 name="confirmPassword"
                 type={type.confirmPassword}
-                placeholder="Masukkan Konfirmasi Kata Sandi"
+                placeholder={t("passwordConfirmationPlaceholder")}
                 className={`font-poppins py-3 focus:outline-none  placeholder:text-placeholder placeholder:font-light  px-2 rounded-md border border-borderColor w-full ${
                   error.confirmPassword
                     ? "border-error "
@@ -413,7 +413,7 @@ const Form: React.FC = () => {
               onChange={onChangeHandler}
             />
             <label className="ml-2 text-neutral font-poppins " htmlFor="tnc">
-              Saya setuju dengan{" "}
+              {t("agree")}{" "}
               <span className="text-primary">
                 <a
                   href="https://repository.tilaka.id/CP_CPS.pdf"
@@ -427,7 +427,7 @@ const Form: React.FC = () => {
                   target="_blank"
                   rel="noreferrer"
                 >
-                  Kebijakan Jaminan
+                  {t("warranty")}
                 </a>
                 ,{" "}
                 <a
@@ -435,27 +435,27 @@ const Form: React.FC = () => {
                   target="_blank"
                   rel="noreferrer"
                 >
-                  Kebijakan Privasi
+                  {t("privacy")}
                 </a>
                 ,{" "}
               </span>
-              dan
+              {t("and")}
               <a
                 target="blank"
                 href="https://repository.tilaka.id/perjanjian-pemilik-sertifikat.pdf"
                 className="text-primary"
               >
                 {" "}
-                Perjanjian Pemilik Sertifikat
+                {t("certificate")}
               </a>
             </label>
           </div>
           <button
             disabled={disabled as boolean}
-            className={`bg-primary mt-10 md:mx-auto md:block md:w-1/4 text-white font-poppins w-full mx-auto rounded-sm h-9 disabled:opacity-50
+            className={`bg-primary mt-10 md:mx-auto md:block md:w-1/4 uppercase text-white font-poppins w-full mx-auto rounded-sm h-9 disabled:opacity-50
           }`}
           >
-            AKTIVASI AKUN
+            {t("CTA")}
           </button>
         </form>
         <Footer />

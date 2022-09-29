@@ -9,10 +9,13 @@ import { toast } from "react-toastify";
 import CheckOvalIcon from "@/public/icons/CheckOvalIcon";
 import XIcon from "@/public/icons/XIcon";
 import { concateRedirectUrlParams } from "@/utils/concateRedirectUrlParams";
+import i18n from "i18";
 
 const Guide = () => {
   const router = useRouter();
   const { request_id, ...restRouterQuery } = router.query;
+
+  const {t} : any = i18n
 
   useEffect(() => {
     if (!router.isReady) return;
@@ -124,8 +127,7 @@ const Guide = () => {
       <div className=" py-10 max-w-sm mx-auto px-2 pt-8 sm:w-full md:w-4/5 ">
         <h2 className="font-poppins text-xl font-semibold">Liveness</h2>
         <span className="font-poppins text-sm block mt-4">
-          Mohon perhatikan hal-hal berikut saat pengambilan wajah untuk
-          penilaian yang maksimal.
+       {t("guideTitle")}
         </span>
         <div className="flex flex-row justify-center mt-10 gap-5">
           <div className="flex flex-col items-center space-y-4">
@@ -159,15 +161,9 @@ const Guide = () => {
         </div>
         <div>
           <ul className="list-disc flex flex-col font-poppins text-sm gap-4 my-10 px-5">
-            <li>Wajah menghadap kamera dengan latar belakang yang jelas.</li>
-            <li>
-              Lepaskan atribut seperti kacamata, topi dan masker, serta rambut
-              tidak menutupi wajah.
-            </li>
-            <li>
-              Pastikan pencahayaan baik, tidak terlalu terang atau terlalu
-              gelap.
-            </li>
+            <li>{t("guideSubtitle1")}</li>
+            <li>{t("guideSubtitle2")}</li>
+            <li>{t("guideSubtitle3")}</li>
           </ul>
         </div>
         <Link
@@ -180,7 +176,7 @@ const Guide = () => {
           }}
         >
           <button className="bg-primary btn md:mx-auto md:block md:w-1/4 text-white font-poppins w-full mx-auto rounded-sm h-9 ">
-            MULAI
+          {t("startButton")}
           </button>
         </Link>
         <Footer />

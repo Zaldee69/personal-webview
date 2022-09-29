@@ -7,18 +7,18 @@ import Image from "next/image";
 import { useRouter } from "next/router";
 import React from "react";
 import { assetPrefix } from "../../next.config";
+import i18n from "i18";
 
 type Props = {};
 
 const FormSuccess = (props: Props) => {
   const router = useRouter();
   const routerQuery = router.query;
+  const {t} : any = i18n
   return (
     <div className="px-10 pt-16 pb-9 text-center">
       <p className="font-poppins text-base font-semibold text-neutral800">
-        Permohonan Aktivasi
-        <br />
-        Akun Tilaka Berhasil Diajukan
+        {t("livenessSuccessTitle")}
       </p>
       <div className="mt-20">
         <Image
@@ -30,9 +30,7 @@ const FormSuccess = (props: Props) => {
       </div>
       <div className="mt-14">
         <p className="font-poppins text-xs text-neutral200">
-          Mohon menunggu 1 x 24 jam
-          <br />
-          untuk proses validasi akun.
+          {t("livenessSuccessSubtitle")}
         </p>
       </div>
       <div className="mt-20 text-primary text-base font-medium font-poppins underline hover:cursor-pointer">
@@ -43,7 +41,7 @@ const FormSuccess = (props: Props) => {
               ""
             )}
           >
-            Kembali ke Halaman Utama
+            {t("livenessSuccessButtonTitle")}
           </a>
         )}
       </div>

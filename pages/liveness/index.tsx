@@ -23,6 +23,7 @@ import { assetPrefix } from "../../next.config";
 import Loading from "@/components/Loading";
 import SkeletonLoading from "@/components/SkeletonLoading";
 import { concateRedirectUrlParams } from "@/utils/concateRedirectUrlParams";
+import i18n from "i18";
 
 interface IModal {
   modal: boolean;
@@ -52,6 +53,7 @@ const Liveness = () => {
   );
   const images = useSelector((state: RootState) => state.liveness.images);
   const isDone = useSelector((state: RootState) => state.liveness.isDone);
+  const {t} : any = i18n
 
   const currentIndex =
     actionList[currentActionIndex] === "look_straight"
@@ -65,7 +67,7 @@ const Liveness = () => {
   const actionText = () => {
     switch (actionList[currentActionIndex]) {
       case "look_straight":
-        return "Wajah menghadap ke depan";
+        return t("lookStraight");
       case "look_up":
         return "Wajah menghadap ke  atas";
       case "look_down":
@@ -75,17 +77,17 @@ const Liveness = () => {
       case "look_right":
         return "Wajah menghadap ke kanan";
       case "mouth_open":
-        return "Buka mulut dengan lebar";
+        return t("openMouth");
       case "blink":
-        return "Pejamkan kedua mata selama 3 detik";
+        return t("blink");
       default:
         return "";
     }
   };
 
   const subtitle = isLoading
-    ? "Terima kasih telah mengikuti proses Liveness. Hasil dinilai berdasarkan keaslian serta kesesuaian foto dengan aksi yang diminta."
-    : "Pastikan wajah di dalam garis panduan dan ikuti petunjuk dengan benar";
+    ? t("livenessVerificationSubtitle")
+    : t("livenessSubtitle");
 
   useEffect(() => {
     const track: any = document.querySelector(".track");
@@ -449,7 +451,7 @@ const Liveness = () => {
         </span>
         {isLoading ? (
           <div className="mt-5 rounded-md h-[350px] flex justify-center items-center sm:w-full md:w-full">
-            <Loading title="Mohon menunggu" />
+            <Loading title={t("loadingTitle")} />
           </div>
         ) : (
           <div className="relative">
@@ -458,7 +460,7 @@ const Liveness = () => {
                 id="loading"
                 className={`rounded-md z-[999] ease-in duration-300 absolute bg-[#E6E6E6] w-full h-[350px] flex justify-center items-center`}
               >
-                <Loading title="Initializing" />
+                <Loading title={t("initializing")} />
               </div>
             )}
             {isMustReload && (
@@ -466,12 +468,12 @@ const Liveness = () => {
                 className={`rounded-md z-[999] ease-in duration-300 absolute bg-[#E6E6E6] w-full h-[350px] flex justify-center items-center`}
               >
                 <div className="text-center text-neutral50 font-poppins">
-                  <p>Initializing Failed</p>
+                  <p>{t("intializingFailed")}</p>
                   <button
                     className="text-[#000] mt-2"
                     onClick={() => window.location.reload()}
                   >
-                    Click here to reload page
+                    {t("clickHere")}
                   </button>
                 </div>
               </div>
@@ -505,13 +507,13 @@ const Liveness = () => {
             </div>
             <div className="flex items-center justify-center mt-5 flex-col">
               <span className={`font-poppins w-full text-center font-medium`}>
-                Wajah menghadap depan
+                {t("lookStraight")}
               </span>
               <span
                 id={isMustReload ? "" : "log"}
                 className="text-center font-poppins text-sm w-full mt-7 text-neutral"
               >
-                Mohon jangan bergerak selama proses pengambilan wajah
+                {t("dontMove")}
               </span>
             </div>
           </>
@@ -544,9 +546,7 @@ const Liveness = () => {
                     </span>
                   ) : (
                     <span className="text-center font-poppins text-sm mt-7 text-neutral">
-                      {actionList.length > 1 &&
-                        "Mohon jangan bergerak selama proses pengambilan wajah"}
-                    </span>
+                      {actionList.length > 1 && t("dontMove")}</span>
                   )}
                 </div>
               </>
@@ -580,6 +580,7 @@ const Liveness = () => {
 export default Liveness;
 
 const UnsupportedDeviceModal: React.FC<IModal> = ({ modal, setModal }) => {
+  const {t}: any = i18n
   const copyLink = () => {
     var copyText = document.getElementById("inputLink") as HTMLInputElement;
     copyText.select();
@@ -605,18 +606,14 @@ const UnsupportedDeviceModal: React.FC<IModal> = ({ modal, setModal }) => {
       >
         <div className="flex flex-col">
           <p className="font-poppins text-center font-semibold text-base text-neutral800">
-            Perangkat Tidak Mendukung
+            {t("deviceNotSupportedTitle")}
           </p>
-          <p className="text-base font-normal text-neutral800 font-poppins text-center mt-6 mx-auto px-4">
-            Kamera tidak terdeteksi atau tidak <br />
-            diizinkan. Lanjutkan proses
-            <br />
-            Liveness dengan mengakses <br />
-            link berikut pada perangkat lain.
+          <p className="text-base font-normal text-neutral800 font-poppins text-center mt-6 mx-auto px-8">
+          {t("deviceNotSupportedSubtitle")}
           </p>
           <label className="mt-10">
             <p className="pl-4 pb-2 font-popping text-neutral200 text-sm font-semibold">
-              Link Liveness
+              {t("link")}
             </p>
             <div className="flex items-center border border-neutral50 rounded-md overflow-hidden">
               <div className="px-3 border-r border-neutral50 self-stretch flex">
@@ -639,7 +636,7 @@ const UnsupportedDeviceModal: React.FC<IModal> = ({ modal, setModal }) => {
                 onClick={copyLink}
                 className="bg-primary text-white text-sm font-poppins px-3 py-4"
               >
-                Copy
+                {t("copy")}
               </button>
             </div>
           </label>
