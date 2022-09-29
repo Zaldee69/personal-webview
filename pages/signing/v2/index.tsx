@@ -22,7 +22,7 @@ import {
 } from "react";
 import { PinInput } from "react-input-pin-code";
 import { toast } from "react-toastify";
-import i18n from "i18"
+import i18n from "i18";
 
 interface IParameterFromRequestSign {
   user?: string;
@@ -62,8 +62,8 @@ const Signing = (props: TPropsSigning) => {
   const routerQuery: NextParsedUrlQuery & {
     redirect_url?: string;
   } & IParameterFromRequestSign = router.query;
-  
-  const {t}: any = i18n
+
+  const { t }: any = i18n;
 
   const [shouldRender, setShouldRender] = useState<boolean>(false);
   const [shouldDisableSubmit, setShouldDisableSubmit] =
@@ -253,7 +253,7 @@ const Signing = (props: TPropsSigning) => {
       <div className="px-10 py-8 text-center flex flex-col justify-center min-h-screen">
         <div>
           <p className="font-poppins text-lg font-semibold text-neutral800">
-            {t("signSuccess")}
+            {t("signRequestTitle")}
           </p>
           <div className="mt-3">
             <Image
@@ -268,7 +268,7 @@ const Signing = (props: TPropsSigning) => {
               className="font-poppins text-sm text-neutral800 text-left"
               style={{ maxWidth: "360px" }}
             >
-             {t("signRequestSubtitle")}
+              {t("signRequestSubtitle")}
             </p>
           </div>
         </div>
@@ -297,7 +297,9 @@ const Signing = (props: TPropsSigning) => {
                 </div>
               ))}
               {shouldDisableSubmit && documentList.length === 0 && (
-                <p className="text-sm text-neutral800">{t("livenessSuccessSubtitle")}</p>
+                <p className="text-sm text-neutral800">
+                  {t("livenessSuccessSubtitle")}
+                </p>
               )}
             </div>
           </div>
@@ -358,7 +360,7 @@ const SigningSuccess = (props: TPropsSigningSuccess) => {
   };
   const queryString = new URLSearchParams(params as any).toString();
 
-  const {t}: any = i18n
+  const { t }: any = i18n;
 
   return (
     <div className="px-10 pt-16 pb-9 text-center flex flex-col justify-center min-h-screen">
@@ -376,7 +378,7 @@ const SigningSuccess = (props: TPropsSigningSuccess) => {
         </div>
         <div className="mt-3">
           <p className="font-poppins text-sm text-neutral800">
-            {props.documentCount} {t('documentSuccess')}
+            {props.documentCount} {t("documentSuccess")}
           </p>
         </div>
       </div>
@@ -418,7 +420,7 @@ const SigningFailure = (props: TPropsSigningFailure) => {
     status: props.error.status,
   };
   const queryString = new URLSearchParams(params as any).toString();
-  const {t}: any = i18n
+  const { t }: any = i18n;
 
   return (
     <div className="px-10 pt-16 pb-9 text-center flex flex-col justify-center min-h-screen">
@@ -437,7 +439,8 @@ const SigningFailure = (props: TPropsSigningFailure) => {
         <div className="mt-3">
           <p className="font-poppins text-sm text-neutral800">
             {t("signProcess")}{" "}
-            {props.documentName ? t("name") + props.documentName : ""} {t("failed")}.
+            {props.documentName ? t("name") + props.documentName : ""}{" "}
+            {t("failed")}.
           </p>
           <p className="font-poppins text-base text-neutral800 font-medium mt-1.5">
             {props.error.message}
@@ -564,7 +567,7 @@ const FRModal: React.FC<IModal> = ({
     }
   }, [isFRSuccess]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const {t}: any = i18n
+  const { t }: any = i18n;
 
   return modal ? (
     <div
@@ -577,7 +580,7 @@ const FRModal: React.FC<IModal> = ({
             {t("frTitle")}
           </p>
           <span className="font-poppins mt-2 block text-center text-sm font-normal">
-          {t("frSubtitle1")}
+            {t("frSubtitle1")}
           </span>
           <FRCamera
             setModal={setModal}
@@ -614,7 +617,7 @@ const OTPModal: React.FC<IModal> = ({
 
   const [values, setValues] = useState(["", "", "", "", "", ""]);
 
-  const {t}: any = i18n
+  const { t }: any = i18n;
 
   const signingFailure = (message: string) => {
     callbackFailure(
@@ -736,7 +739,7 @@ const OTPModal: React.FC<IModal> = ({
             {t("frTitle")}
           </p>
           <span className="font-poppins block text-center pb-5  ">
-          {t("frSubtitle2")}
+            {t("frSubtitle2")}
           </span>
           <PinInput
             containerStyle={{
