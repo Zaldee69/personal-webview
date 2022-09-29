@@ -1,4 +1,5 @@
 import PinFormComponent from "@/components/PinFormComponent";
+import i18n from "i18";
 import { concateRedirectUrlParams } from "@/utils/concateRedirectUrlParams";
 import {
   RestPersonalChangePassword,
@@ -12,6 +13,7 @@ type Props = {};
 
 const ChangePinDedicatedChannel = (props: Props) => {
   const router = useRouter();
+  const {t} : any = i18n
   const {
     random,
     request_id,
@@ -44,6 +46,8 @@ const ChangePinDedicatedChannel = (props: Props) => {
   const [isNewPinMode, setIsNewPinMode] = useState<boolean>(false);
 
   const digitLength: number = 6;
+
+  // console.log(isRandom)
 
   const onClickNumberHandlerCallback = (value: number) => {};
   const onClickDeleteHandlerCallback = () => {};
@@ -84,7 +88,7 @@ const ChangePinDedicatedChannel = (props: Props) => {
     if (pin !== pinConfirm) {
       setPinConfirmErrorAfterSubmit({
         isError: true,
-        message: "PIN tidak sesuai",
+        message: t("confirmPinDoesntMatch"),
       });
       return;
     }
@@ -147,7 +151,7 @@ const ChangePinDedicatedChannel = (props: Props) => {
           if (res.message.toLowerCase().includes("password")) {
             setOldPinErrorAfterSubmit({
               isError: true,
-              message: "PIN salah",
+              message: t("authPinError1")
             });
           } else {
             setOldPinErrorAfterSubmit({
@@ -197,8 +201,8 @@ const ChangePinDedicatedChannel = (props: Props) => {
         <div className="max-w-xs w-full">
           <PinFormComponent
             key="pinFormKey"
-            title={`PIN Lama`}
-            subTitle={`Demi keamanan, masukkan PIN lama yang masih digunakan`}
+            title={t("oldPinTitle")}
+            subTitle={t("oldPinSubttitle")}
             digitLength={digitLength}
             isRandom={isRandom}
             onClickNumberHandlerCallback={onClickNumberHandlerOldPinCallback}
@@ -215,8 +219,8 @@ const ChangePinDedicatedChannel = (props: Props) => {
           {isConfirmMode ? (
             <PinFormComponent
               key="pinFormConfirmKey"
-              title={`Konfirmasi PIN Baru`}
-              subTitle="Pastikan Konfirmasi PIN sudah sesuai"
+              title={t("confirmPinTitle")}
+              subTitle={t("confirmPinSubtitle")}
               digitLength={digitLength}
               isRandom={isRandom}
               onClickNumberHandlerCallback={onClickNumberHandlerConfirmCallback}
@@ -234,15 +238,15 @@ const ChangePinDedicatedChannel = (props: Props) => {
               }}
               cancelLink={{
                 show: redirect_url ? true : false,
-                title: "Batal Buat PIN Baru",
+                title: t("cancelCreateNewPin"),
                 onClickCancelCallback: onClickCancel,
               }}
             />
           ) : (
             <PinFormComponent
               key="pinFormKey"
-              title={`Buat PIN Baru`}
-              subTitle={`Hindari angka yang mudah ditebak, seperti angka berulang atau berurutan`}
+              title={t("newPinTitle")}
+              subTitle={t("newPinSubtitle")}
               digitLength={digitLength}
               isRandom={isRandom}
               onClickNumberHandlerCallback={onClickNumberHandlerCallback}
@@ -253,7 +257,7 @@ const ChangePinDedicatedChannel = (props: Props) => {
               isErrorMessage={pinError.message}
               cancelLink={{
                 show: redirect_url ? true : false,
-                title: "Batal Buat PIN Baru",
+                title: t("cancelCreateNewPin"),
                 onClickCancelCallback: onClickCancel,
               }}
               showPoweredByTilaka

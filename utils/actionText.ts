@@ -1,12 +1,15 @@
+import i18n from "i18";
+
 export const actionText = (text: String) => {
+    const {t}: any = i18n
     let action = {
-        "look_straight": "Wajah menghadap ke depan",
+        "look_straight": t("lookStraight"),
         "look_up": "Wajah menghadap ke atas",
         "look_down": "Wajah menghadap ke bawah",
         "look_left": "Wajah menghadap ke kiri",
         "look_right": "Wajah menghadap ke kanan",
-        "mouth_open": "Buka mulut dengan lebar",
-        "blink": "Pejamkan kedua mata selama 3 detik"
+        "mouth_open": t("openMouth"),
+        "blink": t("blink")
     }
     return action[text as keyof typeof action] || ""
   }

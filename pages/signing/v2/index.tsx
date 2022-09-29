@@ -22,6 +22,7 @@ import {
 } from "react";
 import { PinInput } from "react-input-pin-code";
 import { toast } from "react-toastify";
+import i18n from "i18"
 
 interface IParameterFromRequestSign {
   user?: string;
@@ -61,6 +62,8 @@ const Signing = (props: TPropsSigning) => {
   const routerQuery: NextParsedUrlQuery & {
     redirect_url?: string;
   } & IParameterFromRequestSign = router.query;
+  
+  const {t}: any = i18n
 
   const [shouldRender, setShouldRender] = useState<boolean>(false);
   const [shouldDisableSubmit, setShouldDisableSubmit] =
@@ -250,7 +253,7 @@ const Signing = (props: TPropsSigning) => {
       <div className="px-10 py-8 text-center flex flex-col justify-center min-h-screen">
         <div>
           <p className="font-poppins text-lg font-semibold text-neutral800">
-            Tanda Tangan Berhasil
+            {t("signSuccess")}
           </p>
           <div className="mt-3">
             <Image
@@ -265,14 +268,13 @@ const Signing = (props: TPropsSigning) => {
               className="font-poppins text-sm text-neutral800 text-left"
               style={{ maxWidth: "360px" }}
             >
-              Anda menerima dokumen untuk ditandatangani. Mohon mencentang kotak
-              di bawah untuk melanjutkan proses tanda tangan.
+             {t("signRequestSubtitle")}
             </p>
           </div>
         </div>
         <div className="mt-6 mx-auto w-full" style={{ maxWidth: "360px" }}>
           <p className="font-poppins font-semibold text-sm text-neutral200 text-left">
-            {documentList.length} Dokumen
+            {documentList.length} {t("document")}
           </p>
           <div className="flex justify-center">
             <div
@@ -295,7 +297,7 @@ const Signing = (props: TPropsSigning) => {
                 </div>
               ))}
               {shouldDisableSubmit && documentList.length === 0 && (
-                <p className="text-sm text-neutral800">Memuat...</p>
+                <p className="text-sm text-neutral800">{t("livenessSuccessSubtitle")}</p>
               )}
             </div>
           </div>
@@ -313,7 +315,7 @@ const Signing = (props: TPropsSigning) => {
               className="ml-3 text-neutral800 font-poppins text-left text-sm cursor-pointer select-none"
               htmlFor="agree"
             >
-              Saya telah membaca dan setuju untuk menandatangani dokumen di atas
+              {t("signCheckbox")}
             </label>
           </div>
         </div>
@@ -325,7 +327,7 @@ const Signing = (props: TPropsSigning) => {
               typeMFA === "FR" ? setopenFRModal(true) : setOtpModal(true)
             }
           >
-            Tanda Tangan
+            {t("sign")}
           </button>
         </div>
         <div className="mt-6">
@@ -356,11 +358,13 @@ const SigningSuccess = (props: TPropsSigningSuccess) => {
   };
   const queryString = new URLSearchParams(params as any).toString();
 
+  const {t}: any = i18n
+
   return (
     <div className="px-10 pt-16 pb-9 text-center flex flex-col justify-center min-h-screen">
       <div>
         <p className="font-poppins text-lg font-semibold text-neutral800">
-          Tanda Tangan Berhasil
+          {t("signSuccess")}
         </p>
         <div className="mt-3">
           <Image
@@ -372,7 +376,7 @@ const SigningSuccess = (props: TPropsSigningSuccess) => {
         </div>
         <div className="mt-3">
           <p className="font-poppins text-sm text-neutral800">
-            {props.documentCount} dokumen berhasil ditandatangan.
+            {props.documentCount} {t('documentSuccess')}
           </p>
         </div>
       </div>
@@ -385,7 +389,7 @@ const SigningSuccess = (props: TPropsSigningSuccess) => {
                 queryString
               )}
             >
-              <a>Kembali ke Halaman Utama</a>
+              <a>{t("livenessSuccessButtonTitle")}</a>
             </a>
           </div>
         )}
@@ -414,12 +418,13 @@ const SigningFailure = (props: TPropsSigningFailure) => {
     status: props.error.status,
   };
   const queryString = new URLSearchParams(params as any).toString();
+  const {t}: any = i18n
 
   return (
     <div className="px-10 pt-16 pb-9 text-center flex flex-col justify-center min-h-screen">
       <div>
         <p className="font-poppins text-lg font-semibold text-neutral800">
-          Gagal Tanda Tangan
+          {t("signFailed")}
         </p>
         <div className="mt-3">
           <Image
@@ -431,8 +436,8 @@ const SigningFailure = (props: TPropsSigningFailure) => {
         </div>
         <div className="mt-3">
           <p className="font-poppins text-sm text-neutral800">
-            Proses tanda tangan{" "}
-            {props.documentName ? "Nama " + props.documentName : ""} gagal.
+            {t("signProcess")}{" "}
+            {props.documentName ? t("name") + props.documentName : ""} {t("failed")}.
           </p>
           <p className="font-poppins text-base text-neutral800 font-medium mt-1.5">
             {props.error.message}
@@ -448,7 +453,7 @@ const SigningFailure = (props: TPropsSigningFailure) => {
                 queryString
               )}
             >
-              <a>Kembali ke Halaman Utama</a>
+              <a>{t("livenessSuccessButtonTitle")}</a>
             </a>
           </div>
         )}
@@ -559,6 +564,8 @@ const FRModal: React.FC<IModal> = ({
     }
   }, [isFRSuccess]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  const {t}: any = i18n
+
   return modal ? (
     <div
       style={{ backgroundColor: "rgba(0, 0, 0, .5)" }}
@@ -567,10 +574,10 @@ const FRModal: React.FC<IModal> = ({
       <div className="bg-white max-w-md mt-20 pt-5 px-2 pb-3 rounded-md w-full mx-5 ">
         <>
           <p className="font-poppins block text-center font-semibold ">
-            Konfirmasi Tanda Tangan
+            {t("frTitle")}
           </p>
           <span className="font-poppins mt-2 block text-center text-sm font-normal">
-            Arahkan wajah ke kamera untuk otentikasi
+          {t("frSubtitle1")}
           </span>
           <FRCamera
             setModal={setModal}
@@ -581,9 +588,9 @@ const FRModal: React.FC<IModal> = ({
           />
           <button
             onClick={() => setModal(!modal)}
-            className="text-primary btn  bg-white font-poppins w-full mt-5 mx-auto rounded-sm h-9 font-semibold hover:opacity-50"
+            className="text-primary btn uppercase bg-white font-poppins w-full mt-5 mx-auto rounded-sm h-9 font-semibold hover:opacity-50"
           >
-            Batal
+            {t("cancel")}
           </button>
         </>
       </div>
@@ -606,6 +613,8 @@ const OTPModal: React.FC<IModal> = ({
   } & IParameterFromRequestSign = router.query;
 
   const [values, setValues] = useState(["", "", "", "", "", ""]);
+
+  const {t}: any = i18n
 
   const signingFailure = (message: string) => {
     callbackFailure(
@@ -666,7 +675,7 @@ const OTPModal: React.FC<IModal> = ({
             query: { ...router.query, showAutoLogoutInfo: "1" },
           });
         } else {
-          toast.error(err.response?.data?.message || "Kode OTP salah", {
+          toast.error(err.response?.data?.message || t("otpInvalid"), {
             icon: <XIcon />,
           });
           setValues(["", "", "", "", "", ""]);
@@ -724,10 +733,10 @@ const OTPModal: React.FC<IModal> = ({
       <div className="bg-white max-w-md mt-20 pt-5 px-2 pb-3 rounded-md w-full mx-5">
         <div className="flex flex-col">
           <p className="font-poppins block text-center pb-5  whitespace-nowrap  font-semibold ">
-            Konfirmasi Tanda Tangan
+            {t("frTitle")}
           </p>
           <span className="font-poppins block text-center pb-5  ">
-            Masukkan 6 digit OTP
+          {t("frSubtitle2")}
           </span>
           <PinInput
             containerStyle={{
@@ -746,7 +755,7 @@ const OTPModal: React.FC<IModal> = ({
             onClick={onClickHandler}
             className="bg-primary btn mt-16 disabled:opacity-50 text-white font-poppins mx-auto rounded-sm py-2.5 px-6 font-semibold"
           >
-            Konfirmasi
+            {t("confirm")}
           </button>
           <button
             onClick={() => {
@@ -755,7 +764,7 @@ const OTPModal: React.FC<IModal> = ({
             }}
             className="  text-primary font-poppins mt-4 hover:opacity-50 w-full mx-auto rounded-sm h-9 font-semibold"
           >
-            Batal
+            {t("cancel")}
           </button>
         </div>
       </div>

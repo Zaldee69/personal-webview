@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction } from 'react'
+import i18n from "i18";
 
 type Props = {
     mouth_score: number 
@@ -14,18 +14,19 @@ type Props = {
 
 const openMouthHandler = async ({mouth_score, progressSetter,count,isIndexDone, setIndexDone, currentActionIndex, clicked, capture, wrongActionSetter}: Props) => {
   const openMouthBigger : string = "Buka mulut lebih besar"
+  const {t}: any = i18n
     if(mouth_score >= 0.3 && mouth_score < 0.39) {
         progressSetter(32);
-        wrongActionSetter(false, openMouthBigger)
+        wrongActionSetter(false, t("openMouthError2"))
       } else if(mouth_score >= 0.4 && mouth_score < 0.49) {
         progressSetter(53);
-        wrongActionSetter(false, openMouthBigger)
+        wrongActionSetter(false, t("openMouthError2"))
       } else if(mouth_score >= 0.5 && mouth_score < 0.59) {
         progressSetter(70);
-        wrongActionSetter(false, openMouthBigger)
+        wrongActionSetter(false, t("openMouthError2"))
       } else if(mouth_score >= 0.64) {
         progressSetter(100);
-        wrongActionSetter(false, openMouthBigger)
+        wrongActionSetter(false, t("openMouthError2"))
           let done = await isIndexDone(currentActionIndex);
           if (!done) {
             await new Promise(resolve => setTimeout(resolve, 1000));
@@ -35,7 +36,7 @@ const openMouthHandler = async ({mouth_score, progressSetter,count,isIndexDone, 
             clicked = true;
           }
       }  else {
-        wrongActionSetter(true, "Buka mulut anda")
+        wrongActionSetter(true, t("openMouthError1"))
         count = 1
       }
 }

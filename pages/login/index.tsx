@@ -19,6 +19,7 @@ import { RestKycCheckStep } from "infrastructure";
 import { GetServerSideProps } from "next";
 import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
 import { serverSideRenderReturnConditions } from "@/utils/serverSideRenderReturnConditions";
+import i18n from "i18";
 
 type Props = {
   channel_id: string;
@@ -37,6 +38,7 @@ const Login = () => {
   const [type, setType] = useState<{ password: string }>({
     password: "password",
   });
+  const {t}: any = i18n
   const dispatch: AppDispatch = useDispatch();
   const data = useSelector((state: RootState) => state.login);
   const router = useRouter();
@@ -127,7 +129,7 @@ const Login = () => {
             {tilakaName?.[0]?.toUpperCase()}
           </div>
           <span className="font-bold text-xl text-[#172b4d] font-poppins">
-            Hai, {tilaka_name}
+            {t("hi")}, {tilaka_name}
           </span>
         </div>
         <form onSubmit={submitHandler}>
@@ -136,7 +138,7 @@ const Login = () => {
               className="font-poppins px-2 text-label font-light"
               htmlFor="password"
             >
-              Kata Sandi
+              {t("passwordLabel")}
             </label>
             <div className="relative flex-1">
               <input
@@ -144,7 +146,7 @@ const Login = () => {
                 value={password}
                 name="password"
                 type={type.password}
-                placeholder="Masukkan Kata Sandi"
+                placeholder={t("passwordPlaceholder")}
                 className={`font-poppins py-3 focus:outline-none border-borderColor focus:ring  placeholder:text-placeholder placeholder:font-light px-2 rounded-md border w-full`}
               />
               <button
@@ -161,15 +163,15 @@ const Login = () => {
               rel="noopener noreferrer"
               href={`${process.env.NEXT_PUBLIC_PORTAL_URL}/public/reset-pass-req.xhtml`}
             >
-              Lupa Kata Sandi
+              {t("linkAccountForgotPasswordButton")}
             </a>
           </div>
           <button
             type="submit"
             disabled={password.length < 1}
-            className="bg-primary disabled:opacity-50 mt-32 text-xl md:mx-auto md:block md:w-1/4 text-white font-poppins w-full mx-auto rounded-sm h-11"
+            className="bg-primary uppercase disabled:opacity-50 mt-32 text-xl md:mx-auto md:block md:w-1/4 text-white font-poppins w-full mx-auto rounded-sm h-11"
           >
-            MASUK
+            {t("loginCTA")}
           </button>
         </form>
         <Footer />
@@ -210,6 +212,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 export default Login;
 
 const CertifModal = ({ certifModal, setCertifModal }: ModalProps) => {
+  const {t}: any = i18n
   return certifModal ? (
     <div
       style={{ backgroundColor: "rgba(0, 0, 0, .5)" }}
@@ -217,7 +220,7 @@ const CertifModal = ({ certifModal, setCertifModal }: ModalProps) => {
     >
       <div className="bg-white max-w-md mt-20 pt-5 px-2 pb-3 rounded-xl w-full mx-5">
         <p className="text-center font-poppins font-semibold">
-          Anda Tidak Memiliki Sertifikat
+          {t("dontHaveCertifTitle")}
         </p>
         <div className="flex flex-col justify-center">
           <Image
@@ -227,21 +230,20 @@ const CertifModal = ({ certifModal, setCertifModal }: ModalProps) => {
             alt="cert"
           />
           <p className="text-center font-poppins mt-5">
-            Sertifikat Anda telah kadaluarsa atau telah dicabut. Mohon membuat
-            sertifikat baru untuk melakukan penandatanganan.
+           {t("dontHaveCertifSubtitle")}
           </p>
         </div>
-        <button className="bg-primary btn mt-8 disabled:opacity-50 text-white font-poppins w-full mx-auto rounded-sm h-9">
-          BUAT SERTIFIKAT BARU
+        <button className="bg-primary uppercase btn mt-8 disabled:opacity-50 text-white font-poppins w-full mx-auto rounded-sm h-9">
+          {t("createNewCertif")}
         </button>
         <button
           onClick={() => {
             // restLogout({})
             setCertifModal(false);
           }}
-          className="  text-[#97A0AF]  font-poppins w-full mt-4  mx-auto rounded-sm h-9"
+          className="  text-[#97A0AF] uppercase font-poppins w-full mt-4  mx-auto rounded-sm h-9"
         >
-          BATAL
+          {t("cancel")}
         </button>
       </div>
     </div>

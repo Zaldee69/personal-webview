@@ -3,6 +3,7 @@ import ChevronRight from "../public/icons/ChevronRight";
 import ChevronLeft from "../public/icons/ChevronLeft";
 import PlusIcon from "../public/icons/PlusIcon";
 import MinusIcon from "../public/icons/MinusIcon";
+import i18n from "i18";
 
 
 interface Props {
@@ -53,6 +54,9 @@ const Pagination: React.FC<Props> = ({
       setZoomCount((zoomCount -= 0.3));
     }
   };
+
+  const {t}: any = i18n
+
   return (
     <div
       className={`${!isShow ? "hidden" : "flex"}  bottom-10 absolute transition-all duration-500  justify-center w-full  left-0 right-0`}
@@ -94,7 +98,7 @@ const Pagination: React.FC<Props> = ({
             <ChevronRight />
           </button>
           <span className="text-white font-poppins text-sm">
-            dari {totalPages}
+            {t("pagination")} {totalPages}
           </span>
           <button
             disabled={zoomCount >= 2.9}

@@ -8,15 +8,17 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import React from "react";
 import { assetPrefix } from "../../next.config";
+import i18n from "i18"
 
 type Props = {};
 
 const LinkAccountFailure = (props: Props) => {
   const router = useRouter();
+  const {t}: any = i18n
   return (
     <div className="px-10 pt-16 pb-9 text-center">
       <p className="font-poppins text-base font-semibold text-neutral800">
-        Penautan Akun Gagal
+        {t("linkAccountFailedTitle")}
       </p>
       <div className="mt-20">
         <Image
@@ -28,7 +30,7 @@ const LinkAccountFailure = (props: Props) => {
       </div>
       <div className="mt-14">
         <p className="font-poppins text-xs text-neutral200">
-          Pastikan data sesuai dengan akun Tilaka yang akan ditautkan.
+          {t("linkAccountFailedSubtitle")}
         </p>
       </div>
       <div className="mt-20 text-primary text-base font-medium font-poppins underline hover:cursor-pointer">
@@ -38,7 +40,7 @@ const LinkAccountFailure = (props: Props) => {
             query: { ...router.query },
           }}
         >
-          <a>Tautkan Akun Tilaka</a>
+          <a>{t("linkAccountTilaka")}</a>
         </Link>
       </div>
       <div className="mt-11 flex justify-center">

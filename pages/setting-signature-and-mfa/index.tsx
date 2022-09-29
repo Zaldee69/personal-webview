@@ -16,6 +16,7 @@ import { GetServerSideProps } from "next";
 import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
 import { RestKycCheckStep } from "infrastructure";
 import { serverSideRenderReturnConditions } from "@/utils/serverSideRenderReturnConditions";
+import i18n from "i18"
 
 type Props = {};
 
@@ -32,6 +33,8 @@ type Tform = {
   mfa_method: "fr" | "otp" | "otp_ponsel";
 };
 
+const {t}: any = i18n
+
 function SettingSignatureAndMFA({}: Props) {
   const [form, formSetter] = useState<Tform>({
     signature_type: 1,
@@ -43,6 +46,7 @@ function SettingSignatureAndMFA({}: Props) {
   let ref: any = null;
   const sigPad = useRef<any>();
   const router = useRouter();
+  const {t}: any = i18n
   const [showModalOtpPonsel, showModalOtpPonselSetter] =
     useState<boolean>(false);
   const [agreeOtpPonsel, agreeOtpPonselSetter] = useState<boolean>(false);
@@ -111,8 +115,8 @@ function SettingSignatureAndMFA({}: Props) {
       toast(
         `${
           signature_type === 0
-            ? "Tanda tangan goresan tidak boleh kosong!"
-            : "Anda harus memilih salah satu tipe font"
+            ? t("handwritingRequired")
+            : t("FontRequired")
         }`,
         {
           type: "error",
@@ -194,22 +198,22 @@ function SettingSignatureAndMFA({}: Props) {
   return (
     <>
       <Head>
-        <title>Pengaturan Tanda Tangan Dan MFA</title>
+        <title>{t("settingSignatureTitle")}</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
       <div className="bg-white p-4 font-poppins">
+        <h1 className="text-xl font-semibold mt-2" >{t("settingSignatureTitle")}</h1>
         <form onSubmit={handleFormOnSubmit}>
           <div className="flex justify-center">
             <img src="images/ttdSetting.svg" alt="ill" />
           </div>
-          <p className="text-md text-neutral800">Pilih tipe tanda tangan</p>
+          <p className="text-md text-neutral800">{t("chooseSignature")}</p>
           <div className="mt-2 rounded-md bg-blue50 py-2 px-4 flex items-start">
             <div className="pt-1">
               <InfoIcon />
             </div>
             <p className="text-xs text-blue500 ml-4">
-              Tanda tangan yang dipilih akan digunakan di dalam dokumen yang
-              Anda tandatangani.
+             {t("chooseSignatureInformation")}
             </p>
           </div>
           <div className="mt-5">
@@ -223,7 +227,7 @@ function SettingSignatureAndMFA({}: Props) {
                 className="appearance-none bg-white w-4 h-4 ring-1 ring-neutral40 border-2 border-white border-neutral40 rounded-full checked:bg-primary checked:ring-primary"
               />
               <p className="text-md ml-2.5 text-_030326">
-                Tanda tangan goresan
+                {t("signatureOption1")}
               </p>
             </label>
             <label className="flex items-center mt-3.5">
@@ -235,7 +239,7 @@ function SettingSignatureAndMFA({}: Props) {
                 type="radio"
                 className="appearance-none bg-white w-4 h-4 ring-1 ring-neutral40 border-2 border-white border-neutral40 rounded-full checked:bg-primary checked:ring-primary"
               />
-              <p className="text-md ml-2.5 text-_030326">Tanda tangan font</p>
+              <p className="text-md ml-2.5 text-_030326">{t("signatureOption2")}</p>
             </label>
           </div>
           <div className={form.signature_type == 0 ? undefined : "hidden"}>
@@ -332,18 +336,24 @@ function SettingSignatureAndMFA({}: Props) {
             </div>
           </div>
           <p className="text-md text-neutral800 mt-8">
-            Pilih metode otentikasi
+            {t("choosetAutheticantionMode")}
           </p>
           <div className="mt-1.5 rounded-md bg-blue50 py-2 px-4 flex items-start">
             <div className="pt-1">
               <InfoIcon />
             </div>
             <p className="text-xs text-blue500 ml-4">
-              Untuk meningkatkan keamanan, diperlukan{" "}
-              <i>Multi Factor Authentication</i> yang harus Anda gunakan saat
-              melakukan aktivitas tandatangan digital ataupun aktivitas lainnya
-              di tilaka.id. Silakan pilih metode MFA yang sesuai dengan
-              kenyamanan Anda.
+              {
+                i18n.language === "en" ? t("choosetAutheticantionModeInformation") : (
+                 <>
+                    Untuk meningkatkan keamanan, diperlukan{" "}
+                  <i>Multi Factor Authentication</i> yang harus Anda gunakan saat
+                  melakukan aktivitas tandatangan digital ataupun aktivitas lainnya
+                  di tilaka.id. Silakan pilih metode MFA yang sesuai dengan
+                  kenyamanan Anda.
+                 </>
+                )
+              }
             </p>
           </div>
           <div className="mt-6">
@@ -387,7 +397,7 @@ function SettingSignatureAndMFA({}: Props) {
                 className="appearance-none disabled:opacity-50 bg-white w-4 h-4 ring-1 ring-neutral40 border-2 border-white border-neutral40 rounded-full checked:bg-primary checked:ring-primary"
               />
               <p className="text-md ml-2.5 opacity-50 text-_030326">
-                OTP via Ponsel
+                {t('autheticantionMode3')}
               </p>
             </label>
           </div>
@@ -395,7 +405,7 @@ function SettingSignatureAndMFA({}: Props) {
             type="submit"
             className="mt-8 p-3 text-base text-white bg-primary w-full"
           >
-            LANJUT
+            {t("next")}
           </button>
           <div className="mt-8 flex justify-center">
             <img src="images/poweredByTilaka.svg" alt="powered-by-tilaka" />

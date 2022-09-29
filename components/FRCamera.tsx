@@ -9,6 +9,7 @@ import { useRouter } from "next/router";
 import { toast } from "react-toastify";
 import XIcon from "@/public/icons/XIcon";
 import { handleRoute } from "./../utils/handleRoute";
+import i18n from "i18"
 
 interface Constraint {
   width: number;
@@ -42,6 +43,7 @@ const FRCamera = ({
   };
 
   const dispatch = useDispatch();
+  const {t}: any = i18n
 
   const document = useSelector((state: RootState) => state.document);
   const signature = useSelector((state: RootState) => state.signature);
@@ -84,7 +86,7 @@ const FRCamera = ({
   localStorage.setItem(countIdentifier, count ? count.toString() : "0");
 
   const capture = React.useCallback(() => {
-    toast(`Mencocokkan wajah...`, {
+    toast(t("loadingTitle"), {
       type: "info",
       toastId: "info",
       isLoading: true,
@@ -145,7 +147,7 @@ const FRCamera = ({
             setTimeout(() => {
               setModal(true);
             }, 100);
-            toast.error("Wajah tidak cocok", { icon: <XIcon /> });
+            toast.error(t("faceValidationFailed"), { icon: <XIcon /> });
             const newCount =
               parseInt(localStorage.getItem(countIdentifier) as string) + 1;
             localStorage.setItem(countIdentifier, newCount.toString());

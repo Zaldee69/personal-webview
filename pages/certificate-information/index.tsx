@@ -15,13 +15,15 @@ import { GetServerSideProps } from "next";
 import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
 import { RestKycCheckStep } from "infrastructure";
 import { serverSideRenderReturnConditions } from "@/utils/serverSideRenderReturnConditions";
+import i18n from "i18"
 
 function CertificateInformation({}: Props) {
   const dispatch: AppDispatch = useDispatch();
   const { certificate } = useSelector((state: RootState) => state.certificate);
   const router = useRouter();
   const { company_id } = router.query;
-
+  const {t}: any = i18n
+  
   const getRegisteredCertificate = () => {
     const body = {
       company_id: company_id as string,
@@ -113,26 +115,26 @@ function CertificateInformation({}: Props) {
         <img src="images/certInfo.svg" alt="ill" />
       </div>
       <p className="text-sm text-neutral800">
-        Informasi data pada sertifikat Anda
+        {t("certificateSubtitle")}
       </p>
       <div className="mt-5">
         <div className="flex items-center">
           <p className="text-sm text-neutral800 font-normal w-24 pr-2">
-            Negara
+          {t("country")}
           </p>
           <p className="text-sm text-neutral800 font-medium">
             {certificate.negara}
           </p>
         </div>
         <div className="flex items-center">
-          <p className="text-sm text-neutral800 font-normal w-24 pr-2">Nama</p>
+          <p className="text-sm text-neutral800 font-normal w-24 pr-2">{t("name")}</p>
           <p className="text-sm text-neutral800 font-medium">
             {certificate.nama}
           </p>
         </div>
         <div className="flex items-center">
           <p className="text-sm text-neutral800 font-normal w-24 pr-2">
-            Organisasi
+          {t("organization")}
           </p>
           <p className="text-sm text-neutral800 font-medium">
             {certificate.organisasi}
@@ -145,7 +147,16 @@ function CertificateInformation({}: Props) {
           </p>
         </div>
       </div>
-      <p className="text-xs text-neutral800 mt-4 font-normal text-justify">
+      {
+        i18n.language == "en" ? (
+          <p className="text-xs text-neutral800 mt-4 font-normal text-justify">
+        <span className="font-semibold">
+        If there is no complaint filed within nine days,
+        </span>{" "}
+        user is deemed to have accepted that all the information in the certificate is correct.
+      </p>
+        ) : (
+          <p className="text-xs text-neutral800 mt-4 font-normal text-justify">
         Apabila dalam jangka waktu{" "}
         <span className="font-semibold">
           sembilan hari kalender tidak ada keluhan,
@@ -153,19 +164,21 @@ function CertificateInformation({}: Props) {
         maka pelanggan dianggap telah menerima bahwa semua informasi yang
         terdapat dalam sertifikat adalah benar.
       </p>
+        )
+      }
       <button
         onClick={(e) => handleConfirm(e)}
-        className="mt-8 p-2.5 text-base text-white bg-primary w-full font-medium rounded-sm"
+        className="mt-8 p-2.5 uppercase text-base text-white bg-primary w-full font-medium rounded-sm"
       >
-        SESUAI
+        {t("confirmCertif")}
       </button>
       <a
         target="_blank"
         rel="noreferrer"
         href="https://cantikatnt.atlassian.net/servicedesk/customer/portal/2/group/8/create/27"
-        className="mt-4 p-2.5 text-base text-primary bg-white w-full font-medium rounded-sm border border-primary inline-block text-center"
+        className="mt-4 p-2.5 uppercase text-base text-primary bg-white w-full font-medium rounded-sm border border-primary inline-block text-center"
       >
-        AJUKAN KOMPLAIN
+        {t("complain")}
       </a>
       <div className="mt-8 flex justify-center">
         <img src="images/poweredByTilaka.svg" alt="powered-by-tilaka" />

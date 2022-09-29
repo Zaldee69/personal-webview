@@ -5,6 +5,7 @@ import { useRouter } from "next/router";
 import { toast } from "react-toastify";
 import React, { useEffect, useState } from "react";
 import { concateRedirectUrlParams } from "@/utils/concateRedirectUrlParams";
+import i18n from "i18"
 
 type Props = {};
 
@@ -32,6 +33,7 @@ const AuthPinForm = (props: Props) => {
     useState<boolean>(false);
 
   const digitLength: number = 6;
+  const {t}: any = i18n
 
   const onClickNumberHandlerCallback = (value: number) => {};
   const onClickDeleteHandlerCallback = () => {
@@ -68,7 +70,7 @@ const AuthPinForm = (props: Props) => {
         } else {
           setPinError({
             isError: true,
-            message: res?.message || "proses gagal",
+            message: res?.message || t("authPinError2"),
           });
           if (
             res?.message ===
@@ -99,7 +101,7 @@ const AuthPinForm = (props: Props) => {
         } else {
           setPinError({
             isError: true,
-            message: err.response?.data?.message || "proses gagal",
+            message: err.response?.data?.message || t("authPinError2"),
           });
         }
       });
@@ -125,7 +127,7 @@ const AuthPinForm = (props: Props) => {
         <PinFormComponent
           key="pinFormKey"
           title={"PIN"}
-          subTitle={`Masukkan ${digitLength}-digit PIN untuk konfirmasi tanda tangan`}
+          subTitle={t("authPinSubtitle")}
           digitLength={digitLength}
           isRandom={isRandom}
           onClickNumberHandlerCallback={onClickNumberHandlerCallback}

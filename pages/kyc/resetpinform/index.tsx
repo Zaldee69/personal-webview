@@ -3,11 +3,13 @@ import { concateRedirectUrlParams } from "@/utils/concateRedirectUrlParams";
 import { RestPersonalResetPassword } from "infrastructure/rest/personal";
 import { NextParsedUrlQuery } from "next/dist/server/request-meta";
 import { useRouter } from "next/router";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import i18n from "i18";
 
 type Props = {};
 
 const PinFormDedicatedChannel = (props: Props) => {
+  const {t}: any = i18n
   const router = useRouter();
   const {
     random,
@@ -19,6 +21,7 @@ const PinFormDedicatedChannel = (props: Props) => {
     redirect_url?: string;
   } = router.query;
   const isRandom: boolean = random === "1";
+  const [shouldRender, setShouldRender] = useState<boolean>(false);
   const [pin, setPin] = useState<string>("");
   const [pinError, setPinError] = useState<{
     isError: boolean;
@@ -37,7 +40,6 @@ const PinFormDedicatedChannel = (props: Props) => {
     useState<boolean>(false);
 
   const digitLength: number = 6;
-
   const onClickNumberHandlerCallback = (value: number) => {};
   const onClickDeleteHandlerCallback = () => {};
   const submitFormCallback = (pin: string) => {
@@ -72,7 +74,7 @@ const PinFormDedicatedChannel = (props: Props) => {
     if (pin !== pinConfirm) {
       setPinConfirmErrorAfterSubmit({
         isError: true,
-        message: "PIN tidak sesuai",
+        message: t("confirmPinDoesntMatch"),
       });
       return;
     }
@@ -122,15 +124,14 @@ const PinFormDedicatedChannel = (props: Props) => {
         }
       });
   };
-
   return (
     <div className="flex justify-center items-center min-h-screen px-3 pt-3 pb-5">
       {isConfirmMode ? (
         <div className="w-full" style={{ maxWidth: "331px" }}>
           <PinFormComponent
             key="pinFormConfirmKey"
-            title="Konfirmasi PIN Baru"
-            subTitle="Pastikan Konfirmasi PIN sudah sesuai"
+            title={t("confirmNewPinTitle")}
+            subTitle={t("confirmPinSubtitle")}
             digitLength={digitLength}
             isRandom={isRandom}
             onClickNumberHandlerCallback={onClickNumberHandlerConfirmCallback}
@@ -143,7 +144,7 @@ const PinFormDedicatedChannel = (props: Props) => {
             isErrorMessage={pinConfirmError.message}
             cancelLink={{
               show: redirect_url ? true : false,
-              title: "Batal Buat PIN Baru",
+              title: t("cancelCreateNewPin"),
               onClickCancelCallback: onClickCancel,
             }}
             showPoweredByTilaka
@@ -157,8 +158,8 @@ const PinFormDedicatedChannel = (props: Props) => {
         <div className="w-full" style={{ maxWidth: "331px" }}>
           <PinFormComponent
             key="pinFormKey"
-            title="Buat PIN Baru"
-            subTitle="Hindari angka yang mudah ditebak, seperti angka berulang atau berurutan"
+            title={t("newPinTitle")}
+            subTitle={t("newPinSubtitle")}
             digitLength={digitLength}
             isRandom={isRandom}
             onClickNumberHandlerCallback={onClickNumberHandlerCallback}
@@ -170,7 +171,7 @@ const PinFormDedicatedChannel = (props: Props) => {
             isButtonNumberDisabled={isRequestCheckStatus}
             cancelLink={{
               show: redirect_url ? true : false,
-              title: "Batal Buat PIN Baru",
+              title: t("cancelCreateNewPin"),
               onClickCancelCallback: onClickCancel,
             }}
             showPoweredByTilaka

@@ -15,6 +15,7 @@ import { GetServerSideProps } from "next";
 import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
 import { RestKycCheckStep } from "infrastructure";
 import { serverSideRenderReturnConditions } from "@/utils/serverSideRenderReturnConditions";
+import i18n from "i18";
 
 type Props = {};
 
@@ -25,6 +26,7 @@ type Tform = {
 
 const LinkAccount = (props: Props) => {
   const router = useRouter();
+  const {t} : any = i18n
   const [showPassword, showPasswordSetter] = useState<boolean>(false);
   const [nikRegistered, nikRegisteredSetter] = useState<boolean>(true);
   const [form, formSetter] = useState<Tform>({ tilaka_name: "", password: "" });
@@ -105,12 +107,12 @@ const LinkAccount = (props: Props) => {
   return (
     <>
       <Head>
-        <title>Penautan Akun</title>
+        <title>{t("linkAccountTitle")}</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
       <div className="px-5 py-9">
         <p className="font-poppins text-lg font-semibold text-neutral800">
-          Penautan Akun
+          {t("linkAccountTitle")}
         </p>
         <div className="flex justify-center mt-6">
           <Image
@@ -121,8 +123,7 @@ const LinkAccount = (props: Props) => {
         </div>
         {nikRegistered && (
           <p className="font-poppins text-sm text-neutral800 mt-5">
-            NIK Anda telah terdaftar di Tilaka. Mohon mengisi data-data berikut
-            sebagai proses penautan akun Tilaka:
+            {t("linkAccountSubtitle")}
           </p>
         )}
         <form onSubmit={handleFormOnSubmit}>
@@ -136,8 +137,7 @@ const LinkAccount = (props: Props) => {
                   ?
                 </p>
                 <span className="tooltiptext text-xs">
-                  Tilaka Name tidak dapat diubah dan akan digunakan sebagai
-                  username untuk pengguna masuk / login ke akun Tilaka.
+                  {t("linkAccountTooltip")}
                 </span>
               </div>
             </div>
@@ -145,7 +145,7 @@ const LinkAccount = (props: Props) => {
               <input
                 type="text"
                 name="tilaka_name"
-                placeholder="Masukkan Tilaka Name"
+                placeholder={t("linkAccountPlaceholder")}
                 value={form.tilaka_name}
                 onChange={handleFormOnChange}
                 className="px-2.5 py-3 w-full focus:outline-none text-sm text-neutral800 font-poppins border border-neutral40 rounded-md"
@@ -155,14 +155,14 @@ const LinkAccount = (props: Props) => {
           <label className="block mt-6">
             <div className="flex justify-start items-center">
               <p className="font-poppins text-sm text-neutral200 pl-2.5">
-                Kata Sandi
+                {t("linkAccountPasswordInputlabel")}
               </p>
             </div>
             <div className="mt-1 relative">
               <input
                 type={showPassword ? "text" : "password"}
                 name="password"
-                placeholder="Masukkan Kata Sandi"
+                placeholder={t("passwordPlaceholder")}
                 value={form.password}
                 onChange={handleFormOnChange}
                 className="px-2.5 py-3 w-full focus:outline-none text-sm text-neutral800 font-poppins border border-neutral40 rounded-md"
@@ -185,7 +185,7 @@ const LinkAccount = (props: Props) => {
               href={`${process.env.NEXT_PUBLIC_PORTAL_URL}/public/reset-pass-req.xhtml`}
               className="font-poppins text-primary text-xs"
             >
-              Lupa Kata Sandi
+              {t("linkAccountForgotPasswordButton")}
             </a>
             <div className="block mx-2.5">
               <Image
@@ -200,15 +200,15 @@ const LinkAccount = (props: Props) => {
               href={`${process.env.NEXT_PUBLIC_PORTAL_URL}/public/forgot-tilaka-name.xhtml`}
               className="font-poppins text-primary text-xs"
             >
-              Lupa Tilaka Name
+              {t("linkAccountForgotTilakaName")}
             </a>
           </div>
           <button
             type="submit"
             disabled={!form.tilaka_name || !form.password}
-            className="mt-16 w-full p-2.5 text-base disabled:opacity-50 text-white rounded-sm bg-primary"
+            className="mt-16 w-full p-2.5 uppercase text-base disabled:opacity-50 text-white rounded-sm bg-primary"
           >
-            TAUTKAN AKUN
+            {t("linkAccountCTA")}
           </button>
         </form>
         <div className="mt-8 flex justify-center">
