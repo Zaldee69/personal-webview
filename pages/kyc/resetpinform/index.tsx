@@ -124,6 +124,15 @@ const PinFormDedicatedChannel = (props: Props) => {
         }
       });
   };
+
+  useEffect(() => {
+    if (!router.isReady) return;
+    setShouldRender(true);
+  }, [router.isReady]);
+
+  if (!shouldRender) return;
+
+
   return (
     <div className="flex justify-center items-center min-h-screen px-3 pt-3 pb-5">
       {isConfirmMode ? (
