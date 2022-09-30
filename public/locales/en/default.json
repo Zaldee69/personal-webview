@@ -70,7 +70,7 @@
   "deviceNotSupportedSubtitle": "Camera is not found or not allowed in this device. Please continue the Liveness process by accessing the link below in another device.",
   "link": "Liveness Link",
   "copy": "Copy",
-  "intializing": "intializing...",
+  "initializing": "intializing...",
   "intializingFailed": "Initializing Failed",
   "clickHere": "Click here to reload page",
   "linkAccountSuccessTitle": "Linking Account Success",
