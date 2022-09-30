@@ -252,7 +252,10 @@ const Signing = (props: TPropsSigning) => {
 
       <div className="px-10 py-8 text-center flex flex-col justify-center min-h-screen">
         <div>
-          <p className="font-poppins text-lg font-semibold text-neutral800">
+          <p
+            className="font-poppins text-lg font-semibold text-neutral800 text-left mx-auto"
+            style={{ maxWidth: "360px" }}
+          >
             {t("signRequestTitle")}
           </p>
           <div className="mt-3">
@@ -297,9 +300,7 @@ const Signing = (props: TPropsSigning) => {
                 </div>
               ))}
               {shouldDisableSubmit && documentList.length === 0 && (
-                <p className="text-sm text-neutral800">
-                  {t("livenessSuccessSubtitle")}
-                </p>
+                <p className="text-sm text-neutral800">{t("loadingTitle")}</p>
               )}
             </div>
           </div>
