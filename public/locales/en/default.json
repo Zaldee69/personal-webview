@@ -131,7 +131,8 @@
   "documentSuccess": "Document signed successfully",
   "signFailed": "Sign Failed",
   "signProcess": "Signature process",
-  "failed": "failed"
+  "failed": "failed",
+  "closeYourFace": "Close your face"
 
 
 }

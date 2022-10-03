@@ -12,6 +12,8 @@ import lookLeftHandler from "@/utils/lookLeftHandler";
 import lookRightHandler from "@/utils/lookRightHandler";
 import lookUpHandler from "@/utils/lookUpHandler";
 import lookDownHandler from "@/utils/lookDownHandler";
+import {log} from "@/utils/logging";
+import i18n from "i18";
 
 let result: any;
 let dom: any;
@@ -64,6 +66,7 @@ const Camera: React.FC<Props> = ({
   const actionList = useSelector(
     (state: RootState) => state.liveness.actionList
   );
+  const {t}: any = i18n
 
   const [currentActionState, setCurrentActionState] = useState("look_straight");
   const [isCurrentStepDone, setIsCurrentStepDone] = useState(false);
@@ -200,11 +203,12 @@ const Camera: React.FC<Props> = ({
           }
         });
         if (actionList[currentActionIndex] == "look_straight") {
-          if (look_center) {
+          if (look_center && distance < 25) {
             if (roll > -10 && roll < 10) {
               if (yaw > -10 && yaw < 10) {
                 if (pitch > -10 && pitch < 10) {
                   let done = await isIndexDone(currentActionIndex);
+                  log(t("dontMove"))
                   if (!done) {
                     await new Promise((resolve) => setTimeout(resolve, 500));
                     await setIndexDone(currentActionIndex);
@@ -215,6 +219,8 @@ const Camera: React.FC<Props> = ({
                 }
               }
             }
+          } else if (distance > 25){
+            log(t("closeYourFace"))
           }
         } else if (actionList[currentActionIndex] == "look_left") {
           progressSetter(0);
@@ -277,6 +283,7 @@ const Camera: React.FC<Props> = ({
         } else if (actionList[currentActionIndex] == "mouth_open") {
           progressSetter(0);
           await openMouthHandler({
+            distance,
             mouth_score,
             wrongActionSetter,
             progressSetter,
@@ -290,6 +297,7 @@ const Camera: React.FC<Props> = ({
         } else if (actionList[currentActionIndex] == "blink") {
           progressSetter(0);
           await blinkHandler({
+            distance,
             blink_left_eye,
             blink_right_eye,
             wrongActionSetter,

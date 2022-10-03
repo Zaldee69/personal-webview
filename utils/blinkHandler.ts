@@ -2,6 +2,7 @@ import i18n from "i18";
 let blinkCount : number = 1
 
 type Props = {
+    distance: number,
     blink_left_eye: boolean
     blink_right_eye: boolean
     wrongActionSetter: (error: boolean, message: string ) => void
@@ -14,17 +15,17 @@ type Props = {
     capture: HTMLButtonElement
 }
 
-const blinkHandler = async ({blink_left_eye, blink_right_eye,count,progressSetter,isIndexDone,setIndexDone, currentActionIndex,clicked,capture,wrongActionSetter}: Props) => {
+const blinkHandler = async ({distance, blink_left_eye, blink_right_eye,count,progressSetter,isIndexDone,setIndexDone, currentActionIndex,clicked,capture,wrongActionSetter}: Props) => {
   const {t}: any = i18n
-  if((blink_left_eye || blink_right_eye)){
+  if((blink_left_eye || blink_right_eye && distance < 25)){
     blinkCount >= 30 ? blinkCount : blinkCount++
-    if(blinkCount >= 10 && blinkCount <= 19){
+    if(blinkCount >= 10 && blinkCount <= 19 && distance < 25){
       progressSetter(30);
       wrongActionSetter(false, "")
-    }else if(blinkCount >= 20 && blinkCount <= 29){
+    }else if(blinkCount >= 20 && blinkCount <= 29 && distance < 25){
       progressSetter(65);
       wrongActionSetter(false, "")
-    }else if(blinkCount === 30) {
+    }else if(blinkCount === 30 && distance < 25) {
       progressSetter(100);
       wrongActionSetter(false, "")
       let done = await isIndexDone(currentActionIndex);
@@ -35,7 +36,11 @@ const blinkHandler = async ({blink_left_eye, blink_right_eye,count,progressSette
         capture.click()
         clicked = true;
       }
+    } else if (distance > 25) {
+      wrongActionSetter(true, t("closeYourFace"))
     }
+  } else if (distance > 25) {
+    wrongActionSetter(true, t("closeYourFace"))
   } else {
     wrongActionSetter(true, t("blinkError"))
     blinkCount = 1
