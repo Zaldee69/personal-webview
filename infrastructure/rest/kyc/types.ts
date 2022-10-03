@@ -24,8 +24,8 @@ export type TKycCheckStepResponseData = {
 
 export type TKycFinalFormRequestData = {
   registerId: string;
-  password: string;
-  tilakaName: string;
+  password?: string;
+  tilakaName?: string;
 };
 
 export type TKycFinalFormResponseData = {
@@ -67,6 +67,7 @@ export type TKycVerificationResponseData = {
     companyname: string;
     status: TStepStatus;
     pin_form: boolean;
+    config_level: number;
     numFailedLivenessCheck?: number;
   };
 };

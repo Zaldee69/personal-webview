@@ -8,6 +8,7 @@ import { useRouter } from "next/router";
 import { toast } from "react-toastify";
 import {
   RestKycCheckStep,
+  RestKycFinalForm,
   RestKycGenerateAction,
   RestKycVerification,
 } from "../../infrastructure";
@@ -298,7 +299,43 @@ const Liveness = () => {
       const status = result.data.status;
       if (result.success) {
         removeStorage();
-        if (result.data.pin_form) {
+        if(result.data.config_level === 2){
+          try {
+            const finalFormResponse = await RestKycFinalForm({
+              payload: { registerId: router.query.request_id as string },
+            })
+
+            if (finalFormResponse.success) {
+              toast.success(finalFormResponse?.message || "berhasil", {
+                icon: <CheckOvalIcon />,
+              });
+              
+              // Redirect berdasarkan redirect-url
+              const params = {
+                request_id: routerQuery.request_id,
+              }
+              const queryString = new URLSearchParams(params as any).toString();
+              window.top!.location.href = concateRedirectUrlParams(
+                routerQuery.redirect_url as string,
+                queryString
+              )
+            } else {
+              toast.error(finalFormResponse?.message || "gagal", { icon: <XIcon /> });
+            }
+          } catch(e: any){
+            if (e.response?.data?.data?.errors?.[0]) {
+              toast.error(
+                `${e.response?.data?.message}, ${e.response?.data?.data?.errors?.[0]}`,
+                { icon: <XIcon /> }
+              );
+            } else {
+              toast.error(e.response?.data?.message || "gagal", {
+                icon: <XIcon />,
+              });
+            }
+          }
+        }
+        else if (result.data.pin_form) {
           router.replace({
             pathname: handleRoute("kyc/pinform"),
             query: { ...routerQuery, registration_id: router.query.request_id },
