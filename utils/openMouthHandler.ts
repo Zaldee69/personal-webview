@@ -1,6 +1,7 @@
 import i18n from "i18";
 
 type Props = {
+    distance: number
     mouth_score: number 
     progressSetter: (number: number) => void
     count: number
@@ -12,19 +13,18 @@ type Props = {
     capture: HTMLButtonElement
 }
 
-const openMouthHandler = async ({mouth_score, progressSetter,count,isIndexDone, setIndexDone, currentActionIndex, clicked, capture, wrongActionSetter}: Props) => {
-  const openMouthBigger : string = "Buka mulut lebih besar"
+const openMouthHandler = async ({distance, mouth_score, progressSetter,count,isIndexDone, setIndexDone, currentActionIndex, clicked, capture, wrongActionSetter}: Props) => {
   const {t}: any = i18n
-    if(mouth_score >= 0.3 && mouth_score < 0.39) {
+    if(mouth_score >= 0.3 && mouth_score < 0.39 && distance < 25) {
         progressSetter(32);
         wrongActionSetter(false, t("openMouthError2"))
-      } else if(mouth_score >= 0.4 && mouth_score < 0.49) {
+      } else if(mouth_score >= 0.4 && mouth_score < 0.49 && distance < 25) {
         progressSetter(53);
         wrongActionSetter(false, t("openMouthError2"))
-      } else if(mouth_score >= 0.5 && mouth_score < 0.59) {
+      } else if(mouth_score >= 0.5 && mouth_score < 0.59 && distance < 25) {
         progressSetter(70);
         wrongActionSetter(false, t("openMouthError2"))
-      } else if(mouth_score >= 0.64) {
+      } else if(mouth_score >= 0.64 && distance < 25) {
         progressSetter(100);
         wrongActionSetter(false, t("openMouthError2"))
           let done = await isIndexDone(currentActionIndex);
@@ -35,7 +35,10 @@ const openMouthHandler = async ({mouth_score, progressSetter,count,isIndexDone, 
             capture.click()
             clicked = true;
           }
-      }  else {
+      } else if (distance > 25) {
+        wrongActionSetter(true, t("closeYourFace"))
+        count = 1
+      } else {
         wrongActionSetter(true, t("openMouthError1"))
         count = 1
       }

@@ -131,8 +131,6 @@
   "documentSuccess": "Dokumen berhasil ditandatangan",
   "signFailed": "Gagal Tanda Tangan",
   "signProcess": "Proses tanda tangan",
-  "failed": "gagal"
-
-
-
+  "failed": "gagal",
+  "closeYourFace": "Dekatkan wajah Anda"
 }
