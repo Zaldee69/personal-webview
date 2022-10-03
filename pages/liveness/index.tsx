@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { useEffect, useState, useRef, Dispatch, SetStateAction } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Head from "next/head";
 import { AppDispatch, RootState } from "@/redux/app/store";
@@ -449,48 +449,50 @@ const Liveness = () => {
             subtitle
           )}
         </span>
-        {isLoading ? (
-          <div className="mt-5 rounded-md h-[350px] flex justify-center items-center sm:w-full md:w-full">
-            <Loading title={t("loadingTitle")} />
-          </div>
-        ) : (
-          <div className="relative">
-            {!ready && (
-              <div
-                id="loading"
-                className={`rounded-md z-[999] ease-in duration-300 absolute bg-[#E6E6E6] w-full h-[350px] flex justify-center items-center`}
-              >
-                <Loading title={t("initializing")} />
+        <div
+          className={[
+            "mt-5 rounded-md h-[350px] flex justify-center items-center sm:w-full md:w-full",
+            isLoading ? "block" : "hidden",
+          ].join(" ")}
+        >
+          <Loading title={t("loadingTitle")} />
+        </div>
+        <div className={["relative", isLoading ? "hidden" : "block"].join(" ")}>
+          {!ready && (
+            <div
+              id="loading"
+              className={`rounded-md z-[999] ease-in duration-300 absolute bg-[#E6E6E6] w-full h-[350px] flex justify-center items-center`}
+            >
+              <Loading title={t("initializing")} />
+            </div>
+          )}
+          {isMustReload && (
+            <div
+              className={`rounded-md z-[999] ease-in duration-300 absolute bg-[#E6E6E6] w-full h-[350px] flex justify-center items-center`}
+            >
+              <div className="text-center text-neutral50 font-poppins">
+                <p>{t("intializingFailed")}</p>
+                <button
+                  className="text-[#000] mt-2"
+                  onClick={() => window.location.reload()}
+                >
+                  {t("clickHere")}
+                </button>
               </div>
-            )}
-            {isMustReload && (
-              <div
-                className={`rounded-md z-[999] ease-in duration-300 absolute bg-[#E6E6E6] w-full h-[350px] flex justify-center items-center`}
-              >
-                <div className="text-center text-neutral50 font-poppins">
-                  <p>{t("intializingFailed")}</p>
-                  <button
-                    className="text-[#000] mt-2"
-                    onClick={() => window.location.reload()}
-                  >
-                    {t("clickHere")}
-                  </button>
-                </div>
-              </div>
-            )}
-            <Camera
-              currentActionIndex={currentActionIndex}
-              setCurrentActionIndex={setCurrentActionIndex}
-              currentStep="Liveness Detection"
-              setFailedMessage={setFailedMessage}
-              setProgress={setProgress}
-              setHumanReady={setHumanReady}
-              deviceState={(state) => {
-                setShowUnsupportedDeviceModal(state);
-              }}
-            />
-          </div>
-        )}
+            </div>
+          )}
+          <Camera
+            currentActionIndex={currentActionIndex}
+            setCurrentActionIndex={setCurrentActionIndex}
+            currentStep="Liveness Detection"
+            setFailedMessage={setFailedMessage}
+            setProgress={setProgress}
+            setHumanReady={setHumanReady}
+            deviceState={(state) => {
+              setShowUnsupportedDeviceModal(state);
+            }}
+          />
+        </div>
         {(!isStepDone && actionList.length > 1) || isMustReload ? (
           <>
             <div className="mt-5 flex justify-center">
