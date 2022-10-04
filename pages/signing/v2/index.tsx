@@ -167,7 +167,7 @@ const Signing = (props: TPropsSigning) => {
             } else if (res.status === "PROCESS") {
               if (res.signed_pdf === null) {
                 setSiginingFailureError({
-                  message: "Dokumen Expired",
+                  message: t("documentExpired"),
                   status: "Exp",
                 });
               } else {
@@ -439,9 +439,7 @@ const SigningFailure = (props: TPropsSigningFailure) => {
         </div>
         <div className="mt-3">
           <p className="font-poppins text-sm text-neutral800">
-            {t("signProcess")}{" "}
-            {props.documentName ? t("name") + props.documentName : ""}{" "}
-            {t("failed")}.
+            {t("signFailedSubtitle")}{" "}
           </p>
           <p className="font-poppins text-base text-neutral800 font-medium mt-1.5">
             {props.error.message}

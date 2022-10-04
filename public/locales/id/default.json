@@ -130,7 +130,9 @@
   "document": "Dokumen",
   "documentSuccess": "Dokumen berhasil ditandatangan",
   "signFailed": "Gagal Tanda Tangan",
+  "signFailedSubtitle": "Proses tanda tangan gagal.",
   "signProcess": "Proses tanda tangan",
   "failed": "gagal",
+  "documentExpired": "Dokumen Kedaluwarsa",
   "closeYourFace": "Dekatkan wajah Anda"
 }
