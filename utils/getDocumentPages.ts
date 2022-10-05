@@ -22,11 +22,13 @@ export default async ({
   scale = 1,
   url,
 }: GetDocumentPagesOptions): Promise<Array<string>> => {
-  const PDFJS = window.pdfjsLib;
+  const pdfjsLib = require("pdfjs-dist");
+  pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+
   const pdfAsArray = convertDataURIToBinary(url)
 
   // First, we need to load the document using the getDocument utility
-  const loadingTask = PDFJS.getDocument(pdfAsArray);
+  const loadingTask = await pdfjsLib.getDocument(pdfAsArray);
   const pdf = await loadingTask.promise;
 
   const { numPages } = pdf;
@@ -37,7 +39,7 @@ export default async ({
   for (let i = 0; i < numPages; i++) {
     const page = await pdf.getPage(i + 1);
 
-    const viewport = page.getViewport(scale);
+    const viewport = page.getViewport({scale:scale});
     const { width, height } = viewport;
     const canvas = document.createElement("canvas");
     canvas.width = width;
@@ -46,7 +48,7 @@ export default async ({
     await page.render({
       canvasContext: canvas.getContext("2d"),
       viewport,
-    });
+    }).promise;
 
     canvasURLs.push(canvas.toDataURL());
   }
