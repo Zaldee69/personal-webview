@@ -313,10 +313,11 @@ const Liveness = () => {
               // Redirect berdasarkan redirect-url
               const params = {
                 request_id: routerQuery.request_id,
+                redirect_url: routerQuery.redirect_url
               }
               const queryString = new URLSearchParams(params as any).toString();
               window.top!.location.href = concateRedirectUrlParams(
-                routerQuery.redirect_url as string,
+                routerQuery.dashboard_url as string,
                 queryString
               )
             } else {
@@ -388,7 +389,18 @@ const Liveness = () => {
                 }
               );
               setTimeout(() => {
-                if (result.data.pin_form && routerQuery.redirect_url) {
+                if(result.data.config_level === 2){
+                  const params = {
+                    request_id: routerQuery.request_id,
+                    redirect_url: routerQuery.redirect_url
+                  }
+                  const queryString = new URLSearchParams(params as any).toString();
+                  window.top!.location.href = concateRedirectUrlParams(
+                    routerQuery.dashboard_url as string,
+                    queryString
+                  )
+                }
+                else if (result.data.pin_form && routerQuery.redirect_url) {
                   const params = {
                     status: status,
                     register_id: routerQuery.request_id,
