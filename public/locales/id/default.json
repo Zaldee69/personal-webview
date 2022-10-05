@@ -133,6 +133,7 @@
   "signFailedSubtitle": "Proses tanda tangan gagal.",
   "signProcess": "Proses tanda tangan",
   "failed": "gagal",
+  "success": "sukses",
   "documentExpired": "Dokumen Kedaluwarsa",
   "closeYourFace": "Dekatkan wajah Anda"
 }

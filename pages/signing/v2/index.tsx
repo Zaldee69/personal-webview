@@ -86,7 +86,7 @@ const Signing = (props: TPropsSigning) => {
     setAgree(e.target.checked);
   };
   const downloadOnClick = (pdfBase64: string, pdfName: string) => {
-    toast.success(`Download Nama ${pdfName} berhasil`, { autoClose: 1000 });
+    toast.success(`Download ${pdfName} ${t("success")}`, { autoClose: 1000 });
     setTimeout(() => {
       var a = document.createElement("a");
       a.href = "data:application/pdf;base64," + pdfBase64;

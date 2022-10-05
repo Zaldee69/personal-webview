@@ -347,8 +347,7 @@ function SettingSignatureAndMFA({}: Props) {
                 i18n.language === "en" ? t("choosetAutheticantionModeInformation") : (
                  <>
                    Demi keamanan, diperlukan {" "}
-                  <i>Multi Factor Authentication</i> yang harus Anda gunakan saat melakukan aktivitas tanda tangan digital atau layanan Tilaka lainnya. metode MFA yang sesuai dengan
-                  kenyamanan Anda.
+                  <i>Multi Factor Authentication</i> yang harus Anda gunakan saat melakukan aktivitas tanda tangan digital atau layanan Tilaka lainnya.
                  </>
                 )
               }
