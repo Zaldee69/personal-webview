@@ -133,6 +133,7 @@
   "signFailedSubtitle": "Failed signing documents.",
   "signProcess": "Signature process",
   "failed": "failed",
+  "success": "Success",
   "documentExpired": "Document Expired",
   "closeYourFace": "Close your face"
 
