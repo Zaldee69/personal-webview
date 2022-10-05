@@ -305,7 +305,7 @@ const RevokeMekari = () => {
         >
           <Loading title={t("loadingTitle")} />
         </div>
-        <div className="relative">
+        <div className={["relative", isLoading ? "hidden" : "block"].join(" ")}>
           {!ready && (
             <div
               id="loading"
