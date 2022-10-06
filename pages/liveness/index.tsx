@@ -28,6 +28,8 @@ import i18n from "i18";
 import UnsupportedDeviceModal from "@/components/UnsupportedDeviceModal";
 
 let ready: boolean = false;
+type TQueryParams = { request_id: string, redirect_url?: string }
+
 
 const Liveness = () => {
   const router = useRouter();
@@ -311,9 +313,11 @@ const Liveness = () => {
               });
               
               // Redirect berdasarkan redirect-url
-              const params = {
-                request_id: routerQuery.request_id,
-                redirect_url: routerQuery.redirect_url
+              const params: TQueryParams = {
+                request_id: routerQuery.request_id as string,
+              }
+              if(routerQuery.redirect_url){
+                params.redirect_url = routerQuery.redirect_url as string
               }
               const queryString = new URLSearchParams(params as any).toString();
               window.top!.location.href = concateRedirectUrlParams(
@@ -390,9 +394,11 @@ const Liveness = () => {
               );
               setTimeout(() => {
                 if(result.data.config_level === 2){
-                  const params = {
-                    request_id: routerQuery.request_id,
-                    redirect_url: routerQuery.redirect_url
+                  const params: TQueryParams = {
+                    request_id: routerQuery.request_id as string,
+                  }
+                  if(routerQuery.redirect_url){
+                    params.redirect_url = routerQuery.redirect_url as string
                   }
                   const queryString = new URLSearchParams(params as any).toString();
                   window.top!.location.href = concateRedirectUrlParams(
