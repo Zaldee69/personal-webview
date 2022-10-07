@@ -190,7 +190,6 @@ const PinFormDedicatedChannel = (props: Props) => {
               return;
             }
           } else if (res.data.status === "E" || res.data.status === "F") {
-            if (res.data.status === "F") {
               if (!res.data.pin_form) {
                 if (redirect_url) {
                   const params = {
@@ -218,16 +217,6 @@ const PinFormDedicatedChannel = (props: Props) => {
                 // should stay.
                 return;
               }
-            } else {
-              router.push({
-                pathname: handleRoute("liveness-failure"),
-                query: {
-                  ...restRouterQuery,
-                  request_id: registration_id,
-                  redirect_url,
-                },
-              });
-            }
           } else if (res.data.status === "S") {
             const params = {
               register_id: registration_id,

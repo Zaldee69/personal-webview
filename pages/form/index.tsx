@@ -211,7 +211,7 @@ const Form: React.FC = () => {
                 query: { ...restRouterQuery, registration_id: request_id },
               });
             }
-          } else if (res.data.status === "E" || res.data.status === "F") {
+          } else if (res.data.status === "F") {
             toast.dismiss("kycCheckStepRequestToast");
             toast.error(
               res?.message ||
@@ -235,7 +235,7 @@ const Form: React.FC = () => {
                 query: { ...restRouterQuery, request_id },
               });
             }
-          } else if (res.data.status === "S") {
+          } else if (res.data.status === "S" || res.data.status === "E") {
             toast.dismiss("kycCheckStepRequestToast");
             const params = {
               register_id: request_id,
