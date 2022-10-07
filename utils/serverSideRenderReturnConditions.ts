@@ -103,7 +103,6 @@ export const serverSideRenderReturnConditions = ({
           },
         };
       } else if (
-        checkStepResult.res.data.status === "E" ||
         checkStepResult.res.data.status === "F"
       ) {
         const params = { ...cQuery, request_id: uuid };
