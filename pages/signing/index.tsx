@@ -597,6 +597,7 @@ export const OTPModal: React.FC<Active> = ({ modal, setModal }) => {
             <PinInput
               containerStyle={{
                 alignItems: "center",
+                justifyContent: "center",
                 gap: 5,
                 marginTop: "10px",
               }}
