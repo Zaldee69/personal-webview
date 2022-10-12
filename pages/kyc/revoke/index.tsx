@@ -34,7 +34,6 @@ const RevokeMekari = () => {
   const [isStepDone, setStepDone] = useState<boolean>(false);
   const [isGenerateAction, setIsGenerateAction] = useState<boolean>(true);
   const [isMustReload, setIsMustReload] = useState<boolean>(false);
-  const [isReady, setIsReady] = useState<boolean>(false);
   const [unsupportedDeviceModal, setUnsupportedDeviceModal] =
     useState<boolean>(false);
   const [showUnsupportedDeviceModal, setShowUnsupportedDeviceModal] =
@@ -72,7 +71,6 @@ const RevokeMekari = () => {
     if (loading) {
       loading.style.display = "none";
     }
-    setIsReady(true);
   };
 
   useEffect(() => {
@@ -262,7 +260,7 @@ const RevokeMekari = () => {
   }, [router.isReady]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    if (isReady && showUnsupportedDeviceModal !== null) {
+    if (ready && showUnsupportedDeviceModal !== null) {
       if (
         !showUnsupportedDeviceModal.isDeviceSupportCamera ||
         showUnsupportedDeviceModal.cameraDevicePermission !== "granted"
@@ -272,7 +270,7 @@ const RevokeMekari = () => {
         setUnsupportedDeviceModal(false);
       }
     }
-  }, [showUnsupportedDeviceModal, isReady]);
+  }, [showUnsupportedDeviceModal, ready]);
 
   useEffect(() => {
     setTimeout(() => {
