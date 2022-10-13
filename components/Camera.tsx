@@ -14,6 +14,11 @@ import lookUpHandler from "@/utils/lookUpHandler";
 import lookDownHandler from "@/utils/lookDownHandler";
 import {log} from "@/utils/logging";
 import i18n from "i18";
+import {
+  MediaPermissionsError,
+  MediaPermissionsErrorType,
+  requestMediaPermissions,
+} from 'mic-check';
 
 let result: any;
 let dom: any;
@@ -53,7 +58,7 @@ const Camera: React.FC<Props> = ({
   setHumanReady,
   deviceState,
 }) => {
-  const constraint: Constraint = {
+  const constraints: Constraint = {
     width: 1280,
     height: 720,
     facingMode: "user",
@@ -349,23 +354,23 @@ const Camera: React.FC<Props> = ({
           video: webcamRef.current?.video,
           canvas: null,
         };
-
-        // we assume user has a camera, then check the permission
-        setIsDeviceSupportCamera(true);
-        navigator.permissions
-          .query({ name: "camera" as PermissionName })
-          .then((res) => {
-            setCameraDevicePermission(res.state);
-
-            // PermissionStatus change event not working in some browsers.
-            // see: https://developer.mozilla.org/en-US/docs/Web/API/PermissionStatus/change_event#browser_compatibility
-            res.onchange = () => {
-              console.log(
-                `camera permission state has changed to ${res.state}`
-              );
-              setCameraDevicePermission(res.state);
-            };
-          });
+  
+        requestMediaPermissions({audio: false, video: true})
+        .then(() => {
+          setIsDeviceSupportCamera(true);
+          setCameraDevicePermission("granted");
+        })
+        .catch((err: MediaPermissionsError) => {
+          const { type } = err;
+            if (type === MediaPermissionsErrorType.SystemPermissionDenied
+                || type === MediaPermissionsErrorType.UserPermissionDenied
+                ||type === MediaPermissionsErrorType.CouldNotStartVideoSource
+                ) {
+                  setIsSuccessState(false);
+                  setIsDeviceSupportCamera(false);
+                  setCameraDevicePermission(null);
+            } 
+        });
       }
     } catch (_) {
       setIsSuccessState(false);
@@ -451,7 +456,7 @@ const Camera: React.FC<Props> = ({
             setCameraDevicePermission("granted");
           }
         }}
-        videoConstraints={constraint}
+        videoConstraints={constraints}
       />
       <div className={`circle-container`}>
         <CircularProgressBar percent={percent} error={error} />
