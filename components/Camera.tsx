@@ -43,7 +43,6 @@ interface Props {
   setProgress: Dispatch<SetStateAction<number>>;
   setCurrentActionIndex: Dispatch<SetStateAction<number>>;
   setFailedMessage: Dispatch<SetStateAction<string>>;
-  isGenerateAction: boolean
   setHumanReady: () => void;
   deviceState?: (state: IdeviceState) => void;
 }
@@ -58,7 +57,6 @@ const Camera: React.FC<Props> = ({
   setProgress,
   setHumanReady,
   deviceState,
-  isGenerateAction
 }) => {
   const constraints: Constraint = {
     width: 1280,
@@ -142,7 +140,7 @@ const Camera: React.FC<Props> = ({
       import("@vladmandic/human/dist/human.esm.js").then((H) => {
         human = new H.default(humanConfig);
         human.load().then(() => {
-          detectionLoop()
+          console.log("ready");
           setHumanReady();
         });
       });
@@ -176,6 +174,7 @@ const Camera: React.FC<Props> = ({
     if (result) {
       const interpolated = await human.next(result);
       const capture = captureButtonRef.current;
+
       if (
         interpolated.face.length > 0 &&
         interpolated.face[0].rotation != undefined &&
@@ -432,10 +431,6 @@ const Camera: React.FC<Props> = ({
     }, 1500);
   }, []);
 
-  useEffect(() => {
-    if(!isGenerateAction) onPlay()
-  }, [isGenerateAction])
-
   return (
     <div className="relative">
       <Webcam
@@ -450,6 +445,17 @@ const Camera: React.FC<Props> = ({
         minScreenshotWidth={1280}
         mirrored={false}
         minScreenshotHeight={720}
+        onLoadedMetadata={(e) => {
+          onPlay();
+
+          // We assume the PermissionStatus state is granted.
+          // Because metadata is loaded only when permission is granted.
+          // This is for handling browser that not support PermissionStatus change event.
+          if (cameraDevicePermission !== "granted") {
+            console.log("we assume the PermissionStatus state is granted");
+            setCameraDevicePermission("granted");
+          }
+        }}
         videoConstraints={constraints}
       />
       <div className={`circle-container`}>
