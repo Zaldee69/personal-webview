@@ -3,7 +3,7 @@ import { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Head from "next/head";
 import { AppDispatch, RootState } from "@/redux/app/store";
-import Camera, { IdeviceState } from "../../components/Camera";
+import Camera from "../../components/Camera";
 import { useRouter } from "next/router";
 import { toast } from "react-toastify";
 import {
@@ -42,10 +42,6 @@ const Liveness = () => {
   const [isStepDone, setStepDone] = useState<boolean>(false);
   const [isGenerateAction, setIsGenerateAction] = useState<boolean>(true);
   const [isMustReload, setIsMustReload] = useState<boolean>(false);
-  const [unsupportedDeviceModal, setUnsupportedDeviceModal] =
-    useState<boolean>(false);
-  const [showUnsupportedDeviceModal, setShowUnsupportedDeviceModal] =
-    useState<IdeviceState | null>(null);
 
   const actionList = useSelector(
     (state: RootState) => state.liveness.actionList
@@ -100,7 +96,6 @@ const Liveness = () => {
   }, [progress]);
 
   const dispatch: AppDispatch = useDispatch();
-  const humanReadyRef = useRef<null>(null);
 
   const setHumanReady = () => {
     ready = true;
@@ -467,22 +462,9 @@ const Liveness = () => {
   }, [router.isReady]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    if (ready && showUnsupportedDeviceModal !== null) {
-      if (
-        !showUnsupportedDeviceModal.isDeviceSupportCamera ||
-        showUnsupportedDeviceModal.cameraDevicePermission !== "granted"
-      ) {
-        setUnsupportedDeviceModal(true);
-      } else {
-        setUnsupportedDeviceModal(false);
-      }
-    }
-  }, [showUnsupportedDeviceModal, ready]);
-
-  useEffect(() => {
     setTimeout(() => {
       if (!ready) setIsMustReload(true);
-    }, 15000);
+    }, 25000);
   }, []);
 
   return (
@@ -541,9 +523,6 @@ const Liveness = () => {
             setFailedMessage={setFailedMessage}
             setProgress={setProgress}
             setHumanReady={setHumanReady}
-            deviceState={(state) => {
-              setShowUnsupportedDeviceModal(state);
-            }}
           />
         </div>
         {(!isStepDone && actionList.length > 1) || isMustReload ? (
@@ -624,10 +603,7 @@ const Liveness = () => {
           </div>
         )}
         <Footer />
-        <UnsupportedDeviceModal
-          modal={unsupportedDeviceModal}
-          setModal={setUnsupportedDeviceModal}
-        />
+        <UnsupportedDeviceModal />
       </div>
     </>
   );

@@ -1,4 +1,4 @@
-import Camera, { IdeviceState } from "@/components/Camera";
+import Camera from "@/components/Camera";
 import Footer from "@/components/Footer";
 import ProgressStepBar from "@/components/ProgressStepBar";
 import Head from "next/head";
@@ -34,10 +34,6 @@ const RevokeMekari = () => {
   const [isStepDone, setStepDone] = useState<boolean>(false);
   const [isGenerateAction, setIsGenerateAction] = useState<boolean>(true);
   const [isMustReload, setIsMustReload] = useState<boolean>(false);
-  const [unsupportedDeviceModal, setUnsupportedDeviceModal] =
-    useState<boolean>(false);
-  const [showUnsupportedDeviceModal, setShowUnsupportedDeviceModal] =
-    useState<IdeviceState | null>(null);
   const { t }: any = i18n;
 
   const actionList = useSelector(
@@ -260,22 +256,9 @@ const RevokeMekari = () => {
   }, [router.isReady]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    if (ready && showUnsupportedDeviceModal !== null) {
-      if (
-        !showUnsupportedDeviceModal.isDeviceSupportCamera ||
-        showUnsupportedDeviceModal.cameraDevicePermission !== "granted"
-      ) {
-        setUnsupportedDeviceModal(true);
-      } else {
-        setUnsupportedDeviceModal(false);
-      }
-    }
-  }, [showUnsupportedDeviceModal, ready]);
-
-  useEffect(() => {
     setTimeout(() => {
       if (!ready) setIsMustReload(true);
-    }, 15000);
+    }, 25000);
   }, []);
 
   return (
@@ -334,9 +317,6 @@ const RevokeMekari = () => {
             setFailedMessage={setFailedMessage}
             setProgress={setProgress}
             setHumanReady={setHumanReady}
-            deviceState={(state) => {
-              setShowUnsupportedDeviceModal(state);
-            }}
           />
         </div>
         {(!isStepDone && actionList.length > 1) || isMustReload ? (
@@ -417,10 +397,7 @@ const RevokeMekari = () => {
           </div>
         )}
         <Footer />
-        <UnsupportedDeviceModal
-          modal={unsupportedDeviceModal}
-          setModal={setUnsupportedDeviceModal}
-        />
+        <UnsupportedDeviceModal />
       </div>
     </>
   );
