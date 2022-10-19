@@ -416,8 +416,8 @@ const Camera: React.FC<Props> = ({
         _isMounted && (
           <div className="relative">
           <Webcam
-            style={{ height: "350px", objectFit: "cover" }}
-            className="mt-10 rounded-md sm:w-full md:w-full"
+            style={{ height: "270px", objectFit: "cover" }}
+            className="mt-3 rounded-md sm:w-full md:w-full"
             screenshotQuality={1}
             audio={false}
             ref={webcamRef}
