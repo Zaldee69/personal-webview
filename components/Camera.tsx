@@ -40,6 +40,7 @@ interface Props {
   setCurrentActionIndex: Dispatch<SetStateAction<number>>;
   setFailedMessage: Dispatch<SetStateAction<string>>;
   setHumanReady: () => void;
+  setIsMustReload: Dispatch<SetStateAction<boolean>>;
 }
 
 const Camera: React.FC<Props> = ({
@@ -49,6 +50,7 @@ const Camera: React.FC<Props> = ({
   setFailedMessage,
   setProgress,
   setHumanReady,
+  setIsMustReload
 }) => {
   const constraints: Constraint = {
     width: 1280,
@@ -155,7 +157,12 @@ const Camera: React.FC<Props> = ({
 
   async function drawLoop() {
     // main screen refresh loop
-    if(actionList[currentActionIndex] !==  undefined) setHumanReady(); 
+    if(actionList[currentActionIndex] !== undefined){
+      setHumanReady()
+    }else {
+      setIsMustReload(true);
+      console.error("cannot get action")
+    }
     let clicked = false;
     if (result) {
       const interpolated = await human.next(result);

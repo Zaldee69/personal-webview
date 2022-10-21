@@ -25,7 +25,6 @@ import { resetImages, setActionList } from "@/redux/slices/livenessSlice";
 import { TKycVerificationIssueRequestData } from "infrastructure/rest/kyc/types";
 import UnsupportedDeviceModal from "@/components/UnsupportedDeviceModal";
 
-let ready: boolean = false;
 
 const ReEnrollMekari = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -73,7 +72,6 @@ const ReEnrollMekari = () => {
   const dispatch: AppDispatch = useDispatch();
 
   const setHumanReady = () => {
-    ready = true;
     const loading: any = document.getElementById("loading");
     if (loading) {
       loading.style.display = "none";
@@ -274,11 +272,6 @@ const ReEnrollMekari = () => {
     dispatch(resetImages());
   }, [router.isReady]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  useEffect(() => {
-    setTimeout(() => {
-      if (!ready) setIsMustReload(true);
-    }, 25000);
-  }, []);
 
   return (
     <>
@@ -440,7 +433,7 @@ const ReEnrollMekari = () => {
             <div
               className={["relative", isLoading ? "hidden" : "block"].join(" ")}
             >
-              {!ready && (
+              {!isMustReload && (
                 <div
                   id="loading"
                   className={`rounded-md z-[999] ease-in duration-300 absolute bg-[#E6E6E6] w-full h-[350px] flex justify-center items-center`}
@@ -470,6 +463,8 @@ const ReEnrollMekari = () => {
                   setFailedMessage={setFailedMessage}
                   setProgress={setProgress}
                   setHumanReady={setHumanReady}
+                  setIsMustReload={setIsMustReload}
+                  
           />
             </div>
             {isGenerateAction ? (

@@ -24,8 +24,6 @@ import SkeletonLoading from "@/components/SkeletonLoading";
 import { concateRedirectUrlParams } from "@/utils/concateRedirectUrlParams";
 import UnsupportedDeviceModal from "@/components/UnsupportedDeviceModal";
 
-let ready: boolean = false;
-
 const RevokeMekari = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   let [currentActionIndex, setCurrentActionIndex] = useState(0);
@@ -62,7 +60,6 @@ const RevokeMekari = () => {
   const humanReadyRef = useRef<null>(null);
 
   const setHumanReady = () => {
-    ready = true;
     const loading: any = document.getElementById("loading");
     if (loading) {
       loading.style.display = "none";
@@ -255,12 +252,6 @@ const RevokeMekari = () => {
     dispatch(resetImages());
   }, [router.isReady]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  useEffect(() => {
-    setTimeout(() => {
-      if (!ready) setIsMustReload(true);
-    }, 25000);
-  }, []);
-
   return (
     <>
       <Head>
@@ -348,7 +339,7 @@ const RevokeMekari = () => {
           <Loading title={t("loadingTitle")} />
         </div>
         <div className={["relative", isLoading ? "hidden" : "block"].join(" ")}>
-          {!ready && (
+          {!setIsMustReload && (
             <div
               id="loading"
               className={`rounded-md z-[999] ease-in duration-300 absolute bg-[#E6E6E6] w-full h-[270px] flex justify-center items-center`}
@@ -378,6 +369,7 @@ const RevokeMekari = () => {
             setFailedMessage={setFailedMessage}
             setProgress={setProgress}
             setHumanReady={setHumanReady}
+            setIsMustReload={setIsMustReload}
           />
         </div>
         {isGenerateAction ? (
