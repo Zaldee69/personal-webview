@@ -52,6 +52,8 @@ const Camera: React.FC<Props> = ({
   setHumanReady,
   setIsMustReload
 }) => {
+  const backend = new URLSearchParams(window.location.search).get('backend')??'wasm';
+  
   const constraints: Constraint = {
     width: 1280,
     height: 720,
@@ -70,6 +72,7 @@ const Camera: React.FC<Props> = ({
   const [currentActionState, setCurrentActionState] = useState("look_straight");
   const [isCurrentStepDone, setIsCurrentStepDone] = useState(false);
   const [successState, setIsSuccessState] = useState(false);
+  const [humanDone, setHumanDone] = useState(false);
   const [error, setError] = useState<boolean>(false);
   const [image, setImage] = useState("");
   const [percent, setPercent] = useState<number>(0);
@@ -108,10 +111,9 @@ const Camera: React.FC<Props> = ({
 
   useEffect(() => {
     const initHuman = async () => {
-      const humanConfig = {
+      const humanConfig: any = {
         // user configuration for human, used to fine-tune behavior
-        // backend: 'webgl',
-        async: true,
+        backend: backend,
         modelBasePath: assetPrefix ? `${assetPrefix}/models` : "/models",
         filter: { enabled: false, equalization: false },
         face: {
@@ -126,10 +128,13 @@ const Camera: React.FC<Props> = ({
         hand: { enabled: false },
         object: { enabled: false },
         gesture: { enabled: true },
-        debug: false,
+        debug: true,
       };
-      import("@vladmandic/human/dist/human.esm.js").then((H) => {
+      import("@vladmandic/Human").then((H) => {
         human = new H.default(humanConfig);
+        human.warmup().then(() => {
+          setHumanDone(true);
+        });
       });
     };
     initHuman();
@@ -146,23 +151,19 @@ const Camera: React.FC<Props> = ({
       _isMounted.current = false;
     };
   });
-
+  
   async function detectionLoop() {
     // main detection loop
     if (human != undefined) {
       result = await human.detect(dom.video); // actual detection; were not capturing output in a local variable as it can also be reached via human.result
       requestAnimationFrame(detectionLoop); // start new frame immediately
+    } else {
+      setTimeout(detectionLoop, 30);
     }
   }
 
   async function drawLoop() {
     // main screen refresh loop
-    if(actionList[currentActionIndex] !== undefined){
-      setHumanReady()
-    }else {
-      setIsMustReload(true);
-      console.error("cannot get action")
-    }
     let clicked = false;
     if (result) {
       const interpolated = await human.next(result);
@@ -312,17 +313,30 @@ const Camera: React.FC<Props> = ({
     if (clicked) {
       setTimeout(drawLoop, 1000); // Wait for click update
     } else {
-      setTimeout(drawLoop, 30); // use to slow down refresh from max refresh rate to target of 30 fps
+      setTimeout(drawLoop, 30)
     }
   }
+
+  async function actionDone() {
+    if (humanDone && (actionList[currentActionIndex] !== undefined)) {
+      const dt = new Date();
+      const ts = `${dt.getHours().toString().padStart(2, '0')}:${dt.getMinutes().toString().padStart(2, '0')}:${dt.getSeconds().toString().padStart(2, '0')}.${dt.getMilliseconds().toString().padStart(3, '0')}`;
+      console.log(ts, "Human ready")
+      setHumanReady()
+      detectionLoop();
+      drawLoop();
+    }
+  }
+  
+  useEffect(() => {
+    actionDone();
+  }, [humanDone, actionList]);
 
   const onPlay = async () => {
     isDone = new Array(actionList.length);
     for (var i = 0; i < actionList.length; i++) {
       isDone[i] = false;
     }
-    await detectionLoop();
-    await drawLoop();
     setIsSuccessState(false);
   };
 
