@@ -14,11 +14,6 @@ import lookUpHandler from "@/utils/lookUpHandler";
 import lookDownHandler from "@/utils/lookDownHandler";
 import {log} from "@/utils/logging";
 import i18n from "i18";
-import {
-  MediaPermissionsError,
-  MediaPermissionsErrorType,
-  requestMediaPermissions,
-} from 'mic-check';
 
 let result: any;
 let dom: any;
@@ -358,21 +353,6 @@ const Camera: React.FC<Props> = ({
           video: webcamRef.current?.video,
           canvas: null,
         };
-        const unsupport : any = document.getElementById("unsupportedDevice")
-        requestMediaPermissions({audio: false, video: true})
-        .then(() => {
-          unsupport.style.display = "none"
-        })
-        .catch((err: MediaPermissionsError) => {
-          const { type } = err;
-          if (type === MediaPermissionsErrorType.SystemPermissionDenied
-            || type === MediaPermissionsErrorType.UserPermissionDenied
-            ||type === MediaPermissionsErrorType.CouldNotStartVideoSource
-            ) {
-                  unsupport.style.display = "flex"
-                  setIsSuccessState(false);
-            } 
-        });
       }
     } catch (_) {
       setIsSuccessState(false);
@@ -450,6 +430,11 @@ const Camera: React.FC<Props> = ({
             minScreenshotHeight={720}
             onLoadedMetadata={(e) => onPlay()}
             videoConstraints={constraints}
+            onUserMediaError={() => {
+              const unsupport: any =
+                document.getElementById("unsupportedDevice");
+              unsupport.style.display = "flex";
+            }}
           />
           <div className={`circle-container`}>
             <CircularProgressBar percent={percent} error={error} />
