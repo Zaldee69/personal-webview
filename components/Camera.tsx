@@ -130,7 +130,7 @@ const Camera: React.FC<Props> = ({
         gesture: { enabled: true },
         debug: true,
       };
-      import("@vladmandic/Human").then((H) => {
+      import("@vladmandic/human").then((H) => {
         human = new H.default(humanConfig);
         human.warmup().then(() => {
           setHumanDone(true);
