@@ -2,7 +2,6 @@ import Webcam from "react-webcam";
 import React, { Dispatch, SetStateAction } from "react";
 import { useRef, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { assetPrefix } from "../next.config";
 import { AppDispatch, RootState } from "@/redux/app/store";
 import CircularProgressBar from "./CircularProgressBar";
 import { setImages, setIsDone } from "@/redux/slices/livenessSlice";
@@ -23,7 +22,6 @@ import {
 let result: any;
 let dom: any;
 let isDone: any;
-let human: any = undefined;
 let count: number = 1;
 
 
@@ -40,7 +38,8 @@ interface Props {
   setCurrentActionIndex: Dispatch<SetStateAction<number>>;
   setFailedMessage: Dispatch<SetStateAction<string>>;
   setHumanReady: () => void;
-  setIsMustReload: Dispatch<SetStateAction<boolean>>;
+  humanDone: boolean
+  human: any
 }
 
 const Camera: React.FC<Props> = ({
@@ -50,7 +49,8 @@ const Camera: React.FC<Props> = ({
   setFailedMessage,
   setProgress,
   setHumanReady,
-  setIsMustReload
+  humanDone,
+  human
 }) => {
   const backend = new URLSearchParams(window.location.search).get('backend')??'wasm';
   
@@ -72,7 +72,6 @@ const Camera: React.FC<Props> = ({
   const [currentActionState, setCurrentActionState] = useState("look_straight");
   const [isCurrentStepDone, setIsCurrentStepDone] = useState(false);
   const [successState, setIsSuccessState] = useState(false);
-  const [humanDone, setHumanDone] = useState(false);
   const [error, setError] = useState<boolean>(false);
   const [image, setImage] = useState("");
   const [percent, setPercent] = useState<number>(0);
@@ -99,7 +98,7 @@ const Camera: React.FC<Props> = ({
     const progressCircle: any = document.querySelector(".progress-circle");
     if (
       currentActionState === "mouth_open" ||
-      currentActionState === "look_straight"
+      currentActionState === "look_straight"  
     ) {
       progressCircle.style.transition = "2s";
     } else {
@@ -109,36 +108,6 @@ const Camera: React.FC<Props> = ({
     }
   }, [currentActionState]);
 
-  useEffect(() => {
-    const initHuman = async () => {
-      const humanConfig: any = {
-        // user configuration for human, used to fine-tune behavior
-        backend: backend,
-        modelBasePath: assetPrefix ? `${assetPrefix}/models` : "/models",
-        filter: { enabled: false, equalization: false },
-        face: {
-          enabled: true,
-          detector: { rotation: true },
-          mesh: { enabled: true },
-          iris: { enabled: true },
-          description: { enabled: true },
-          emotion: { enabled: false },
-        },
-        body: { enabled: false },
-        hand: { enabled: false },
-        object: { enabled: false },
-        gesture: { enabled: true },
-        debug: true,
-      };
-      import("@vladmandic/human").then((H) => {
-        human = new H.default(humanConfig);
-        human.warmup().then(() => {
-          setHumanDone(true);
-        });
-      });
-    };
-    initHuman();
-  }, []);
 
   useEffect(() => {
     if (_isMounted) {
@@ -154,7 +123,7 @@ const Camera: React.FC<Props> = ({
   
   async function detectionLoop() {
     // main detection loop
-    if (human != undefined) {
+    if (human != undefined && dom != undefined ) {
       result = await human.detect(dom.video); // actual detection; were not capturing output in a local variable as it can also be reached via human.result
       requestAnimationFrame(detectionLoop); // start new frame immediately
     } else {
