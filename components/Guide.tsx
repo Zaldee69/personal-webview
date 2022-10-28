@@ -3,6 +3,7 @@ import React from "react";
 import Head from "next/head";
 import i18n from "i18";
 import Footer from "@/components/Footer";
+import { assetPrefix } from 'next.config';
 
 interface Props {
   setIsClicked: React.Dispatch<React.SetStateAction<boolean>>;
@@ -27,13 +28,13 @@ const Guide = ({setIsClicked, isDisabled}: Props) => {
           <div className="flex flex-col items-center space-y-4">
             <Image
               alt="guide-1"
-              src="/images/Liveness.svg"
+              src={`${assetPrefix}/images/Liveness.svg`}
               width={150}
               height={120}
             />
             <Image
               alt="right-guide"
-              src="/images/Right.svg"
+              src={`${assetPrefix}/images/Right.svg`}
               width={30}
               height={30}
             />
@@ -41,13 +42,13 @@ const Guide = ({setIsClicked, isDisabled}: Props) => {
           <div className="flex flex-col items-center space-y-4">
             <Image
               alt="guide-2"
-              src="/images/guide1.svg"
+              src={`${assetPrefix}/images/guide1.svg`}
               width={150}
               height={120}
             />
             <Image
               alt="wrong-guide"
-              src="/images/Wrong.svg"
+              src={`${assetPrefix}/images/Wrong.svg`}
               width={30}
               height={30}
             />
