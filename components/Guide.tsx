@@ -1,12 +1,17 @@
-import Footer from "../../components/Footer";
-import Head from "next/head";
-import { handleRoute } from "@/utils/handleRoute";
-import i18n from "i18";
 import Image from "next/image";
-import { GetServerSideProps } from "next";
+import React from "react";
+import Head from "next/head";
+import i18n from "i18";
+import Footer from "@/components/Footer";
 
-const Guide = () => {
+interface Props {
+  setIsClicked: React.Dispatch<React.SetStateAction<boolean>>;
+  isDisabled: boolean
+}
+
+const Guide = ({setIsClicked, isDisabled}: Props) => {
   const { t }: any = i18n;
+
   return (
     <>
       <Head>
@@ -22,13 +27,13 @@ const Guide = () => {
           <div className="flex flex-col items-center space-y-4">
             <Image
               alt="guide-1"
-              src="images/Liveness.svg"
+              src="/images/Liveness.svg"
               width={150}
               height={120}
             />
             <Image
               alt="right-guide"
-              src="images/Right.svg"
+              src="/images/Right.svg"
               width={30}
               height={30}
             />
@@ -36,13 +41,13 @@ const Guide = () => {
           <div className="flex flex-col items-center space-y-4">
             <Image
               alt="guide-2"
-              src="images/guide1.svg"
+              src="/images/guide1.svg"
               width={150}
               height={120}
             />
             <Image
               alt="wrong-guide"
-              src="images/Wrong.svg"
+              src="/images/Wrong.svg"
               width={30}
               height={30}
             />
@@ -55,32 +60,13 @@ const Guide = () => {
             <li>{t("guideSubtitle3")}</li>
           </ul>
         </div>
-          <button className="bg-primary btn md:mx-auto md:block md:w-1/4 text-white font-poppins w-full mx-auto rounded-sm h-9 ">
-            {t("startButton")}
-          </button>
+        <button disabled={isDisabled} onClick={() => setIsClicked(true)} className="bg-primary disabled:opacity-75 btn md:mx-auto md:block md:w-1/4 text-white font-poppins w-full mx-auto rounded-sm h-9 ">
+          {t("startButton")}
+        </button>
         <Footer />
       </div>
     </>
   );
-};
-
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  const cQuery = context.query;
-  const params = context.resolvedUrl.split("?")[1]
-
-  return {
-    redirect: {
-      permanent: false,
-      destination: cQuery.issue_id
-        ? handleRoute(`kyc/re-enroll?${params}`)
-        : cQuery.request_id
-        ? handleRoute(`liveness?${params}`)
-        : cQuery.revoke_id
-        ? handleRoute(`kyc/revoke?${params}`)
-        : handleRoute("/"),
-    },
-    props: {},
-  };
 };
 
 export default Guide;
