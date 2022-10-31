@@ -49,6 +49,7 @@ const AuthPinForm = (props: Props) => {
         user: user || "",
         pin,
         id: id || "",
+        is_async: router.query.async as string
       },
     })
       .then((res) => {
