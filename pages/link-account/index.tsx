@@ -83,6 +83,7 @@ const LinkAccount = (props: Props) => {
                     pathname: handleRoute("setting-signature-and-mfa"),
                     query: {
                       ...queryWithDynamicRedirectURL,
+                      tilaka_name: form.tilaka_name
                     },
                   });
                 } else {
@@ -101,7 +102,7 @@ const LinkAccount = (props: Props) => {
           } else {
             router.replace({
               pathname: handleRoute("certificate-information"),
-              query: { ...queryWithDynamicRedirectURL },
+              query: { ...queryWithDynamicRedirectURL, tilaka_name: form.tilaka_name },
             });
           }
         });
