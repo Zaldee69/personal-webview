@@ -135,10 +135,10 @@ const PinFormDedicatedChannel = (props: Props) => {
         .then((res) => {
           if (res.success) {
             if (redirect_url) {
-              console.log(isProcessed);
               const params = {
                 register_id: registration_id,
                 status: res.data.status === "E" ? "S" : res.data.status,
+                reason_code: res.data.reason_code,
               };
               const queryString = new URLSearchParams(params as any).toString();
               window.top!.location.href = concateRedirectUrlParams(
@@ -219,6 +219,7 @@ const PinFormDedicatedChannel = (props: Props) => {
                 const params = {
                   register_id: registration_id,
                   status: res.data.status,
+                  reason_code: res.data.reason_code,
                 };
                 const queryString = new URLSearchParams(
                   params as any
@@ -234,6 +235,7 @@ const PinFormDedicatedChannel = (props: Props) => {
                     ...restRouterQuery,
                     request_id: registration_id,
                     redirect_url,
+                    reason_code: res.data.reason_code,
                   },
                 });
               }
@@ -246,6 +248,7 @@ const PinFormDedicatedChannel = (props: Props) => {
             const params = {
               register_id: registration_id,
               status: res.data.status,
+              reason_code: res.data.reason_code,
             };
             const queryString = new URLSearchParams(params as any).toString();
             if (redirect_url) {

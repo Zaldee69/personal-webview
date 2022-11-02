@@ -88,6 +88,7 @@ const ReEnrollMekari = () => {
             const params = {
               issue_id: routerQuery.issue_id,
               status: "Selesai",
+              reason_code: result.data.reason_code,
             };
             const queryString = new URLSearchParams(params as any).toString();
             window.top!.location.href = concateRedirectUrlParams(
@@ -132,6 +133,7 @@ const ReEnrollMekari = () => {
         setIsGenerateAction(false);
         const msg = error.response?.data?.data?.errors?.[0];
         const status = error.response?.data?.data?.status;
+        const reason_code = error.response?.data?.data?.reason_code;
         if (msg) {
           toast.error(msg, {
             icon: <XIcon />,
@@ -143,6 +145,7 @@ const ReEnrollMekari = () => {
             const params = {
               issue_id: routerQuery.issue_id,
               status: "Selesai",
+              reason_code: reason_code,
             };
             const queryString = new URLSearchParams(params as any).toString();
             window.top!.location.href = concateRedirectUrlParams(
@@ -186,6 +189,7 @@ const ReEnrollMekari = () => {
             const params = {
               status: "Selesai",
               issue_id: routerQuery.issue_id,
+              reason_code: result.data.reason_code,
             };
             const queryString = new URLSearchParams(params as any).toString();
             window.top!.location.href = concateRedirectUrlParams(
@@ -202,6 +206,7 @@ const ReEnrollMekari = () => {
               const params = {
                 status: "Selesai",
                 issue_id: routerQuery.issue_id,
+                reason_code: result.data.reason_code,
               };
               const queryString = new URLSearchParams(params as any).toString();
 
@@ -218,6 +223,7 @@ const ReEnrollMekari = () => {
             ),
             query: {
               ...routerQuery,
+              reason_code: result.data.reason_code,
             },
           });
         }

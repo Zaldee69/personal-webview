@@ -27,12 +27,16 @@ import Guide from "@/components/Guide";
 import InitializingFailed from "@/components/atoms/InitializingFailed";
 import Initializing from "@/components/atoms/Initializing";
 import { ActionGuide1, ActionGuide2 } from "@/components/atoms/ActionGuide";
-import { actionText } from '@/utils/actionText';
-import { assetPrefix } from 'next.config';
+import { actionText } from "@/utils/actionText";
+import { assetPrefix } from "next.config";
 
-type TQueryParams = { request_id: string; redirect_url?: string };
+type TQueryParams = {
+  request_id: string;
+  redirect_url?: string;
+  reason_code?: string;
+};
 
-let human: any = undefined
+let human: any = undefined;
 
 const Liveness = () => {
   const router = useRouter();
@@ -45,11 +49,11 @@ const Liveness = () => {
   const [isStepDone, setStepDone] = useState<boolean>(false);
   const [isGenerateAction, setIsGenerateAction] = useState<boolean>(true);
   const [isMustReload, setIsMustReload] = useState<boolean>(false);
-  const [isLivenessStarted, setIsLivenessStarted] = useState<boolean>(false)
-  const [isDisabled, setIsDisabled] = useState<boolean>(false)
+  const [isLivenessStarted, setIsLivenessStarted] = useState<boolean>(false);
+  const [isDisabled, setIsDisabled] = useState<boolean>(false);
   const [humanDone, setHumanDone] = useState(false);
-  const [isClicked, setIsClicked] = useState<boolean>(false)
- 
+  const [isClicked, setIsClicked] = useState<boolean>(false);
+
   const actionList = useSelector(
     (state: RootState) => state.liveness.actionList
   );
@@ -87,7 +91,7 @@ const Liveness = () => {
   };
 
   const generateAction = () => {
-    setIsDisabled(true)
+    setIsDisabled(true);
     const body = {
       registerId: routerQuery.request_id as string,
     };
@@ -108,12 +112,13 @@ const Liveness = () => {
           res.data.status !== "E"
         ) {
           // this scope for status A B C S
-          setIsDisabled(false)
+          setIsDisabled(false);
           if (res.data.status === "S") {
             toast.dismiss("generateAction");
             const params = {
               register_id: routerQuery.request_id,
               status: res.data.status,
+              reason_code: res.data.reason_code,
             };
             const queryString = new URLSearchParams(params as any).toString();
             if (routerQuery.redirect_url) {
@@ -214,6 +219,7 @@ const Liveness = () => {
               const params = {
                 status: res.data.status,
                 register_id: routerQuery.request_id,
+                reason_code: res.data.reason_code,
               };
               const queryString = new URLSearchParams(params as any).toString();
               window.top!.location.href = concateRedirectUrlParams(
@@ -223,7 +229,11 @@ const Liveness = () => {
             } else {
               router.push({
                 pathname: handleRoute("liveness-failure"),
-                query: { ...routerQuery, request_id: router.query.request_id },
+                query: {
+                  ...routerQuery,
+                  request_id: router.query.request_id,
+                  reason_code: res.data.reason_code,
+                },
               });
             }
           }
@@ -291,6 +301,7 @@ const Liveness = () => {
               // Redirect berdasarkan redirect-url
               const params: TQueryParams = {
                 request_id: routerQuery.request_id as string,
+                reason_code: finalFormResponse.data.reason_code as string,
               };
               if (routerQuery.redirect_url) {
                 params.redirect_url = routerQuery.redirect_url as string;
@@ -320,12 +331,20 @@ const Liveness = () => {
         } else if (result.data.pin_form) {
           router.replace({
             pathname: handleRoute("kyc/pinform"),
-            query: { ...routerQuery, registration_id: router.query.request_id },
+            query: {
+              ...routerQuery,
+              registration_id: router.query.request_id,
+              reason_code: result.data.reason_code,
+            },
           });
         } else {
           router.push({
             pathname: handleRoute("form"),
-            query: { ...routerQuery, request_id: router.query.request_id },
+            query: {
+              ...routerQuery,
+              request_id: router.query.request_id,
+              reason_code: result.data.reason_code,
+            },
           });
         }
       } else {
@@ -341,7 +360,11 @@ const Liveness = () => {
           });
           router.push({
             pathname: handleRoute("liveness-fail"),
-            query: { ...routerQuery, request_id: router.query.request_id },
+            query: {
+              ...routerQuery,
+              request_id: router.query.request_id,
+              reason_code: result.data.reason_code,
+            },
           });
         } else {
           if (status) {
@@ -372,6 +395,7 @@ const Liveness = () => {
                 if (result.data.config_level === 2) {
                   const params: TQueryParams = {
                     request_id: routerQuery.request_id as string,
+                    reason_code: result?.data.reason_code as string,
                   };
                   if (routerQuery.redirect_url) {
                     params.redirect_url = routerQuery.redirect_url as string;
@@ -387,6 +411,7 @@ const Liveness = () => {
                   const params = {
                     status: status,
                     register_id: routerQuery.request_id,
+                    reason_code: result?.data.reason_code as string,
                   };
                   const queryString = new URLSearchParams(
                     params as any
@@ -401,6 +426,7 @@ const Liveness = () => {
                     query: {
                       ...routerQuery,
                       request_id: router.query.request_id,
+                      reason_code: result?.data.reason_code,
                     },
                   });
                 }
@@ -423,7 +449,10 @@ const Liveness = () => {
       setTimeout(() => {
         router.push({
           pathname: handleRoute("liveness-fail"),
-          query: { ...routerQuery, request_id: router.query.request_id },
+          query: {
+            ...routerQuery,
+            request_id: router.query.request_id,
+          },
         });
       }, 5000);
     }
@@ -471,19 +500,19 @@ const Liveness = () => {
   }, [isDone]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    if(!humanDone && isClicked){
-      toast.dismiss()
+    if (!humanDone && isClicked) {
+      toast.dismiss();
       toast(`Loading...`, {
         type: "info",
         toastId: "load",
         isLoading: true,
         position: "top-center",
       });
-      setIsDisabled(true)
-    }else if(humanDone && isClicked){
-      toast.dismiss("load")
-      setIsLivenessStarted(true)
-    }  
+      setIsDisabled(true);
+    } else if (humanDone && isClicked) {
+      toast.dismiss("load");
+      setIsLivenessStarted(true);
+    }
   }, [isClicked, humanDone]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
@@ -492,7 +521,8 @@ const Liveness = () => {
     dispatch(resetImages());
   }, [router.isReady]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  if(!isLivenessStarted) return <Guide setIsClicked={setIsClicked} isDisabled={isDisabled} />
+  if (!isLivenessStarted)
+    return <Guide setIsClicked={setIsClicked} isDisabled={isDisabled} />;
 
   return (
     <>
