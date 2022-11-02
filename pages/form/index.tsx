@@ -51,7 +51,7 @@ const Form: React.FC = () => {
     confirmPassword: "password",
   });
 
-  const {t} : any = i18n
+  const { t }: any = i18n;
 
   const [isChecked, setIsCheked] = useState<boolean>(false);
   const disabled =
@@ -86,8 +86,7 @@ const Form: React.FC = () => {
           } else if (
             !/^(?=.*\d)(?=.*[a-zA-Z])[0-9a-zA-Z_]{6,15}$/.test(value)
           ) {
-            stateObj[name] =
-              t("tilakaNameWrongFormat")
+            stateObj[name] = t("tilakaNameWrongFormat");
           }
           break;
 
@@ -99,8 +98,7 @@ const Form: React.FC = () => {
               value
             )
           ) {
-            stateObj[name] =
-              t("passwordWrongFormat")
+            stateObj[name] = t("passwordWrongFormat");
           } else if (input.password && value !== input.confirmPassword) {
             stateObj["confirmPassword"] = t("passwordNotMatch");
           } else {
@@ -116,7 +114,7 @@ const Form: React.FC = () => {
           } else if (
             !/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])[0-9a-zA-Z@#$%^&+=]{10,40}$/
           ) {
-            stateObj[name] = t("passwordWrongFormat")
+            stateObj[name] = t("passwordWrongFormat");
           } else if (input.password && value !== input.password) {
             stateObj[name] = t("passwordNotMatch");
           }
@@ -171,7 +169,11 @@ const Form: React.FC = () => {
           });
           router.replace({
             pathname: handleRoute("/form/success"),
-            query: { request_id, ...restRouterQuery },
+            query: {
+              request_id,
+              ...restRouterQuery,
+              reason_code: res.data.reason_code,
+            },
           });
         } else {
           toast.dismiss("kycCheckStepRequestToast");
@@ -227,12 +229,16 @@ const Form: React.FC = () => {
             ) {
               window.top!.location.href = concateRedirectUrlParams(
                 restRouterQuery.redirect_url as string,
-                ""
+                `request_id=${request_id}%26reason_code=${res.data.reason_code}`
               );
             } else {
               router.push({
                 pathname: handleRoute("liveness-failure"),
-                query: { ...restRouterQuery, request_id },
+                query: {
+                  ...restRouterQuery,
+                  request_id,
+                  reason_code: res.data.reason_code,
+                },
               });
             }
           } else if (res.data.status === "S" || res.data.status === "E") {
@@ -240,6 +246,7 @@ const Form: React.FC = () => {
             const params = {
               register_id: request_id,
               status: res.data.status,
+              reason_code: res.data.reason_code,
             };
             const queryString = new URLSearchParams(params as any).toString();
             if (restRouterQuery.redirect_url) {
@@ -292,7 +299,9 @@ const Form: React.FC = () => {
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
       <div className="px-5 pt-8 sm:w-full md:w-4/5 mx-auto">
-        <h1 className="font-poppins font-semibold text-xl">{t("finalFormTitle")}</h1>
+        <h1 className="font-poppins font-semibold text-xl">
+          {t("finalFormTitle")}
+        </h1>
         <div className="flex justify-center mt-10">
           <Image
             width={200}
@@ -317,7 +326,7 @@ const Form: React.FC = () => {
                 <QuestionIcon />
                 <div className="absolute left-9 -top-10  w-48   flex-col items-center hidden mb-6 group-hover:flex">
                   <span className="relative z-10 p-2 text-xs rounded-md font-poppins w-full text-white whitespace-no-wrap bg-neutral shadow-lg">
-                 {t("finalFormTooltip")}
+                    {t("finalFormTooltip")}
                   </span>
                   <div className="w-3 h-3 -mt-16 mr-48 rotate-45 bg-neutral"></div>
                 </div>
