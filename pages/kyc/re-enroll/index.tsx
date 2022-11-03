@@ -85,11 +85,15 @@ const ReEnrollMekari = () => {
         ) {
           toast.error(result?.message || "Pengecekan Step Re-enroll gagal");
           setTimeout(() => {
-            const params = {
+            const params: any = {
               issue_id: routerQuery.issue_id,
               status: "Selesai",
-              reason_code: result.data.reason_code,
             };
+
+            if (result.data.reason_code) {
+              params.reason_code = result.data.reason_code;
+            }
+
             const queryString = new URLSearchParams(params as any).toString();
             window.top!.location.href = concateRedirectUrlParams(
               routerQuery.redirect_url as string,
@@ -142,11 +146,15 @@ const ReEnrollMekari = () => {
         if (routerQuery.redirect_url && (status === "F" || status === "S")) {
           setIsGenerateAction(false);
           setTimeout(() => {
-            const params = {
+            const params: any = {
               issue_id: routerQuery.issue_id,
               status: "Selesai",
-              reason_code: reason_code,
             };
+
+            if (reason_code) {
+              params.reason_code = reason_code;
+            }
+
             const queryString = new URLSearchParams(params as any).toString();
             window.top!.location.href = concateRedirectUrlParams(
               routerQuery.redirect_url as string,
@@ -186,11 +194,15 @@ const ReEnrollMekari = () => {
         removeStorage();
         if (routerQuery.redirect_url) {
           setTimeout(() => {
-            const params = {
+            const params: any = {
               status: "Selesai",
               issue_id: routerQuery.issue_id,
-              reason_code: result.data.reason_code,
             };
+
+            if (result.data.reason_code) {
+              params.reason_code = result.data.reason_code;
+            }
+
             const queryString = new URLSearchParams(params as any).toString();
             window.top!.location.href = concateRedirectUrlParams(
               routerQuery.redirect_url as string,
@@ -203,11 +215,15 @@ const ReEnrollMekari = () => {
           setIsLoading(false);
           if (routerQuery.redirect_url) {
             setTimeout(() => {
-              const params = {
+              const params: any = {
                 status: "Selesai",
                 issue_id: routerQuery.issue_id,
-                reason_code: result.data.reason_code,
               };
+
+              if (result.data.reason_code) {
+                params.reason_code = result.data.reason_code;
+              }
+
               const queryString = new URLSearchParams(params as any).toString();
 
               window.top!.location.href = concateRedirectUrlParams(
@@ -217,14 +233,19 @@ const ReEnrollMekari = () => {
             }, 2000);
           }
         } else {
+          const query: any = {
+            ...routerQuery,
+          };
+
+          if (result.data.reason_code) {
+            query.reason_code = result.data.reason_code;
+          }
+
           router.push({
             pathname: handleRoute(
               assetPrefix ? "liveness-fail" : "/liveness-fail"
             ),
-            query: {
-              ...routerQuery,
-              reason_code: result.data.reason_code,
-            },
+            query,
           });
         }
       }
