@@ -167,13 +167,19 @@ const Form: React.FC = () => {
           toast.success(res?.message || "berhasil", {
             icon: <CheckOvalIcon />,
           });
+
+          const query: any = {
+            request_id,
+            ...restRouterQuery,
+          };
+
+          if (res.data.reason_code) {
+            query.reason_code = res.data.reason_code;
+          }
+
           router.replace({
             pathname: handleRoute("/form/success"),
-            query: {
-              request_id,
-              ...restRouterQuery,
-              reason_code: res.data.reason_code,
-            },
+            query,
           });
         } else {
           toast.dismiss("kycCheckStepRequestToast");
@@ -229,25 +235,38 @@ const Form: React.FC = () => {
             ) {
               window.top!.location.href = concateRedirectUrlParams(
                 restRouterQuery.redirect_url as string,
-                `request_id=${request_id}%26reason_code=${res.data.reason_code}`
+                `request_id=${request_id}${
+                  res.data.reason_code
+                    ? "%26reason_code=" + res.data.reason_code
+                    : ""
+                }`
               );
             } else {
+              const query: any = {
+                ...restRouterQuery,
+                request_id,
+              };
+
+              if (res.data.reason_code) {
+                query.reason_code = res.data.reason_code;
+              }
+
               router.push({
                 pathname: handleRoute("liveness-failure"),
-                query: {
-                  ...restRouterQuery,
-                  request_id,
-                  reason_code: res.data.reason_code,
-                },
+                query,
               });
             }
           } else if (res.data.status === "S" || res.data.status === "E") {
             toast.dismiss("kycCheckStepRequestToast");
-            const params = {
+            const params: any = {
               register_id: request_id,
               status: res.data.status,
-              reason_code: res.data.reason_code,
             };
+
+            if (res.data.reason_code) {
+              params.reason_code = res.data.reason_code;
+            }
+
             const queryString = new URLSearchParams(params as any).toString();
             if (restRouterQuery.redirect_url) {
               window.top!.location.href = concateRedirectUrlParams(

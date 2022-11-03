@@ -135,11 +135,15 @@ const PinFormDedicatedChannel = (props: Props) => {
         .then((res) => {
           if (res.success) {
             if (redirect_url) {
-              const params = {
+              const params: any = {
                 register_id: registration_id,
                 status: res.data.status === "E" ? "S" : res.data.status,
-                reason_code: res.data.reason_code,
               };
+
+              if (res.data.reason_code) {
+                params.reason_code = res.data.reason_code;
+              }
+
               const queryString = new URLSearchParams(params as any).toString();
               window.top!.location.href = concateRedirectUrlParams(
                 redirect_url as string,
@@ -216,11 +220,15 @@ const PinFormDedicatedChannel = (props: Props) => {
           } else if (res.data.status === "E" || res.data.status === "F") {
             if (!res.data.pin_form) {
               if (redirect_url) {
-                const params = {
+                const params: any = {
                   register_id: registration_id,
                   status: res.data.status,
-                  reason_code: res.data.reason_code,
                 };
+
+                if (res.data.reason_code) {
+                  params.reason_code = res.data.reason_code;
+                }
+
                 const queryString = new URLSearchParams(
                   params as any
                 ).toString();
@@ -229,14 +237,19 @@ const PinFormDedicatedChannel = (props: Props) => {
                   queryString
                 );
               } else {
+                const query: any = {
+                  ...restRouterQuery,
+                  request_id: registration_id,
+                  redirect_url,
+                };
+
+                if (res.data.reason_code) {
+                  query.reason_code = res.data.reason_code;
+                }
+
                 router.push({
                   pathname: handleRoute("liveness-failure"),
-                  query: {
-                    ...restRouterQuery,
-                    request_id: registration_id,
-                    redirect_url,
-                    reason_code: res.data.reason_code,
-                  },
+                  query,
                 });
               }
             } else {
@@ -245,11 +258,15 @@ const PinFormDedicatedChannel = (props: Props) => {
               return;
             }
           } else if (res.data.status === "S") {
-            const params = {
+            const params: any = {
               register_id: registration_id,
               status: res.data.status,
-              reason_code: res.data.reason_code,
             };
+
+            if (res.data.reason_code) {
+              params.reason_code = res.data.reason_code;
+            }
+
             const queryString = new URLSearchParams(params as any).toString();
             if (redirect_url) {
               window.top!.location.href = concateRedirectUrlParams(

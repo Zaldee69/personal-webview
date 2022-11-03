@@ -103,11 +103,15 @@ export const serverSideRenderReturnConditions = ({
           },
         };
       } else if (checkStepResult.res.data.status === "F") {
-        const params = {
+        const params: any = {
           ...cQuery,
           request_id: uuid,
-          reason_code: checkStepResult.res.data.reason_code,
         };
+
+        if (checkStepResult.res.data.reason_code) {
+          params.reason_code = checkStepResult.res.data.reason_code;
+        }
+
         const queryString = new URLSearchParams(params as any).toString();
 
         if (
@@ -120,7 +124,13 @@ export const serverSideRenderReturnConditions = ({
               permanent: false,
               destination: concateRedirectUrlParams(
                 cQuery.redirect_url as string,
-                `status=${checkStepResult.res.data.status}%26register_id=${uuid}%26reason_code=${checkStepResult.res.data.reason_code}`
+                `status=${
+                  checkStepResult.res.data.status
+                }%26register_id=${uuid}${
+                  checkStepResult.res.data.reason_code
+                    ? "%26reason_code=" + checkStepResult.res.data.reason_code
+                    : ""
+                }`
               ),
             },
             props: {},
@@ -144,11 +154,15 @@ export const serverSideRenderReturnConditions = ({
           },
         };
       } else if (checkStepResult.res.data.status === "S") {
-        const params = {
+        const params: any = {
           register_id: uuid,
           status: checkStepResult.res.data.status,
-          reason_code: checkStepResult.res.data.reason_code,
         };
+
+        if (checkStepResult.res.data.reason_code) {
+          params.reason_code = checkStepResult.res.data.reason_code;
+        }
+
         const queryString = new URLSearchParams(params as any).toString();
 
         if (cQuery.redirect_url) {

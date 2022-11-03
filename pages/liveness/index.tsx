@@ -31,9 +31,11 @@ import { actionText } from "@/utils/actionText";
 import { assetPrefix } from "next.config";
 
 type TQueryParams = {
-  request_id: string;
+  request_id?: string;
   redirect_url?: string;
   reason_code?: string;
+  register_id?: string;
+  status?: string;
 };
 
 let human: any = undefined;
@@ -115,11 +117,15 @@ const Liveness = () => {
           setIsDisabled(false);
           if (res.data.status === "S") {
             toast.dismiss("generateAction");
-            const params = {
-              register_id: routerQuery.request_id,
+            const params: TQueryParams = {
+              register_id: routerQuery.request_id as string,
               status: res.data.status,
-              reason_code: res.data.reason_code,
             };
+
+            if (res.data.reason_code) {
+              params.reason_code = res.data.reason_code;
+            }
+
             const queryString = new URLSearchParams(params as any).toString();
             if (routerQuery.redirect_url) {
               window.top!.location.href = concateRedirectUrlParams(
@@ -216,24 +222,35 @@ const Liveness = () => {
               res.data.pin_form &&
               routerQuery.redirect_url
             ) {
-              const params = {
+              const params: TQueryParams = {
                 status: res.data.status,
-                register_id: routerQuery.request_id,
-                reason_code: res.data.reason_code,
+                register_id: routerQuery.request_id as string,
               };
+
+              if (res.data.reason_code) {
+                params.reason_code = res.data.reason_code;
+              }
+
               const queryString = new URLSearchParams(params as any).toString();
               window.top!.location.href = concateRedirectUrlParams(
                 routerQuery.redirect_url as string,
                 queryString
               );
             } else {
+              console.log("first");
+
+              const query: TQueryParams = {
+                ...routerQuery,
+                request_id: router.query.request_id as string,
+              };
+
+              if (res.data.reason_code) {
+                query.reason_code = res.data.reason_code;
+              }
+
               router.push({
                 pathname: handleRoute("liveness-failure"),
-                query: {
-                  ...routerQuery,
-                  request_id: router.query.request_id,
-                  reason_code: res.data.reason_code,
-                },
+                query,
               });
             }
           }
@@ -301,11 +318,16 @@ const Liveness = () => {
               // Redirect berdasarkan redirect-url
               const params: TQueryParams = {
                 request_id: routerQuery.request_id as string,
-                reason_code: finalFormResponse.data.reason_code as string,
               };
+
               if (routerQuery.redirect_url) {
                 params.redirect_url = routerQuery.redirect_url as string;
               }
+
+              if (finalFormResponse.data.reason_code) {
+                params.reason_code = finalFormResponse.data.reason_code;
+              }
+
               const queryString = new URLSearchParams(params as any).toString();
               window.top!.location.href = concateRedirectUrlParams(
                 routerQuery.dashboard_url as string,
@@ -329,22 +351,32 @@ const Liveness = () => {
             }
           }
         } else if (result.data.pin_form) {
+          const query: any = {
+            ...routerQuery,
+            registration_id: router.query.request_id,
+          };
+
+          if (result.data.reason_code) {
+            query.reason_code = result.data.reason_code;
+          }
+
           router.replace({
             pathname: handleRoute("kyc/pinform"),
-            query: {
-              ...routerQuery,
-              registration_id: router.query.request_id,
-              reason_code: result.data.reason_code,
-            },
+            query,
           });
         } else {
+          const query: any = {
+            ...routerQuery,
+            request_id: router.query.request_id,
+          };
+
+          if (result.data.reason_code) {
+            query.reason_code = result.data.reason_code;
+          }
+
           router.push({
             pathname: handleRoute("form"),
-            query: {
-              ...routerQuery,
-              request_id: router.query.request_id,
-              reason_code: result.data.reason_code,
-            },
+            query,
           });
         }
       } else {
@@ -358,13 +390,21 @@ const Liveness = () => {
             autoClose: 5000,
             position: "top-center",
           });
+
+          console.log("ususu");
+
+          const query: TQueryParams = {
+            ...routerQuery,
+            request_id: router.query.request_id as string,
+          };
+
+          if (result.data.reason_code) {
+            query.reason_code = result.data.reason_code;
+          }
+
           router.push({
             pathname: handleRoute("liveness-fail"),
-            query: {
-              ...routerQuery,
-              request_id: router.query.request_id,
-              reason_code: result.data.reason_code,
-            },
+            query,
           });
         } else {
           if (status) {
@@ -395,11 +435,16 @@ const Liveness = () => {
                 if (result.data.config_level === 2) {
                   const params: TQueryParams = {
                     request_id: routerQuery.request_id as string,
-                    reason_code: result?.data.reason_code as string,
                   };
+
                   if (routerQuery.redirect_url) {
                     params.redirect_url = routerQuery.redirect_url as string;
                   }
+
+                  if (result?.data.reason_code) {
+                    params.reason_code = result?.data.reason_code as string;
+                  }
+
                   const queryString = new URLSearchParams(
                     params as any
                   ).toString();
@@ -408,11 +453,15 @@ const Liveness = () => {
                     queryString
                   );
                 } else if (result.data.pin_form && routerQuery.redirect_url) {
-                  const params = {
+                  const params: any = {
                     status: status,
                     register_id: routerQuery.request_id,
-                    reason_code: result?.data.reason_code as string,
                   };
+
+                  if (result?.data.reason_code) {
+                    params.reason_code = result?.data.reason_code;
+                  }
+
                   const queryString = new URLSearchParams(
                     params as any
                   ).toString();
@@ -421,13 +470,18 @@ const Liveness = () => {
                     queryString
                   );
                 } else {
+                  const query: any = {
+                    ...routerQuery,
+                    request_id: router.query.request_id,
+                  };
+
+                  if (result?.data.reason_code) {
+                    query.reason_code = result?.data.reason_code;
+                  }
+
                   router.push({
                     pathname: handleRoute("liveness-fail"),
-                    query: {
-                      ...routerQuery,
-                      request_id: router.query.request_id,
-                      reason_code: result?.data.reason_code,
-                    },
+                    query,
                   });
                 }
               }, 5000);
