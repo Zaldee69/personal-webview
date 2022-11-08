@@ -24,42 +24,34 @@ const Guide = ({setIsClicked, isDisabled}: Props) => {
         <span className="font-poppins text-sm block mt-4">
           {t("guideTitle")}
         </span>
-        <div className="flex flex-row justify-center mt-10 gap-5">
-          <div className="flex flex-col items-center space-y-4">
+        <div className="flex flex-col gap-5 my-6" >
+          <div className="grid font-poppins text-sm grid-cols-2 items-center grid-flow-col">
             <Image
               alt="guide-1"
-              src={`${assetPrefix}/images/Liveness.svg`}
-              width={150}
-              height={120}
+              src={`${assetPrefix}/images/1.svg`}
+              width={120}
+              height={90}
             />
-            <Image
-              alt="right-guide"
-              src={`${assetPrefix}/images/Right.svg`}
-              width={30}
-              height={30}
-            />
+            <p>{t("guideSubtitle1")}</p>
           </div>
-          <div className="flex flex-col items-center space-y-4">
+          <div className="grid font-poppins text-sm grid-cols-2 items-center grid-flow-col">
             <Image
-              alt="guide-2"
-              src={`${assetPrefix}/images/guide1.svg`}
-              width={150}
-              height={120}
+              alt="guide-1"
+              src={`${assetPrefix}/images/2.svg`}
+              width={120}
+              height={90}
             />
-            <Image
-              alt="wrong-guide"
-              src={`${assetPrefix}/images/Wrong.svg`}
-              width={30}
-              height={30}
-            />
+            <p>{t("guideSubtitle2")}</p>
           </div>
-        </div>
-        <div>
-          <ul className="list-disc flex flex-col font-poppins text-sm gap-4 my-10 px-5">
-            <li>{t("guideSubtitle1")}</li>
-            <li>{t("guideSubtitle2")}</li>
-            <li>{t("guideSubtitle3")}</li>
-          </ul>
+          <div className="grid font-poppins text-sm grid-cols-2 items-center grid-flow-col">
+            <Image
+              alt="guide-1"
+              src={`${assetPrefix}/images/3.svg`}
+              width={120}
+              height={90}
+            />
+            <p>{t("guideSubtitle3")}</p>
+          </div>
         </div>
         <button disabled={isDisabled} onClick={() => setIsClicked(true)} className="bg-primary disabled:opacity-75 btn md:mx-auto md:block md:w-1/4 text-white font-poppins w-full mx-auto rounded-sm h-9 ">
           {t("startButton")}
