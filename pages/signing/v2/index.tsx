@@ -72,7 +72,7 @@ const Signing = (props: TPropsSigning) => {
   const [openFRModal, setopenFRModal] = useState<boolean>(false);
   const [otpModal, setOtpModal] = useState<boolean>(false);
   const [documentList, setDocumentList] = useState<ISignedPDF[]>([]);
-  const [isSuccess, setIsSuccess] = useState<"-1" | "0" | "1">("-1");
+  const [isSuccess, setIsSuccess] = useState<"-1" | "0" | "1" | "2">("-1");
   const [signingFailureDocumentName, setSigningFailureDocumentName] =
     useState<string>("");
   const [signingFailureError, setSiginingFailureError] =
@@ -95,7 +95,11 @@ const Signing = (props: TPropsSigning) => {
     }, 2000);
   };
   const mfaCallbackSuccess = () => {
-    setIsSuccess("1");
+    if(routerQuery.is_async){
+      setIsSuccess("2");
+    }else {
+      setIsSuccess("1");
+    }
   };
   const mfaCallbackFailure = (
     documentName: string,
@@ -225,6 +229,8 @@ const Signing = (props: TPropsSigning) => {
   if (!shouldRender) return;
   if (isSuccess === "1") {
     return <SigningSuccess documentCount={documentList.length} />;
+  } else if(isSuccess === "2"){
+    return <SigningOnProgress documentCount={documentList.length} />;
   } else if (isSuccess === "0") {
     return (
       <SigningFailure
@@ -380,6 +386,66 @@ const SigningSuccess = (props: TPropsSigningSuccess) => {
         <div className="mt-3">
           <p className="font-poppins text-sm text-neutral800">
             {props.documentCount} {t("documentSuccess")}
+          </p>
+        </div>
+      </div>
+      <div className="mt-32">
+        {routerQuery.redirect_url && (
+          <div className="text-primary text-base font-medium font-poppins underline hover:cursor-pointer">
+            <a
+              href={concateRedirectUrlParams(
+                routerQuery.redirect_url,
+                queryString
+              )}
+            >
+              <a>{t("livenessSuccessButtonTitle")}</a>
+            </a>
+          </div>
+        )}
+        <div className="mt-8 flex justify-center">
+          <Image
+            src={`${assetPrefix}/images/poweredByTilaka.svg`}
+            alt="powered-by-tilaka"
+            width="80px"
+            height="41.27px"
+          />
+        </div>
+      </div>
+    </div>
+  );
+};
+const SigningOnProgress = (props: TPropsSigningSuccess) => {
+  const router = useRouter();
+  const routerQuery: NextParsedUrlQuery & {
+    redirect_url?: string;
+  } & IParameterFromRequestSign = router.query;
+
+  const params = {
+    user_identifier: routerQuery.user,
+    request_id: routerQuery.request_id,
+    status: "Sukses",
+  };
+  const queryString = new URLSearchParams(params as any).toString();
+
+  const { t }: any = i18n;
+
+  return (
+    <div className="pt-16 px-1 pb-9 text-center flex flex-col justify-center min-h-screen">
+      <div>
+        <p className="font-poppins text-lg font-semibold text-neutral800">
+          {t("authenticationSuccessTitle")}
+        </p>
+        <div className="mt-5">
+          <Image
+            src={`${assetPrefix}/images/authenticationSuccess.png`}
+            width="196px"
+            height="196px"
+            alt="signing-success-ill"
+          />
+        </div>
+        <div className="mt-3">
+          <p className="font-poppins text-sm whitespace-pre-line text-neutral800">
+              {t("authenticationSuccessSubtitle")}
           </p>
         </div>
       </div>

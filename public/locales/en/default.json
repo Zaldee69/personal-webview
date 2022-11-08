@@ -135,7 +135,7 @@
   "failed": "failed",
   "success": "Success",
   "documentExpired": "Document Expired",
-  "closeYourFace": "Move your face closer"
-
-
+  "closeYourFace": "Move your face closer",
+  "authenticationSuccessTitle": "Authentication Success",
+  "authenticationSuccessSubtitle": "Signing is currently in process.\n Notification will be received when document(s)\nare succesfully signed."
 }
