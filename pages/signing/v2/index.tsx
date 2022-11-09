@@ -675,6 +675,8 @@ const OTPModal: React.FC<IModal> = ({
   documentList,
 }) => {
   const [successSigning, setSuccessSigning] = useState<boolean>(false);
+  const [timeRemaining, setTimeRemaining] = useState<string>("0")
+  const [isCountDone, setIsCountDone] = useState<boolean>(false)
   const router = useRouter();
   const routerQuery: NextParsedUrlQuery & {
     redirect_url?: string;
@@ -760,32 +762,60 @@ const OTPModal: React.FC<IModal> = ({
       });
   };
 
-  useEffect(() => {
-    if (modal && !successSigning) {
-      restGetOtp({ token: localStorage.getItem("token_v2") })
-        .then((res) => {
-          toast(`Kode OTP telah dikirim ke Email anda`, {
-            type: "info",
-            toastId: "info",
-            isLoading: false,
-            position: "top-center",
-          });
-        })
-        .catch((err) => {
-          if (err.request.status === 401) {
-            restLogout({ token: localStorage.getItem("refresh_token_v2") });
-            localStorage.removeItem("token_v2");
-            localStorage.removeItem("refresh_token_v2");
-            router.replace({
-              pathname: "/login/v2",
-              query: { ...router.query, showAutoLogoutInfo: "1" },
-            });
-          } else {
-            toast.error("Kode OTP gagal dikirim", {
-              icon: <XIcon />,
-            });
-          }
+const interval = 60000;
+const reset = () => {
+  localStorage.endTime = +new Date() + interval;
+};
+
+const timerHandler = () => {
+  setInterval(function () {
+    const date: any = new Date();
+    const remaining = localStorage.endTime - date;
+    const timeRemaining = Math.floor( remaining / 1000 ).toString()
+    if (remaining >= 1) {
+        setTimeRemaining(timeRemaining)
+    } else {
+        setIsCountDone(false)
+    }
+  }, 100);
+};
+
+  const handleTriggerSendOTP = () => {
+    restGetOtp({ token: localStorage.getItem("token_v2") })
+    .then((res) => {
+      timerHandler()
+      reset()
+      setIsCountDone(true)
+      toast(`Kode OTP telah dikirim ke Email anda`, {
+        type: "info",
+        toastId: "info",
+        isLoading: false,
+        position: "top-center",
+      });
+    })
+    .catch((err) => {
+      if (err?.request?.status === 401) {
+        restLogout({ token: localStorage.getItem("refresh_token_v2") });
+        localStorage.removeItem("token_v2");
+        localStorage.removeItem("refresh_token_v2");
+        router.replace({
+          pathname: "/login/v2",
+          query: { ...router.query, showAutoLogoutInfo: "1" },
         });
+      } else {
+        toast.error("Kode OTP gagal dikirim", {
+          icon: <XIcon />,
+        });
+      }
+    });
+  }
+
+  useEffect(() => {
+    if (modal && !successSigning && !isCountDone && timeRemaining === "0") {
+      handleTriggerSendOTP()
+    }else {
+      setIsCountDone(true)
+      timerHandler()
     }
   }, [modal]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -821,10 +851,14 @@ const OTPModal: React.FC<IModal> = ({
             values={values}
             onChange={(value, index, values) => setValues(values)}
           />
+          <div className="flex font-poppins justify-center text-sm gap-1 mt-5" >
+          <p className="text-neutral200" >{t("dindtReceiveOtp")}</p>
+          <div className="text-primary font-semibold">{!isCountDone ? <button onClick={handleTriggerSendOTP} >{t("resend")}</button> : `0:${timeRemaining}`}</div>
+          </div>
           <button
             disabled={values.join("").length < 6}
             onClick={onClickHandler}
-            className="bg-primary btn mt-16 disabled:opacity-50 text-white font-poppins mx-auto rounded-sm py-2.5 px-6 font-semibold"
+            className="bg-primary btn mt-16 disabled:bg-[#DAE6F8] disabled:text-[#6B778C]/30 hover:opacity-70 text-white font-poppins mx-auto rounded-sm py-2.5 px-6 font-semibold"
           >
             {t("confirm")}
           </button>
