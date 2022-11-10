@@ -27,6 +27,7 @@ import { TKycVerificationRevokeRequestData } from "infrastructure/rest/kyc/types
 import { handleRoute } from "@/utils/handleRoute";
 import { concateRedirectUrlParams } from "@/utils/concateRedirectUrlParams";
 import { ActionGuide1, ActionGuide2 } from "@/components/atoms/ActionGuide";
+import CheckOvalIcon from "@/public/icons/CheckOvalIcon";
 
 let human: any = undefined;
 
@@ -72,11 +73,23 @@ const RevokeMekari = () => {
 
   const generateAction = () => {
     setIsDisabled(true);
+
+    toast(`Mengecek status...`, {
+      type: "info",
+      toastId: "generateAction",
+      isLoading: true,
+      position: "top-center",
+    });
+
     const body = {
       revokeId: routerQuery.revoke_id as string,
     };
     RestKycGenerateRevokeAction(body)
       .then((result) => {
+        toast.dismiss("generateAction");
+        toast.success("Pembuatan daftar aksi sukses", {
+          icon: <CheckOvalIcon />,
+        });
         setIsDisabled(false);
         if (result?.data) {
           const payload = ["look_straight"].concat(result.data.actionList);
