@@ -496,15 +496,19 @@ export const OTPModal: React.FC<Active> = ({ modal, setModal }) => {
   const handleTriggerSendOTP = () => {
     restGetOtp({})
           .then((res) => {
-            toast(`Kode OTP telah dikirim ke Email anda`, {
-              type: "info",
-              toastId: "info",
-              isLoading: false,
-              position: "top-center",
-            });
-            timerHandler()
-            reset()
-            setIsCountDone(true)
+            if(res.success){
+              toast(`Kode OTP telah dikirim ke Email anda`, {
+                type: "info",
+                toastId: "info",
+                isLoading: false,
+                position: "top-center",
+              });
+              timerHandler()
+              reset()
+              setIsCountDone(true)
+            }else {
+              toast.error(res.message, { icon: <XIcon /> });
+            }
           })
           .catch(() => {
             toast.error("Kode OTP gagal dikirim", { icon: <XIcon /> });
@@ -620,10 +624,10 @@ export const OTPModal: React.FC<Active> = ({ modal, setModal }) => {
           </div>
         ) : (
           <>
-            <p className="font-poppins block text-center pb-5  whitespace-nowrap  font-semibold ">
+            <p className="poppins-regular block text-center pb-5  whitespace-nowrap  font-semibold ">
               {t("frTitle")}
             </p>
-            <span className="font-poppins block text-center pb-5  ">
+            <span className="poppins-regular block text-center pb-5  ">
               {t("frSubtitle2")}
             </span>
             <PinInput
@@ -639,14 +643,14 @@ export const OTPModal: React.FC<Active> = ({ modal, setModal }) => {
               values={values}
               onChange={(value, index, values) => setValues(values)}
             />
-            <div className="flex font-poppins justify-center text-sm gap-1 mt-5" >
+            <div className="flex poppins-regular justify-center text-sm gap-1 mt-5" >
               <p className="text-neutral200" >{t("dindtReceiveOtp")}</p>
               <div className="text-primary font-semibold">{!isCountDone ? <button onClick={handleTriggerSendOTP} >{t("resend")}</button> : `0:${timeRemaining}`}</div>
             </div>
             <button
               disabled={values.join("").length < 6}
               onClick={onClickHandler}
-              className="bg-primary disabled:bg-[#DAE6F8] btn mt-16 disabled:text-[#6B778C]/30 mx-auto flex text-white poppins-regular mx-auto rounded-sm py-2.5 px-6 font-semibold"
+              className="bg-primary disabled:bg-[#DAE6F8] btn mt-16 disabled:text-[#6B778C]/30 mx-auto flex text-white poppins-regular rounded-sm py-2.5 px-6 font-semibold"
             >
               {t("confirm")}
             </button>
