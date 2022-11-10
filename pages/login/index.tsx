@@ -42,7 +42,7 @@ const Login = () => {
   const dispatch: AppDispatch = useDispatch();
   const data = useSelector((state: RootState) => state.login);
   const router = useRouter();
-  const { channel_id, tilaka_name, company_id, transaction_id } = router.query;
+  const { channel_id, tilaka_name, company_id, transaction_id, signing } = router.query;
 
   useEffect(() => {
     if (router.isReady) {
@@ -62,7 +62,7 @@ const Login = () => {
       localStorage.setItem("refresh_token", data.data.data[1] as string);
       getCertificateList({ params: company_id as string }).then((res) => {
         const certif = JSON.parse(res.data);
-        if (!transaction_id) {
+        if (!transaction_id && signing === "1") {
           toast.dismiss("success");
           toast("Transaction ID tidak boleh kosong", {
             type: "error",
@@ -117,7 +117,7 @@ const Login = () => {
 
   const submitHandler = (e: React.SyntheticEvent) => {
     e.preventDefault();
-    dispatch(login({ password, ...router.query } as TLoginProps));
+    dispatch(login({ password, channel_id, tilaka_name, company_id, transaction_id,} as TLoginProps));
     setPassword("");
   };
 
