@@ -1188,15 +1188,21 @@ const timerHandler = () => {
   const handleTriggerSendOTP = () => {
     restGetOtp({ token: localStorage.getItem("token_v2") })
     .then((res) => {
-      timerHandler()
-      reset()
-      setIsCountDone(true)
-      toast(`Kode OTP telah dikirim ke Email anda`, {
-        type: "info",
-        toastId: "info",
-        isLoading: false,
-        position: "top-center",
-      });
+      if(res.success){
+        timerHandler()
+        reset()
+        setIsCountDone(true)
+        toast(`Kode OTP telah dikirim ke Email anda`, {
+          type: "info",
+          toastId: "info",
+          isLoading: false,
+          position: "top-center",
+        });
+      }else {
+        toast.error(res.message, {
+          icon: <XIcon />,
+        });
+      }
     })
     .catch((err) => {
       if (err?.request?.status === 401) {
