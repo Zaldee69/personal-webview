@@ -1119,6 +1119,7 @@ const OTPModal: React.FC<IModal> = ({
           setSuccessSigning(true);
           toast.dismiss("loading");
           localStorage.setItem("count_v2", "0");
+          setEndTimeToZero()
         } else {
           setSuccessSigning(false);
           toast.dismiss("loading");
@@ -1133,8 +1134,9 @@ const OTPModal: React.FC<IModal> = ({
             count >= 5 ||
             res.message.toLowerCase() ===
               "penandatanganan dokumen gagal. gagal FR sudah 5 kali".toLocaleLowerCase()
-          ) {
-            signingFailure(res.message || "Ada yang salah");
+              ) {
+                signingFailure(res.message || "Ada yang salah");
+                setEndTimeToZero()
           }
         }
       })
@@ -1162,6 +1164,7 @@ const OTPModal: React.FC<IModal> = ({
           const count = parseInt(localStorage.getItem("count_v2") as string);
           if (count >= 5) {
             signingFailure(err.response?.data?.message || "Ada yang salah");
+            setEndTimeToZero()
           }
         }
       });
@@ -1170,7 +1173,11 @@ const OTPModal: React.FC<IModal> = ({
 const interval = 60000;
 const reset = () => {
   localStorage.endTime = +new Date() + interval;
-};
+}
+
+const setEndTimeToZero = () => {
+  localStorage.endTime = "0"
+}
 
 const timerHandler = () => {
   setInterval(function () {
