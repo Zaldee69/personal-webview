@@ -28,6 +28,7 @@ import Guide from "@/components/Guide";
 import InitializingFailed from "@/components/atoms/InitializingFailed";
 import Initializing from "@/components/atoms/Initializing";
 import { ActionGuide1, ActionGuide2 } from "@/components/atoms/ActionGuide";
+import CheckOvalIcon from "@/public/icons/CheckOvalIcon";
 
 let human: any = undefined;
 
@@ -122,9 +123,21 @@ const ReEnrollMekari = () => {
     const body = {
       issueId: routerQuery.issue_id as string,
     };
+
+    toast(`Mengecek status...`, {
+      type: "info",
+      toastId: "generateAction",
+      isLoading: true,
+      position: "top-center",
+    });
+
     RestKycGenerateActionIssue(body)
       .then((result) => {
         if (result?.data) {
+          toast.dismiss("generateAction");
+          toast.success("Pembuatan daftar aksi sukses", {
+          icon: <CheckOvalIcon />,
+          });
           setIsGenerateAction(false);
           setIsDisabled(false);
           const payload = ["look_straight"].concat(result.data.actionList);
@@ -135,6 +148,7 @@ const ReEnrollMekari = () => {
       })
       .catch((error) => {
         setIsGenerateAction(false);
+        toast.dismiss("generateAction");
         const msg = error.response?.data?.data?.errors?.[0];
         const status = error.response?.data?.data?.status;
         const reason_code = error.response?.data?.data?.reason_code;
