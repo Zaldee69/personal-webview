@@ -912,9 +912,6 @@ const SigningFailure = (props: TPropsSigningFailure) => {
           <p className="font-poppins text-sm text-neutral800">
             {t("signFailedSubtitle")}{" "}
           </p>
-          <p className="font-poppins text-base text-neutral800 font-medium mt-1.5">
-            {props.error.message}
-          </p>
         </div>
       </div>
       <div className="mt-32">
