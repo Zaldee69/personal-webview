@@ -523,6 +523,10 @@ export const OTPModal: React.FC<Active> = ({ modal, setModal }) => {
       timerHandler()
     }
   }, [modal]);
+  
+  const setEndTimeToZero = () => {
+    localStorage.endTime = "0";
+  };
 
   const onClickHandler = () => {
     toast(`Loading...`, {
@@ -554,6 +558,7 @@ export const OTPModal: React.FC<Active> = ({ modal, setModal }) => {
       },
     })
       .then((res) => {
+        setEndTimeToZero()
         setSuccessSigning(true);
         toast.dismiss("loading");
         localStorage.setItem("count", "0");
@@ -573,6 +578,7 @@ export const OTPModal: React.FC<Active> = ({ modal, setModal }) => {
           localStorage.setItem("count", newCount.toString());
           const count = parseInt(localStorage.getItem("count") as string);
           if (count >= 5) {
+            setEndTimeToZero()
             localStorage.removeItem("token");
             localStorage.setItem("count", "0");
             restLogout({});
