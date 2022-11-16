@@ -139,7 +139,7 @@ const SigningWithRead = () => {
     setViewDocBase64({ pdfBase64, pdfName, docIndex });
   };
   const mfaCallbackSuccess = () => {
-    if (routerQuery.is_async) {
+    if (routerQuery.async) {
       setIsSuccess("2");
     } else {
       setIsSuccess("1");
@@ -498,7 +498,7 @@ const SigningWithoutRead = () => {
     }, 2000);
   };
   const mfaCallbackSuccess = () => {
-    if (routerQuery.is_async) {
+    if (routerQuery.async) {
       setIsSuccess("2");
     } else {
       setIsSuccess("1");
@@ -969,7 +969,7 @@ const FRModal: React.FC<IModal> = ({
         face_image: base64Img?.split(",")[1] as string,
         id: routerQuery.id as string,
         user: routerQuery.user as string,
-        is_async: routerQuery.async as string,
+        async: routerQuery.async as string,
       },
       token: localStorage.getItem("token_v2"),
     })
@@ -1110,7 +1110,7 @@ const OTPModal: React.FC<IModal> = ({
         otp_pin: values.join(""),
         id: routerQuery.id as string,
         user: routerQuery.user as string,
-        is_async: routerQuery.async as string,
+        async: routerQuery.async as string,
       },
       token: localStorage.getItem("token_v2"),
     })

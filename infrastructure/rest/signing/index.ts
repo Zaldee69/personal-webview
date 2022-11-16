@@ -35,7 +35,7 @@ export const RestSigningAuthPIN = ({
   payload: TSigningAuthPINRequestData;
   token?: string | null;
 }): Promise<TSigningAuthPINResponseData> => {
-  const isAsync = payload.is_async === "true" 
+  const isAsync = payload.async === "true" 
   return axios
     .post<TSigningAuthPINResponseData>(
      `${BASE_URL}/${isAsync ? "v2/" : ""}signing-authpin`,
