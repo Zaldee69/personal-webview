@@ -361,7 +361,7 @@ const SigningWithRead = () => {
                     i !== 0 ? "mt-4" : ""
                   }`}
                 >
-                  <div className="flex items-center">
+                  <div className="flex items-center w-3/4">
                     <span className="mr-2.5">
                       {documentsHasBeenRead.includes(i) ? (
                         <CheckEvalGreenIcon />
@@ -373,7 +373,7 @@ const SigningWithRead = () => {
                       {e.pdf_name}
                     </p>
                   </div>
-                  <div>
+                  <div className="flex items-center justify-end w-1/4">
                     <button
                       onClick={() => readOnClick(e.pdf, e.pdf_name, i)}
                       className="mr-2.5"
@@ -1077,8 +1077,8 @@ const OTPModal: React.FC<IModal> = ({
   documentList,
 }) => {
   const [successSigning, setSuccessSigning] = useState<boolean>(false);
-  const [timeRemaining, setTimeRemaining] = useState<string>("0")
-  const [isCountDone, setIsCountDone] = useState<boolean>(false)
+  const [timeRemaining, setTimeRemaining] = useState<string>("0");
+  const [isCountDone, setIsCountDone] = useState<boolean>(false);
   const router = useRouter();
   const routerQuery: NextParsedUrlQuery & {
     redirect_url?: string;
@@ -1116,7 +1116,7 @@ const OTPModal: React.FC<IModal> = ({
           setSuccessSigning(true);
           toast.dismiss("loading");
           localStorage.setItem("count_v2", "0");
-          setEndTimeToZero()
+          setEndTimeToZero();
         } else {
           setSuccessSigning(false);
           toast.dismiss("loading");
@@ -1131,9 +1131,9 @@ const OTPModal: React.FC<IModal> = ({
             count >= 5 ||
             res.message.toLowerCase() ===
               "penandatanganan dokumen gagal. gagal FR sudah 5 kali".toLocaleLowerCase()
-              ) {
-                signingFailure(res.message || "Ada yang salah");
-                setEndTimeToZero()
+          ) {
+            signingFailure(res.message || "Ada yang salah");
+            setEndTimeToZero();
           }
         }
       })
@@ -1161,76 +1161,76 @@ const OTPModal: React.FC<IModal> = ({
           const count = parseInt(localStorage.getItem("count_v2") as string);
           if (count >= 5) {
             signingFailure(err.response?.data?.message || "Ada yang salah");
-            setEndTimeToZero()
+            setEndTimeToZero();
           }
         }
       });
   };
 
-const interval = 60000;
-const reset = () => {
-  localStorage.endTime = +new Date() + interval;
-}
+  const interval = 60000;
+  const reset = () => {
+    localStorage.endTime = +new Date() + interval;
+  };
 
-const setEndTimeToZero = () => {
-  localStorage.endTime = "0"
-}
+  const setEndTimeToZero = () => {
+    localStorage.endTime = "0";
+  };
 
-const timerHandler = () => {
-  setInterval(function () {
-    const date: any = new Date();
-    const remaining = localStorage.endTime - date;
-    const timeRemaining = Math.floor( remaining / 1000 ).toString()
-    if (remaining >= 1) {
-        setTimeRemaining(timeRemaining)
-    } else {
-        setIsCountDone(false)
-    }
-  }, 100);
-};
+  const timerHandler = () => {
+    setInterval(function () {
+      const date: any = new Date();
+      const remaining = localStorage.endTime - date;
+      const timeRemaining = Math.floor(remaining / 1000).toString();
+      if (remaining >= 1) {
+        setTimeRemaining(timeRemaining);
+      } else {
+        setIsCountDone(false);
+      }
+    }, 100);
+  };
 
   const handleTriggerSendOTP = () => {
     restGetOtp({ token: localStorage.getItem("token_v2") })
-    .then((res) => {
-      if(res.success){
-        timerHandler()
-        reset()
-        setIsCountDone(true)
-        toast(`Kode OTP telah dikirim ke Email anda`, {
-          type: "info",
-          toastId: "info",
-          isLoading: false,
-          position: "top-center",
-        });
-      }else {
-        toast.error(res.message, {
-          icon: <XIcon />,
-        });
-      }
-    })
-    .catch((err) => {
-      if (err?.request?.status === 401) {
-        restLogout({ token: localStorage.getItem("refresh_token_v2") });
-        localStorage.removeItem("token_v2");
-        localStorage.removeItem("refresh_token_v2");
-        router.replace({
-          pathname: "/login/v2",
-          query: { ...router.query, showAutoLogoutInfo: "1" },
-        });
-      } else {
-        toast.error("Kode OTP gagal dikirim", {
-          icon: <XIcon />,
-        });
-      }
-    });
-  }
+      .then((res) => {
+        if (res.success) {
+          timerHandler();
+          reset();
+          setIsCountDone(true);
+          toast(`Kode OTP telah dikirim ke Email anda`, {
+            type: "info",
+            toastId: "info",
+            isLoading: false,
+            position: "top-center",
+          });
+        } else {
+          toast.error(res.message, {
+            icon: <XIcon />,
+          });
+        }
+      })
+      .catch((err) => {
+        if (err?.request?.status === 401) {
+          restLogout({ token: localStorage.getItem("refresh_token_v2") });
+          localStorage.removeItem("token_v2");
+          localStorage.removeItem("refresh_token_v2");
+          router.replace({
+            pathname: "/login/v2",
+            query: { ...router.query, showAutoLogoutInfo: "1" },
+          });
+        } else {
+          toast.error("Kode OTP gagal dikirim", {
+            icon: <XIcon />,
+          });
+        }
+      });
+  };
 
   useEffect(() => {
     if (modal && !successSigning && !isCountDone && timeRemaining === "0") {
-      handleTriggerSendOTP()
-    }else {
-      setIsCountDone(true)
-      timerHandler()
+      handleTriggerSendOTP();
+    } else {
+      setIsCountDone(true);
+      timerHandler();
     }
   }, [modal]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -1266,9 +1266,15 @@ const timerHandler = () => {
             values={values}
             onChange={(value, index, values) => setValues(values)}
           />
-          <div className="flex font-poppins justify-center text-sm gap-1 mt-5" >
-          <p className="text-neutral200" >{t("dindtReceiveOtp")}</p>
-          <div className="text-primary font-semibold">{!isCountDone ? <button onClick={handleTriggerSendOTP} >{t("resend")}</button> : `0:${timeRemaining}`}</div>
+          <div className="flex font-poppins justify-center text-sm gap-1 mt-5">
+            <p className="text-neutral200">{t("dindtReceiveOtp")}</p>
+            <div className="text-primary font-semibold">
+              {!isCountDone ? (
+                <button onClick={handleTriggerSendOTP}>{t("resend")}</button>
+              ) : (
+                `0:${timeRemaining}`
+              )}
+            </div>
           </div>
           <button
             disabled={values.join("").length < 6}
@@ -1303,22 +1309,50 @@ const ViewerModal: React.FC<IModalViewer> = ({ modal, onClose, viewedDoc }) => {
     const bottom =
       e.target.scrollHeight - Math.ceil(e.target.scrollTop) ===
       e.target.clientHeight;
-    if (bottom) {
-      setCloseButtonShouldDisabled(false);
-    }
+    const scrollDiv: HTMLDivElement | null =
+      document.querySelector("#scrollDiv");
+
+    window.requestAnimationFrame(() => {
+      if (bottom) {
+        setCloseButtonShouldDisabled(false);
+        if (scrollDiv) {
+          scrollDiv.style.borderBottomWidth = "4px";
+          scrollDiv.style.borderColor = "#DFE1E6";
+        }
+      } else {
+        if (scrollDiv) {
+          scrollDiv.style.borderBottomWidth = "4px";
+          scrollDiv.style.borderColor = "transparent";
+        }
+      }
+    });
   };
+
+  useEffect(() => {
+    const bodyEl = document.querySelector("body");
+    if (!modal || !bodyEl) {
+      return;
+    } else {
+      bodyEl.style.overflow = "hidden";
+    }
+
+    return () => {
+      bodyEl.style.overflow = "auto";
+    };
+  }, [modal]);
 
   return modal ? (
     <div
       style={{ backgroundColor: "rgba(0, 0, 0, .5)" }}
-      className="fixed z-50 flex items-start transition-all duration-1000 pb-3 justify-center w-full left-0 top-0 h-screen"
+      className="fixed z-50 flex items-center transition-all duration-1000 justify-center left-0 top-0 w-full h-screen"
     >
-      <div className="bg-white max-w-md mt-20 mx-5 rounded-xl w-full">
-        <p className="text-center font-semibold text-base text-neutral800 pt-4 px-2 pb-3 border-b border-neutral40">
+      <div className="bg-white max-w-md my-6 mx-5 rounded-xl w-full">
+        <p className="text-center font-semibold text-base text-neutral800 pt-4 px-8 pb-3 border-b border-neutral40 truncate">
           {viewedDoc?.pdfName}
         </p>
         <div
-          className="overflow-y-auto"
+          id="scrollDiv"
+          className="overflow-y-scroll pb-4"
           style={{ maxHeight: "calc(100vh - 220px)" }}
           onScroll={handleScroll}
         >
