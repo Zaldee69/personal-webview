@@ -842,10 +842,10 @@ const SigningOnProgress = (props: TPropsSigningSuccess) => {
         </p>
         <div className="mt-5">
           <Image
-            src={`${assetPrefix}/images/authenticationSuccess.png`}
+            src={`${assetPrefix}/images/progress.svg`}
             width="196px"
             height="196px"
-            alt="signing-success-ill"
+            alt="signing-success"
           />
         </div>
         <div className="mt-3">
