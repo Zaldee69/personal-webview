@@ -518,11 +518,10 @@ const SigningWithoutRead = () => {
     const count = parseInt(localStorage.getItem("count_v2") as string);
     localStorage.setItem("count_v2", count ? count.toString() : "0");
     if (!token_v2) {
-      // router.replace({
-      //   pathname: handleRoute("/login/v2"),
-      //   query: { ...router.query },
-      // });
-      setShouldRender(true);
+      router.replace({
+        pathname: handleRoute("/login/v2"),
+        query: { ...router.query },
+      });
     } else {
       setShouldRender(true);
     }
