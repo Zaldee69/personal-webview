@@ -1336,7 +1336,7 @@ const ViewerModal: React.FC<IModalViewer> = ({ modal, onClose, viewedDoc }) => {
     }
 
     return () => {
-      bodyEl.style.overflow = "auto";
+      bodyEl.style.overflow = "unset";
     };
   }, [modal]);
 
@@ -1352,7 +1352,7 @@ const ViewerModal: React.FC<IModalViewer> = ({ modal, onClose, viewedDoc }) => {
         <div
           id="scrollDiv"
           className="overflow-y-scroll pb-4"
-          style={{ maxHeight: "calc(100vh - 220px)" }}
+          style={{ maxHeight: "64vh" }}
           onScroll={handleScroll}
         >
           <ViewerV2
