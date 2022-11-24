@@ -106,7 +106,12 @@
   "pagination": "of",
   "sign": "Sign",
   "signRequestTitle": "Sign Request",
-  "signRequestSubtitle": "You have received documents to sign. Please tick the checkbox below to proceed signing.",
+  "signRequestSubtitle": {
+    "subtitle1": "You have received documents to sign.",
+    "subtitle2": " Please tick the checkbox below to proceed signing.",
+    "subtitle3": " Click the",
+    "subtitle4": " icon to read the documents and tick the checkbox below to proceed signing."
+  },
   "signCheckbox": "I have read and agreed to sign the documents",
   "frTitle": "Confirm Signing",
   "frSubtitle1": "Face towards the camera for authentication ",
