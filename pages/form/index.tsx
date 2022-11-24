@@ -386,6 +386,7 @@ const Form: React.FC = () => {
                     ? "border-error "
                     : "border-borderColor focus:ring"
                 }`}
+                autoComplete="off"
               />
               <button
                 onClick={(e) => handleShowPwd("password", e)}

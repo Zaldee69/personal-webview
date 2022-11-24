@@ -187,6 +187,7 @@ const Login = () => {
                 type={type.password}
                 placeholder={t("passwordPlaceholder")}
                 className={`font-poppins py-3 focus:outline-none border-borderColor focus:ring  placeholder:text-placeholder placeholder:font-light px-2 rounded-md border w-full`}
+                autoComplete="off"
               />
               <button
                 type="button"
