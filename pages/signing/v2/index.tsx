@@ -24,6 +24,7 @@ import { PinInput } from "react-input-pin-code";
 import { toast } from "react-toastify";
 import i18n from "i18";
 import EyeIcon2 from "@/public/icons/EyeIcon2";
+import EyeIcon3 from "@/public/icons/EyeIcon3";
 import CheckEvalGrayIcon from "@/public/icons/CheckOvalGrayIcon";
 import CheckEvalGreenIcon from "@/public/icons/CheckOvalGreenIcon";
 import { ViewerV2 } from "@/components/ViewerV2";
@@ -341,7 +342,8 @@ const SigningWithRead = () => {
               className="font-poppins text-sm text-neutral800 text-left"
               style={{ maxWidth: "360px" }}
             >
-              {t("signRequestSubtitle")}
+              {t("signRequestSubtitle.subtitle1")}
+              {routerQuery.mustread === "1" ? <>{t("signRequestSubtitle.subtitle3")} <EyeIcon3/> {t("signRequestSubtitle.subtitle4")} </>: t("signRequestSubtitle.subtitle2")}
             </p>
           </div>
         </div>

@@ -106,7 +106,12 @@
   "pagination": "dari",
   "sign": "Tanda Tangan",
   "signRequestTitle": "Permintaan Tanda Tangan",
-  "signRequestSubtitle": "Anda menerima dokumen untuk ditandatangani. Mohon mencentang kotak di bawah untuk melanjutkan proses tanda tangan.",
+  "signRequestSubtitle": {
+    "subtitle1": "Anda menerima dokumen untuk ditandatangani.",
+    "subtitle2": " Mohon mencentang kotak di bawah untuk melanjutkan proses tanda tangan.",
+    "subtitle3": " Klik ikon",
+    "subtitle4": "  untuk membaca dokumen serta centang kotak di bawah untuk dapat melanjutkan proses tanda tangan."
+  },
   "signCheckbox": "Saya telah membaca dan setuju untuk menandatangani dokumen di atas",
   "frTitle": "Konfirmasi Tanda Tangan",
   "frSubtitle1": "Arahkan wajah ke kamera untuk otentikasi",
