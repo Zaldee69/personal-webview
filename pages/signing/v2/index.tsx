@@ -683,7 +683,8 @@ const SigningWithoutRead = () => {
               className="font-poppins text-sm text-neutral800 text-left"
               style={{ maxWidth: "360px" }}
             >
-              {t("signRequestSubtitle")}
+              {t("signRequestSubtitle.subtitle1")}
+              {routerQuery.mustread === "1" ? <>{t("signRequestSubtitle.subtitle3")} <EyeIcon3/> {t("signRequestSubtitle.subtitle4")} </>: t("signRequestSubtitle.subtitle2")}
             </p>
           </div>
         </div>
