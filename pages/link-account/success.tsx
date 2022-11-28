@@ -32,7 +32,7 @@ const LinkAccountSuccess = (props: Props) => {
     } else {
       setTimeout(() => {
         router.replace({
-          pathname: handleRoute("/signing"),
+          pathname: handleRoute("signing"),
           query: { ...routerQuery },
         });
       }, 1000);

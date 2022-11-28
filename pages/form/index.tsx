@@ -178,7 +178,7 @@ const Form: React.FC = () => {
           }
 
           router.replace({
-            pathname: handleRoute("/form/success"),
+            pathname: handleRoute("form/success"),
             query,
           });
         } else {
