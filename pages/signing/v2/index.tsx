@@ -167,7 +167,7 @@ const SigningWithRead = () => {
     localStorage.setItem("count_v2", count ? count.toString() : "0");
     if (!token_v2) {
       router.replace({
-        pathname: handleRoute("/login/v2"),
+        pathname: handleRoute("login/v2"),
         query: { ...router.query },
       });
     } else {
@@ -259,7 +259,7 @@ const SigningWithRead = () => {
               localStorage.removeItem("token_v2");
               localStorage.removeItem("refresh_token_v2");
               router.replace({
-                pathname: handleRoute("/login/v2"),
+                pathname: handleRoute("login/v2"),
                 query: { ...router.query, showAutoLogoutInfo: "1" },
               });
             } else {
@@ -521,7 +521,7 @@ const SigningWithoutRead = () => {
     localStorage.setItem("count_v2", count ? count.toString() : "0");
     if (!token_v2) {
       router.replace({
-        pathname: handleRoute("/login/v2"),
+        pathname: handleRoute("login/v2"),
         query: { ...router.query },
       });
     } else {
@@ -613,7 +613,7 @@ const SigningWithoutRead = () => {
               localStorage.removeItem("token_v2");
               localStorage.removeItem("refresh_token_v2");
               router.replace({
-                pathname: handleRoute("/login/v2"),
+                pathname: handleRoute("login/v2"),
                 query: { ...router.query, showAutoLogoutInfo: "1" },
               });
             } else {
@@ -1055,7 +1055,7 @@ const FRModal: React.FC<IModal> = ({
           <FRCamera
             setModal={setModal}
             setIsFRSuccess={setIsFRSuccess}
-            signingFailedRedirectTo={handleRoute("/login/v2")}
+            signingFailedRedirectTo={handleRoute("login/v2")}
             tokenIdentifier="token_v2"
             callbackCaptureProcessor={captureProcessor}
           />
