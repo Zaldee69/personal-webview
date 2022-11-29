@@ -395,10 +395,9 @@ const SigningWithRead = () => {
           </div>
         </div>
         <div className="flex justify-center">
-          <div>
+          <div style={{ maxWidth: "360px", width: "100%" }} >
             <div
               className="flex items-center mt-7"
-              style={{ maxWidth: "360px" }}
             >
               <input
                 id="read"
