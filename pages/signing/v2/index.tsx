@@ -297,7 +297,7 @@ const SigningWithRead = () => {
     }
   }, [documentsHasBeenRead, documentList]);
 
-  // if (!shouldRender) return null;
+  if (!shouldRender) return null;
   if (isSuccess === "1") {
     return <SigningSuccess documentCount={documentList.length} />;
   } else if (isSuccess === "2") {
@@ -659,7 +659,7 @@ const SigningWithoutRead = () => {
     }
   }, [routerIsReady]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // if (!shouldRender) return null;
+  if (!shouldRender) return null;
   if (isSuccess === "1") {
     return <SigningSuccess documentCount={documentList.length} />;
   } else if (isSuccess === "2") {
