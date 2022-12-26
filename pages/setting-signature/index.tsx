@@ -1,22 +1,22 @@
-import {
-  restSetDefaultSignature,
-  restSetDefaultMFA,
-  getUserName,
-} from "infrastructure/rest/b2b";
 import { useState, useRef, useEffect } from "react";
-import SignaturePad from "../../components/SignaturePad";
-import InfoIcon from "../../public/icons/InfoIcon";
+import { GetServerSideProps } from "next";
+import { useRouter } from "next/router";
 import html2canvas from "html2canvas";
 import { toast } from "react-toastify";
+import i18n from "i18";
+
+import {
+  restSetDefaultSignature,
+  getUserName,
+} from "infrastructure/rest/b2b";
+import SignaturePad from "../../components/SignaturePad";
+import InfoIcon from "../../public/icons/InfoIcon";
 import XIcon from "@/public/icons/XIcon";
-import { useRouter } from "next/router";
 import Head from "next/head";
 import { handleRoute } from "@/utils/handleRoute";
-import { GetServerSideProps } from "next";
 import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
 import { RestKycCheckStep } from "infrastructure";
 import { serverSideRenderReturnConditions } from "@/utils/serverSideRenderReturnConditions";
-import i18n from "i18";
 
 type Props = {};
 
@@ -30,16 +30,12 @@ type Tform = {
     | "MrsSaintDelafield-Regular"
     | "SCRIPTIN"
     | "";
-  mfa_method: "fr" | "otp" | "otp_ponsel";
 };
 
-const { t }: any = i18n;
-
-function SettingSignatureAndMFA({}: Props) {
+const SettingSignature = ({}: Props) => {
   const [form, formSetter] = useState<Tform>({
     signature_type: 1,
     signature_font_type: "",
-    mfa_method: "fr",
   });
   const [imageURL, setImageURL] = useState<string>();
   const [data, setData] = useState<string>();
@@ -47,26 +43,30 @@ function SettingSignatureAndMFA({}: Props) {
   const sigPad = useRef<any>();
   const router = useRouter();
   const { t }: any = i18n;
-  const [showModalOtpPonsel, showModalOtpPonselSetter] =
-    useState<boolean>(false);
-  const [agreeOtpPonsel, agreeOtpPonselSetter] = useState<boolean>(false);
+
   const handleFormOnChange = (e: React.FormEvent<HTMLInputElement>): void => {
     formSetter({ ...form, [e.currentTarget.name]: e.currentTarget.value });
     ref = e.currentTarget;
 
-    if (ref.name !== "mfa_method" && ref.name !== "signature_type") {
+    if (ref.name !== "signature_type") {
       convertToDataURL();
     }
   };
 
   useEffect(() => {
     if (router.isReady) {
-      getUserName({}).then((res) => {
-        const data = JSON.parse(res.data);
-        setData(data.name);
-      });
+      getUserName({})
+        .then((res) => {
+          const data = JSON.parse(res.data);
+          setData(data.name);
+        })
+        .catch((err) => {
+          if (err.response.status === 401) {
+            router.push("/login");
+          }
+        });
     }
-  }, [router.isReady]);
+  }, [router, router.isReady]);
 
   //Convert HTML element to base64 png
   const convertToDataURL = async () => {
@@ -79,7 +79,7 @@ function SettingSignatureAndMFA({}: Props) {
     setImageURL(image);
   };
 
-  const handleFormOnSubmit = (e: React.SyntheticEvent): void => {
+  const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     toast(`Loading...`, {
       type: "info",
@@ -93,16 +93,14 @@ function SettingSignatureAndMFA({}: Props) {
     const target = e.target as typeof e.target & {
       signature_type: { value: Tform["signature_type"] };
       signature_font_type: { value: Tform["signature_font_type"] };
-      mfa_method: { value: Tform["mfa_method"] };
     };
 
     const signature_type = target.signature_type.value;
-    const font_type = target.signature_font_type.value;
-    const mfa_type = target.mfa_method.value;
+    const signature_font_type = target.signature_font_type.value;
 
     const payload = {
       signature_type,
-      font_type: signature_type == 0 ? "" : font_type,
+      signature_font_type: signature_type === 0 ? "" : signature_font_type,
       signature_image:
         signature_type == 1 ? (imageURL as string) : signature_image,
     };
@@ -187,35 +185,22 @@ function SettingSignatureAndMFA({}: Props) {
             });
           }
         });
-
-      restSetDefaultMFA({
-        payload: {
-          mfa_type,
-        },
-      })
-        .then((res) => {
-          return res;
-        })
-        .catch((err) => {
-          {
-          }
-        });
     }
   };
 
   return (
     <>
       <Head>
-        <title>{t("settingSignatureTitleAndMFA")}</title>
+        <title>{t("settingSignatureTitle")}</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
       <div className="bg-white p-4">
         <h1 className="text-xl poppins-semibold mt-2">
-          {t("settingSignatureTitleAndMFA")}
+          {t("settingSignatureTitle")}
         </h1>
-        <form onSubmit={handleFormOnSubmit}>
+        <form onSubmit={handleFormSubmit}>
           <div className="flex justify-center">
-            <img src="images/ttdSetting.svg" alt="ill" />
+            <img src="images/ttdSetting.svg" alt="ttdImageSetting" />
           </div>
           <p className="text-md poppins-regular text-neutral800">
             {t("chooseSignature")}
@@ -234,12 +219,12 @@ function SettingSignatureAndMFA({}: Props) {
                 name="signature_type"
                 value={0}
                 onChange={handleFormOnChange}
-                checked={form.signature_type == 0}
                 type="radio"
+                checked={form.signature_type == 0}
                 className="appearance-none bg-white w-4 h-4 ring-1 ring-neutral40 border-2 border-neutral40 rounded-full checked:bg-primary checked:ring-primary"
               />
               <p className="text-md poppins-regular ml-2.5 text-_030326">
-                {t("signatureOption1")}
+                {t("handwritingSignature")}
               </p>
             </label>
             <label className="flex items-center mt-3.5">
@@ -247,12 +232,12 @@ function SettingSignatureAndMFA({}: Props) {
                 name="signature_type"
                 value={1}
                 onChange={handleFormOnChange}
-                checked={form.signature_type == 1}
                 type="radio"
+                checked={form.signature_type == 1}
                 className="appearance-none bg-white w-4 h-4 ring-1 ring-neutral40 border-2 border-white border-neutral40 rounded-full checked:bg-primary checked:ring-primary"
               />
               <p className="text-md ml-2.5 poppins-regular text-_030326">
-                {t("signatureOption2")}
+                {t("fontSignature")}
               </p>
             </label>
           </div>
@@ -349,74 +334,6 @@ function SettingSignatureAndMFA({}: Props) {
               </label>
             </div>
           </div>
-          <p className="text-md poppins-regular text-neutral800 mt-8">
-            {t("choosetAutheticantionMode")}
-          </p>
-          <div className="mt-1.5 rounded-md bg-blue50 py-2 px-4 flex items-start">
-            <div className="pt-1">
-              <InfoIcon />
-            </div>
-            <p className="text-xs poppins-regular text-blue500 ml-4">
-              {i18n.language === "en" ? (
-                t("choosetAutheticantionModeInformation")
-              ) : (
-                <>
-                  Demi keamanan, diperlukan <i>Multi Factor Authentication</i>{" "}
-                  yang harus Anda gunakan saat melakukan aktivitas tanda tangan
-                  digital atau layanan Tilaka lainnya.
-                </>
-              )}
-            </p>
-          </div>
-          <div className="mt-6">
-            <label className="flex items-center">
-              <input
-                name="mfa_method"
-                value="fr"
-                onChange={handleFormOnChange}
-                checked={form.mfa_method === "fr"}
-                type="radio"
-                className="appearance-none bg-white w-4 h-4 ring-1 ring-neutral40 border-2 border-white border-neutral40 rounded-full checked:bg-primary checked:ring-primary"
-              />
-              <p className="text-md ml-2.5 poppins-regular text-_030326">
-                Face Recognition
-              </p>
-            </label>
-            <label className="flex items-center mt-3.5">
-              <input
-                name="mfa_method"
-                value="otp"
-                onChange={handleFormOnChange}
-                checked={form.mfa_method === "otp"}
-                type="radio"
-                className="appearance-none bg-white w-4 h-4 ring-1 ring-neutral40 border-2 border-white border-neutral40 rounded-full checked:bg-primary checked:ring-primary"
-              />
-              <p className="text-md ml-2.5 poppins-regular text-_030326">
-                OTP via Email
-              </p>
-            </label>
-            <label className="flex items-center mt-3.5">
-              <input
-                disabled
-                name="mfa_method"
-                value="mfa_method_otp_ponsel"
-                onChange={agreeOtpPonsel ? handleFormOnChange : undefined}
-                onClick={
-                  agreeOtpPonsel
-                    ? undefined
-                    : (_: React.MouseEvent<HTMLInputElement>) => {
-                        showModalOtpPonselSetter(true);
-                      }
-                }
-                checked={form.mfa_method === "otp_ponsel"}
-                type="radio"
-                className="appearance-none disabled:opacity-50 bg-white w-4 h-4 ring-1 ring-neutral40 border-2 border-white border-neutral40 rounded-full checked:bg-primary checked:ring-primary"
-              />
-              <p className="text-md ml-2.5 poppins-regular opacity-50 text-_030326">
-                {t("autheticantionMode3")}
-              </p>
-            </label>
-          </div>
           <button
             type="submit"
             className="mt-8 p-3 text-base poppins-regular text-white bg-primary w-full"
@@ -427,50 +344,10 @@ function SettingSignatureAndMFA({}: Props) {
             <img src="images/poweredByTilaka.svg" alt="powered-by-tilaka" />
           </div>
         </form>
-        <div
-          className={[
-            `${showModalOtpPonsel ? "flex" : "hidden"}`,
-            "fixed left-0 top-0 justify-center items-center inset-0 z-50",
-          ].join(" ")}
-        >
-          <div className="absolute bg-black opacity-80 inset-0 z-0"></div>
-          <div className="w-full max-w-352px px-3 py-5 relative mx-auto my-auto rounded-xl shadow-lg bg-white ">
-            <div className="">
-              <div className="text-center poppins-regular flex-auto justify-center">
-                <p className="text-base text-neutral800">
-                  Untuk mengirimkan OTP via Ponsel, maka Anda perlu membagikan
-                  informasi Nomor Ponsel yang terdaftar di Dana Bagus kepada
-                  Tilaka. Apakah Anda setuju?
-                </p>
-              </div>
-              <div className="mt-10">
-                <button
-                  onClick={(_: React.MouseEvent<HTMLButtonElement>) => {
-                    agreeOtpPonselSetter(true);
-                    showModalOtpPonselSetter(false);
-                    formSetter({ ...form, mfa_method: "otp_ponsel" });
-                  }}
-                  className="text-white bg-primary p-2.5 w-full rounded-sm"
-                >
-                  SETUJU
-                </button>
-                <button
-                  onClick={(_: React.MouseEvent<HTMLButtonElement>) => {
-                    agreeOtpPonselSetter(false);
-                    showModalOtpPonselSetter(false);
-                  }}
-                  className="text-neutral80 bg-white p-2.5 w-full rounded-sm mt-2"
-                >
-                  BATAL
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
     </>
   );
-}
+};
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const cQuery = context.query;
@@ -506,4 +383,4 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   });
 };
 
-export default SettingSignatureAndMFA;
+export default SettingSignature;
