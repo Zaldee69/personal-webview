@@ -38,6 +38,7 @@ const Login = () => {
   const [type, setType] = useState<{ password: string }>({
     password: "password",
   });
+  const [rememberMe, setRememberMe] = useState<boolean>(false);
   const {t}: any = i18n
   const dispatch: AppDispatch = useDispatch();
   const data = useSelector((state: RootState) => state.login);
@@ -50,6 +51,25 @@ const Login = () => {
     }
   }, [router.isReady]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // When the component mounts
+  useEffect(() => {
+    const rememberMeFlag = localStorage.getItem("rememberMe");
+      if (rememberMeFlag) {
+        setRememberMe(true);
+      }
+  }, []);
+
+  // When the state of the "remember me" checkbox changes
+  useEffect(() => {
+    if (rememberMe) {
+      localStorage.setItem("rememberMe", true as any);
+    } else {
+      localStorage.removeItem("rememberMe");
+      localStorage.removeItem("token");
+      localStorage.removeItem("refresh_token");
+    }
+  }, [rememberMe]);
+
   useEffect(() => {
     if (data.status === "FULLFILLED" && data.data.success) {
       let queryWithDynamicRedirectURL = {
@@ -59,7 +79,14 @@ const Login = () => {
         queryWithDynamicRedirectURL["redirect_url"] = data.data.message;
       }
       localStorage.setItem("token", data.data.data[0] as string);
-      localStorage.setItem("refresh_token", data.data.data[1] as string);
+      if (rememberMe) {
+        localStorage.setItem("token", data.data.data[0] as string);
+        localStorage.setItem("refresh_token", data.data.data[1] as string);
+      } else {
+        setInterval(() => {
+          localStorage.removeItem("token");
+        }, 3600000);
+      }
       getCertificateList({ params: company_id as string }).then((res) => {
         const certif = JSON.parse(res.data);
         if (!transaction_id && signing === "1") {
@@ -169,6 +196,23 @@ const Login = () => {
               >
                 {type.password === "password" ? <EyeIcon /> : <EyeIconOff />}
               </button>
+            </div>
+            {/* add remember me check box button */}
+            <div className="flex items-center mt-5">
+              <input
+                type="checkbox"
+                className="mr-2"
+                id="rememberMe"
+                name="rememberMe"
+                checked={rememberMe}
+                onChange={() => setRememberMe(!rememberMe)}
+              />
+              <label
+                className="poppins-regular text-label font-light"
+                htmlFor="rememberMe"
+              >
+                {t("rememberMe")}
+              </label>
             </div>
             <a
               className="m-5 text-center poppins-regular text-primary"

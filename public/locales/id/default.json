@@ -92,7 +92,7 @@
   "customers": "maka pelanggan dianggap telah menerima bahwa semua informasi yang terdapat dalam sertifikat adalah benar.",
   "confirmCertif": "Sesuai",
   "complain": "Ajukan Komplain",
-  "settingSignatureTitle": "Pengaturan Tanda Tangan dan MFA",
+  "settingSignatureTitleAndMFA": "Pengaturan Tanda Tangan dan MFA",
   "chooseSignature": "Pilih tipe tanda tangan",
   "chooseSignatureInformation": "Tanda tangan yang dipilih akan digunakan di dalam dokumen yang Anda tandatangani.",
   "choosetAutheticantionMode": "Pilih metode otentikasi",
@@ -151,5 +151,9 @@
   "offlineModal": {
     "title": "Anda sedang offline",
     "subtitle": "Periksa kembali koneksi yang Anda gunakan untuk menggunakan layanan Tilaka."
-  }
+  },
+  "settingSignatureTitle": "Pengaturan Tanda Tangan",
+  "handwritingSignature": "Tanda tangan goresan",
+  "fontSignature": "Tanda tangan font",
+  "rememberMe": "Ingat saya"
 }

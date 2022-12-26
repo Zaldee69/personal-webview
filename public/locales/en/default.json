@@ -92,7 +92,7 @@
   "customers": "user is deemed to have accepted that all the information in the certificate is correct.",
   "confirmCertif": "Confirm",
   "complain": "File a Complaint",
-  "settingSignatureTitle": "MFA & Signature Setting",
+  "settingSignatureTitleAndMFA": "MFA & Signature Setting",
   "chooseSignature": "Select signature type",
   "chooseSignatureInformation": "The selected signature will be used in the document you sign.",
   "choosetAutheticantionMode": "Select authentication method",
@@ -151,5 +151,9 @@
   "offlineModal": {
     "title": "You're offline",
     "subtitle": "Please re-check your connection to use Tilaka service."
-  }
+  },
+  "settingSignatureTitle": "Signature Setting",
+  "handwritingSignature": "Handwriting Signature",
+  "fontSignature": "Font Signature",
+  "rememberMe": "Remember me"
 }
