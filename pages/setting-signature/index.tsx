@@ -61,8 +61,17 @@ const SettingSignature = ({}: Props) => {
           setData(data.name);
         })
         .catch((err) => {
-          if (err.response.status === 401) {
-            router.push("/login");
+          switch (err.response.status) {
+            case 401:
+            // unauthorized
+            router.replace({
+              pathname: handleRoute("login"),
+              query: { ...router.query },
+            });
+            break;
+
+            default:
+            break;
           }
         });
     }
