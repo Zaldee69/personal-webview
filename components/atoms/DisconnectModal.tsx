@@ -15,7 +15,7 @@ const DisconnectModal = () => {
         !status && show ? "flex" : "hidden"
       }`}
     >
-      <div className="bg-white max-w-md font-poppins pt-5 p-2 pb-3 rounded-md w-full mx-5 ">
+      <div className="bg-white max-w-md poppins-regular pt-5 p-2 pb-3 rounded-md w-full mx-5 ">
         <div className="px-5 py-5 flex justify-start gap-5 items-start">
           <img
             src={`${assetPrefix}/images/danger.jpg`}
