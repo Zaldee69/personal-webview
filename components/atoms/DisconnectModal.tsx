@@ -20,7 +20,7 @@ const DisconnectModal = () => {
           <img
             src={`${assetPrefix}/images/danger.jpg`}
             alt="danger"
-            style={{ height: "1.3rem", width: "2rem" }}
+            style={{ height: "1.3rem", maxWidth: "2rem" }}
           />
           <div>
             <p>{t("offlineModal.title")}</p>
