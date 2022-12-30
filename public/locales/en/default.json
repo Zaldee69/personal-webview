@@ -155,5 +155,8 @@
   "settingSignatureTitle": "Signature Setting",
   "handwritingSignature": "Handwriting Signature",
   "fontSignature": "Font Signature",
-  "rememberMe": "Remember me"
+  "rememberMe": "Remember me",
+  "settingSignatureSuccessTitle": "Signature Setting Success",
+  "settingSignatureSuccessSubtitle": "Signature setting has been successfully updated.",
+  "settingSignatureSuccessButton": "Back to Main Page"
 }

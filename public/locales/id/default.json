@@ -155,5 +155,8 @@
   "settingSignatureTitle": "Pengaturan Tanda Tangan",
   "handwritingSignature": "Tanda tangan goresan",
   "fontSignature": "Tanda tangan font",
-  "rememberMe": "Ingat saya"
+  "rememberMe": "Ingat saya",
+  "settingSignatureSuccessTitle": "Pengaturan Tanda Tangan Berhasil",
+  "settingSignatureSuccessSubtitle": "Pengaturan tanda tangan berhasil disimpan.",
+  "settingSignatureSuccessButton": "Kembali ke Halaman Utama"
 }
