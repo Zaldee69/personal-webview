@@ -4,11 +4,9 @@ import { useRouter } from "next/router";
 import html2canvas from "html2canvas";
 import { toast } from "react-toastify";
 import i18n from "i18";
+import Image from "next/image";
 
-import {
-  restSetDefaultSignature,
-  getUserName,
-} from "infrastructure/rest/b2b";
+import { restSetDefaultSignature, getUserName } from "infrastructure/rest/b2b";
 import SignaturePad from "../../components/SignaturePad";
 import InfoIcon from "../../public/icons/InfoIcon";
 import XIcon from "@/public/icons/XIcon";
@@ -17,6 +15,7 @@ import { handleRoute } from "@/utils/handleRoute";
 import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
 import { RestKycCheckStep } from "infrastructure";
 import { serverSideRenderReturnConditions } from "@/utils/serverSideRenderReturnConditions";
+import { assetPrefix } from "../../next.config";
 
 type Props = {};
 
@@ -63,15 +62,15 @@ const SettingSignature = ({}: Props) => {
         .catch((err) => {
           switch (err.response.status) {
             case 401:
-            // unauthorized
-            router.replace({
-              pathname: handleRoute("login"),
-              query: { ...router.query },
-            });
-            break;
+              // unauthorized
+              router.replace({
+                pathname: handleRoute("login"),
+                query: { ...router.query },
+              });
+              break;
 
             default:
-            break;
+              break;
           }
         });
     }
@@ -156,7 +155,7 @@ const SettingSignature = ({}: Props) => {
                   pathname:
                     router.query.v2 === "1"
                       ? handleRoute("signing/v2")
-                      : handleRoute("signing"),
+                      : handleRoute("setting-signature/success"),
                   query: { ...router.query },
                 });
               }, 3000);
@@ -209,7 +208,12 @@ const SettingSignature = ({}: Props) => {
         </h1>
         <form onSubmit={handleFormSubmit}>
           <div className="flex justify-center">
-            <img src="images/ttdSetting.svg" alt="ttdImageSetting" />
+            <Image
+              src={`${assetPrefix}/images/ttdSetting.svg`}
+              alt="ttdImageSetting"
+              height={"196"}
+              width={"196"}
+            />
           </div>
           <p className="text-md poppins-regular text-neutral800">
             {t("chooseSignature")}
@@ -243,7 +247,7 @@ const SettingSignature = ({}: Props) => {
                 onChange={handleFormOnChange}
                 type="radio"
                 checked={form.signature_type == 1}
-                className="appearance-none bg-white w-4 h-4 ring-1 ring-neutral40 border-2 border-white border-neutral40 rounded-full checked:bg-primary checked:ring-primary"
+                className="appearance-none bg-white w-4 h-4 ring-1 ring-neutral40 border-2 border-neutral40 rounded-full checked:bg-primary checked:ring-primary"
               />
               <p className="text-md ml-2.5 poppins-regular text-_030326">
                 {t("fontSignature")}
@@ -349,8 +353,13 @@ const SettingSignature = ({}: Props) => {
           >
             {t("next")}
           </button>
-          <div className="mt-8 flex justify-center">
-            <img src="images/poweredByTilaka.svg" alt="powered-by-tilaka" />
+          <div className="mt-11 flex justify-center">
+            <Image
+              src={`${assetPrefix}/images/poweredByTilaka.svg`}
+              alt="powered-by-tilaka"
+              width="80px"
+              height="41.27px"
+            />
           </div>
         </form>
       </div>
