@@ -16,6 +16,7 @@ import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
 import { RestKycCheckStep } from "infrastructure";
 import { serverSideRenderReturnConditions } from "@/utils/serverSideRenderReturnConditions";
 import i18n from "i18";
+import { toast } from "react-toastify";
 
 type Props = {};
 
@@ -30,7 +31,7 @@ const LinkAccount = (props: Props) => {
   const [showPassword, showPasswordSetter] = useState<boolean>(false);
   const [nikRegistered, nikRegisteredSetter] = useState<boolean>(true);
   const [form, formSetter] = useState<Tform>({ tilaka_name: "", password: "" });
-  const { nik, request_id, signing, setting, ...restRouterQuery } =
+  const { nik, request_id, signing, setting, tilaka_name, ...restRouterQuery } =
     router.query;
   const dispatch: AppDispatch = useDispatch();
   const data = useSelector((state: RootState) => state.login);
@@ -83,7 +84,7 @@ const LinkAccount = (props: Props) => {
                     pathname: handleRoute("setting-signature-and-mfa"),
                     query: {
                       ...queryWithDynamicRedirectURL,
-                      tilaka_name: form.tilaka_name
+                      tilaka_name: form.tilaka_name,
                     },
                   });
                 } else {
@@ -102,7 +103,10 @@ const LinkAccount = (props: Props) => {
           } else {
             router.replace({
               pathname: handleRoute("certificate-information"),
-              query: { ...queryWithDynamicRedirectURL, tilaka_name: form.tilaka_name },
+              query: {
+                ...queryWithDynamicRedirectURL,
+                tilaka_name: form.tilaka_name,
+              },
             });
           }
         });
@@ -112,6 +116,17 @@ const LinkAccount = (props: Props) => {
           query: { ...queryWithDynamicRedirectURL },
         });
       }
+    } else if (
+      (data.data.message ===
+        `Invalid Username / Password for Tilaka Name ${tilaka_name}` &&
+        data.status === "FULLFILLED" &&
+        !data.data.success) ||
+      (data.data.message === "User Not Found" &&
+        data.status === "FULLFILLED" &&
+        !data.data.success)
+    ) {
+      toast.dismiss();
+      toast.error(t("invalidUsernamePassword"));
     } else if (
       data.status === "REJECTED" ||
       (data.status === "FULLFILLED" && !data.data.success)
