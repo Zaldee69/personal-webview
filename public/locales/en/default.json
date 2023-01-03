@@ -156,6 +156,7 @@
   "handwritingSignature": "Handwriting Signature",
   "fontSignature": "Font Signature",
   "rememberMe": "Remember me",
+  "livenessSuccess": "Liveness Success",
   "settingSignatureSuccessTitle": "Signature Setting Success",
   "settingSignatureSuccessSubtitle": "Signature setting has been successfully updated.",
   "settingSignatureSuccessButton": "Back to Main Page",
