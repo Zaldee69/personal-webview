@@ -158,5 +158,6 @@
   "rememberMe": "Ingat saya",
   "settingSignatureSuccessTitle": "Pengaturan Tanda Tangan Berhasil",
   "settingSignatureSuccessSubtitle": "Pengaturan tanda tangan berhasil disimpan.",
-  "settingSignatureSuccessButton": "Kembali ke Halaman Utama"
+  "settingSignatureSuccessButton": "Kembali ke Halaman Utama",
+  "invalidUsernamePassword": "Tilaka Name / Kata Sandi Salah"
 }

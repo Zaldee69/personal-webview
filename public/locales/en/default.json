@@ -158,5 +158,6 @@
   "rememberMe": "Remember me",
   "settingSignatureSuccessTitle": "Signature Setting Success",
   "settingSignatureSuccessSubtitle": "Signature setting has been successfully updated.",
-  "settingSignatureSuccessButton": "Back to Main Page"
+  "settingSignatureSuccessButton": "Back to Main Page",
+  "invalidUsernamePassword": "Tilaka Name / Password is incorrect"
 }
