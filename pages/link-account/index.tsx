@@ -31,7 +31,7 @@ const LinkAccount = (props: Props) => {
   const [showPassword, showPasswordSetter] = useState<boolean>(false);
   const [nikRegistered, nikRegisteredSetter] = useState<boolean>(true);
   const [form, formSetter] = useState<Tform>({ tilaka_name: "", password: "" });
-  const { nik, request_id, signing, setting, tilaka_name, ...restRouterQuery } =
+  const { nik, request_id, signing, setting, ...restRouterQuery } =
     router.query;
   const dispatch: AppDispatch = useDispatch();
   const data = useSelector((state: RootState) => state.login);
@@ -118,7 +118,7 @@ const LinkAccount = (props: Props) => {
       }
     } else if (
       (data.data.message ===
-        `Invalid Username / Password for Tilaka Name ${tilaka_name}` &&
+        `Invalid Username / Password for Tilaka Name ${form?.tilaka_name}` &&
         data.status === "FULLFILLED" &&
         !data.data.success) ||
       (data.data.message === "User Not Found" &&
