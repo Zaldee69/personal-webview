@@ -25,6 +25,7 @@ type TPropsSignaturLocationSimulator = {};
 type TUrlQuery = {
   generate_document_file?: "1";
   generate_signature_image?: "1";
+  lock_aspect_ratio?: "1";
 };
 
 type TPropsUploadBox = {
@@ -1049,7 +1050,7 @@ const DraggrableWrapper = ({
             SIGNATURE_PROPERTY_HEIGHT_DEFAULT,
           ]}
           maxConstraints={resizeableMaxConstraints}
-          lockAspectRatio
+          lockAspectRatio={routerQuery.lock_aspect_ratio === "1"}
         >
           <div
             ref={ref}
