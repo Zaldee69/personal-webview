@@ -25,7 +25,7 @@ const contextClass: TcontextClass = {
   error: "Toastify__toast-error bg-red50 text-neutral800 border border-red75",
   info: "bg-primary text-white",
   warning: "bg-warning text-neutral800",
-  default: "bg-white text-neutral800",
+  default: "bg-neutral200 text-white",
   dark: "bg-neutral800 text-white",
 };
 
@@ -34,7 +34,6 @@ function MyApp({ Component, pageProps }: AppProps) {
   const { lang } = router.query;
 
   i18n.changeLanguage(lang as string);
-  
 
   const [showChild, setShowChild] = useState<boolean>(false);
   useEffect(() => {
@@ -63,7 +62,9 @@ function MyApp({ Component, pageProps }: AppProps) {
               ] +
               " relative  rounded items-center w-fit px-5 mx-auto mt-5 text-sm overflow-hidden hover:cursor-pointer flex justify-between"
             }
-            bodyClassName={() => "text-sm poppins-regular  p-3 flex items-center"}
+            bodyClassName={() =>
+              "text-sm poppins-regular  p-3 flex items-center"
+            }
             position="top-center"
             autoClose={3000}
             hideProgressBar={true}

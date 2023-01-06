@@ -22,6 +22,7 @@ module.exports = {
       neutral30: "#EBECF0",
       neutral40: "#DFE1E6",
       neutral50: "#C1C7D0",
+      neutral60: "#B3BAC5",
       neutral80: "#97A0AF",
       neutral200: "#6B778C",
       neutral800: "#172B4D",
@@ -36,6 +37,7 @@ module.exports = {
       _B6B6B6: "#B6B6B6",
       _1A73E8: "#1A73E8",
       _030326: "#030326",
+      transparent: "transparent",
     },
   },
   plugins: [

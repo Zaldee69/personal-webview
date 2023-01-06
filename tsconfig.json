@@ -17,7 +17,7 @@
     "baseUrl": ".",
     "paths": {
       "@/components/*": ["components/*"],
-      "@/hook/*": ["hook/*"],
+      "@/hooks/*": ["hooks/*"],
       "@/interface/*": ["interface/*"],
       "@/redux/*": ["redux/*"],
       "@/public/*": ["public/*"],
