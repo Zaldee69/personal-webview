@@ -39,12 +39,12 @@
   src: url("../public/fonts/Poppins-SemiBold.ttf");
 }
 
-@font-face {  
+@font-face {
   font-family: poppins-regular;
   src: url("../public/fonts/Poppins-Regular.ttf");
 }
 
-@font-face {  
+@font-face {
   font-family: poppins-medium;
   src: url("../public/fonts/Poppins-Medium.ttf");
 }
@@ -122,6 +122,28 @@
   }
   .bullet-pin-form {
     @apply w-2.5 h-2.5 rounded-full mr-4 last:mr-0 transition-colors;
+  }
+  .simulator-btn-primary {
+    @apply bg-primary disabled:bg-primary70 px-6 py-2.5 font-poppins font-semibold text-sm text-white disabled:text-neutral200 disabled:text-opacity-30 rounded disabled:cursor-not-allowed;
+  }
+  .simulator-header {
+    @apply bg-primary pb-3;
+  }
+  .simulator-header-text {
+    @apply px-3 pt-6 font-poppins font-semibold text-lg text-white text-center pb-4;
+    box-shadow: 0px 3px 5px rgba(9, 30, 66, 0.2),
+      0px 0px 1px rgba(9, 30, 66, 0.31);
+  }
+  .simulator-btn-primary-pagination-prev {
+    @apply bg-primary disabled:bg-primary70 p-2 w-10 h-10 rounded-tl-lg rounded-bl-lg disabled:cursor-not-allowed;
+  }
+  .simulator-btn-primary-pagination-next {
+    @apply bg-primary disabled:bg-primary70 p-2 w-10 h-10 rounded-tr-lg rounded-br-lg disabled:cursor-not-allowed;
+  }
+  .simulator-canvas-wrapper {
+    @apply bg-white mt-2 relative;
+    border: 0.5px solid #c1c7d0;
+    /* min-height: 877px; */
   }
 }
 
@@ -303,3 +325,69 @@ input[type="checkbox"] {
   stroke: #fff !important;
 }
 
+/* react-resizeable */
+.react-resizable {
+  position: relative;
+}
+.react-resizable-handle {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background-repeat: no-repeat;
+  background-origin: content-box;
+  box-sizing: border-box;
+  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2IDYiIHN0eWxlPSJiYWNrZ3JvdW5kLWNvbG9yOiNmZmZmZmYwMCIgeD0iMHB4IiB5PSIwcHgiIHdpZHRoPSI2cHgiIGhlaWdodD0iNnB4Ij48ZyBvcGFjaXR5PSIwLjMwMiI+PHBhdGggZD0iTSA2IDYgTCAwIDYgTCAwIDQuMiBMIDQgNC4yIEwgNC4yIDQuMiBMIDQuMiAwIEwgNiAwIEwgNiA2IEwgNiA2IFoiIGZpbGw9IiMwMDAwMDAiLz48L2c+PC9zdmc+");
+  background-position: bottom right;
+  padding: 0 3px 3px 0;
+}
+.react-resizable-handle-sw {
+  bottom: 0;
+  left: 0;
+  cursor: sw-resize;
+  transform: rotate(90deg);
+}
+.react-resizable-handle-se {
+  bottom: 0;
+  right: 0;
+  cursor: se-resize;
+}
+.react-resizable-handle-nw {
+  top: 0;
+  left: 0;
+  cursor: nw-resize;
+  transform: rotate(180deg);
+}
+.react-resizable-handle-ne {
+  top: 0;
+  right: 0;
+  cursor: ne-resize;
+  transform: rotate(270deg);
+}
+.react-resizable-handle-w,
+.react-resizable-handle-e {
+  top: 50%;
+  margin-top: -10px;
+  cursor: ew-resize;
+}
+.react-resizable-handle-w {
+  left: 0;
+  transform: rotate(135deg);
+}
+.react-resizable-handle-e {
+  right: 0;
+  transform: rotate(315deg);
+}
+.react-resizable-handle-n,
+.react-resizable-handle-s {
+  left: 50%;
+  margin-left: -10px;
+  cursor: ns-resize;
+}
+.react-resizable-handle-n {
+  top: 0;
+  transform: rotate(225deg);
+}
+.react-resizable-handle-s {
+  bottom: 0;
+  transform: rotate(45deg);
+}
