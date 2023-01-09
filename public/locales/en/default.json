@@ -116,6 +116,8 @@
   "frTitle": "Confirm Signing",
   "frSubtitle1": "Face towards the camera for authentication ",
   "frSubtitle2": "Input 6-digit OTP",
+  "frSubtitle3": "Face towards the camera",
+  "linkingAccount": "Confirm Linking",
   "cancel": "Cancel",
   "faceValidationFailed": "Face validation failed",
   "confirm": "Confirm",

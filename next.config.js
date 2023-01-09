@@ -2,7 +2,7 @@
 const nextConfig = {
   reactStrictMode: false,
   swcMinify: true,
-  assetPrefix: process.env.NEXT_PUBLIC_BASE_PATH || '/personal-webview',
+  assetPrefix: "",
   i18n: {
     locales: ["id", "en"],
     defaultLocale: "id",
