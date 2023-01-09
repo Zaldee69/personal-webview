@@ -15,6 +15,7 @@ import { GetServerSideProps } from "next";
 import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
 import { RestKycCheckStep } from "infrastructure";
 import { serverSideRenderReturnConditions } from "@/utils/serverSideRenderReturnConditions";
+import  FRCamera  from '@/components/FRCamera';
 import i18n from "i18";
 import { toast } from "react-toastify";
 
@@ -25,13 +26,19 @@ type Tform = {
   password: string;
 };
 
+type IModal = {
+  modal: boolean;
+  setModal: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
 const LinkAccount = (props: Props) => {
   const router = useRouter();
   const { t }: any = i18n;
   const [showPassword, showPasswordSetter] = useState<boolean>(false);
   const [nikRegistered, nikRegisteredSetter] = useState<boolean>(true);
   const [form, formSetter] = useState<Tform>({ tilaka_name: "", password: "" });
-  const { nik, request_id, signing, setting, ...restRouterQuery } =
+  const [modal, setModal] = useState<boolean>(false)
+  const { nik, request_id, signing, setting, is_penautan, ...restRouterQuery } =
     router.query;
   const dispatch: AppDispatch = useDispatch();
   const data = useSelector((state: RootState) => state.login);
@@ -111,10 +118,14 @@ const LinkAccount = (props: Props) => {
           }
         });
       } else {
-        router.replace({
-          pathname: handleRoute("link-account/success"),
-          query: { ...queryWithDynamicRedirectURL },
-        });
+        if(is_penautan === "true"){
+          setModal(true)
+        }else {
+          router.replace({
+            pathname: handleRoute("link-account/success"),
+            query: { ...queryWithDynamicRedirectURL },
+          })
+        }
       }
     } else if (
       (data.data.message ===
@@ -258,9 +269,52 @@ const LinkAccount = (props: Props) => {
           />
         </div>
       </div>
+      <FRModal modal={modal} setModal={setModal} />
     </>
   );
 };
+
+
+const FRModal = ({modal, setModal}: IModal) => {
+
+  const [isFRSuccess, setIsFRSuccess] = useState<boolean>(false);
+
+  const { t }: any = i18n;
+
+  const captureProcessor = () => {}
+
+  return modal ? (
+    <div
+    style={{ backgroundColor: "rgba(0, 0, 0, .5)" }}
+    className="fixed z-50 flex items-start transition-all duration-1000 justify-center w-full left-0 top-0 h-full "
+  >
+    <div className="bg-white max-w-md mt-20 pt-5 px-2 pb-3 rounded-md w-full mx-5 ">
+      <>
+        <p className="font-poppins block text-center font-semibold ">
+          {t("linkingAccount")}
+        </p>
+        <span className="font-poppins mt-2 block text-center text-sm font-normal">
+          {t("frSubtitle3")}
+        </span>
+        <FRCamera
+          setModal={setModal}
+          setIsFRSuccess={setIsFRSuccess}
+          signingFailedRedirectTo={handleRoute("login/v2")}
+          tokenIdentifier="token_v2"
+          callbackCaptureProcessor={captureProcessor}
+        />
+        <button
+          onClick={() => setModal(!modal)}
+          className="bg-primary btn uppercase text-white font-poppins w-full mt-5 mx-auto rounded-sm h-9 font-semibold hover:opacity-50"
+        >
+          {t("cancel")}
+        </button>
+      </>
+    </div>
+  </div> 
+    ) : null
+
+}
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const cQuery = context.query;
