@@ -70,6 +70,7 @@
   "deviceNotSupportedSubtitle": "Camera is not found or not allowed in this device. Please continue the Liveness process by accessing the link below in another device.",
   "link": "Liveness Link",
   "copy": "Copy",
+  "copied": "Copied",
   "initializing": "intializing...",
   "intializingFailed": "Initializing Failed",
   "clickHere": "Click here to reload page",
@@ -162,5 +163,19 @@
   "settingSignatureSuccessTitle": "Signature Setting Success",
   "settingSignatureSuccessSubtitle": "Signature setting has been successfully updated.",
   "settingSignatureSuccessButton": "Back to Main Page",
-  "invalidUsernamePassword": "Tilaka Name / Password is incorrect"
+  "invalidUsernamePassword": "Tilaka Name / Password is incorrect",
+  "all": "All",
+  "page": "Page",
+  "simulatorPDFTitle": "Simulator PDF",
+  "simulatorViewJsonButtonTextClose": "Close JSON",
+  "simulatorViewJsonButtonTextOpen": "Open JSON",
+  "simulatorUploadDocument": "Upload File",
+  "simulatorUploadDocumentDescription": "Dokument .pdf maximum 32 MB",
+  "simulatorUploadDocumentErrorSize": "The document size is too large",
+  "simulatorSignerText": "Signer",
+  "simulatorAddSignerText": "Add Signer",
+  "simulatorAddSignerErrorReqiredOrWrongFormat": "The form is incomplete or the format is incorrect",
+  "simulatorAddSignerErrorAlradyExist": "Tilaka Name has been added, please edit or delete it first",
+  "simulatorSignerPageInputPlaceholder": "Example: 1,2,5-9",
+  "simulatorSignerErrorTotalPage": "Cannot exceed the number of pages"
 }

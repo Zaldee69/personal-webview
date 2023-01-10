@@ -44,5 +44,11 @@ export const generateFormatedSignerPage = (pageText: string): string => {
     }
   });
 
-  return arrRemoveDuplicates(pageTextToArr).join(",");
+  let result = arrRemoveDuplicates(pageTextToArr).join(",");
+
+  if (result === "0") {
+    result = "";
+  }
+
+  return result;
 };

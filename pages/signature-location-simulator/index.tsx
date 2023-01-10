@@ -19,6 +19,7 @@ import { validTilakaNameFormatRegex } from "@/utils/validTilakaNameFormatRegex";
 import html2canvas from "html2canvas";
 import { useRouter } from "next/router";
 import { v4 as uuidv4 } from "uuid";
+import i18n from "i18";
 
 type TPropsSignaturLocationSimulator = {};
 
@@ -136,6 +137,8 @@ const SignaturLocationSimulator = (props: TPropsSignaturLocationSimulator) => {
   const [shouldRenderPdfViewerBox, setShouldRenderPdfViewerBox] =
     useState<boolean>(false);
 
+  const { t }: any = i18n;
+
   const fileOnChange = (file: TFile) => {
     setFile(file);
     setUploaded(true);
@@ -153,7 +156,7 @@ const SignaturLocationSimulator = (props: TPropsSignaturLocationSimulator) => {
   };
   const copyOnClick = () => {
     copyToClipboard(JSON.stringify(json, null, 4));
-    toast("Copied", {
+    toast(t("copied"), {
       icon: (
         <Image
           src={`${assetPrefix}/images/check-circle-white-ic.svg`}
@@ -179,7 +182,7 @@ const SignaturLocationSimulator = (props: TPropsSignaturLocationSimulator) => {
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#FAFAFA" }}>
       <div className="simulator-header">
-        <div className="simulator-header-text">Simulator PDF</div>
+        <div className="simulator-header-text">{t("simulatorPDFTitle")}</div>
       </div>
       <div className="pt-8 sm:pt-12 md:pt-20 pb-2 sm:pb-6 md:pb-9 px-11 sm:px-20 md:px-32">
         <UploadBox show={!uploaded} fileOnChange={fileOnChange} />
@@ -198,7 +201,9 @@ const SignaturLocationSimulator = (props: TPropsSignaturLocationSimulator) => {
             onClick={viewJsonOnClick}
             className="simulator-btn-primary flex items-center"
           >
-            {viewJson ? "Tutup JSON" : "Lihat JSON"}
+            {viewJson
+              ? t("simulatorViewJsonButtonTextClose")
+              : t("simulatorViewJsonButtonTextOpen")}
             <div
               className={[
                 "ml-3",
@@ -223,7 +228,7 @@ const SignaturLocationSimulator = (props: TPropsSignaturLocationSimulator) => {
               height="16px"
               alt="copy-ic"
             />
-            <p className="ml-2.5">Copy</p>
+            <p className="ml-2.5">{t("copy")}</p>
           </button>
         </div>
         <ViewJsonBox show={viewJson} json={json} />
@@ -244,6 +249,8 @@ const SignaturLocationSimulator = (props: TPropsSignaturLocationSimulator) => {
 const UploadBox = ({ show, fileOnChange }: TPropsUploadBox) => {
   const [isErrorDocumentSize, setIsErrorDocumentSize] =
     useState<boolean>(false);
+
+  const { t }: any = i18n;
 
   const onChange = (e: React.FormEvent<HTMLInputElement>): void => {
     const targetFile: TFile = e.currentTarget.files?.[0];
@@ -274,14 +281,16 @@ const UploadBox = ({ show, fileOnChange }: TPropsUploadBox) => {
             className="hidden"
             onChange={onChange}
           />
-          <p className="simulator-btn-primary cursor-pointer">Unggah Dokumen</p>
+          <p className="simulator-btn-primary cursor-pointer">
+            {t("simulatorUploadDocument")}
+          </p>
         </label>
         <p className="text-sm font-normal text-black mt-3">
-          Dokumen .pdf maksimal 32 MB
+          {t("simulatorUploadDocumentDescription")}
         </p>
         {isErrorDocumentSize && (
           <p className="text-xs font-normal text-red300 mt-3">
-            Ukuran dokumen terlalu besar
+            {t("simulatorUploadDocumentErrorSize")}
           </p>
         )}
       </div>
@@ -309,14 +318,21 @@ const PdfViewerBox = ({
     useState<TDraggableData>(draggableDataInitial);
   const [onSignerAddValidateInfo, setOnSignerAddValidateInfo] =
     useState<string>("");
+  const [onSignerEditValidateInfo, setOnSignerEditValidateInfo] = useState<{
+    index?: number;
+    text?: string;
+  }>();
   const [zoomCount, setZoomCount] = useState<number>(1);
 
   const { pages } = useDocument({
     url: fileBase64,
   });
 
+  const { t }: any = i18n;
+
   const prevShouldDisabled = currentPage === 1;
   const nextShouldDisabled = currentPage === pageCount;
+  const signerPageFormatAllPages = "1-" + pageCount.toString();
 
   const onPrev = () => {
     if (prevShouldDisabled) return;
@@ -363,7 +379,8 @@ const PdfViewerBox = ({
   };
   const onChangeSignerEdit = (
     e: React.FormEvent<HTMLInputElement>,
-    user_identifier: TSigner["user_identifier"]
+    userIdentifier: TSigner["user_identifier"],
+    currentInputIndex: number
   ) => {
     const currentType = e.currentTarget.type.split("__")[0];
     const currentName = e.currentTarget.name.split("__")[0];
@@ -377,8 +394,12 @@ const PdfViewerBox = ({
       // update page on current signer list
       const newSigners = signers.map((el) => {
         // modify signer property
-        if (el.user_identifier === user_identifier) {
-          return { ...el, pageType: currentValue as TSigner["pageType"] };
+        if (el.user_identifier === userIdentifier) {
+          return {
+            ...el,
+            pageType: currentValue as TSigner["pageType"],
+            page: signerPageFormatAllPages,
+          };
         }
 
         return el;
@@ -393,7 +414,7 @@ const PdfViewerBox = ({
       // update page on current signer list
       const newSigners = signers.map((el) => {
         // modify signer property
-        if (el.user_identifier === user_identifier) {
+        if (el.user_identifier === userIdentifier) {
           return { ...el, pageType: currentValue as TSigner["pageType"] };
         }
 
@@ -405,14 +426,30 @@ const PdfViewerBox = ({
       currentType === "text" &&
       currentName === "signer_signature_page_selective_text"
     ) {
-      // update page on current signer list
-      const newSigners = signers.map((el) => {
-        // modify signer property
-        if (el.user_identifier === user_identifier) {
-          return { ...el, page: currentValue };
-        }
+      const generatedSignerPage = generateFormatedSignerPage(currentValue);
+      const pageExceedNumber = generatedSignerPage
+        .split(",")
+        .map((el, idx) => (parseInt(el) > pageCount ? true : false));
 
-        return el;
+      if (pageExceedNumber.includes(true)) {
+        setOnSignerEditValidateInfo({
+          index: currentInputIndex,
+          text: t("simulatorSignerErrorTotalPage"),
+        });
+
+        return;
+      } else {
+        setOnSignerEditValidateInfo(undefined);
+      }
+
+      // update page on current signer list
+      let newSigners = signers.map((el, idx) => {
+        // modify signer property
+        if (el.user_identifier === userIdentifier) {
+          return { ...el, page: currentValue.replace(/(?!-)[^0-9.]/g, "") };
+        } else {
+          return el;
+        }
       });
 
       setSigners(newSigners);
@@ -420,12 +457,17 @@ const PdfViewerBox = ({
       return;
     }
   };
+  const onBlurSignerEdit = () => {
+    setOnSignerEditValidateInfo(undefined);
+  };
   const onSignerAdd = (_: React.SyntheticEvent) => {
-    const signerPageFormatAllPages = "1-" + pageCount.toString();
     const generatedSignerPage = generateFormatedSignerPage(signer.page);
     const userIdentifierAlreadyExistOnSigners =
       signers.filter((el) => el.user_identifier === signer.user_identifier)
         .length > 0;
+    const pageExceedNumber = generatedSignerPage
+      .split(",")
+      .map((el, idx) => (parseInt(el) > pageCount ? true : false));
 
     if (
       !signer.user_identifier ||
@@ -434,12 +476,15 @@ const PdfViewerBox = ({
         !generatedSignerPage) ||
       !validTilakaNameFormatRegex.test(signer.user_identifier)
     ) {
-      setOnSignerAddValidateInfo("Form tidak lengkap atau format salah");
+      setOnSignerAddValidateInfo(
+        t("simulatorAddSignerErrorReqiredOrWrongFormat")
+      );
       return;
     } else if (userIdentifierAlreadyExistOnSigners) {
-      setOnSignerAddValidateInfo(
-        "Tilaka Name sudah ditambahkan, silahkan edit ada hapus terlebih dahulu"
-      );
+      setOnSignerAddValidateInfo(t("simulatorAddSignerErrorAlradyExist"));
+      return;
+    } else if (pageExceedNumber.includes(true)) {
+      setOnSignerAddValidateInfo(t("simulatorSignerErrorTotalPage"));
       return;
     }
 
@@ -534,6 +579,39 @@ const PdfViewerBox = ({
       });
     });
 
+    // filter
+    const signerValid: {
+      user_identifier: TSigner["user_identifier"];
+      page_number: TSignatureProperty["page_number"];
+    }[] = [];
+    signers.forEach((el) => {
+      const signerPagesString = generateFormatedSignerPage(el.page);
+      const signerPagesStringToArr = signerPagesString.split(",");
+
+      signerPagesStringToArr.forEach((page) => {
+        if (signerPagesString.includes(page)) {
+          signerValid.push({
+            user_identifier: el.user_identifier,
+            page_number: parseInt(page),
+          });
+        }
+      });
+    });
+
+    arrSignatureProperty = arrSignatureProperty.filter((sp) => {
+      if (
+        signerValid.findIndex(
+          (sv) =>
+            sv.user_identifier === sp.user_identifier &&
+            sv.page_number === sp.page_number
+        ) !== -1
+      ) {
+        return sp;
+      } else {
+        return;
+      }
+    });
+
     return arrSignatureProperty;
   };
 
@@ -580,7 +658,7 @@ const PdfViewerBox = ({
       return;
     }
 
-    // after add signers at firstly
+    // after add signers at firstly or on edit
     const requestSignJsonMock = {
       ...requestSignJson,
       signatures: generateArrSignature(signers),
@@ -739,7 +817,9 @@ const PdfViewerBox = ({
           </div>
         </div>
         <div className="col-span-4 font-poppins">
-          <p className="text-base text-neutral800 font-normal">Penandatangan</p>
+          <p className="text-base text-neutral800 font-normal">
+            {t("simulatorSignerText")}
+          </p>
           <div className="mt-10">
             {signers.map((el, ix) => (
               <div key={ix} className="flex items-start gap-8">
@@ -787,13 +867,13 @@ const PdfViewerBox = ({
                         }
                         value="signer_signature_page_all"
                         onChange={(e) => {
-                          onChangeSignerEdit(e, el.user_identifier);
+                          onChangeSignerEdit(e, el.user_identifier, ix);
                         }}
                         checked={el.pageType === "signer_signature_page_all"}
                         className="form-radio text-primary"
                       />
                       <p className="text-sm text-neutral800 font-normal ml-3">
-                        Semua
+                        {t("all")}
                       </p>
                     </label>
                     <label className="flex items-center mt-5">
@@ -804,7 +884,7 @@ const PdfViewerBox = ({
                         }
                         value="signer_signature_page_selective"
                         onChange={(e) => {
-                          onChangeSignerEdit(e, el.user_identifier);
+                          onChangeSignerEdit(e, el.user_identifier, ix);
                         }}
                         checked={
                           el.pageType === "signer_signature_page_selective"
@@ -812,7 +892,7 @@ const PdfViewerBox = ({
                         className="form-radio text-primary"
                       />
                       <p className="text-sm text-neutral800 font-normal ml-3">
-                        Halaman
+                        {t("page")}
                       </p>
                       <input
                         disabled={
@@ -826,13 +906,19 @@ const PdfViewerBox = ({
                         }
                         value={el.page}
                         onChange={(e) => {
-                          onChangeSignerEdit(e, el.user_identifier);
+                          onChangeSignerEdit(e, el.user_identifier, ix);
                         }}
+                        onBlur={onBlurSignerEdit}
                         className="w-full bg-white border border-neutral50 rounded text-neutral800 placeholder:text-neutral60 p-2.5 text-sm focus:outline-none ml-2.5 disabled:border-neutral30 disabled:text-neutral40 disabled:cursor-not-allowed"
-                        placeholder="Contoh: 1,2,5-9"
+                        placeholder={t("simulatorSignerPageInputPlaceholder")}
                       />
                     </label>
                   </div>
+                  {ix === onSignerEditValidateInfo?.index && (
+                    <p className="mt-2.5 text-xs text-red300 font-normal">
+                      {onSignerEditValidateInfo?.text}
+                    </p>
+                  )}
                 </div>
               </div>
             ))}
@@ -853,7 +939,7 @@ const PdfViewerBox = ({
                   value={signer.user_identifier}
                   onChange={onChangeSignerAdd}
                   className="bg-transparent w-full placeholder:text-neutral60 text-neutral800 border-b border-neutral50 py-2.5 focus:outline-none focus:border-neutral800 text-sm"
-                  placeholder="Masukkan Tilaka Name"
+                  placeholder={t("linkAccountPlaceholder")}
                 />
                 <div className="mt-4">
                   <label className="flex items-center">
@@ -866,7 +952,7 @@ const PdfViewerBox = ({
                       className="form-radio text-primary"
                     />
                     <p className="text-sm text-neutral800 font-normal ml-3">
-                      Semua
+                      {t("all")}
                     </p>
                   </label>
                   <label className="flex items-center mt-5">
@@ -881,7 +967,7 @@ const PdfViewerBox = ({
                       className="form-radio text-primary"
                     />
                     <p className="text-sm text-neutral800 font-normal ml-3">
-                      Halaman
+                      {t("page")}
                     </p>
                     <input
                       disabled={
@@ -903,7 +989,7 @@ const PdfViewerBox = ({
             </div>
             <div className="mt-6 flex justify-end">
               <button onClick={onSignerAdd} className="simulator-btn-primary">
-                Tambah Penandatangan
+                {t("simulatorAddSignerText")}
               </button>
             </div>
           </div>
@@ -961,6 +1047,8 @@ const DraggrableWrapper = ({
     currentPageCanvasWrapperClientWidth,
     currentPageCanvasWrapperClientHeight,
   ]);
+
+  const { t }: any = i18n;
 
   const handleStop: DraggableEventHandler = (e, ui) => {
     // Calculate max resize on draggable signature
@@ -1021,7 +1109,13 @@ const DraggrableWrapper = ({
       ]);
     }
 
-    setData({ ...data, height: size.height, width: size.width });
+    setData({
+      ...data,
+      height: size.height,
+      width: size.width,
+      user_identifier: userIdentifier,
+      page_number: pageNumber,
+    });
   };
 
   useEffect(() => {
@@ -1063,7 +1157,7 @@ const DraggrableWrapper = ({
             <div className="handle h-full w-full p-2">
               <div style={{ width: data.width - 8 + "px" }}>
                 <p className="text-xs text-neutral200 font-normal font-poppins truncate">
-                  Signer {signingOrder}
+                  {t("simulatorSignerText")} {signingOrder}
                 </p>
                 <p className="text-sm text-neutral800 font-normal font-poppins truncate">
                   {userIdentifier}
