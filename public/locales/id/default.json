@@ -25,6 +25,7 @@
   "deviceNotSupportedSubtitle": "Kamera tidak terdeteksi atau tidak diizinkan. Lanjutkan proses Liveness dengan mengakses link berikut pada perangkat lain.",
   "link": "Link Liveness",
   "copy": "Salin",
+  "copied": "Disalin",
   "finalFormTitle": "Aktivasi Akun",
   "finalFormSubtitle": "Mohon mengisi data-data berikut sebagai proses aktivasi akun Tilaka",
   "finalFormTooltip": "Tilaka Name tidak dapat diubah dan akan digunakan sebagai username untuk pengguna masuk ke akun Tilaka dan menggunakan layanan Tilaka.",
@@ -162,5 +163,19 @@
   "settingSignatureSuccessTitle": "Pengaturan Tanda Tangan Berhasil",
   "settingSignatureSuccessSubtitle": "Pengaturan tanda tangan berhasil disimpan.",
   "settingSignatureSuccessButton": "Kembali ke Halaman Utama",
-  "invalidUsernamePassword": "Tilaka Name / Kata Sandi Salah"
+  "invalidUsernamePassword": "Tilaka Name / Kata Sandi Salah",
+  "all": "Semua",
+  "page": "Halaman",
+  "simulatorPDFTitle": "Simulator PDF",
+  "simulatorViewJsonButtonTextClose": "Tutup JSON",
+  "simulatorViewJsonButtonTextOpen": "Lihat JSON",
+  "simulatorUploadDocument": "Unggah File",
+  "simulatorUploadDocumentDescription": "Dokumen .pdf maksimal 32 MB",
+  "simulatorUploadDocumentErrorSize": "Ukuran dokumen terlalu besar",
+  "simulatorSignerText": "Penandatangan",
+  "simulatorAddSignerText": "Tambah Penandatangan",
+  "simulatorAddSignerErrorReqiredOrWrongFormat": "Form tidak lengkap atau format salah",
+  "simulatorAddSignerErrorAlradyExist": "Tilaka Name sudah ditambahkan, silahkan edit ada hapus terlebih dahulu",
+  "simulatorSignerPageInputPlaceholder": "Contoh: 1,2,5-9",
+  "simulatorSignerErrorTotalPage": "Tidak boleh melebihi jumlah halaman"
 }
