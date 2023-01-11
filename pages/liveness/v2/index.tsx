@@ -166,7 +166,7 @@ const Liveness = () => {
       if (result.success) {
         removeStorage();
         router.push({
-          pathname: handleRoute("v2/success"),
+          pathname: handleRoute("liveness/v2/success"),
           query: {
             request_id: router.query.request_id,
           },
