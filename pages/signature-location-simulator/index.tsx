@@ -249,18 +249,27 @@ const SignaturLocationSimulator = (props: TPropsSignaturLocationSimulator) => {
 const UploadBox = ({ show, fileOnChange }: TPropsUploadBox) => {
   const [isErrorDocumentSize, setIsErrorDocumentSize] =
     useState<boolean>(false);
+  const [isErrorDocumentType, setIsErrorDocumentType] =
+    useState<boolean>(false);
 
   const { t }: any = i18n;
 
   const onChange = (e: React.FormEvent<HTMLInputElement>): void => {
     const targetFile: TFile = e.currentTarget.files?.[0];
     if (targetFile) {
-      const fileSize = targetFile.size / 1024 / 1024; // in MiB
-      if (fileSize <= 32) {
-        fileOnChange(targetFile);
-        setIsErrorDocumentSize(false);
+      const fileType = targetFile.type;
+      if (fileType === "application/pdf") {
+        setIsErrorDocumentType(false);
+        const fileSize = targetFile.size / 1024 / 1024; // in MiB
+        if (fileSize <= 32) {
+          fileOnChange(targetFile);
+          setIsErrorDocumentSize(false);
+        } else {
+          setIsErrorDocumentSize(true);
+        }
       } else {
-        setIsErrorDocumentSize(true);
+        setIsErrorDocumentType(true);
+        setIsErrorDocumentSize(false);
       }
     }
   };
@@ -291,6 +300,11 @@ const UploadBox = ({ show, fileOnChange }: TPropsUploadBox) => {
         {isErrorDocumentSize && (
           <p className="text-xs font-normal text-red300 mt-3">
             {t("simulatorUploadDocumentErrorSize")}
+          </p>
+        )}
+        {isErrorDocumentType && (
+          <p className="text-xs font-normal text-red300 mt-3">
+            {t("simulatorUploadDocumentErrorType")}
           </p>
         )}
       </div>
