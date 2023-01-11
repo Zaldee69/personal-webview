@@ -11,7 +11,5 @@ export const log = (...msg: any) => {
         dom.log.style.color = "#FF5630"
         track.style.stroke = "#DE350B"
     }
-    if(!dom.perf) dom.perf = document.getElementById("perf") as HTMLDivElement;
-    dom.perf.innerText = msg[1] === undefined ? "" : msg[1]
   }
 };

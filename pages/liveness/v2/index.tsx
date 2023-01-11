@@ -6,12 +6,14 @@ import Camera from "../../../components/Camera";
 import { useRouter } from "next/router";
 import { toast } from "react-toastify";
 import {
-  RestKycCheckStep,
   RestKycFinalForm,
-  RestKycGenerateAction,
-  RestKycVerification,
+  RestLivenessV2GenerateAction,
+  RestLivenessv2Verification,
 } from "../../../infrastructure";
-import { TKycVerificationRequestData } from "../../../infrastructure/rest/kyc/types";
+import {
+  TKycVerificationRequestData,
+  TLivenessV2VerificationRequestData,
+} from "../../../infrastructure/rest/kyc/types";
 import XIcon from "@/public/icons/XIcon";
 import CheckOvalIcon from "@/public/icons/CheckOvalIcon";
 import Footer from "../../../components/Footer";
@@ -30,6 +32,7 @@ import { ActionGuide1, ActionGuide2 } from "@/components/atoms/ActionGuide";
 import { actionText } from "@/utils/actionText";
 import { assetPrefix } from "next.config";
 import ImageDebugger from "@/components/ImageDebugger";
+import { log } from "@/utils/logging";
 
 type TQueryParams = {
   request_id?: string;
@@ -93,197 +96,44 @@ const Liveness = () => {
     }
   };
 
-  const generateAction = () => {
-    setIsDisabled(true);
+  const generateAction = async () => {
     const body = {
-      registerId: routerQuery.request_id as string,
+      uuid: routerQuery.request_id as string,
     };
-    toast(`Mengecek status...`, {
+
+    toast(`Membuat aksi...`, {
       type: "info",
-      toastId: "generateAction",
+      toastId: "loading",
       isLoading: true,
       position: "top-center",
     });
-    RestKycCheckStep({
-      payload: { registerId: routerQuery.request_id as string },
-    })
-      .then((res) => {
-        if (
-          res.success &&
-          res.data.status !== "D" &&
-          res.data.status !== "F" &&
-          res.data.status !== "E"
-        ) {
-          // this scope for status A B C S
-          setIsDisabled(false);
-          if (res.data.status === "S") {
-            toast.dismiss("generateAction");
-            const params: TQueryParams = {
-              register_id: routerQuery.request_id as string,
-              status: res.data.status,
-            };
 
-            if (res.data.reason_code) {
-              params.reason_code = res.data.reason_code;
-            }
+    try {
+      const res = await RestLivenessV2GenerateAction(body);
 
-            const queryString = new URLSearchParams(params as any).toString();
-            if (routerQuery.redirect_url) {
-              window.top!.location.href = concateRedirectUrlParams(
-                routerQuery.redirect_url as string,
-                queryString
-              );
-            } else {
-              toast.success(res?.message || "pengecekan step berhasil", {
-                icon: <CheckOvalIcon />,
-              });
-            }
-          } else {
-            RestKycGenerateAction(body)
-              .then((result) => {
-                if (result?.data) {
-                  const payload = ["look_straight"].concat(
-                    result.data.actionList
-                  );
-                  dispatch(setActionList(payload));
-                  toast(`${result.message}`, {
-                    type: "success",
-                    position: "top-center",
-                    autoClose: 3000,
-                  });
-                  toast.dismiss("generateAction");
-                  setIsGenerateAction(false);
-                } else {
-                  setIsGenerateAction(false);
-                  throw new Error(result.message);
-                }
-              })
-              .catch((error) => {
-                toast.dismiss("generateAction");
-                const msg = error.response?.data?.data?.errors?.[0];
-                if (msg) {
-                  if (
-                    msg === "Proses ekyc untuk registrationId ini telah sukses"
-                  ) {
-                    toast(`${msg}`, {
-                      type: "success",
-                      position: "top-center",
-                      autoClose: 3000,
-                    });
-                    setIsGenerateAction(false);
-                  } else {
-                    toast.error(msg, {
-                      icon: <XIcon />,
-                    });
-                    setIsGenerateAction(false);
-                  }
-                } else {
-                  setIsGenerateAction(false);
-                  toast.error(
-                    error.response?.data?.message || "Generate Action gagal",
-                    {
-                      icon: <XIcon />,
-                    }
-                  );
-                }
-              });
-          }
-        } else {
-          // this scope for status D F E
-          setIsGenerateAction(false);
-          toast.dismiss("generateAction");
-          toast(`${res.message || "Tidak merespon!"}`, {
-            type: "error",
-            autoClose: 5000,
-            position: "top-center",
-            toastId: "errToast1",
-          });
-          if (
-            res.message === "Anda berada di tahap pengisian formulir" ||
-            res.data.status === "D"
-          ) {
-            toast.dismiss("errToast1");
-            if (res.data.pin_form) {
-              router.replace({
-                pathname: handleRoute("kyc/pinform"),
-                query: {
-                  ...routerQuery,
-                  registration_id: router.query.request_id,
-                },
-              });
-            } else {
-              router.push({
-                pathname: handleRoute("form"),
-                query: { ...routerQuery, request_id: router.query.request_id },
-              });
-            }
-          } else {
-            if (
-              res.data.status === "F" &&
-              res.data.pin_form &&
-              routerQuery.redirect_url
-            ) {
-              const params: TQueryParams = {
-                status: res.data.status,
-                register_id: routerQuery.request_id as string,
-              };
-
-              if (res.data.reason_code) {
-                params.reason_code = res.data.reason_code;
-              }
-
-              const queryString = new URLSearchParams(params as any).toString();
-              window.top!.location.href = concateRedirectUrlParams(
-                routerQuery.redirect_url as string,
-                queryString
-              );
-            } else if (res.data.status === "F" && routerQuery.dashboard_url){
-              // Redirect berdasarkan redirect-url
-              
-              const params: TQueryParams = {
-                request_id: routerQuery.request_id as string,
-                reason_code: res.data.reason_code as string,
-              };
-              const queryString = new URLSearchParams(params as any).toString();
-              const { hostname } = new URL(routerQuery.dashboard_url as string)
-              
-              if(hostname === 'tilaka.id' || hostname.endsWith("tilaka.id")){
-                window.top!.location.href = concateRedirectUrlParams(
-                  routerQuery.dashboard_url as string,
-                  queryString
-                  );
-              }
-            } else {
-              const query: TQueryParams = {
-                ...routerQuery,
-                request_id: router.query.request_id as string,
-              };
-
-              if (res.data.reason_code) {
-                query.reason_code = res.data.reason_code;
-              }
-
-              router.push({
-                pathname: handleRoute("liveness-failure"),
-                query,
-              });
-            }
-          }
-        }
-      })
-      .catch((err) => {
-        toast.dismiss("generateAction");
+      if (res.success) {
+        setIsDisabled(false);
         setIsGenerateAction(false);
-        if (err.response?.data?.data?.errors?.[0]) {
-          toast.error(err.response?.data?.data?.errors?.[0], {
-            icon: <XIcon />,
-          });
-        } else {
-          toast.error(err.response?.data?.message || "pengecekan step gagal", {
-            icon: <XIcon />,
-          });
-        }
-      });
+        toast.dismiss("loading");
+        toast.success("Pembuatan daftar aksi sukses", {
+          icon: <CheckOvalIcon />,
+          autoClose: 3000,
+        });
+        const payload = ["look_straight"].concat(res.data.actionList);
+        dispatch(setActionList(payload));
+      } else {
+        setIsDisabled(true);
+        setIsGenerateAction(true);
+        toast.dismiss("loading");
+        toast("Pembuatan daftar aksi gagal", {
+          type: "error",
+          autoClose: 5000,
+          position: "top-center",
+        });
+      }
+    } catch (err) {
+      throw err;
+    }
   };
 
   const changePage = async () => {
@@ -291,13 +141,9 @@ const Liveness = () => {
     setFailedMessage("");
 
     try {
-      const body: TKycVerificationRequestData = {
-        registerId: router.query.request_id as string,
-        mode: "web",
-        image_action1: "",
-        image_action2: "",
-        image_action3: "",
-        image_selfie: "",
+      const body: TLivenessV2VerificationRequestData = {
+        uuid: router.query.request_id as string,
+        selfie_image: "",
       };
 
       const imageActions = images.filter(
@@ -306,212 +152,57 @@ const Liveness = () => {
           image.action !== "look_straight"
       );
       imageActions.forEach((image, index) => {
-        body[`image_action${++index}` as keyof TKycVerificationRequestData] =
-          image.value;
+        body[
+          `image_action${++index}` as keyof TLivenessV2VerificationRequestData
+        ] = image.value;
       });
       const imageSelfie = images.filter(
         (image) => image.action === "look_straight"
       )[0];
 
-      body.image_selfie = imageSelfie.value;
+      body.selfie_image = imageSelfie.value;
 
-      const result = await RestKycVerification(body);
-      const status = result.data.status;
+      const result = await RestLivenessv2Verification(body);
       if (result.success) {
         removeStorage();
-        if (result.data.config_level === 2) {
-          try {
-            const finalFormResponse = await RestKycFinalForm({
-              payload: { registerId: router.query.request_id as string },
-            });
-
-            if (finalFormResponse.success) {
-              toast.success(finalFormResponse?.message || "berhasil", {
-                icon: <CheckOvalIcon />,
-              });
-
-              // Redirect berdasarkan redirect-url
-              const params: TQueryParams = {
-                request_id: routerQuery.request_id as string,
-              };
-
-              if (routerQuery.redirect_url) {
-                params.redirect_url = routerQuery.redirect_url as string;
-              }
-
-              if (finalFormResponse.data.reason_code) {
-                params.reason_code = finalFormResponse.data.reason_code;
-              }
-
-              const queryString = new URLSearchParams(params as any).toString();
-              const { hostname } = new URL(routerQuery.dashboard_url as string)
-              
-              if(hostname === 'tilaka.id' || (hostname).endsWith("tilaka.id")){
-                window.top!.location.href = concateRedirectUrlParams(
-                  routerQuery.dashboard_url as string,
-                  queryString
-                );
-              }
-            } else {
-              toast.error(finalFormResponse?.message || "gagal", {
-                icon: <XIcon />,
-              });
-            }
-          } catch (e: any) {
-            if (e.response?.data?.data?.errors?.[0]) {
-              toast.error(
-                `${e.response?.data?.message}, ${e.response?.data?.data?.errors?.[0]}`,
-                { icon: <XIcon /> }
-              );
-            } else {
-              toast.error(e.response?.data?.message || "gagal", {
-                icon: <XIcon />,
-              });
-            }
-          }
-        } else if (result.data.pin_form) {
-          const query: any = {
-            ...routerQuery,
-            registration_id: router.query.request_id,
-          };
-
-          if (result.data.reason_code) {
-            query.reason_code = result.data.reason_code;
-          }
-
-          router.replace({
-            pathname: handleRoute("kyc/pinform"),
-            query,
-          });
-        } else {
-          const query: any = {
-            ...routerQuery,
+        router.push({
+          pathname: handleRoute("v2/success"),
+          query: {
             request_id: router.query.request_id,
-          };
-
-          if (result.data.reason_code) {
-            query.reason_code = result.data.reason_code;
-          }
-
-          router.push({
-            pathname: handleRoute("form"),
-            query,
-          });
-        }
+          },
+        });
       } else {
         const attempt =
-          result.data?.numFailedLivenessCheck ||
-          parseInt(localStorage.getItem("tlk-counter") as string) + 1;
-        localStorage.setItem("tlk-counter", attempt.toString());
-        if (status !== "E" && status !== "F") {
-          toast("Liveness Detection failed. Please try again", {
+          result.data?.liveness_error_counter ||
+          parseInt(localStorage.getItem("tlk-counter1") as string) + 1;
+        localStorage.setItem("tlk-counter1", attempt.toString());
+
+        toast(
+          result.data?.liveness_error_counter &&
+            result.data?.liveness_error_counter > 2
+            ? "Registrasi Gagal"
+            : "Liveness gagal, mohon ulangi",
+          {
             type: "error",
             autoClose: 5000,
             position: "top-center",
-          });
-
-
-          const query: TQueryParams = {
-            ...routerQuery,
-            request_id: router.query.request_id as string,
-          };
-
-          if (result.data.reason_code) {
-            query.reason_code = result.data.reason_code;
           }
+        );
 
+        if (result.data?.liveness_error_counter > 2) {
           router.push({
-            pathname: handleRoute("liveness-fail"),
-            query,
+            pathname: handleRoute("liveness-failure/v2"),
+            query: {
+              request_id: router.query.request_id,
+            },
           });
         } else {
-          if (status) {
-            if (status === "E") {
-              removeStorage();
-              toast(
-                "We are unable to find your data in Dukpacil. For further assistance, please contact admin@tilaka.id",
-                {
-                  type: "error",
-                  autoClose: 5000,
-                  position: "top-center",
-                }
-              );
-              setIsLoading(false);
-            } else if (status === "F") {
-              toast(
-                result?.data?.numFailedLivenessCheck &&
-                  result?.data?.numFailedLivenessCheck > 2
-                  ? "You have failed 3 times \nYou will be redirected to the next page, please wait..."
-                  : "Registration Gagal",
-                {
-                  type: "error",
-                  autoClose: 5000,
-                  position: "top-center",
-                }
-              );
-              setTimeout(() => {
-                if (result.data.config_level === 2) {
-                  const params: TQueryParams = {
-                    request_id: routerQuery.request_id as string,
-                  };
-
-                  if (routerQuery.redirect_url) {
-                    params.redirect_url = routerQuery.redirect_url as string;
-                  }
-
-                  if (result?.data.reason_code) {
-                    params.reason_code = result?.data.reason_code as string;
-                  }
-
-                  const queryString = new URLSearchParams(
-                    params as any
-                  ).toString();
-                  const { hostname } = new URL(routerQuery.dashboard_url as string)
-              
-                  if(hostname === 'tilaka.id' || (hostname).endsWith("tilaka.id")){
-                    window.top!.location.href = concateRedirectUrlParams(
-                      routerQuery.dashboard_url as string,
-                      queryString
-                    );
-                  }
-                } else if (result.data.pin_form && routerQuery.redirect_url) {
-                  const params: any = {
-                    status: status,
-                    register_id: routerQuery.request_id,
-                  };
-
-                  if (result?.data.reason_code) {
-                    params.reason_code = result?.data.reason_code;
-                  }
-
-                  const queryString = new URLSearchParams(
-                    params as any
-                  ).toString();
-                  window.top!.location.href = concateRedirectUrlParams(
-                    routerQuery.redirect_url as string,
-                    queryString
-                  );
-                } else {
-                  const query: any = {
-                    ...routerQuery,
-                    request_id: router.query.request_id,
-                  };
-
-                  if (result?.data.reason_code) {
-                    query.reason_code = result?.data.reason_code;
-                  }
-
-                  router.push({
-                    pathname: handleRoute("liveness-fail"),
-                    query,
-                  });
-                }
-              }, 5000);
-              setIsLoading(false);
+          router.replace({
+            pathname: handleRoute("liveness-fail/v2"),
+            query: {
+              request_id: router.query.request_id,
             }
-          } else {
-            setIsLoading(false);
-          }
+          });
         }
       }
     } catch (e) {
@@ -524,9 +215,8 @@ const Liveness = () => {
       setIsLoading(false);
       setTimeout(() => {
         router.push({
-          pathname: handleRoute("liveness-fail"),
+          pathname: handleRoute("liveness-fail/v2"),
           query: {
-            ...routerQuery,
             request_id: router.query.request_id,
           },
         });
@@ -536,7 +226,7 @@ const Liveness = () => {
 
   const removeStorage = () => {
     localStorage.removeItem("tlk-reg-id");
-    localStorage.removeItem("tlk-counter");
+    localStorage.removeItem("tlk-counter1");
   };
 
   useEffect(() => {
@@ -602,7 +292,6 @@ const Liveness = () => {
 
   return (
     <>
-    {/* <ImageDebugger/> */}
       <Head>
         <title>Liveness</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />

@@ -153,4 +153,48 @@ export type TKycVerificationIssueResponseData = {
     status: string;
     reason_code: TReasonCode;
   };
-};
+};  
+
+export type TLivenessV2GenerateActionResponse = {
+  success: boolean,
+  message: string,
+  data: {
+    actionList: string[]
+  }
+}
+
+export type TLivenessV2GenerateActionRequestData = {
+    uuid: string
+}
+
+export type TLivenessV2IdProofingResponse = {
+  success: boolean
+  message: string
+  data: {
+    nik: string | null
+    name: string | null
+    date_of_birth: string | null
+    selfie_image_percentage: string | null,
+    liveness_result: string | null
+    liveness_fail_message: string | null
+    uuid: string,
+    url: string
+    reason_code: TReasonCode
+  }
+}
+
+export type TLivenessV2VerificationResponse = {
+  success: boolean
+  message: string
+  data: {
+    errors: string[]
+    liveness_error_counter: number
+    liveness_summary_status: number
+  }
+
+}
+
+export type TLivenessV2VerificationRequestData = {
+  uuid: string
+  selfie_image: string
+}
