@@ -172,6 +172,7 @@
   "simulatorUploadDocument": "Upload File",
   "simulatorUploadDocumentDescription": "Dokument .pdf maximum 32 MB",
   "simulatorUploadDocumentErrorSize": "The document size is too large",
+  "simulatorUploadDocumentErrorType": "The document must be a PDF",
   "simulatorSignerText": "Signer",
   "simulatorAddSignerText": "Add Signer",
   "simulatorAddSignerErrorReqiredOrWrongFormat": "The form is incomplete or the format is incorrect",
