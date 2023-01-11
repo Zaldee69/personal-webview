@@ -25,7 +25,7 @@ const LivenessFail = () => {
 
   const resetStorage = () => {
     setGagalCounter(0);
-    sessionStorage.removeItem("tlk-counter");
+    sessionStorage.removeItem("tlk-counter1");
     if (router.query.redirect_url) {
       window.location.replace(
         concateRedirectUrlParams(router.query.redirect_url as string, "")
@@ -37,20 +37,15 @@ const LivenessFail = () => {
     }
   };
 
-  const setPathName = (routerQuery: any) => {
-    if (routerQuery.revoke_id) return handleRoute("kyc/revoke");
-    if (routerQuery.issue_id) return handleRoute("kyc/re-enroll");
-    return handleRoute("guide");
-  };
 
   useEffect(() => {
-    if (gagalCounter > 2) localStorage.removeItem("tlk-counter");
+    if (gagalCounter > 2) localStorage.removeItem("tlk-counter1");
   }, [gagalCounter]);
 
   useEffect(() => {
     dispatch(setIsDone(false));
-    if (localStorage.getItem("tlk-counter")) {
-      setGagalCounter(parseInt(localStorage.getItem("tlk-counter") as string));
+    if (localStorage.getItem("tlk-counter1")) {
+      setGagalCounter(parseInt(localStorage.getItem("tlk-counter1") as string));
     }
   }, []);
 
@@ -68,7 +63,7 @@ const LivenessFail = () => {
       return (
         <Link
           href={{
-            pathname: setPathName(router.query),
+            pathname: handleRoute("liveness/v2"),
             query: { ...router.query },
           }}
         >
@@ -111,32 +106,33 @@ const LivenessFail = () => {
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const cQuery = context.query;
-  const uuid =
-    cQuery.transaction_id || cQuery.request_id || cQuery.registration_id;
-
-  const checkStepResult: {
-    res?: TKycCheckStepResponseData;
-    err?: {
-      response: {
-        data: {
-          success: boolean;
-          message: string;
-          data: { errors: string[] };
+    const cQuery = context.query;
+    const uuid =
+      cQuery.transaction_id || cQuery.request_id || cQuery.registration_id;
+  
+    const checkStepResult: {
+      res?: TKycCheckStepResponseData;
+      err?: {
+        response: {
+          data: {
+            success: boolean;
+            message: string;
+            data: { errors: string[] };
+          };
         };
       };
-    };
-  } = await RestKycCheckStep({
-    payload: { registerId: uuid as string },
-  })
-    .then((res) => {
-      return { res };
+    } = await RestKycCheckStep({
+      payload: { registerId: uuid as string },
     })
-    .catch((err) => {
-      return { err };
-    });
+      .then((res) => {
+        return { res };
+      })
+      .catch((err) => {
+        return { err };
+      });
+  
+    return serverSideRenderReturnConditions({ context, checkStepResult });
+  };
 
-  return serverSideRenderReturnConditions({ context, checkStepResult });
-};
 
 export default LivenessFail;

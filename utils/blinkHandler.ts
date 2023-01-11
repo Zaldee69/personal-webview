@@ -14,6 +14,7 @@ type Props = {
   currentActionIndex: number;
   clicked: boolean;
   capture: HTMLButtonElement;
+  perfSetter: (display: string) => void
 };
 
 const blinkHandler = async ({
@@ -28,6 +29,7 @@ const blinkHandler = async ({
   clicked,
   capture,
   wrongActionSetter,
+  perfSetter
 }: Props) => {
   const { t }: any = i18n;
   if (blink_left_eye || (blink_right_eye && distance < 25)) {
@@ -43,6 +45,7 @@ const blinkHandler = async ({
       wrongActionSetter(false, "");
       await new Promise((resolve) => setTimeout(resolve, 500));
       log(t("dontMove"), t("doNotMove"));
+      perfSetter("block")
       await new Promise((resolve) => setTimeout(resolve, 1000));
       let done = await isIndexDone(currentActionIndex);
       if (!done) {

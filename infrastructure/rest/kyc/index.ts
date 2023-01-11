@@ -20,6 +20,10 @@ import {
   TKycGenerateActionIssueResponseData,
   TKycVerificationIssueRequestData,
   TKycVerificationIssueResponseData,
+  TLivenessV2GenerateActionResponse,
+  TLivenessV2GenerateActionRequestData,
+  TLivenessV2VerificationRequestData,
+  TLivenessV2VerificationResponse
 } from "./types";
 
 const BASE_URL =
@@ -193,3 +197,24 @@ export const RestKycVerificationIssue = (
       throw err;
     });
 };
+
+export const RestLivenessV2GenerateAction = (
+  body: TLivenessV2GenerateActionRequestData
+): Promise<TLivenessV2GenerateActionResponse> => {
+  return axios
+    .post<TLivenessV2GenerateActionResponse>(
+      `${BASE_URL}/api/kycv2/init`,
+      body
+    )
+    .then((res) => res.data)
+    .catch((err) => err);
+};
+
+export const RestLivenessv2Verification  = (
+  body: TLivenessV2VerificationRequestData
+): Promise<TLivenessV2VerificationResponse> => {
+  return axios.post<TLivenessV2VerificationResponse>(
+    `${BASE_URL}/api/kycv2/verification`,
+    body,
+  ).then((res) => res.data).catch((err) => err)
+}

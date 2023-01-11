@@ -12,6 +12,7 @@ type Props = {
   currentActionIndex: number;
   clicked: boolean;
   capture: HTMLButtonElement;
+  perfSetter: (display: string) => void
 };
 
 const openMouthHandler = async ({
@@ -25,6 +26,7 @@ const openMouthHandler = async ({
   clicked,
   capture,
   wrongActionSetter,
+  perfSetter
 }: Props) => {
   const { t }: any = i18n;
   if(mouth_score >= 0.3 && mouth_score < 0.39 && distance < 25) {
@@ -41,6 +43,7 @@ const openMouthHandler = async ({
     wrongActionSetter(false, "");
     await new Promise((resolve) => setTimeout(resolve, 1000));
       log(t("dontMove"), t("doNotMove"));
+      perfSetter("block")
       await new Promise((resolve) => setTimeout(resolve, 500));
       let done = await isIndexDone(currentActionIndex);
       if (!done) {

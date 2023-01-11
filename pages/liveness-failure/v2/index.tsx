@@ -25,6 +25,7 @@ const LivenessFailure = () => {
     status: "F",
     register_id: uuid,
   };
+
   const queryString = new URLSearchParams(params as any).toString();
   return (
     <>

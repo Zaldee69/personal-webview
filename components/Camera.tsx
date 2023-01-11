@@ -78,6 +78,11 @@ const Camera: React.FC<Props> = ({
     isDone[i] = true;
   };
 
+  const perfSetter = (display: string) => {
+    const perf = document.getElementById("perf") as HTMLDivElement;
+    perf.style.display = display
+  }
+
   const wrongActionSetter = (error: boolean, message: string) => {
     setFailedMessage(message);
     setError(error);
@@ -184,6 +189,7 @@ const Camera: React.FC<Props> = ({
                   setCircle()
                   await new Promise((resolve) => setTimeout(resolve, 1000));
                   log(t("dontMove"), t("doNotMove"))
+                  perfSetter("block")
                   await new Promise((resolve) => setTimeout(resolve, 500));
                     let done = await isIndexDone(currentActionIndex);
                     if (!done) {
@@ -258,6 +264,7 @@ const Camera: React.FC<Props> = ({
           });
         } else if (actionList[currentActionIndex] == "mouth_open") {
           progressSetter(0);
+          perfSetter("none")
           await openMouthHandler({
             distance,
             mouth_score,
@@ -269,9 +276,11 @@ const Camera: React.FC<Props> = ({
             currentActionIndex,
             clicked,
             capture,
+            perfSetter
           });
         } else if (actionList[currentActionIndex] == "blink") {
           progressSetter(0);
+          perfSetter("none")
           await blinkHandler({
             distance,
             blink_left_eye,
@@ -284,6 +293,7 @@ const Camera: React.FC<Props> = ({
             currentActionIndex,
             clicked,
             capture,
+            perfSetter
           });
         }
       }
@@ -399,7 +409,7 @@ const Camera: React.FC<Props> = ({
       {
         _isMounted && (
           <div className="relative">
-            <div style={{ backgroundColor: "rgba(0, 0, 0, .5)" }} id="perf" className="absolute text-center font-poppins  text-white top-0 left-0 right-0" ></div>
+            <div style={{ backgroundColor: "rgba(0, 0, 0, .5)" }} id="perf" className="absolute text-center font-poppins hidden  text-white top-0 left-0 right-0" >{t("doNotMove")}</div>
           <Webcam
             style={{ height: "270px", objectFit: "cover" }}
             className="mt-3 rounded-md sm:w-full md:w-full"
