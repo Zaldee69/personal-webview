@@ -172,6 +172,7 @@
   "simulatorUploadDocument": "Unggah File",
   "simulatorUploadDocumentDescription": "Dokumen .pdf maksimal 32 MB",
   "simulatorUploadDocumentErrorSize": "Ukuran dokumen terlalu besar",
+  "simulatorUploadDocumentErrorType": "Dokumen harus berupa PDF",
   "simulatorSignerText": "Penandatangan",
   "simulatorAddSignerText": "Tambah Penandatangan",
   "simulatorAddSignerErrorReqiredOrWrongFormat": "Form tidak lengkap atau format salah",
