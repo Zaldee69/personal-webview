@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { getCertificateList, getUserName } from "infrastructure/rest/b2b";
 import Footer from "@/components/Footer";
 import EyeIcon from "@/public/icons/EyeIcon";
@@ -6,7 +6,7 @@ import EyeIconOff from "@/public/icons/EyeIconOff";
 import { AppDispatch, RootState } from "@/redux/app/store";
 import { useDispatch, useSelector } from "react-redux";
 import { login } from "@/redux/slices/loginSlice";
-import { TLoginProps } from "@/interface/interface";
+import { TLoginInitialState, TLoginProps } from "@/interface/interface";
 import Head from "next/head";
 import toastCaller from "@/utils/toastCaller";
 import { toast } from "react-toastify";
@@ -20,10 +20,10 @@ import { GetServerSideProps } from "next";
 import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
 import { serverSideRenderReturnConditions } from "@/utils/serverSideRenderReturnConditions";
 import i18n from "i18";
+import Loading from "@/components/Loading";
 
 type Props = {
-  channel_id: string;
-  pathname: string;
+  tokenFromHeader: string | null;
 };
 
 type ModalProps = {
@@ -31,7 +31,7 @@ type ModalProps = {
   setCertifModal: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const Login = () => {
+const Login = ({ tokenFromHeader }: Props) => {
   const [password, setPassword] = useState<string>("");
   const [tilakaName, setTilakaName] = useState("");
   const [certifModal, setCertifModal] = useState<boolean>(false);
@@ -39,11 +39,16 @@ const Login = () => {
     password: "password",
   });
   const [rememberMe, setRememberMe] = useState<boolean>(false);
-  const {t}: any = i18n
+  const [loginQueue, setIsLoginQueue] = useState<{
+    queue: boolean;
+    data: { existingToken: Props["tokenFromHeader"] };
+  }>({ queue: false, data: { existingToken: null } });
+  const { t }: any = i18n;
   const dispatch: AppDispatch = useDispatch();
   const data = useSelector((state: RootState) => state.login);
   const router = useRouter();
-  const { channel_id, tilaka_name, company_id, transaction_id, signing } = router.query;
+  const { channel_id, tilaka_name, company_id, transaction_id, signing } =
+    router.query;
 
   useEffect(() => {
     if (router.isReady) {
@@ -54,9 +59,9 @@ const Login = () => {
   // When the component mounts
   useEffect(() => {
     const rememberMeFlag = localStorage.getItem("rememberMe");
-      if (rememberMeFlag) {
-        setRememberMe(true);
-      }
+    if (rememberMeFlag) {
+      setRememberMe(true);
+    }
   }, []);
 
   // When the state of the "remember me" checkbox changes
@@ -65,73 +70,97 @@ const Login = () => {
       localStorage.setItem("rememberMe", true as any);
     } else {
       localStorage.removeItem("rememberMe");
-      localStorage.removeItem("token");
+      // localStorage.removeItem("token");
       localStorage.removeItem("refresh_token");
     }
   }, [rememberMe]);
 
   useEffect(() => {
     if (data.status === "FULLFILLED" && data.data.success) {
-      let queryWithDynamicRedirectURL = {
-        ...router.query,
-      };
-      if (data.data.message.length > 0) {
-        queryWithDynamicRedirectURL["redirect_url"] = data.data.message;
-      }
       localStorage.setItem("token", data.data.data[0] as string);
       if (rememberMe) {
         localStorage.setItem("token", data.data.data[0] as string);
         localStorage.setItem("refresh_token", data.data.data[1] as string);
       }
-      getCertificateList({ params: company_id as string }).then((res) => {
-        const certif = JSON.parse(res.data);
-        if (!transaction_id && signing === "1") {
-          toast.dismiss("success");
-          toast("Transaction ID tidak boleh kosong", {
-            type: "error",
-            toastId: "error",
-            position: "top-center",
-            icon: XIcon,
-          });
-        } else {
-          if (certif[0].status == "Aktif") {
-            getUserName({}).then((res) => {
-              const data = JSON.parse(res.data);
-              if(data.typeMfa == null) {
-                router.replace({
-                  pathname: handleRoute("setting-signature-and-mfa"),
-                  query: {
-                    ...queryWithDynamicRedirectURL,
-                  },
-                });
-              } else {
-                router.replace({
-                  pathname: handleRoute("signing"),
-                  query: {
-                    ...queryWithDynamicRedirectURL,
-                  },
-                });
-              }
-            });
-          } else if (
-            certif[0].status === "Revoke" ||
-            certif[0].status === "Expired" ||
-            certif[0].status === "Enroll"
-          ) {
-            setCertifModal(true);
-          } else {
-            router.replace({
-              pathname: handleRoute("certificate-information"),
-              query: {
-                ...queryWithDynamicRedirectURL,
-              },
-            });
-          }
-        }
-      });
+
+      doIn(data);
     }
     toastCaller(data);
   }, [data.status]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    const existingToken: Props["tokenFromHeader"] =
+      tokenFromHeader || localStorage.getItem("token");
+
+    if (existingToken) {
+      setIsLoginQueue({
+        queue: true,
+        data: { existingToken: existingToken },
+      });
+    } else {
+      setIsLoginQueue({ queue: false, data: { existingToken: null } });
+      return;
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const doIn = (data?: TLoginInitialState): void => {
+    let queryWithDynamicRedirectURL = {
+      ...router.query,
+    };
+
+    if (data) {
+      if (data.data.message.length > 0) {
+        queryWithDynamicRedirectURL["redirect_url"] = data.data.message;
+      }
+    }
+
+    getCertificateList({ params: company_id as string }).then((res) => {
+      const certif = JSON.parse(res.data);
+      if (!transaction_id && signing === "1") {
+        toast.dismiss("success");
+        toast("Transaction ID tidak boleh kosong", {
+          type: "error",
+          toastId: "error",
+          position: "top-center",
+          icon: XIcon,
+        });
+      } else {
+        if (certif[0].status == "Aktif") {
+          getUserName({}).then((res) => {
+            const data = JSON.parse(res.data);
+            if (data.typeMfa == null) {
+              router.replace({
+                pathname: handleRoute("setting-signature-and-mfa"),
+                query: {
+                  ...queryWithDynamicRedirectURL,
+                },
+              });
+            } else {
+              router.replace({
+                pathname: handleRoute("signing"),
+                query: {
+                  ...queryWithDynamicRedirectURL,
+                },
+              });
+            }
+          });
+        } else if (
+          certif[0].status === "Revoke" ||
+          certif[0].status === "Expired" ||
+          certif[0].status === "Enroll"
+        ) {
+          setCertifModal(true);
+        } else {
+          router.replace({
+            pathname: handleRoute("certificate-information"),
+            query: {
+              ...queryWithDynamicRedirectURL,
+            },
+          });
+        }
+      }
+    });
+  };
 
   const onChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
@@ -140,7 +169,15 @@ const Login = () => {
 
   const submitHandler = (e: React.SyntheticEvent) => {
     e.preventDefault();
-    dispatch(login({ password, channel_id, tilaka_name, company_id, transaction_id,} as TLoginProps));
+    dispatch(
+      login({
+        password,
+        channel_id,
+        tilaka_name,
+        company_id,
+        transaction_id,
+      } as TLoginProps)
+    );
     setPassword("");
   };
 
@@ -151,6 +188,17 @@ const Login = () => {
       password: type.password === "password" ? "text" : "password",
     }));
   };
+
+  if (loginQueue.queue) {
+    return (
+      <LoginQueue
+        existingToken={loginQueue.data.existingToken}
+        setIsLoginQueue={setIsLoginQueue}
+        doIn={doIn}
+      />
+    );
+  }
+
   return (
     <>
       <CertifModal setCertifModal={setCertifModal} certifModal={certifModal} />
@@ -237,6 +285,9 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const cQuery = context.query;
   const uuid =
     cQuery.transaction_id || cQuery.request_id || cQuery.registration_id;
+  const tokenFromHeader = context.req
+    ? context.req.headers["x-token"] || null
+    : null;
 
   const checkStepResult: {
     res?: TKycCheckStepResponseData;
@@ -259,13 +310,21 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       return { err };
     });
 
-  return serverSideRenderReturnConditions({ context, checkStepResult });
+  const serverSideRenderReturnConditionsResult =
+    serverSideRenderReturnConditions({ context, checkStepResult });
+
+  serverSideRenderReturnConditionsResult["props"] = {
+    ...serverSideRenderReturnConditionsResult["props"],
+    tokenFromHeader,
+  };
+
+  return serverSideRenderReturnConditionsResult;
 };
 
 export default Login;
 
 const CertifModal = ({ certifModal, setCertifModal }: ModalProps) => {
-  const {t}: any = i18n
+  const { t }: any = i18n;
   return certifModal ? (
     <div
       style={{ backgroundColor: "rgba(0, 0, 0, .5)" }}
@@ -283,7 +342,7 @@ const CertifModal = ({ certifModal, setCertifModal }: ModalProps) => {
             alt="cert"
           />
           <p className="text-center font-poppins mt-5">
-           {t("dontHaveCertifSubtitle")}
+            {t("dontHaveCertifSubtitle")}
           </p>
         </div>
         <button className="bg-primary uppercase btn mt-8 disabled:opacity-50 text-white font-poppins w-full mx-auto rounded-sm h-9">
@@ -301,4 +360,69 @@ const CertifModal = ({ certifModal, setCertifModal }: ModalProps) => {
       </div>
     </div>
   ) : null;
+};
+
+type TPropsLoginQueue = {
+  existingToken: Props["tokenFromHeader"];
+  setIsLoginQueue: React.Dispatch<
+    React.SetStateAction<{
+      queue: boolean;
+      data: {
+        existingToken: Props["tokenFromHeader"];
+      };
+    }>
+  >;
+  doIn: (data?: TLoginInitialState) => void;
+};
+
+const LoginQueue = ({
+  existingToken,
+  setIsLoginQueue,
+  doIn,
+}: TPropsLoginQueue) => {
+  const { t }: any = i18n;
+
+  const onLoginFailed = useCallback(() => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("refresh_token");
+    toast(t("loginQueueErrorText"), {
+      type: "error",
+      toastId: "error",
+      position: "top-center",
+      icon: XIcon,
+    });
+    setTimeout(() => {
+      setIsLoginQueue({ queue: false, data: { existingToken: null } });
+    }, 2000);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    // validate token
+    getUserName({ token: existingToken })
+      .then((_) => {
+        // token valid and redirect to authenticated page
+        localStorage.setItem("token", existingToken as string);
+        doIn();
+      })
+      .catch((_) => {
+        // should check is err.status equal to 401?
+        onLoginFailed();
+      });
+  }, [existingToken, onLoginFailed]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  return (
+    <div className="min-h-screen bg-white">
+      <div className="flex justify-center items-center h-screen pb-20">
+        <Loading title={t("loginQueueProcessText")} />
+      </div>
+      <div className="bg-neutral10 w-full absolute bottom-0 flex justify-center items-center">
+        <Image
+          src={`${assetPrefix}/images/tilaka-logo.svg`}
+          width={100}
+          height={100}
+          alt="tilaka-logo"
+        />
+      </div>
+    </div>
+  );
 };

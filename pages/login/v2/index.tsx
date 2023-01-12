@@ -1,12 +1,18 @@
-import React, { useState, useEffect, Dispatch, SetStateAction } from "react";
-import { getCertificateList } from "infrastructure/rest/b2b";
+import React, {
+  useState,
+  useEffect,
+  Dispatch,
+  SetStateAction,
+  useCallback,
+} from "react";
+import { getCertificateList, getUserName } from "infrastructure/rest/b2b";
 import Footer from "@/components/Footer";
 import EyeIcon from "@/public/icons/EyeIcon";
 import EyeIconOff from "@/public/icons/EyeIconOff";
 import { AppDispatch, RootState } from "@/redux/app/store";
 import { useDispatch, useSelector } from "react-redux";
 import { login } from "@/redux/slices/loginSlice";
-import { TLoginProps } from "@/interface/interface";
+import { TLoginInitialState, TLoginProps } from "@/interface/interface";
 import Head from "next/head";
 import toastCaller from "@/utils/toastCaller";
 import { toast } from "react-toastify";
@@ -17,6 +23,13 @@ import Image from "next/image";
 import { assetPrefix } from "../../../next.config";
 import { NextParsedUrlQuery } from "next/dist/server/request-meta";
 import i18n from "i18";
+import { GetServerSideProps } from "next";
+import Loading from "@/components/Loading";
+
+interface IPropsLogin {
+  tokenFromHeader: string | null;
+}
+
 interface IParameterFromRequestSign {
   user?: string;
   id?: string;
@@ -34,7 +47,7 @@ type ModalProps = {
   setCertifModal: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const Login = () => {
+const Login = ({ tokenFromHeader }: IPropsLogin) => {
   const [password, setPassword] = useState<string>("");
   const [tilakaName, setTilakaName] = useState("");
   const [certifModal, setCertifModal] = useState<boolean>(false);
@@ -43,6 +56,10 @@ const Login = () => {
   });
   const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
   const [autoLogoutModal, setAutoLogoutModal] = useState<boolean>(false);
+  const [loginQueue, setIsLoginQueue] = useState<{
+    queue: boolean;
+    data: { existingToken: IPropsLogin["tokenFromHeader"] };
+  }>({ queue: false, data: { existingToken: null } });
   const dispatch: AppDispatch = useDispatch();
   const data = useSelector((state: RootState) => state.login);
   const router = useRouter();
@@ -56,7 +73,7 @@ const Login = () => {
     showAutoLogoutInfo?: string;
   } & IParameterFromRequestSign = router.query;
 
-  const {t}: any = i18n
+  const { t }: any = i18n;
 
   useEffect(() => {
     if (router.isReady) {
@@ -69,52 +86,12 @@ const Login = () => {
 
   useEffect(() => {
     if (isSubmitted && data.status === "FULLFILLED" && data.data.success) {
-      let queryWithDynamicRedirectURL = {
-        ...router.query,
-      };
-      if (data.data.message.length > 0) {
-        queryWithDynamicRedirectURL["redirect_url"] = data.data.message;
-      }
       localStorage.setItem("count_v2", "0");
       localStorage.setItem("token_v2", data.data.data[0] as string);
       localStorage.setItem("refresh_token_v2", data.data.data[1] as string);
-      getCertificateList({
-        token: localStorage.getItem("token_v2"),
-      }).then((res) => {
-        const certif = JSON.parse(res.data);
-        if (!id) {
-          toast.dismiss("success");
-          toast("ID tidak boleh kosong", {
-            type: "error",
-            toastId: "error",
-            position: "top-center",
-            icon: XIcon,
-          });
-        } else {
-          if (certif[0].status == "Aktif") {
-            router.replace({
-              pathname: handleRoute("signing/v2"),
-              query: {
-                ...queryWithDynamicRedirectURL,
-              },
-            });
-          } else if (
-            certif[0].status === "Revoke" ||
-            certif[0].status === "Expired" ||
-            certif[0].status === "Enroll"
-          ) {
-            setCertifModal(true);
-          } else {
-            router.replace({
-              pathname: handleRoute("certificate-information"),
-              query: {
-                ...queryWithDynamicRedirectURL,
-                v2: "1",
-              },
-            });
-          }
-        }
-      });
+
+      doIn(data);
+
       toastCaller(data);
     } else if (data.status === "FULLFILLED" && !data.data.success) {
       toast(data.data.message || "Ada kesalahan", {
@@ -125,6 +102,71 @@ const Login = () => {
       });
     }
   }, [data.status]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    const existingToken: IPropsLogin["tokenFromHeader"] =
+      tokenFromHeader || localStorage.getItem("token_v2");
+
+    if (existingToken) {
+      setIsLoginQueue({
+        queue: true,
+        data: { existingToken: existingToken },
+      });
+    } else {
+      setIsLoginQueue({ queue: false, data: { existingToken: null } });
+      return;
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const doIn = (data?: TLoginInitialState): void => {
+    let queryWithDynamicRedirectURL = {
+      ...router.query,
+    };
+
+    if (data) {
+      if (data.data.message.length > 0) {
+        queryWithDynamicRedirectURL["redirect_url"] = data.data.message;
+      }
+    }
+
+    getCertificateList({
+      token: localStorage.getItem("token_v2"),
+    }).then((res) => {
+      const certif = JSON.parse(res.data);
+      if (!id) {
+        toast.dismiss("success");
+        toast("ID tidak boleh kosong", {
+          type: "error",
+          toastId: "error",
+          position: "top-center",
+          icon: XIcon,
+        });
+      } else {
+        if (certif[0].status == "Aktif") {
+          router.replace({
+            pathname: handleRoute("signing/v2"),
+            query: {
+              ...queryWithDynamicRedirectURL,
+            },
+          });
+        } else if (
+          certif[0].status === "Revoke" ||
+          certif[0].status === "Expired" ||
+          certif[0].status === "Enroll"
+        ) {
+          setCertifModal(true);
+        } else {
+          router.replace({
+            pathname: handleRoute("certificate-information"),
+            query: {
+              ...queryWithDynamicRedirectURL,
+              v2: "1",
+            },
+          });
+        }
+      }
+    });
+  };
 
   const onChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
@@ -151,6 +193,17 @@ const Login = () => {
       password: type.password === "password" ? "text" : "password",
     }));
   };
+
+  if (loginQueue.queue) {
+    return (
+      <LoginQueue
+        existingToken={loginQueue.data.existingToken}
+        setIsLoginQueue={setIsLoginQueue}
+        doIn={doIn}
+      />
+    );
+  }
+
   return (
     <>
       <CertifModal setCertifModal={setCertifModal} certifModal={certifModal} />
@@ -168,7 +221,7 @@ const Login = () => {
             {tilakaName?.[0]?.toUpperCase()}
           </div>
           <span className="font-bold text-xl text-[#172b4d] font-poppins">
-          {t("hi")}, {user}
+            {t("hi")}, {user}
           </span>
         </div>
         <form onSubmit={submitHandler}>
@@ -220,10 +273,18 @@ const Login = () => {
   );
 };
 
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const tokenFromHeader = context.req
+    ? context.req.headers["x-token"] || null
+    : null;
+
+  return { props: { tokenFromHeader } };
+};
+
 export default Login;
 
 const CertifModal = ({ certifModal, setCertifModal }: ModalProps) => {
-  const {t}: any = i18n
+  const { t }: any = i18n;
   return certifModal ? (
     <div
       style={{ backgroundColor: "rgba(0, 0, 0, .5)" }}
@@ -231,7 +292,7 @@ const CertifModal = ({ certifModal, setCertifModal }: ModalProps) => {
     >
       <div className="bg-white max-w-md mt-20 pt-5 px-2 pb-3 rounded-xl w-full mx-5">
         <p className="text-center font-poppins font-semibold">
-        {t("dontHaveCertifTitle")}
+          {t("dontHaveCertifTitle")}
         </p>
         <div className="flex flex-col justify-center">
           <Image
@@ -241,11 +302,11 @@ const CertifModal = ({ certifModal, setCertifModal }: ModalProps) => {
             alt="cert"
           />
           <p className="text-center font-poppins mt-5">
-          {t("dontHaveCertifSubtitle")}
+            {t("dontHaveCertifSubtitle")}
           </p>
         </div>
         <button className="bg-primary btn uppercase mt-8 disabled:opacity-50 text-white font-poppins w-full mx-auto rounded-sm h-9">
-        {t("createNewCertif")}
+          {t("createNewCertif")}
         </button>
         <button
           onClick={() => {
@@ -276,7 +337,7 @@ const AutoLogoutInfoModal: React.FC<IModal> = ({ modal, setModal }) => {
       query: { ...restRouterQuery },
     });
   };
-  const {t}: any = i18n
+  const { t }: any = i18n;
 
   return modal ? (
     <div
@@ -313,4 +374,69 @@ const AutoLogoutInfoModal: React.FC<IModal> = ({ modal, setModal }) => {
       </div>
     </div>
   ) : null;
+};
+
+type TPropsLoginQueue = {
+  existingToken: IPropsLogin["tokenFromHeader"];
+  setIsLoginQueue: React.Dispatch<
+    React.SetStateAction<{
+      queue: boolean;
+      data: {
+        existingToken: IPropsLogin["tokenFromHeader"];
+      };
+    }>
+  >;
+  doIn: (data?: TLoginInitialState) => void;
+};
+
+const LoginQueue = ({
+  existingToken,
+  setIsLoginQueue,
+  doIn,
+}: TPropsLoginQueue) => {
+  const { t }: any = i18n;
+
+  const onLoginFailed = useCallback(() => {
+    localStorage.removeItem("token_v2");
+    localStorage.removeItem("refresh_token_v2");
+    toast(t("loginQueueErrorText"), {
+      type: "error",
+      toastId: "error",
+      position: "top-center",
+      icon: XIcon,
+    });
+    setTimeout(() => {
+      setIsLoginQueue({ queue: false, data: { existingToken: null } });
+    }, 2000);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    // validate token
+    getUserName({ token: existingToken })
+      .then((_) => {
+        // token valid and redirect to authenticated page
+        localStorage.setItem("token_v2", existingToken as string);
+        doIn();
+      })
+      .catch((_) => {
+        // should check is err.status equal to 401?
+        onLoginFailed();
+      });
+  }, [existingToken, onLoginFailed]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  return (
+    <div className="min-h-screen bg-white">
+      <div className="flex justify-center items-center h-screen pb-20">
+        <Loading title={t("loginQueueProcessText")} />
+      </div>
+      <div className="bg-neutral10 w-full absolute bottom-0 flex justify-center items-center">
+        <Image
+          src={`${assetPrefix}/images/tilaka-logo.svg`}
+          width={100}
+          height={100}
+          alt="tilaka-logo"
+        />
+      </div>
+    </div>
+  );
 };
