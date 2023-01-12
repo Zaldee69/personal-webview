@@ -178,5 +178,7 @@
   "simulatorAddSignerErrorReqiredOrWrongFormat": "Form tidak lengkap atau format salah",
   "simulatorAddSignerErrorAlradyExist": "Tilaka Name sudah ditambahkan, silahkan edit ada hapus terlebih dahulu",
   "simulatorSignerPageInputPlaceholder": "Contoh: 1,2,5-9",
-  "simulatorSignerErrorTotalPage": "Tidak boleh melebihi jumlah halaman"
+  "simulatorSignerErrorTotalPage": "Tidak boleh melebihi jumlah halaman",
+  "loginQueueProcessText": "Loading proses login...",
+  "loginQueueErrorText": "Proses login gagal"
 }
