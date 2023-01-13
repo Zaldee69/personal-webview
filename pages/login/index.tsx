@@ -286,7 +286,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const uuid =
     cQuery.transaction_id || cQuery.request_id || cQuery.registration_id;
   const tokenFromHeader = context.req
-    ? context.req.headers["x-token"] || null
+    ? context.req.headers["Authorization"] || null
     : null;
 
   const checkStepResult: {

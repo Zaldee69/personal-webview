@@ -275,7 +275,7 @@ const Login = ({ tokenFromHeader }: IPropsLogin) => {
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const tokenFromHeader = context.req
-    ? context.req.headers["x-token"] || null
+    ? context.req.headers["Authorization"] || null
     : null;
 
   return { props: { tokenFromHeader } };
