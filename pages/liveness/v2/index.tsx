@@ -167,9 +167,7 @@ const Liveness = () => {
         removeStorage();
         router.push({
           pathname: handleRoute("liveness/v2/success"),
-          query: {
-            request_id: router.query.request_id,
-          },
+          query: {...router.query}
         });
       } else {
         const attempt =
@@ -193,14 +191,14 @@ const Liveness = () => {
           router.push({
             pathname: handleRoute("liveness-failure/v2"),
             query: {
-              request_id: router.query.request_id,
+                  ...router.query
             },
           });
         } else {
           router.replace({
             pathname: handleRoute("liveness-fail/v2"),
             query: {
-              request_id: router.query.request_id,
+                  ...router.query
             }
           });
         }
@@ -216,9 +214,7 @@ const Liveness = () => {
       setTimeout(() => {
         router.push({
           pathname: handleRoute("liveness-fail/v2"),
-          query: {
-            request_id: router.query.request_id,
-          },
+          query: {...router.query}
         });
       }, 5000);
     }

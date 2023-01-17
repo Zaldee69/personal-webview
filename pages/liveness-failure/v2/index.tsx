@@ -7,7 +7,7 @@ import { GetServerSideProps } from "next";
 import Head from "next/head";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import React from "react";
+import React, {useEffect} from "react";
 import Footer from "../../../components/Footer";
 import { assetPrefix } from "../../../next.config";
 import i18n from "i18";
@@ -22,11 +22,22 @@ const LivenessFailure = () => {
     routerQuery.request_id ||
     routerQuery.registration_id;
   const params = {
-    status: "F",
     register_id: uuid,
   };
-
+  
   const queryString = new URLSearchParams(params as any).toString();
+  
+  useEffect(() => {
+    if(routerQuery.redirect_url) {
+      setTimeout(() => {
+        router.push({
+          pathname: routerQuery.redirect_url as string,
+          query: queryString
+        })
+      }, 5000)
+    }
+  }, [router.isReady])
+
   return (
     <>
       <Head>
@@ -45,7 +56,7 @@ const LivenessFailure = () => {
           />
           <div className="flex flex-col items-center gap-10 ">
             <p className="text-center poppins-regular text-neutral">
-              {t("livenessFailed3xSubtitle")}
+              {t("livenessV2FailureTitle")}
             </p>
             {routerQuery.redirect_url && (
               <a

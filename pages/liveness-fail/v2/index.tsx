@@ -81,7 +81,7 @@ const LivenessFail = () => {
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
       <div className="px-5 pt-8 max-w-sm sm:w-full md:w-4/5 mx-auto">
-        <div className="flex flex-col gap-20 items-center justify-center">
+        <div className="flex flex-col gap-10 items-center justify-center">
           <h1 className="text-center poppins-semibold text-xl">
             {t("livenessFailedTitle")}
           </h1>
