@@ -13,6 +13,7 @@
   "livenessSuccessButtonTitle": "Back to Main Page",
   "livenessSubtitle": "Please ensure your face is inside the border line and follow the instructions properly",
   "livenessVerificationSubtitle": "Thank you for completing the Liveness process. The result is measured by the authenticity and suitability of the photo with the requested actions.",
+  "livenessV2FailureTitle": "Link not available, You have failed liveness 3x",
   "lookStraight": "Face facing forward",
   "loadingTitle": "Please wait…",
   "openMouth": "Mouth wide open",

@@ -8,6 +8,7 @@ import { useRouter } from "next/router";
 import React from "react";
 import { assetPrefix } from "../../../next.config";
 import i18n from "i18";
+import { useEffect } from "react";
 
 type Props = {};
 
@@ -15,6 +16,17 @@ const FormSuccess = (props: Props) => {
   const router = useRouter();
   const routerQuery = router.query;
   const {t} : any = i18n
+
+  useEffect(() => {
+    if(routerQuery.redirect_url) {
+      setTimeout(() => {
+        router.push({
+          pathname: routerQuery.redirect_url as string,
+        })
+      }, 5000)
+    }
+  }, [router.isReady])
+
   return (
     <div className="px-10 pt-16 pb-9 text-center">
       <p className="text-base poppins-semibold text-neutral800">
@@ -27,11 +39,6 @@ const FormSuccess = (props: Props) => {
           height="194px"
           alt="liveness-success-ill"
         />
-      </div>
-      <div className="mt-14">
-        <p className="poppins-regular text-xs text-neutral200">
-          {t("livenessSuccessSubtitle")}
-        </p>
       </div>
       <div className="mt-20 text-primary text-base poppins-medium underline hover:cursor-pointer">
         {routerQuery.redirect_url && (

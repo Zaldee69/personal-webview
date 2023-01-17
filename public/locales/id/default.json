@@ -13,6 +13,7 @@
   "livenessSuccessButtonTitle": "Kembali ke Halaman Utama",
   "livenessSubtitle": "Pastikan wajah di dalam garis panduan dan ikuti petunjuk dengan benar",
   "livenessVerificationSubtitle": "Terima kasih telah mengikuti proses Liveness. Hasil dinilai berdasarkan keaslian serta kesesuaian foto dengan aksi yang diminta.",
+  "livenessV2FailureTitle": "Tautan tidak tersedia, Anda telah gagal liveness 3x",
   "lookStraight": "Wajah menghadap ke depan",
   "loadingTitle": "Mohon menunggu…",
   "openMouth": "Buka mulut dengan lebar",
