@@ -569,7 +569,7 @@ export const OTPModal: React.FC<Active> = ({ modal, setModal }) => {
         toast.dismiss("loading");
         if (err.response?.status === 401) {
           router.replace({
-            pathname: "/login",
+            pathname: handleRoute("login"),
             query: { ...router.query },
           });
         } else {
@@ -585,7 +585,7 @@ export const OTPModal: React.FC<Active> = ({ modal, setModal }) => {
             localStorage.setItem("count", "0");
             restLogout({});
             router.replace({
-              pathname: "/login",
+              pathname: handleRoute("login"),
               query: { ...router.query },
             });
           }

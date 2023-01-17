@@ -207,7 +207,7 @@ const SigningWithRead = () => {
                   localStorage.removeItem("token_v2");
                   localStorage.removeItem("refresh_token_v2");
                   router.replace({
-                    pathname: "/login/v2",
+                    pathname: handleRoute("login/v2"),
                     query: { ...router.query, showAutoLogoutInfo: "1" },
                   });
                 } else {
@@ -577,7 +577,7 @@ const SigningWithoutRead = () => {
                   localStorage.removeItem("token_v2");
                   localStorage.removeItem("refresh_token_v2");
                   router.replace({
-                    pathname: "/login/v2",
+                    pathname: handleRoute("login/v2"),
                     query: { ...router.query, showAutoLogoutInfo: "1" },
                   });
                 } else {
@@ -1043,7 +1043,7 @@ const FRModal: React.FC<IModal> = ({
           localStorage.removeItem("token_v2");
           localStorage.removeItem("refresh_token_v2");
           router.replace({
-            pathname: "/login/v2",
+            pathname: handleRoute("login/v2"),
             query: { ...router.query, showAutoLogoutInfo: "1" },
           });
         } else {
@@ -1184,7 +1184,7 @@ const OTPModal: React.FC<IModal> = ({
           localStorage.removeItem("token_v2");
           localStorage.removeItem("refresh_token_v2");
           router.replace({
-            pathname: "/login/v2",
+            pathname: handleRoute("login/v2"),
             query: { ...router.query, showAutoLogoutInfo: "1" },
           });
         } else {
@@ -1251,7 +1251,7 @@ const OTPModal: React.FC<IModal> = ({
           localStorage.removeItem("token_v2");
           localStorage.removeItem("refresh_token_v2");
           router.replace({
-            pathname: "/login/v2",
+            pathname: handleRoute("login/v2"),
             query: { ...router.query, showAutoLogoutInfo: "1" },
           });
         } else {
