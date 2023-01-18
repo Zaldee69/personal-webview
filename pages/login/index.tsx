@@ -45,6 +45,7 @@ const Login = ({}: Props) => {
     queue: boolean;
     data: { existingToken: TEventMessageDataToken };
   }>(loginQueueInitial);
+  const [doInManual, setDoInManual] = useState<boolean>(false);
   const { t }: any = i18n;
   const dispatch: AppDispatch = useDispatch();
   const data = useSelector((state: RootState) => state.login);
@@ -104,7 +105,6 @@ const Login = ({}: Props) => {
         });
       } else {
         setLoginQueue(loginQueueInitial);
-        return;
       }
     };
     const onLoad = () => {
@@ -126,6 +126,8 @@ const Login = ({}: Props) => {
     };
 
     if (data) {
+      setDoInManual(true);
+
       if (data.data.message.length > 0) {
         queryWithDynamicRedirectURL["redirect_url"] = data.data.message;
       }
@@ -206,7 +208,7 @@ const Login = ({}: Props) => {
     }));
   };
 
-  if (loginQueue.queue) {
+  if (!doInManual && loginQueue.queue) {
     return (
       <LoginQueue
         existingToken={loginQueue.data.existingToken}
@@ -302,9 +304,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const cQuery = context.query;
   const uuid =
     cQuery.transaction_id || cQuery.request_id || cQuery.registration_id;
-  const tokenFromHeader = context.req
-    ? context.req.headers["authorization"] || null
-    : null;
 
   const checkStepResult: {
     res?: TKycCheckStepResponseData;
@@ -332,7 +331,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   serverSideRenderReturnConditionsResult["props"] = {
     ...serverSideRenderReturnConditionsResult["props"],
-    tokenFromHeader,
   };
 
   return serverSideRenderReturnConditionsResult;
