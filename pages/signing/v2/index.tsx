@@ -1092,6 +1092,7 @@ const FRModal: React.FC<IModal> = ({
             setIsFRSuccess={setIsFRSuccess}
             signingFailedRedirectTo={handleRoute("login/v2")}
             tokenIdentifier="token_v2"
+            countIdentifier="count_v2"
             callbackCaptureProcessor={captureProcessor}
           />
           <button

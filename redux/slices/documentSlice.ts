@@ -14,7 +14,7 @@ const initialState: TDocumentResponse = {
       width: 0,
       height: 0,
       tandaTangan: "",
-      page_number: 0
+      page_number: 0,
     },
     status: "IDDLE",
   },
@@ -23,7 +23,7 @@ const initialState: TDocumentResponse = {
 export const getDocument = createAsyncThunk(
   "personal/document",
   async ({ transaction_id, company_id, token }: TDocumentProps) => {
-    API.defaults.headers.common["Authorization"] =`Bearer ${token}`
+    API.defaults.headers.common["Authorization"] = `Bearer ${token}`;
     const res = API.post("receiveDocument", {
       transaction_id,
       company_id,
@@ -42,13 +42,15 @@ const documentSlice = createSlice({
         state.response.status = "PENDING";
       })
       .addCase(getDocument.fulfilled, (state, { payload }) => {
-          state.response = payload.data;
-          state.response.status = "FULLFILLED";
+        state.response = payload.data;
+        state.response.status = "FULLFILLED";
       })
       .addCase(getDocument.rejected, (state) => {
         state.response.status = "REJECTED";
       });
   },
 });
+
+export { initialState as initialStateDocumentSlice };
 
 export default documentSlice.reducer;

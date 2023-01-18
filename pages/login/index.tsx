@@ -22,16 +22,18 @@ import { serverSideRenderReturnConditions } from "@/utils/serverSideRenderReturn
 import i18n from "i18";
 import Loading from "@/components/Loading";
 
-type Props = {
-  tokenFromHeader: string | null;
-};
+type Props = {};
 
 type ModalProps = {
   certifModal: boolean;
   setCertifModal: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const Login = ({ tokenFromHeader }: Props) => {
+type TEventMessageDataToken = string | undefined;
+
+const loginQueueInitial = { queue: false, data: { existingToken: undefined } };
+
+const Login = ({}: Props) => {
   const [password, setPassword] = useState<string>("");
   const [tilakaName, setTilakaName] = useState("");
   const [certifModal, setCertifModal] = useState<boolean>(false);
@@ -39,10 +41,10 @@ const Login = ({ tokenFromHeader }: Props) => {
     password: "password",
   });
   const [rememberMe, setRememberMe] = useState<boolean>(false);
-  const [loginQueue, setIsLoginQueue] = useState<{
+  const [loginQueue, setLoginQueue] = useState<{
     queue: boolean;
-    data: { existingToken: Props["tokenFromHeader"] };
-  }>({ queue: false, data: { existingToken: null } });
+    data: { existingToken: TEventMessageDataToken };
+  }>(loginQueueInitial);
   const { t }: any = i18n;
   const dispatch: AppDispatch = useDispatch();
   const data = useSelector((state: RootState) => state.login);
@@ -89,18 +91,33 @@ const Login = ({ tokenFromHeader }: Props) => {
   }, [data.status]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    const existingToken: Props["tokenFromHeader"] =
-      tokenFromHeader || localStorage.getItem("token");
+    const parentWindow = window.parent;
 
-    if (existingToken) {
-      setIsLoginQueue({
-        queue: true,
-        data: { existingToken: existingToken },
-      });
-    } else {
-      setIsLoginQueue({ queue: false, data: { existingToken: null } });
-      return;
-    }
+    const receiveMessage = (event: MessageEvent) => {
+      const existingToken: TEventMessageDataToken =
+        event.data.token || localStorage.getItem("token");
+
+      if (existingToken) {
+        setLoginQueue({
+          queue: true,
+          data: { existingToken: existingToken },
+        });
+      } else {
+        setLoginQueue(loginQueueInitial);
+        return;
+      }
+    };
+    const onLoad = () => {
+      parentWindow.postMessage("shakehand", "*");
+    };
+
+    window.addEventListener("message", receiveMessage);
+    window.addEventListener("load", onLoad);
+
+    return () => {
+      window.removeEventListener("message", receiveMessage);
+      window.removeEventListener("load", onLoad);
+    };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const doIn = (data?: TLoginInitialState): void => {
@@ -193,7 +210,7 @@ const Login = ({ tokenFromHeader }: Props) => {
     return (
       <LoginQueue
         existingToken={loginQueue.data.existingToken}
-        setIsLoginQueue={setIsLoginQueue}
+        setLoginQueue={setLoginQueue}
         doIn={doIn}
       />
     );
@@ -363,12 +380,12 @@ const CertifModal = ({ certifModal, setCertifModal }: ModalProps) => {
 };
 
 type TPropsLoginQueue = {
-  existingToken: Props["tokenFromHeader"];
-  setIsLoginQueue: React.Dispatch<
+  existingToken: TEventMessageDataToken;
+  setLoginQueue: React.Dispatch<
     React.SetStateAction<{
       queue: boolean;
       data: {
-        existingToken: Props["tokenFromHeader"];
+        existingToken: TEventMessageDataToken;
       };
     }>
   >;
@@ -377,7 +394,7 @@ type TPropsLoginQueue = {
 
 const LoginQueue = ({
   existingToken,
-  setIsLoginQueue,
+  setLoginQueue,
   doIn,
 }: TPropsLoginQueue) => {
   const { t }: any = i18n;
@@ -392,7 +409,7 @@ const LoginQueue = ({
       icon: XIcon,
     });
     setTimeout(() => {
-      setIsLoginQueue({ queue: false, data: { existingToken: null } });
+      setLoginQueue(loginQueueInitial);
     }, 2000);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
