@@ -62,6 +62,7 @@ const Login = ({}: IPropsLogin) => {
     queue: boolean;
     data: { existingToken: TEventMessageDataToken };
   }>(loginQueueInitial);
+  const [doInManual, setDoInManual] = useState<boolean>(false);
   const dispatch: AppDispatch = useDispatch();
   const data = useSelector((state: RootState) => state.login);
   const router = useRouter();
@@ -119,7 +120,6 @@ const Login = ({}: IPropsLogin) => {
         });
       } else {
         setLoginQueue(loginQueueInitial);
-        return;
       }
     };
     const onLoad = () => {
@@ -141,6 +141,8 @@ const Login = ({}: IPropsLogin) => {
     };
 
     if (data) {
+      setDoInManual(true);
+
       if (data.data.message.length > 0) {
         queryWithDynamicRedirectURL["redirect_url"] = data.data.message;
       }
@@ -211,7 +213,7 @@ const Login = ({}: IPropsLogin) => {
     }));
   };
 
-  if (loginQueue.queue) {
+  if (!doInManual && loginQueue.queue) {
     return (
       <LoginQueue
         existingToken={loginQueue.data.existingToken}
@@ -291,11 +293,7 @@ const Login = ({}: IPropsLogin) => {
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const tokenFromHeader = context.req
-    ? context.req.headers["authorization"] || null
-    : null;
-
-  return { props: { tokenFromHeader } };
+  return { props: {} };
 };
 
 export default Login;
