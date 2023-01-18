@@ -62,7 +62,7 @@ const Login = ({}: IPropsLogin) => {
     queue: boolean;
     data: { existingToken: TEventMessageDataToken };
   }>(loginQueueInitial);
-  const [doInManual, setDoInManual] = useState<boolean>(false);
+  const [doInAuto, setDoInAuto] = useState<boolean>(false);
   const dispatch: AppDispatch = useDispatch();
   const data = useSelector((state: RootState) => state.login);
   const router = useRouter();
@@ -110,8 +110,14 @@ const Login = ({}: IPropsLogin) => {
     const parentWindow = window.parent;
 
     const receiveMessage = (event: MessageEvent) => {
+      const dataToken = event.data.token;
       const existingToken: TEventMessageDataToken =
-        event.data.token || localStorage.getItem("token_v2");
+        dataToken || localStorage.getItem("token_v2");
+
+      // rendered by iframe
+      if (dataToken) {
+        setDoInAuto(true);
+      }
 
       if (existingToken) {
         setLoginQueue({
@@ -141,7 +147,7 @@ const Login = ({}: IPropsLogin) => {
     };
 
     if (data) {
-      setDoInManual(true);
+      setDoInAuto(false);
 
       if (data.data.message.length > 0) {
         queryWithDynamicRedirectURL["redirect_url"] = data.data.message;
@@ -213,7 +219,7 @@ const Login = ({}: IPropsLogin) => {
     }));
   };
 
-  if (!doInManual && loginQueue.queue) {
+  if (doInAuto && loginQueue.queue) {
     return (
       <LoginQueue
         existingToken={loginQueue.data.existingToken}
