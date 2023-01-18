@@ -45,7 +45,7 @@ const Login = ({}: Props) => {
     queue: boolean;
     data: { existingToken: TEventMessageDataToken };
   }>(loginQueueInitial);
-  const [doInManual, setDoInManual] = useState<boolean>(false);
+  const [doInAuto, setDoInAuto] = useState<boolean>(false);
   const { t }: any = i18n;
   const dispatch: AppDispatch = useDispatch();
   const data = useSelector((state: RootState) => state.login);
@@ -95,8 +95,14 @@ const Login = ({}: Props) => {
     const parentWindow = window.parent;
 
     const receiveMessage = (event: MessageEvent) => {
+      const dataToken = event.data.token;
       const existingToken: TEventMessageDataToken =
-        event.data.token || localStorage.getItem("token");
+        dataToken || localStorage.getItem("token");
+
+      // rendered by iframe
+      if (dataToken) {
+        setDoInAuto(true);
+      }
 
       if (existingToken) {
         setLoginQueue({
@@ -126,7 +132,7 @@ const Login = ({}: Props) => {
     };
 
     if (data) {
-      setDoInManual(true);
+      setDoInAuto(false);
 
       if (data.data.message.length > 0) {
         queryWithDynamicRedirectURL["redirect_url"] = data.data.message;
@@ -208,7 +214,7 @@ const Login = ({}: Props) => {
     }));
   };
 
-  if (!doInManual && loginQueue.queue) {
+  if (doInAuto && loginQueue.queue) {
     return (
       <LoginQueue
         existingToken={loginQueue.data.existingToken}
