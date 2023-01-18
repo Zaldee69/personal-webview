@@ -26,9 +26,7 @@ import i18n from "i18";
 import { GetServerSideProps } from "next";
 import Loading from "@/components/Loading";
 
-interface IPropsLogin {
-  tokenFromHeader: string | null;
-}
+interface IPropsLogin {}
 
 interface IParameterFromRequestSign {
   user?: string;
@@ -47,7 +45,11 @@ type ModalProps = {
   setCertifModal: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const Login = ({ tokenFromHeader }: IPropsLogin) => {
+type TEventMessageDataToken = string | undefined;
+
+const loginQueueInitial = { queue: false, data: { existingToken: undefined } };
+
+const Login = ({}: IPropsLogin) => {
   const [password, setPassword] = useState<string>("");
   const [tilakaName, setTilakaName] = useState("");
   const [certifModal, setCertifModal] = useState<boolean>(false);
@@ -56,10 +58,10 @@ const Login = ({ tokenFromHeader }: IPropsLogin) => {
   });
   const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
   const [autoLogoutModal, setAutoLogoutModal] = useState<boolean>(false);
-  const [loginQueue, setIsLoginQueue] = useState<{
+  const [loginQueue, setLoginQueue] = useState<{
     queue: boolean;
-    data: { existingToken: IPropsLogin["tokenFromHeader"] };
-  }>({ queue: false, data: { existingToken: null } });
+    data: { existingToken: TEventMessageDataToken };
+  }>(loginQueueInitial);
   const dispatch: AppDispatch = useDispatch();
   const data = useSelector((state: RootState) => state.login);
   const router = useRouter();
@@ -104,18 +106,33 @@ const Login = ({ tokenFromHeader }: IPropsLogin) => {
   }, [data.status]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    const existingToken: IPropsLogin["tokenFromHeader"] =
-      tokenFromHeader || localStorage.getItem("token_v2");
+    const parentWindow = window.parent;
 
-    if (existingToken) {
-      setIsLoginQueue({
-        queue: true,
-        data: { existingToken: existingToken },
-      });
-    } else {
-      setIsLoginQueue({ queue: false, data: { existingToken: null } });
-      return;
-    }
+    const receiveMessage = (event: MessageEvent) => {
+      const existingToken: TEventMessageDataToken =
+        event.data.token || localStorage.getItem("token_v2");
+
+      if (existingToken) {
+        setLoginQueue({
+          queue: true,
+          data: { existingToken: existingToken },
+        });
+      } else {
+        setLoginQueue(loginQueueInitial);
+        return;
+      }
+    };
+    const onLoad = () => {
+      parentWindow.postMessage("shakehand", "*");
+    };
+
+    window.addEventListener("message", receiveMessage);
+    window.addEventListener("load", onLoad);
+
+    return () => {
+      window.removeEventListener("message", receiveMessage);
+      window.removeEventListener("load", onLoad);
+    };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const doIn = (data?: TLoginInitialState): void => {
@@ -198,7 +215,7 @@ const Login = ({ tokenFromHeader }: IPropsLogin) => {
     return (
       <LoginQueue
         existingToken={loginQueue.data.existingToken}
-        setIsLoginQueue={setIsLoginQueue}
+        setLoginQueue={setLoginQueue}
         doIn={doIn}
       />
     );
@@ -377,12 +394,12 @@ const AutoLogoutInfoModal: React.FC<IModal> = ({ modal, setModal }) => {
 };
 
 type TPropsLoginQueue = {
-  existingToken: IPropsLogin["tokenFromHeader"];
-  setIsLoginQueue: React.Dispatch<
+  existingToken: TEventMessageDataToken;
+  setLoginQueue: React.Dispatch<
     React.SetStateAction<{
       queue: boolean;
       data: {
-        existingToken: IPropsLogin["tokenFromHeader"];
+        existingToken: TEventMessageDataToken;
       };
     }>
   >;
@@ -391,7 +408,7 @@ type TPropsLoginQueue = {
 
 const LoginQueue = ({
   existingToken,
-  setIsLoginQueue,
+  setLoginQueue,
   doIn,
 }: TPropsLoginQueue) => {
   const { t }: any = i18n;
@@ -406,7 +423,7 @@ const LoginQueue = ({
       icon: XIcon,
     });
     setTimeout(() => {
-      setIsLoginQueue({ queue: false, data: { existingToken: null } });
+      setLoginQueue(loginQueueInitial);
     }, 2000);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 

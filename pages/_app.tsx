@@ -9,6 +9,11 @@ import Script from "next/script";
 import i18n from "../i18";
 import { useEffect, useState } from "react";
 import DisconnectModal from "@/components/atoms/DisconnectModal";
+import { initialStateCertificateSlice } from "@/redux/slices/certificateSlice";
+import { initialStateDocumentSlice } from "@/redux/slices/documentSlice";
+import { initialStateLivenessSlice } from "@/redux/slices/livenessSlice";
+import { initialStateLoginSlice } from "@/redux/slices/loginSlice";
+import { initialStateSignatureSlice } from "@/redux/slices/signatureSlice";
 
 type TcontextClass = {
   success: string;
@@ -54,7 +59,16 @@ function MyApp({ Component, pageProps }: AppProps) {
           strategy="beforeInteractive"
         ></Script>
         <DisconnectModal />
-        <Provider store={store}>
+        <Provider
+          store={store}
+          serverState={{
+            certificate: initialStateCertificateSlice,
+            document: initialStateDocumentSlice,
+            liveness: initialStateLivenessSlice,
+            login: initialStateLoginSlice,
+            signature: initialStateSignatureSlice,
+          }}
+        >
           <ToastContainer
             toastClassName={(context: any) =>
               contextClass[

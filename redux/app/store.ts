@@ -1,23 +1,39 @@
 import { configureStore } from "@reduxjs/toolkit";
-import loginSlice from "../slices/loginSlice";
-import certificateSlice from "../slices/certificateSlice";
-import documentSlice from "../slices/documentSlice";
-import signatureSlice from "../slices/signatureSlice";
-import livenessSlice from "../slices/livenessSlice";
+import loginSlice, { initialStateLoginSlice } from "../slices/loginSlice";
+import certificateSlice, {
+  initialStateCertificateSlice,
+} from "../slices/certificateSlice";
+import documentSlice, {
+  initialStateDocumentSlice,
+} from "../slices/documentSlice";
+import signatureSlice, {
+  initialStateSignatureSlice,
+} from "../slices/signatureSlice";
+import livenessSlice, {
+  initialStateLivenessSlice,
+} from "../slices/livenessSlice";
+
 export const store = configureStore({
   reducer: {
-    login : loginSlice,
-    document : documentSlice,
+    login: loginSlice,
+    document: documentSlice,
     certificate: certificateSlice,
-    signature : signatureSlice,
+    signature: signatureSlice,
     liveness: livenessSlice,
   },
   middleware: (getDefaultMiddleware) =>
-  getDefaultMiddleware({
-    serializableCheck: false
-  }).concat(),
+    getDefaultMiddleware({
+      serializableCheck: false,
+    }).concat(),
+  preloadedState: {
+    certificate: initialStateCertificateSlice,
+    document: initialStateDocumentSlice,
+    liveness: initialStateLivenessSlice,
+    login: initialStateLoginSlice,
+    signature: initialStateSignatureSlice,
+  },
 });
 
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
-export default store
+export default store;
