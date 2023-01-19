@@ -181,5 +181,7 @@
   "simulatorSignerPageInputPlaceholder": "Example: 1,2,5-9",
   "simulatorSignerErrorTotalPage": "Cannot exceed the number of pages",
   "loginQueueProcessText": "Loading login process...",
-  "loginQueueErrorText": "Login process failed"
+  "loginQueueErrorText": "Login process failed",
+  "linkAccountConsentText": "By carrying out this process, you have given consent to PT TILAKA NUSA TEKNOLOGI (“TILAKA”) to provide your Personal Data to Business Partners or other third parties, whose services, sites or applications have collaborated with TILAKA in order to provide Signature Services. Tilaka electronics through API integration. We will only do this if you use the services, sites or applications of these Business Partners or other third parties to use the Tilaka Electronic Signature Service.",
+  "customerConsentText": "Customer Consent"
 }
