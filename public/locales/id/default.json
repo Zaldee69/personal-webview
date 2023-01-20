@@ -181,5 +181,7 @@
   "simulatorSignerPageInputPlaceholder": "Contoh: 1,2,5-9",
   "simulatorSignerErrorTotalPage": "Tidak boleh melebihi jumlah halaman",
   "loginQueueProcessText": "Loading proses login...",
-  "loginQueueErrorText": "Proses login gagal"
+  "loginQueueErrorText": "Proses login gagal",
+  "linkAccountConsentText": "Dengan melakukan proses ini, Anda telah memberikan persetujuan kepada PT TILAKA NUSA TEKNOLOGI (“TILAKA”) untuk menyediakan Data Pribadi Anda kepada Mitra Usaha atau pihak ketiga lainnya, yang layanan, situs, atau aplikasinya telah bekerja sama dengan TILAKA dalam rangka menyediakan Layanan Tanda Tangan Elektronik Tilaka melalui integrasi API. Hal tersebut hanya akan kami lakukan jika Anda menggunakan layanan, situs, atau aplikasi Mitra Usaha atau pihak ketiga lainnya tersebut untuk menggunakan Layanan Tanda Tangan Elektronik Tilaka.",
+  "customerConsentText": "Customer Consent"
 }

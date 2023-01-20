@@ -19,6 +19,7 @@ module.exports = {
       error: "rgba(255, 86, 48, 1)",
       black: "#000",
       neutral10: "#FAFBFC",
+      neutral20: "#F4F5F7",
       neutral30: "#EBECF0",
       neutral40: "#DFE1E6",
       neutral50: "#C1C7D0",
