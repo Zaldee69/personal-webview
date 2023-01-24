@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import EyeIcon from "./../../public/icons/EyeIcon";
 import EyeIconOff from "./../../public/icons/EyeIconOff";
-import { useRouter } from "next/router";
+import Router, { useRouter } from "next/router";
 import { AppDispatch, RootState } from "@/redux/app/store";
 import { useDispatch, useSelector } from "react-redux";
 import { login } from "@/redux/slices/loginSlice";
@@ -10,14 +10,26 @@ import Head from "next/head";
 import { TLoginProps } from "@/interface/interface";
 import { assetPrefix } from "../../next.config";
 import { handleRoute } from "./../../utils/handleRoute";
-import { getCertificateList, getUserName } from "infrastructure/rest/b2b";
+import {
+  getCertificateList,
+  getUserName,
+  restLogout,
+} from "infrastructure/rest/b2b";
 import { GetServerSideProps } from "next";
 import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
 import { RestKycCheckStep } from "infrastructure";
 import { serverSideRenderReturnConditions } from "@/utils/serverSideRenderReturnConditions";
-import  FRCamera  from '@/components/FRCamera';
+import FRCamera from "@/components/FRCamera";
 import i18n from "i18";
 import { toast } from "react-toastify";
+import { RestPersonalFaceRecognition } from "infrastructure/rest/personal/index";
+import XIcon from "@/public/icons/XIcon";
+
+import {
+  setFRFailedCount,
+  getFRFailedCount,
+  resetFRFailedCount,
+} from "@/utils/frFailedCountGetterSetter";
 
 type Props = {};
 
@@ -29,7 +41,9 @@ type Tform = {
 type IModal = {
   modal: boolean;
   setModal: React.Dispatch<React.SetStateAction<boolean>>;
-}
+  formSetter: React.Dispatch<React.SetStateAction<Tform>>;
+  tilakaName: string;
+};
 
 const LinkAccount = (props: Props) => {
   const router = useRouter();
@@ -37,7 +51,7 @@ const LinkAccount = (props: Props) => {
   const [showPassword, showPasswordSetter] = useState<boolean>(false);
   const [nikRegistered, nikRegisteredSetter] = useState<boolean>(true);
   const [form, formSetter] = useState<Tform>({ tilaka_name: "", password: "" });
-  const [modal, setModal] = useState<boolean>(false)
+  const [modal, setModal] = useState<boolean>(false);
   const { nik, request_id, signing, setting, is_penautan, ...restRouterQuery } =
     router.query;
   const dispatch: AppDispatch = useDispatch();
@@ -118,26 +132,30 @@ const LinkAccount = (props: Props) => {
           }
         });
       } else {
-        if(is_penautan === "true"){
-          setModal(true)
-        }else {
+        if (data.data.data[2] === "penautan") {
+          setModal(true);
+        } else {
           router.replace({
             pathname: handleRoute("link-account/success"),
             query: { ...queryWithDynamicRedirectURL },
-          })
+          });
         }
       }
     } else if (
-      (data.data.message ===
-        `Invalid Username / Password for Tilaka Name ${form?.tilaka_name}` &&
-        data.status === "FULLFILLED" &&
-        !data.data.success) ||
-      (data.data.message === "User Not Found" &&
-        data.status === "FULLFILLED" &&
-        !data.data.success)
+      data.status === "FULLFILLED" &&
+      !data.data.success && 
+      (data.data.message === `Invalid Username / Password for Tilaka Name ${form?.tilaka_name}` 
+      || data.data.message === "User Not Found" 
+      || data.data.message === "NIK Not Equals ON Tilaka System" )
     ) {
       toast.dismiss();
       toast.error(t("invalidUsernamePassword"));
+    } else if (
+      data.data.message === "Sudah melakukan penautan" &&
+      data.status === "FULLFILLED" &&
+      !data.data.success
+    ) {
+      toast.error(data.data.message, { icon: <XIcon /> });
     } else if (
       data.status === "REJECTED" ||
       (data.status === "FULLFILLED" && !data.data.success)
@@ -269,52 +287,125 @@ const LinkAccount = (props: Props) => {
           />
         </div>
       </div>
-      <FRModal modal={modal} setModal={setModal} />
+      <FRModal
+        formSetter={formSetter}
+        tilakaName={form.tilaka_name}
+        modal={modal}
+        setModal={setModal}
+      />
     </>
   );
 };
 
-
-const FRModal = ({modal, setModal}: IModal) => {
-
+const FRModal = ({ modal, setModal, tilakaName, formSetter }: IModal) => {
   const [isFRSuccess, setIsFRSuccess] = useState<boolean>(false);
+  const controller = new AbortController();
 
   const { t }: any = i18n;
+  const router = useRouter();
 
-  const captureProcessor = () => {}
+  const captureProcessor = (base64Img: string | null | undefined) => {
+    const payload = {
+      registerId: router.query.request_id as string,
+      tilakaName: tilakaName,
+      faceImage: base64Img?.split(",")[1] as string,
+    };
+
+    const doRedirect = (path: string) => {
+      router.push({
+        pathname: handleRoute(path),
+        query: { ...router.query },
+      });
+    };
+
+    RestPersonalFaceRecognition({ payload })
+      .then((res) => {
+        if (res.success) {
+          toast.dismiss("info");
+          toast(res.message, {
+            type: "success",
+            position: "top-center",
+          });
+          setIsFRSuccess(true);
+          resetFRFailedCount("count");
+          doRedirect("link-account/success");
+        } else {
+          setIsFRSuccess(false);
+          setModal(false);
+          if (res.message === "Gagal Validasi Wajah") {
+            setTimeout(() => {
+              setModal(true);
+            }, 100);
+          }
+          toast.dismiss("info");
+          toast.error(res.message, { icon: <XIcon /> });
+          const doCounting: number = getFRFailedCount("count") + 1;
+          setFRFailedCount("count", doCounting);
+          const newCount: number = getFRFailedCount("count");
+          if (newCount >= 5) {
+            doRedirect("link-account/failure");
+          }
+        }
+      })
+      .catch((err) => {
+        setModal(false);
+        toast.dismiss("info");
+        if (err.response?.status === 401) {
+          toast.error(err.response?.data?.message, { icon: <XIcon /> });
+        } else {
+          toast.error(err.response?.data?.message || "Gagal validasi wajah", {
+            icon: <XIcon />,
+          });
+          const doCounting: number = getFRFailedCount("count") + 1;
+          setFRFailedCount("count", doCounting);
+          const newCount: number = getFRFailedCount("count");
+          if (newCount >= 5) {
+            doRedirect("link-account/failure");
+          }
+        }
+      });
+  };
 
   return modal ? (
     <div
-    style={{ backgroundColor: "rgba(0, 0, 0, .5)" }}
-    className="fixed z-50 flex items-start transition-all duration-1000 justify-center w-full left-0 top-0 h-full "
-  >
-    <div className="bg-white max-w-md mt-20 pt-5 px-2 pb-3 rounded-md w-full mx-5 ">
-      <>
-        <p className="font-poppins block text-center font-semibold ">
-          {t("linkingAccount")}
-        </p>
-        <span className="font-poppins mt-2 block text-center text-sm font-normal">
-          {t("frSubtitle3")}
-        </span>
-        <FRCamera
-          setModal={setModal}
-          setIsFRSuccess={setIsFRSuccess}
-          signingFailedRedirectTo={handleRoute("login/v2")}
-          tokenIdentifier="token_v2"
-          callbackCaptureProcessor={captureProcessor}
-        />
-        <button
-          onClick={() => setModal(!modal)}
-          className="bg-primary btn uppercase text-white font-poppins w-full mt-5 mx-auto rounded-sm h-9 font-semibold hover:opacity-50"
-        >
-          {t("cancel")}
-        </button>
-      </>
+      style={{ backgroundColor: "rgba(0, 0, 0, .5)" }}
+      className="fixed z-50 flex items-start transition-all duration-1000 justify-center w-full left-0 top-0 h-full "
+    >
+      <div className="bg-white max-w-md mt-20 pt-5 px-2 pb-3 rounded-md w-full mx-5 ">
+        <>
+          <p className="font-poppins block text-center font-semibold ">
+            {t("linkingAccount")}
+          </p>
+          <span className="font-poppins mt-2 block text-center text-sm font-normal">
+            {t("frSubtitle3")}
+          </span>
+          <FRCamera
+            setModal={setModal}
+            setIsFRSuccess={setIsFRSuccess}
+            signingFailedRedirectTo={handleRoute("login/v2")}
+            tokenIdentifier="token_v2"
+            callbackCaptureProcessor={captureProcessor}
+          />
+          <button
+            onClick={() => {
+              controller.abort();
+              toast.dismiss("info");
+              restLogout({});
+              setModal(!modal);
+              formSetter({
+                tilaka_name: "",
+                password: "",
+              });
+            }}
+            className="bg-primary btn uppercase text-white font-poppins w-full mt-5 mx-auto rounded-sm h-9 font-semibold hover:opacity-50"
+          >
+            {t("cancel")}
+          </button>
+        </>
+      </div>
     </div>
-  </div> 
-    ) : null
-
-}
+  ) : null;
+};
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const cQuery = context.query;

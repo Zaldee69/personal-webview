@@ -9,6 +9,9 @@ import {
   TPersonalResetPasswordResponseData,
   TPersonalSetPasswordRequestData,
   TPersonalSetPasswordResponseData,
+  TPersonalFaceRecognitionRequestData,
+  TPersonalFaceRecognitionResponseData,
+  TPersonalCheckStepv2Response,
 } from "./types";
 
 const BASE_URL =
@@ -79,6 +82,45 @@ export const RestPersonalSetPassword = ({
 }): Promise<TPersonalSetPasswordResponseData> => {
   return axios
     .post<TPersonalSetPasswordResponseData>(`${BASE_URL}/setPassword`, payload)
+    .then((res) => res.data)
+    .catch((err) => {
+      throw err;
+    });
+};
+
+export const RestPersonalFaceRecognition = ({
+  payload,
+}: {
+  payload: TPersonalFaceRecognitionRequestData;
+}): Promise<TPersonalFaceRecognitionResponseData> => {
+  return axios
+    .post<TPersonalSetPasswordResponseData>(
+      `http://10.117.1.151:8080/v1/ekyc/face-verification`,
+      payload,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem(
+            "token"
+          )}`,
+        },
+      }
+    )
+    .then((res) => res.data)
+    .catch((err) => {
+      throw err;
+    });
+};
+
+export const RestKycCheckStepv2 = ({
+  registerId,
+}: {
+  registerId: string;
+}): Promise<TPersonalCheckStepv2Response> => {
+  return axios
+    .post<TPersonalCheckStepv2Response>(
+      `http://10.117.1.151:8080/v1/ekyc/checkstep`,
+      { registerId },
+    )
     .then((res) => res.data)
     .catch((err) => {
       throw err;
