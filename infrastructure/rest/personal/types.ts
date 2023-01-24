@@ -42,3 +42,25 @@ export type TPersonalSetPasswordResponseData = {
   message: string;
   data: null;
 };
+
+
+export type TPersonalFaceRecognitionRequestData = {
+  registerId: string
+  tilakaName: string
+  faceImage: string
+}
+
+export type TPersonalFaceRecognitionResponseData = {
+  success: boolean
+  message: string
+}
+
+export type TPersonalCheckStepv2Response = {
+  success: boolean
+  message: string
+  data: {
+    token: string
+    status: string
+    route: string
+  }
+}
