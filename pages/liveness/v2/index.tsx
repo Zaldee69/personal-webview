@@ -124,8 +124,7 @@ const Liveness = () => {
       } else {
         setIsDisabled(true);
         setIsGenerateAction(true);
-        toast.dismiss("loading");
-        toast("Pembuatan daftar aksi gagal", {
+        toast("Request telah liveness", {
           type: "error",
           autoClose: 5000,
           position: "top-center",
