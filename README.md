@@ -12,7 +12,7 @@
 
 - **SERVER_SIDE_CHECKSTEP**
 
-  1. `/certificate-information`
+  1. `/liveness`
   2. `/certificate-information`
   3. `/form/success`
   4. `/link-account`

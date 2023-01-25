@@ -118,7 +118,7 @@ export const RestKycCheckStepv2 = ({
 }): Promise<TPersonalCheckStepv2Response> => {
   return axios
     .post<TPersonalCheckStepv2Response>(
-      `${BASE_URL}/ekyc/checkstep`,
+      `${BASE_URL}/checkstep`,
       { registerId },
     )
     .then((res) => res.data)
