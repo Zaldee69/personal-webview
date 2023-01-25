@@ -28,6 +28,8 @@ import { serverSideRenderReturnConditions } from "@/utils/serverSideRenderReturn
 import { concateRedirectUrlParams } from "@/utils/concateRedirectUrlParams";
 import i18n from "i18";
 import Loading from "@/components/Loading";
+import { TPersonalCheckStepv2Response } from "infrastructure/rest/personal/types";
+import { RestKycCheckStepv2 } from "infrastructure/rest/personal";
 
 type TFontSig =
   | "Adine-Kirnberg"
@@ -148,6 +150,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const cQuery = context.query;
   const uuid =
     cQuery.transaction_id || cQuery.request_id || cQuery.registration_id;
+  const params = { ...cQuery, registration_id: uuid };
+  const queryString = new URLSearchParams(params as any).toString();
 
   const checkStepResult: {
     res?: TKycCheckStepResponseData;
@@ -169,6 +173,22 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     .catch((err) => {
       return { err };
     });
+
+    const checkStepForLinkAccountResult: TPersonalCheckStepv2Response = await RestKycCheckStepv2({
+      registerId: uuid as string,
+    })
+      .then((res) => res)
+      .catch((err) => err);
+  
+    if (checkStepForLinkAccountResult?.data?.route === "penautan") {
+      return {
+        redirect: {
+          permanent: false,
+          destination: handleRoute("link-account?" + queryString),
+        },
+        props: {},
+      };
+    }
 
   return serverSideRenderReturnConditions({ context, checkStepResult });
 };

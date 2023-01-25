@@ -30,6 +30,9 @@ import { ActionGuide1, ActionGuide2 } from "@/components/atoms/ActionGuide";
 import { actionText } from "@/utils/actionText";
 import { assetPrefix } from "next.config";
 import ImageDebugger from "@/components/ImageDebugger";
+import { GetServerSideProps } from "next";
+import { RestKycCheckStepv2 } from "infrastructure/rest/personal";
+import { TPersonalCheckStepv2Response } from "infrastructure/rest/personal/types";
 
 type TQueryParams = {
   request_id?: string;
@@ -237,21 +240,21 @@ const Liveness = () => {
                 routerQuery.redirect_url as string,
                 queryString
               );
-            } else if (res.data.status === "F" && routerQuery.dashboard_url){
+            } else if (res.data.status === "F" && routerQuery.dashboard_url) {
               // Redirect berdasarkan redirect-url
-              
+
               const params: TQueryParams = {
                 request_id: routerQuery.request_id as string,
                 reason_code: res.data.reason_code as string,
               };
               const queryString = new URLSearchParams(params as any).toString();
-              const { hostname } = new URL(routerQuery.dashboard_url as string)
-              
-              if(hostname === 'tilaka.id' || hostname.endsWith("tilaka.id")){
+              const { hostname } = new URL(routerQuery.dashboard_url as string);
+
+              if (hostname === "tilaka.id" || hostname.endsWith("tilaka.id")) {
                 window.top!.location.href = concateRedirectUrlParams(
                   routerQuery.dashboard_url as string,
                   queryString
-                  );
+                );
               }
             } else {
               const query: TQueryParams = {
@@ -344,9 +347,9 @@ const Liveness = () => {
               }
 
               const queryString = new URLSearchParams(params as any).toString();
-              const { hostname } = new URL(routerQuery.dashboard_url as string)
-              
-              if(hostname === 'tilaka.id' || (hostname).endsWith("tilaka.id")){
+              const { hostname } = new URL(routerQuery.dashboard_url as string);
+
+              if (hostname === "tilaka.id" || hostname.endsWith("tilaka.id")) {
                 window.top!.location.href = concateRedirectUrlParams(
                   routerQuery.dashboard_url as string,
                   queryString
@@ -410,7 +413,6 @@ const Liveness = () => {
             position: "top-center",
           });
 
-
           const query: TQueryParams = {
             ...routerQuery,
             request_id: router.query.request_id as string,
@@ -466,9 +468,14 @@ const Liveness = () => {
                   const queryString = new URLSearchParams(
                     params as any
                   ).toString();
-                  const { hostname } = new URL(routerQuery.dashboard_url as string)
-              
-                  if(hostname === 'tilaka.id' || (hostname).endsWith("tilaka.id")){
+                  const { hostname } = new URL(
+                    routerQuery.dashboard_url as string
+                  );
+
+                  if (
+                    hostname === "tilaka.id" ||
+                    hostname.endsWith("tilaka.id")
+                  ) {
                     window.top!.location.href = concateRedirectUrlParams(
                       routerQuery.dashboard_url as string,
                       queryString
@@ -602,7 +609,7 @@ const Liveness = () => {
 
   return (
     <>
-    {/* <ImageDebugger/> */}
+      {/* <ImageDebugger/> */}
       <Head>
         <title>Liveness</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
@@ -679,6 +686,34 @@ const Liveness = () => {
       </div>
     </>
   );
+};
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const cQuery = context.query;
+  const uuid =
+    cQuery.transaction_id || cQuery.request_id || cQuery.registration_id;
+  const params = { ...cQuery, registration_id: uuid };
+  const queryString = new URLSearchParams(params as any).toString();
+
+  const checkStepForLinkAccountResult: TPersonalCheckStepv2Response = await RestKycCheckStepv2({
+    registerId: uuid as string,
+  })
+    .then((res) => res)
+    .catch((err) => err);
+
+  if (checkStepForLinkAccountResult?.data?.route === "penautan") {
+    return {
+      redirect: {
+        permanent: false,
+        destination: handleRoute("link-account?" + queryString),
+      },
+      props: {},
+    };
+  }else {
+    return {
+      props: {},
+    };
+  }
 };
 
 export default Liveness;
