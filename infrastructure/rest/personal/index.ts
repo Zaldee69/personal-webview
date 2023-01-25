@@ -95,7 +95,7 @@ export const RestPersonalFaceRecognition = ({
 }): Promise<TPersonalFaceRecognitionResponseData> => {
   return axios
     .post<TPersonalSetPasswordResponseData>(
-      `http://10.117.1.151:8080/v1/ekyc/face-verification`,
+      `${BASE_URL}/face-verification`,
       payload,
       {
         headers: {
@@ -118,7 +118,7 @@ export const RestKycCheckStepv2 = ({
 }): Promise<TPersonalCheckStepv2Response> => {
   return axios
     .post<TPersonalCheckStepv2Response>(
-      `http://10.117.1.151:8080/v1/ekyc/checkstep`,
+      `${BASE_URL}/ekyc/checkstep`,
       { registerId },
     )
     .then((res) => res.data)
