@@ -161,6 +161,7 @@ export type TLivenessV2GenerateActionResponse = {
   data: {
     actionList: string[]
   }
+  response?: any
 }
 
 export type TLivenessV2GenerateActionRequestData = {

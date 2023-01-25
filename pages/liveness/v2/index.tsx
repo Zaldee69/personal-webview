@@ -96,7 +96,7 @@ const Liveness = () => {
     }
   };
 
-  const generateAction = async () => {
+  const generateAction = () => {
     const body = {
       uuid: routerQuery.request_id as string,
     };
@@ -108,31 +108,34 @@ const Liveness = () => {
       position: "top-center",
     });
 
-    try {
-      const res = await RestLivenessV2GenerateAction(body);
-
-      if (res.success) {
-        setIsDisabled(false);
-        setIsGenerateAction(false);
+    RestLivenessV2GenerateAction(body)
+      .then((res) => {
+        if (res.success) {
+          setIsDisabled(false);
+          setIsGenerateAction(false);
+          toast.dismiss("loading");
+          toast.success("Pembuatan daftar aksi sukses", {
+            icon: <CheckOvalIcon />,
+            autoClose: 3000,
+          });
+          const payload = ["look_straight"].concat(res.data.actionList);
+          dispatch(setActionList(payload));
+        } else {
+          const message = res.response.data.data.errors[0] === "Request tidak ditemukan" ? res.response.data.data.errors[0] : "Request telah liveness"
+          toast.dismiss("loading");
+          setIsDisabled(true);
+          setIsGenerateAction(true);
+          toast(message, {
+            type: "error",
+            autoClose: 5000,
+            position: "top-center",
+          });
+        }
+      })
+      .catch((err) => {
         toast.dismiss("loading");
-        toast.success("Pembuatan daftar aksi sukses", {
-          icon: <CheckOvalIcon />,
-          autoClose: 3000,
-        });
-        const payload = ["look_straight"].concat(res.data.actionList);
-        dispatch(setActionList(payload));
-      } else {
-        setIsDisabled(true);
-        setIsGenerateAction(true);
-        toast("Request telah liveness", {
-          type: "error",
-          autoClose: 5000,
-          position: "top-center",
-        });
-      }
-    } catch (err) {
-      throw err;
-    }
+        throw err;
+      });
   };
 
   const changePage = async () => {
@@ -166,7 +169,7 @@ const Liveness = () => {
         removeStorage();
         router.push({
           pathname: handleRoute("liveness/v2/success"),
-          query: {...router.query}
+          query: { ...router.query },
         });
       } else {
         const attempt =
@@ -190,15 +193,15 @@ const Liveness = () => {
           router.push({
             pathname: handleRoute("liveness-failure/v2"),
             query: {
-                  ...router.query
+              ...router.query,
             },
           });
         } else {
           router.replace({
             pathname: handleRoute("liveness-fail/v2"),
             query: {
-                  ...router.query
-            }
+              ...router.query,
+            },
           });
         }
       }
@@ -213,7 +216,7 @@ const Liveness = () => {
       setTimeout(() => {
         router.push({
           pathname: handleRoute("liveness-fail/v2"),
-          query: {...router.query}
+          query: { ...router.query },
         });
       }, 5000);
     }
