@@ -15,13 +15,11 @@ import { useRouter } from "next/router";
 import { handleRoute } from "./../../utils/handleRoute";
 import Image from "next/image";
 import { assetPrefix } from "../../next.config";
-import { RestKycCheckStep } from "infrastructure";
 import { GetServerSideProps } from "next";
 import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
 import { serverSideRenderReturnConditions } from "@/utils/serverSideRenderReturnConditions";
 import i18n from "i18";
 import Loading from "@/components/Loading";
-import { TPersonalCheckStepv2Response } from "infrastructure/rest/personal/types";
 import { RestKycCheckStepv2 } from "infrastructure/rest/personal";
 
 type Props = {};
@@ -312,29 +310,27 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const cQuery = context.query;
   const uuid =
     cQuery.transaction_id || cQuery.request_id || cQuery.registration_id;
-  const params = { ...cQuery, registration_id: uuid };
-  const queryString = new URLSearchParams(params as any).toString();
-
-  const checkStepResult: {
-    res?: TKycCheckStepResponseData;
-    err?: {
-      response: {
-        data: {
-          success: boolean;
-          message: string;
-          data: { errors: string[] };
+  
+    const checkStepResult: {
+      res?: TKycCheckStepResponseData;
+      err?: {
+        response: {
+          data: {
+            success: boolean;
+            message: string;
+            data: { errors: string[] };
+          };
         };
       };
-    };
-  } = await RestKycCheckStep({
-    payload: { registerId: uuid as string },
-  })
-    .then((res) => {
-      return { res };
+    } = await RestKycCheckStepv2({
+      registerId: uuid as string,
     })
-    .catch((err) => {
-      return { err };
-    });
+      .then((res) => {
+        return {res}
+      })
+      .catch((err) => {
+        return {err}
+      });
 
   const serverSideRenderReturnConditionsResult =
     serverSideRenderReturnConditions({ context, checkStepResult });
@@ -342,22 +338,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   serverSideRenderReturnConditionsResult["props"] = {
     ...serverSideRenderReturnConditionsResult["props"],
   };
-
-  const checkStepForLinkAccountResult: TPersonalCheckStepv2Response = await RestKycCheckStepv2({
-    registerId: uuid as string,
-  })
-    .then((res) => res)
-    .catch((err) => err);
-
-  if (checkStepForLinkAccountResult?.data?.route === "penautan") {
-    return {
-      redirect: {
-        permanent: false,
-        destination: handleRoute("link-account?" + queryString),
-      },
-      props: {},
-    };
-  }
 
   return serverSideRenderReturnConditionsResult;
 };

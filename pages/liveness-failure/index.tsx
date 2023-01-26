@@ -1,7 +1,5 @@
 import { concateRedirectUrlParams } from "@/utils/concateRedirectUrlParams";
-import { handleRoute } from "@/utils/handleRoute";
 import { serverSideRenderReturnConditions } from "@/utils/serverSideRenderReturnConditions";
-import { RestKycCheckStep } from "infrastructure";
 import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
 import { GetServerSideProps } from "next";
 import Head from "next/head";
@@ -11,7 +9,6 @@ import React from "react";
 import Footer from "../../components/Footer";
 import { assetPrefix } from "../../next.config";
 import i18n from "i18";
-import { TPersonalCheckStepv2Response } from "infrastructure/rest/personal/types";
 import { RestKycCheckStepv2 } from "infrastructure/rest/personal";
 
 
@@ -72,8 +69,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const cQuery = context.query;
   const uuid =
     cQuery.transaction_id || cQuery.request_id || cQuery.registration_id;
-  const params = { ...cQuery, registration_id: uuid };
-  const queryString = new URLSearchParams(params as any).toString();
 
   const checkStepResult: {
     res?: TKycCheckStepResponseData;
@@ -86,31 +81,15 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         };
       };
     };
-  } = await RestKycCheckStep({
-    payload: { registerId: uuid as string },
+  } = await RestKycCheckStepv2({
+    registerId: uuid as string,
   })
     .then((res) => {
-      return { res };
+      return {res}
     })
     .catch((err) => {
-      return { err };
+      return {err}
     });
-
-    const checkStepForLinkAccountResult: TPersonalCheckStepv2Response = await RestKycCheckStepv2({
-      registerId: uuid as string,
-    })
-      .then((res) => res)
-      .catch((err) => err);
-  
-    if (checkStepForLinkAccountResult?.data?.route === "penautan") {
-      return {
-        redirect: {
-          permanent: false,
-          destination: handleRoute("link-account?" + queryString),
-        },
-        props: {},
-      };
-    }
 
   return serverSideRenderReturnConditions({ context, checkStepResult });
 };

@@ -32,7 +32,8 @@ import { assetPrefix } from "next.config";
 import ImageDebugger from "@/components/ImageDebugger";
 import { GetServerSideProps } from "next";
 import { RestKycCheckStepv2 } from "infrastructure/rest/personal";
-import { TPersonalCheckStepv2Response } from "infrastructure/rest/personal/types";
+import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
+import { serverSideRenderReturnConditions } from "@/utils/serverSideRenderReturnConditions";
 
 type TQueryParams = {
   request_id?: string;
@@ -690,30 +691,32 @@ const Liveness = () => {
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const cQuery = context.query;
+  const isNotRedirect: boolean = true
   const uuid =
     cQuery.transaction_id || cQuery.request_id || cQuery.registration_id;
-  const params = { ...cQuery, registration_id: uuid };
-  const queryString = new URLSearchParams(params as any).toString();
-
-  const checkStepForLinkAccountResult: TPersonalCheckStepv2Response = await RestKycCheckStepv2({
+    
+  const checkStepResult: {
+    res?: TKycCheckStepResponseData;
+    err?: {
+      response: {
+        data: {
+          success: boolean;
+          message: string;
+          data: { errors: string[] };
+        };
+      };
+    };
+  } = await RestKycCheckStepv2({
     registerId: uuid as string,
   })
-    .then((res) => res)
-    .catch((err) => err);
+    .then((res) => {
+      return {res}
+    })
+    .catch((err) => {
+      return {err}
+    });
 
-  if (checkStepForLinkAccountResult?.data?.route === "penautan") {
-    return {
-      redirect: {
-        permanent: false,
-        destination: handleRoute("link-account?" + queryString),
-      },
-      props: {},
-    };
-  }else {
-    return {
-      props: {},
-    };
-  }
+  return serverSideRenderReturnConditions({ context, checkStepResult, isNotRedirect });
 };
 
 export default Liveness;

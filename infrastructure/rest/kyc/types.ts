@@ -21,7 +21,8 @@ export type TKycCheckStepResponseData = {
     status: TStepStatus;
     token?: string;
     pin_form?: boolean; // shown when status === 'D' || status === 'F'
-    reason_code: TReasonCode;
+    reason_code?: TReasonCode;
+    route?: string
   };
 };
 

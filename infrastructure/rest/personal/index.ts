@@ -14,6 +14,8 @@ import {
   TPersonalCheckStepv2Response,
 } from "./types";
 
+import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
+
 const BASE_URL =
   process.env.NEXT_PUBLIC_PERSONAL_API_URL || "https://dev-api.tilaka.id";
 
@@ -115,9 +117,9 @@ export const RestKycCheckStepv2 = ({
   registerId,
 }: {
   registerId: string;
-}): Promise<TPersonalCheckStepv2Response> => {
+}): Promise<TKycCheckStepResponseData> => {
   return axios
-    .post<TPersonalCheckStepv2Response>(
+    .post<TKycCheckStepResponseData>(
       `${BASE_URL}/checkstep`,
       { registerId },
     )

@@ -95,15 +95,18 @@ export const serverSideRenderReturnConditions = ({
           return { props: {} };
         }
 
-        return {
-          redirect: {
-            permanent: false,
-            destination: handleRoute("guide?" + queryString),
-          },
-          props: {
-            // kyc_checkstep_token: checkStepResult.res?.data?.token || null,
-          },
-        };
+        if(currentPathnameWithoutParams !== "/liveness"){
+          return {
+            redirect: {
+              permanent: false,
+              destination: handleRoute("guide?" + queryString),
+            },
+            props: {
+              // kyc_checkstep_token: checkStepResult.res?.data?.token || null,
+            },
+          };
+        }
+
       } else if (checkStepResult.res.data.status === "F") {
         const params: any = {
           ...cQuery,
@@ -183,6 +186,21 @@ export const serverSideRenderReturnConditions = ({
         return {
           props: {},
         };
+      } else if (checkStepResult.res.data.route === "penautan"){
+        const params: any = {
+          register_id: uuid,
+        };
+
+        const queryString = new URLSearchParams(params as any).toString();
+
+        return {
+          redirect: {
+            permanent: false,
+            destination: handleRoute("link-account?" + queryString)
+          },
+          props: {},
+        };
+        
       } else {
         return { props: {} };
       }
