@@ -603,11 +603,11 @@ const ModalConsent = ({
   return modalConsent.show ? (
     <div
       style={{ backgroundColor: "rgba(0, 0, 0, .5)" }}
-      className="fixed z-50 flex items-start transition-all duration-1000 justify-center w-full left-0 top-0 h-full "
+      className="fixed z-50 flex items-start transition-all duration-1000 justify-center w-full left-0 top-0 h-full overflow-y-auto"
     >
-      <div className="bg-white max-w-3xl mt-20 pt-5 px-2 pb-3 rounded-md w-full mx-5">
+      <div className="bg-white max-w-3xl mt-20 mb-10 pt-5 px-2 pb-3 rounded-md w-full mx-5">
         <>
-          <div className="sm:overflow-scroll lg:overflow-hidden rounded px-6 pt-4 pb-6 bg-white">
+          <div className="rounded px-2 sm:px-6 pt-4 pb-6 bg-white">
             <div className="bg-neutral10 px-4 sm:px-10 md:px-16 pt-4 pb-6">
               <p className="text-lg sm:text-xl md:text-2xl font-normal text-center text-neutral800">
                 {t("page")}{" "}
