@@ -33,15 +33,15 @@ export const ActionGuide1 = (props: ActionGuide1Props) => {
         )}
       </div>
       <div className="flex flex-col">
-        <span className="font-poppins font-medium">
+        <span className="poppins-regular font-medium">
           {props.actionText(props.actionList[props.currentActionIndex])}
         </span>
         {props.failedMessage ? (
-          <span className="font-poppins text-sm text-red300">
+          <span className="poppins-regular text-sm text-red300">
             {props.failedMessage}
           </span>
         ) : (
-          <span className="font-poppins text-sm text-neutral">
+          <span className="poppins-regular text-sm text-neutral">
             {props.actionList.length > 1 && t("dontMove")}
           </span>
         )}
@@ -68,12 +68,12 @@ export const ActionGuide2 = (props: ActionGuide2Props) => {
         )}
       </div>
       <div className="flex items-center justify-center flex-col">
-        <span className={`font-poppins w-full font-medium`}>
+        <span className={`poppins-regular w-full font-medium`}>
           {t("lookStraight")}
         </span>
         <span
           id={props.isMustReload ? "" : "log"}
-          className=" font-poppins text-sm w-full  text-neutral"
+          className=" poppins-regular text-sm w-full  text-neutral"
         >
           {t("dontMove")}
         </span>

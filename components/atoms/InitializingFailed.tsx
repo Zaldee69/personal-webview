@@ -6,7 +6,7 @@ const InitializingFailed = () => {
     <div
       className={`rounded-md z-[999] ease-in duration-300 absolute bg-[#E6E6E6] w-full h-[270px] flex justify-center items-center`}
     >
-      <div className="text-center text-neutral50 font-poppins">
+      <div className="text-center text-neutral50 poppins-regular">
         <p>{t("intializingFailed")}</p>
         <button
           className="text-[#000] mt-2"

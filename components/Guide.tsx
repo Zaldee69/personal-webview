@@ -20,12 +20,12 @@ const Guide = ({setIsClicked, isDisabled}: Props) => {
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
       <div className=" py-10 max-w-sm mx-auto px-2 pt-8 sm:w-full md:w-4/5 ">
-        <h2 className="font-poppins text-xl font-semibold">Liveness</h2>
-        <span className="font-poppins text-sm block mt-4">
+        <h2 className="poppins-regular text-xl font-semibold">Liveness</h2>
+        <span className="poppins-regular text-sm block mt-4">
           {t("guideTitle")}
         </span>
         <div className="flex flex-col gap-5 my-6" >
-          <div className="grid font-poppins text-sm grid-cols-2 items-center grid-flow-col">
+          <div className="grid poppins-regular text-sm grid-cols-2 items-center grid-flow-col">
             <Image
               alt="guide-1"
               src={`${assetPrefix}/images/1.svg`}
@@ -34,7 +34,7 @@ const Guide = ({setIsClicked, isDisabled}: Props) => {
             />
             <p>{t("guideSubtitle1")}</p>
           </div>
-          <div className="grid font-poppins text-sm grid-cols-2 items-center grid-flow-col">
+          <div className="grid poppins-regular text-sm grid-cols-2 items-center grid-flow-col">
             <Image
               alt="guide-1"
               src={`${assetPrefix}/images/2.svg`}
@@ -43,7 +43,7 @@ const Guide = ({setIsClicked, isDisabled}: Props) => {
             />
             <p>{t("guideSubtitle2")}</p>
           </div>
-          <div className="grid font-poppins text-sm grid-cols-2 items-center grid-flow-col">
+          <div className="grid poppins-regular text-sm grid-cols-2 items-center grid-flow-col">
             <Image
               alt="guide-1"
               src={`${assetPrefix}/images/3.svg`}
@@ -53,7 +53,7 @@ const Guide = ({setIsClicked, isDisabled}: Props) => {
             <p>{t("guideSubtitle3")}</p>
           </div>
         </div>
-        <button disabled={isDisabled} onClick={() => setIsClicked(true)} className="bg-primary disabled:opacity-75 btn md:mx-auto md:block md:w-1/4 text-white font-poppins w-full mx-auto rounded-sm h-9 ">
+        <button disabled={isDisabled} onClick={() => setIsClicked(true)} className="bg-primary disabled:opacity-75 btn md:mx-auto md:block md:w-1/4 text-white poppins-regular w-full mx-auto rounded-sm h-9 ">
           {t("startButton")}
         </button>
         <Footer />

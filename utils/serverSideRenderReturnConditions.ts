@@ -187,9 +187,7 @@ export const serverSideRenderReturnConditions = ({
           props: {},
         };
       } else if (checkStepResult.res.data.route === "penautan"){
-        const params: any = {
-          register_id: uuid,
-        };
+        const params: any = { ...cQuery, request_id: uuid };
 
         const queryString = new URLSearchParams(params as any).toString();
 
