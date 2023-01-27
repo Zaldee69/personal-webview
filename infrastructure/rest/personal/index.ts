@@ -12,6 +12,7 @@ import {
   TPersonalFaceRecognitionRequestData,
   TPersonalFaceRecognitionResponseData,
   TPersonalCheckStepv2Response,
+  TPersonalApproveConsentResponse,
 } from "./types";
 
 import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
@@ -101,9 +102,7 @@ export const RestPersonalFaceRecognition = ({
       payload,
       {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem(
-            "token"
-          )}`,
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       }
     )
@@ -119,9 +118,32 @@ export const RestKycCheckStepv2 = ({
   registerId: string;
 }): Promise<TKycCheckStepResponseData> => {
   return axios
-    .post<TKycCheckStepResponseData>(
-      `${BASE_URL}/checkstep`,
-      { registerId },
+    .post<TKycCheckStepResponseData>(`${BASE_URL}/checkstep`, { registerId })
+    .then((res) => res.data)
+    .catch((err) => {
+      throw err;
+    });
+};
+
+export const RestPersonalApproveConsent = ({
+  registerId,
+  tilakaName,
+}: {
+  registerId: string;
+  tilakaName: string;
+}): Promise<TPersonalApproveConsentResponse> => {
+  return axios
+    .post<TPersonalApproveConsentResponse>(
+      `${BASE_URL}/approveConsent`,
+      {
+        registerId,
+        tilakaName,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
     )
     .then((res) => res.data)
     .catch((err) => {

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import EyeIcon from "./../../public/icons/EyeIcon";
 import EyeIconOff from "./../../public/icons/EyeIconOff";
-import Router, { useRouter } from "next/router";
+import { useRouter } from "next/router";
 import { AppDispatch, RootState } from "@/redux/app/store";
 import { useDispatch, useSelector } from "react-redux";
 import { login } from "@/redux/slices/loginSlice";
@@ -22,7 +22,11 @@ import { serverSideRenderReturnConditions } from "@/utils/serverSideRenderReturn
 import FRCamera from "@/components/FRCamera";
 import i18n from "i18";
 import { toast } from "react-toastify";
-import { RestKycCheckStepv2, RestPersonalFaceRecognition } from "infrastructure/rest/personal/index";
+import {
+  RestKycCheckStepv2,
+  RestPersonalFaceRecognition,
+  RestPersonalApproveConsent,
+} from "infrastructure/rest/personal/index";
 import XIcon from "@/public/icons/XIcon";
 
 import {
@@ -45,6 +49,21 @@ type IModal = {
   tilakaName: string;
 };
 
+type IModalConsent = {
+  modalConsent: {
+    show: boolean;
+    data: { queryWithDynamicRedirectURL: any } | null;
+  };
+  setModalConsent: React.Dispatch<
+    React.SetStateAction<{
+      show: boolean;
+      data: { queryWithDynamicRedirectURL: any } | null;
+    }>
+  >;
+  formSetter: React.Dispatch<React.SetStateAction<Tform>>;
+  tilakaName: string;
+};
+
 const LinkAccount = (props: Props) => {
   const router = useRouter();
   const { t }: any = i18n;
@@ -52,6 +71,10 @@ const LinkAccount = (props: Props) => {
   const [nikRegistered, nikRegisteredSetter] = useState<boolean>(true);
   const [form, formSetter] = useState<Tform>({ tilaka_name: "", password: "" });
   const [modal, setModal] = useState<boolean>(false);
+  const [modalConsent, setModalConsent] = useState<{
+    show: boolean;
+    data: { queryWithDynamicRedirectURL: any } | null;
+  }>({ show: false, data: null });
   const { nik, request_id, signing, setting, is_penautan, ...restRouterQuery } =
     router.query;
   const dispatch: AppDispatch = useDispatch();
@@ -84,6 +107,7 @@ const LinkAccount = (props: Props) => {
   };
 
   useEffect(() => {
+    // res -- data.data.is_penautan: boolean;
     if (data.status === "FULLFILLED" && data.data.success) {
       let queryWithDynamicRedirectURL = {
         ...router.query,
@@ -93,6 +117,7 @@ const LinkAccount = (props: Props) => {
       }
       localStorage.setItem("refresh_token", data.data.data[1] as string);
       localStorage.setItem("token", data.data.data[0] as string);
+
       if (signing === "1" || setting === "1") {
         getCertificateList({ params: "" as string }).then((res) => {
           const certif = JSON.parse(res.data);
@@ -134,6 +159,11 @@ const LinkAccount = (props: Props) => {
       } else {
         if (data.data.data[2] === "penautan") {
           setModal(true);
+        } else if (data.data.data[2] === "penautan_consent") {
+          setModalConsent({
+            show: true,
+            data: { queryWithDynamicRedirectURL },
+          });
         } else {
           router.replace({
             pathname: handleRoute("link-account/success"),
@@ -143,10 +173,11 @@ const LinkAccount = (props: Props) => {
       }
     } else if (
       data.status === "FULLFILLED" &&
-      !data.data.success && 
-      (data.data.message === `Invalid Username / Password for Tilaka Name ${form?.tilaka_name}` 
-      || data.data.message === "User Not Found" 
-      || data.data.message === "NIK Not Equals ON Tilaka System" )
+      !data.data.success &&
+      (data.data.message ===
+        `Invalid Username / Password for Tilaka Name ${form?.tilaka_name}` ||
+        data.data.message === "User Not Found" ||
+        data.data.message === "NIK Not Equals ON Tilaka System")
     ) {
       toast.dismiss();
       toast.error(t("invalidUsernamePassword"));
@@ -293,6 +324,12 @@ const LinkAccount = (props: Props) => {
         modal={modal}
         setModal={setModal}
       />
+      <ModalConsent
+        formSetter={formSetter}
+        tilakaName={form.tilaka_name}
+        modalConsent={modalConsent}
+        setModalConsent={setModalConsent}
+      />
     </>
   );
 };
@@ -407,11 +444,212 @@ const FRModal = ({ modal, setModal, tilakaName, formSetter }: IModal) => {
   ) : null;
 };
 
+const ModalConsent = ({
+  modalConsent,
+  setModalConsent,
+  tilakaName,
+  formSetter,
+}: IModalConsent) => {
+  const controller = new AbortController();
+  const router = useRouter();
+  const { t }: any = i18n;
+
+  const onApprove = () => {
+    RestPersonalApproveConsent({
+      registerId: modalConsent.data?.queryWithDynamicRedirectURL
+        .request_id as string,
+      tilakaName,
+    })
+      .then((res) => {
+        if (res.success) {
+          router.replace({
+            pathname: handleRoute("link-account/success"),
+            query: { ...modalConsent.data?.queryWithDynamicRedirectURL },
+          });
+        } else {
+          let queryWithDynamicRedirectURL = {
+            ...modalConsent.data?.queryWithDynamicRedirectURL,
+          };
+
+          const params = {
+            ...queryWithDynamicRedirectURL,
+            status: "F",
+            reason: "user already exist",
+          };
+          const queryString = new URLSearchParams(params as any).toString();
+
+          if (queryWithDynamicRedirectURL.redirect_url?.length) {
+            const currentRedirectUrl =
+              queryWithDynamicRedirectURL.redirect_url as string;
+            const currentRedirectUrlArr = currentRedirectUrl.split("%3F");
+
+            if (currentRedirectUrlArr.length > 1) {
+              // current redirect_url has param
+              queryWithDynamicRedirectURL.redirect_url =
+                currentRedirectUrlArr[0] +
+                "%3F" +
+                currentRedirectUrlArr[1] +
+                "%26" +
+                queryString;
+            } else {
+              // current redirect_url no has param
+              queryWithDynamicRedirectURL.redirect_url =
+                currentRedirectUrlArr[0] + "%3F" + queryString;
+            }
+          }
+
+          router.replace({
+            pathname: handleRoute("link-account/failure"),
+            query: {
+              ...queryWithDynamicRedirectURL,
+            },
+          });
+        }
+      })
+      .catch((err) => {
+        let queryWithDynamicRedirectURL = {
+          ...modalConsent.data?.queryWithDynamicRedirectURL,
+        };
+
+        const params = {
+          ...queryWithDynamicRedirectURL,
+          status: "F",
+          reason: "something wrong",
+        };
+        const queryString = new URLSearchParams(params as any).toString();
+
+        if (queryWithDynamicRedirectURL.redirect_url?.length) {
+          const currentRedirectUrl =
+            queryWithDynamicRedirectURL.redirect_url as string;
+          const currentRedirectUrlArr = currentRedirectUrl.split("%3F");
+
+          if (currentRedirectUrlArr.length > 1) {
+            // current redirect_url has param
+            queryWithDynamicRedirectURL.redirect_url =
+              currentRedirectUrlArr[0] +
+              "%3F" +
+              currentRedirectUrlArr[1] +
+              "%26" +
+              queryString;
+          } else {
+            // current redirect_url no has param
+            queryWithDynamicRedirectURL.redirect_url =
+              currentRedirectUrlArr[0] + "%3F" + queryString;
+          }
+        }
+
+        router.replace({
+          pathname: handleRoute("link-account/failure"),
+          query: {
+            ...queryWithDynamicRedirectURL,
+          },
+        });
+      });
+    // catch to penautan failure with
+  };
+
+  const onReject = () => {
+    // call api
+    // redirect with status=F&reason=reject by user pada redirect url
+    // not call api, logout enough
+    controller.abort();
+    toast.dismiss("info");
+    restLogout({});
+    setModalConsent({ show: !modalConsent.show, data: null });
+    formSetter({
+      tilaka_name: "",
+      password: "",
+    });
+
+    let queryWithDynamicRedirectURL = {
+      ...modalConsent.data?.queryWithDynamicRedirectURL,
+    };
+
+    const params = {
+      ...queryWithDynamicRedirectURL,
+      status: "F",
+      reason: "reject by user",
+    };
+    const queryString = new URLSearchParams(params as any).toString();
+
+    if (queryWithDynamicRedirectURL.redirect_url?.length) {
+      const currentRedirectUrl =
+        queryWithDynamicRedirectURL.redirect_url as string;
+      const currentRedirectUrlArr = currentRedirectUrl.split("%3F");
+
+      if (currentRedirectUrlArr.length > 1) {
+        // current redirect_url has param
+        queryWithDynamicRedirectURL.redirect_url =
+          currentRedirectUrlArr[0] +
+          "%3F" +
+          currentRedirectUrlArr[1] +
+          "%26" +
+          queryString;
+      } else {
+        // current redirect_url no has param
+        queryWithDynamicRedirectURL.redirect_url =
+          currentRedirectUrlArr[0] + "%3F" + queryString;
+      }
+    }
+
+    router.replace({
+      pathname: handleRoute("link-account/failure"),
+      query: {
+        ...queryWithDynamicRedirectURL,
+      },
+    });
+  };
+
+  return modalConsent.show ? (
+    <div
+      style={{ backgroundColor: "rgba(0, 0, 0, .5)" }}
+      className="fixed z-50 flex items-start transition-all duration-1000 justify-center w-full left-0 top-0 h-full "
+    >
+      <div className="bg-white max-w-3xl mt-20 pt-5 px-2 pb-3 rounded-md w-full mx-5">
+        <>
+          <div className="sm:overflow-scroll lg:overflow-hidden rounded px-6 pt-4 pb-6 bg-white">
+            <div className="bg-neutral10 px-4 sm:px-10 md:px-16 pt-4 pb-6">
+              <p className="text-lg sm:text-xl md:text-2xl font-normal text-center text-neutral800">
+                {t("page")}{" "}
+                <span className="italic">{t("customerConsentText")}</span>
+              </p>
+              <div className="mt-3 text-center">
+                <Image
+                  src={`${assetPrefix}/images/customerConsent.svg`}
+                  width="152px"
+                  height="151px"
+                  alt="customerConsent"
+                />
+              </div>
+              <p className="mt-3 text-center font-normal text-neutral800 text-sm">
+                {t("linkAccountConsentText")}
+              </p>
+            </div>
+            <div className="flex justify-end mt-5">
+              <button
+                onClick={onReject}
+                className="bg-white text-primary hover:opacity-50  px-6 py-2.5 rounded hover:cursor-pointer"
+              >
+                {t("cancel")}
+              </button>
+              <a
+                onClick={onApprove}
+                className="block bg-primary hover:opacity-50 text-white px-6 py-2.5 rounded hover:cursor-pointer"
+              >
+                {t("next")}
+              </a>
+            </div>
+          </div>
+        </>
+      </div>
+    </div>
+  ) : null;
+};
+
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const cQuery = context.query;
   const uuid =
     cQuery.transaction_id || cQuery.request_id || cQuery.registration_id;
-
   const checkStepResult: {
     res?: TKycCheckStepResponseData;
     err?: {
