@@ -21,6 +21,7 @@ const LinkAccountFailure = (props: Props) => {
   const router = useRouter();
   const routerQuery: NextParsedUrlQuery & {
     redirect_url?: string;
+    reject_by_user?: "1";
   } = router.query;
   const { t }: any = i18n;
 
@@ -37,11 +38,23 @@ const LinkAccountFailure = (props: Props) => {
           alt="liveness-failure-ill"
         />
       </div>
-      <div className="mt-14">
-        <p className="poppins-regular text-xs text-neutral200">
-          {t("linkAccountFailedSubtitle")}
-        </p>
-      </div>
+      {props.checkStepResultDataRoute === "penautan_consent" ? (
+        routerQuery.reject_by_user === "1" ? (
+          <div className="mt-14">
+            <p className="poppins-regular text-xs text-neutral200">
+              {t("consentLinkAccountFailedSubtitleRejectByUser")}
+            </p>
+          </div>
+        ) : (
+          <></>
+        )
+      ) : (
+        <div className="mt-14">
+          <p className="poppins-regular text-xs text-neutral200">
+            {t("linkAccountFailedSubtitle")}
+          </p>
+        </div>
+      )}
       {props.checkStepResultDataRoute === "penautan_consent" ? (
         routerQuery.redirect_url && (
           <div className="mt-20 text-primary text-base poppins-medium underline hover:cursor-pointer">
