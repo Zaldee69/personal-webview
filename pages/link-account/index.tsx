@@ -22,7 +22,7 @@ import { serverSideRenderReturnConditions } from "@/utils/serverSideRenderReturn
 import FRCamera from "@/components/FRCamera";
 import i18n from "i18";
 import { toast } from "react-toastify";
-import { RestPersonalFaceRecognition } from "infrastructure/rest/personal/index";
+import { RestKycCheckStepv2, RestPersonalFaceRecognition } from "infrastructure/rest/personal/index";
 import XIcon from "@/public/icons/XIcon";
 
 import {
@@ -423,8 +423,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         };
       };
     };
-  } = await RestKycCheckStep({
-    payload: { registerId: uuid as string },
+  } = await RestKycCheckStepv2({
+    registerId: uuid as string,
   })
     .then((res) => {
       return { res };

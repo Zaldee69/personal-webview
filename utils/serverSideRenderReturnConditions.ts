@@ -188,17 +188,18 @@ export const serverSideRenderReturnConditions = ({
         };
       } else if (checkStepResult.res.data.route === "penautan"){
         const params: any = { ...cQuery, request_id: uuid };
-
         const queryString = new URLSearchParams(params as any).toString();
 
-        return {
-          redirect: {
-            permanent: false,
-            destination: handleRoute("link-account?" + queryString)
-          },
-          props: {},
-        };
-        
+        if(!currentPathnameWithoutParams.includes("/link-account") ){
+          return {
+            redirect: {
+              permanent: false,
+              destination: handleRoute("link-account?" + queryString)
+            },
+            props: {},
+          };
+        }
+
       } else {
         return { props: {} };
       }
