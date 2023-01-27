@@ -251,7 +251,7 @@ const LinkAccount = (props: Props) => {
           </label>
           <label className="block mt-6">
             <div className="flex justify-start items-center">
-              <p className="font-poppins text-sm text-neutral200 pl-2.5">
+              <p className="poppins-regular text-sm text-neutral200 pl-2.5">
                 {t("linkAccountPasswordInputlabel")}
               </p>
             </div>
@@ -410,10 +410,10 @@ const FRModal = ({ modal, setModal, tilakaName, formSetter }: IModal) => {
     >
       <div className="bg-white max-w-md mt-20 pt-5 px-2 pb-3 rounded-md w-full mx-5 ">
         <>
-          <p className="font-poppins block text-center font-semibold ">
+          <p className="poppins-regular block text-center font-semibold ">
             {t("linkingAccount")}
           </p>
-          <span className="font-poppins mt-2 block text-center text-sm font-normal">
+          <span className="poppins-regular mt-2 block text-center text-sm font-normal">
             {t("frSubtitle3")}
           </span>
           <FRCamera
@@ -434,7 +434,7 @@ const FRModal = ({ modal, setModal, tilakaName, formSetter }: IModal) => {
                 password: "",
               });
             }}
-            className="bg-primary btn uppercase text-white font-poppins w-full mt-5 mx-auto rounded-sm h-9 font-semibold hover:opacity-50"
+            className="bg-primary btn uppercase text-white poppins-regular w-full mt-5 mx-auto rounded-sm h-9 font-semibold hover:opacity-50"
           >
             {t("cancel")}
           </button>
@@ -679,7 +679,7 @@ export default LinkAccount;
 // const LinkAccountProcess = (props: Props) => {
 //   return (
 //     <div className="px-10 pt-16 pb-9 text-center">
-//       <p className="font-poppins text-base font-semibold text-neutral800">
+//       <p className="poppins-regular text-base font-semibold text-neutral800">
 //         Penautan Akun Berhasil!
 //       </p>
 //       <div className="mt-20">
@@ -696,7 +696,7 @@ export default LinkAccount;
 //           height="48px"
 //           className="animate-spin"
 //         />
-//         <p className="font-poppins text-sm text-neutral50">Mohon menunggu...</p>
+//         <p className="poppins-regular text-sm text-neutral50">Mohon menunggu...</p>
 //       </div>
 //       <div className="mt-11 flex justify-center">
 //         <Image
