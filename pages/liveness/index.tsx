@@ -616,7 +616,7 @@ const Liveness = () => {
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
       <div className="py-10 max-w-sm mx-auto px-2">
-        <h2 className="font-poppins text-xl font-semibold">
+        <h2 className="poppins-regular text-xl font-semibold">
           {isGenerateAction ? <SkeletonLoading width="w-2/5" /> : "Liveness"}
         </h2>
         {(!isStepDone && actionList.length > 1) || isMustReload ? (
