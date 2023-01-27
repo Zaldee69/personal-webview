@@ -19,12 +19,12 @@ interface IserverSideRenderReturnConditions {
       };
     };
   };
-  isNotRedirect?: boolean
+  isNotRedirect?: boolean;
 }
 export const serverSideRenderReturnConditions = ({
   context,
   checkStepResult,
-  isNotRedirect
+  isNotRedirect,
 }: IserverSideRenderReturnConditions) => {
   const currentPathnameWithoutParams = context.resolvedUrl.split("?")[0];
   const cQuery = context.query;
@@ -95,7 +95,7 @@ export const serverSideRenderReturnConditions = ({
           return { props: {} };
         }
 
-        if(currentPathnameWithoutParams !== "/liveness"){
+        if (currentPathnameWithoutParams !== "/liveness") {
           return {
             redirect: {
               permanent: false,
@@ -106,7 +106,6 @@ export const serverSideRenderReturnConditions = ({
             },
           };
         }
-
       } else if (checkStepResult.res.data.status === "F") {
         const params: any = {
           ...cQuery,
@@ -186,20 +185,22 @@ export const serverSideRenderReturnConditions = ({
         return {
           props: {},
         };
-      } else if (checkStepResult.res.data.route === "penautan"){
+      } else if (
+        checkStepResult.res.data.route === "penautan" ||
+        checkStepResult.res.data.route === "penautan_consent"
+      ) {
         const params: any = { ...cQuery, request_id: uuid };
         const queryString = new URLSearchParams(params as any).toString();
 
-        if(!currentPathnameWithoutParams.includes("/link-account") ){
+        if (!currentPathnameWithoutParams.includes("/link-account")) {
           return {
             redirect: {
               permanent: false,
-              destination: handleRoute("link-account?" + queryString)
+              destination: handleRoute("link-account?" + queryString),
             },
             props: {},
           };
         }
-
       } else {
         return { props: {} };
       }

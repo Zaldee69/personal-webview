@@ -8,14 +8,22 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import React from "react";
 import { assetPrefix } from "../../next.config";
-import i18n from "i18"
+import i18n from "i18";
 import { RestKycCheckStepv2 } from "infrastructure/rest/personal";
+import { concateRedirectUrlParams } from "@/utils/concateRedirectUrlParams";
+import { NextParsedUrlQuery } from "next/dist/server/request-meta";
 
-type Props = {};
+type Props = {
+  checkStepResultDataRoute: TKycCheckStepResponseData["data"]["route"];
+};
 
 const LinkAccountFailure = (props: Props) => {
   const router = useRouter();
-  const {t}: any = i18n
+  const routerQuery: NextParsedUrlQuery & {
+    redirect_url?: string;
+  } = router.query;
+  const { t }: any = i18n;
+
   return (
     <div className="px-10 pt-16 pb-9 text-center">
       <p className="text-base poppins-semibold text-neutral800">
@@ -34,16 +42,26 @@ const LinkAccountFailure = (props: Props) => {
           {t("linkAccountFailedSubtitle")}
         </p>
       </div>
-      <div className="mt-20 text-primary text-base poppins-medium underline hover:cursor-pointer">
-        <Link
-          href={{
-            pathname: handleRoute("link-account"),
-            query: { ...router.query },
-          }}
-        >
-          <a>{t("linkAccountTilaka")}</a>
-        </Link>
-      </div>
+      {props.checkStepResultDataRoute === "penautan_consent" ? (
+        routerQuery.redirect_url && (
+          <div className="mt-20 text-primary text-base poppins-medium underline hover:cursor-pointer">
+            <a href={concateRedirectUrlParams(routerQuery.redirect_url, "")}>
+              <a>{t("livenessSuccessButtonTitle")}</a>
+            </a>
+          </div>
+        )
+      ) : (
+        <div className="mt-20 text-primary text-base poppins-medium underline hover:cursor-pointer">
+          <Link
+            href={{
+              pathname: handleRoute("link-account"),
+              query: { ...router.query },
+            }}
+          >
+            <a>{t("linkAccountTilaka")}</a>
+          </Link>
+        </div>
+      )}
       <div className="mt-11 flex justify-center">
         <Image
           src={`${assetPrefix}/images/poweredByTilaka.svg`}
@@ -82,7 +100,15 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       return { err };
     });
 
-  return serverSideRenderReturnConditions({ context, checkStepResult });
+  const serverSideRenderReturnConditionsResult =
+    serverSideRenderReturnConditions({ context, checkStepResult });
+
+  serverSideRenderReturnConditionsResult["props"] = {
+    ...serverSideRenderReturnConditionsResult["props"],
+    checkStepResultDataRoute: checkStepResult.res?.data.route || null,
+  };
+
+  return serverSideRenderReturnConditionsResult;
 };
 
 export default LinkAccountFailure;

@@ -21,8 +21,8 @@ export type TKycCheckStepResponseData = {
     status: TStepStatus;
     token?: string;
     pin_form?: boolean; // shown when status === 'D' || status === 'F'
-    reason_code?: TReasonCode;
-    route?: string
+    reason_code: TReasonCode;
+    route: "penautan" | "penautan_consent";
   };
 };
 
@@ -154,49 +154,48 @@ export type TKycVerificationIssueResponseData = {
     status: string;
     reason_code: TReasonCode;
   };
-};  
+};
 
 export type TLivenessV2GenerateActionResponse = {
-  success: boolean,
-  message: string,
+  success: boolean;
+  message: string;
   data: {
-    actionList: string[]
-  }
-  response?: any
-}
+    actionList: string[];
+  };
+  response?: any;
+};
 
 export type TLivenessV2GenerateActionRequestData = {
-    uuid: string
-}
+  uuid: string;
+};
 
 export type TLivenessV2IdProofingResponse = {
-  success: boolean
-  message: string
+  success: boolean;
+  message: string;
   data: {
-    nik: string | null
-    name: string | null
-    date_of_birth: string | null
-    selfie_image_percentage: string | null,
-    liveness_result: string | null
-    liveness_fail_message: string | null
-    uuid: string,
-    url: string
-    reason_code: TReasonCode
-  }
-}
+    nik: string | null;
+    name: string | null;
+    date_of_birth: string | null;
+    selfie_image_percentage: string | null;
+    liveness_result: string | null;
+    liveness_fail_message: string | null;
+    uuid: string;
+    url: string;
+    reason_code: TReasonCode;
+  };
+};
 
 export type TLivenessV2VerificationResponse = {
-  success: boolean
-  message: string
+  success: boolean;
+  message: string;
   data: {
-    errors: string[]
-    liveness_error_counter: number
-    liveness_summary_status: number
-  }
-
-}
+    errors: string[];
+    liveness_error_counter: number;
+    liveness_summary_status: number;
+  };
+};
 
 export type TLivenessV2VerificationRequestData = {
-  uuid: string
-  selfie_image: string
-}
+  uuid: string;
+  selfie_image: string;
+};

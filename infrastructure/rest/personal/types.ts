@@ -43,24 +43,33 @@ export type TPersonalSetPasswordResponseData = {
   data: null;
 };
 
-
 export type TPersonalFaceRecognitionRequestData = {
-  registerId: string
-  tilakaName: string
-  faceImage: string
-}
+  registerId: string;
+  tilakaName: string;
+  faceImage: string;
+};
 
 export type TPersonalFaceRecognitionResponseData = {
-  success: boolean
-  message: string
-}
+  success: boolean;
+  message: string;
+};
 
 export type TPersonalCheckStepv2Response = {
-  success: boolean
-  message: string
+  success: boolean;
+  message: string;
   data: {
-    token: string
-    status: string
-    route: string
-  }
-}
+    token: string;
+    status: string;
+    route: string;
+  };
+};
+
+export type TPersonalApproveConsentResponse = {
+  success: boolean;
+  message: string;
+  // data: null;
+  data: {
+    status: string;
+    reason: string;
+  };
+};
