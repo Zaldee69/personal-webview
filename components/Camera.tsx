@@ -409,7 +409,7 @@ const Camera: React.FC<Props> = ({
       {
         _isMounted && (
           <div className="relative">
-            <div style={{ backgroundColor: "rgba(0, 0, 0, .5)" }} id="perf" className="absolute text-center font-poppins hidden  text-white top-0 left-0 right-0" >{t("doNotMove")}</div>
+            <div style={{ backgroundColor: "rgba(0, 0, 0, .5)" }} id="perf" className="absolute text-center poppins-regular hidden  text-white top-0 left-0 right-0" >{t("doNotMove")}</div>
           <Webcam
             style={{ height: "270px", objectFit: "cover" }}
             className="mt-3 rounded-md sm:w-full md:w-full"
