@@ -596,6 +596,7 @@ const ModalConsent = ({
       pathname: handleRoute("link-account/failure"),
       query: {
         ...queryWithDynamicRedirectURL,
+        reject_by_user: "1",
       },
     });
   };
@@ -630,13 +631,13 @@ const ModalConsent = ({
                 onClick={onReject}
                 className="bg-white text-primary hover:opacity-50  px-6 py-2.5 rounded hover:cursor-pointer"
               >
-                {t("cancel")}
+                {t("consentDisagree")}
               </button>
               <a
                 onClick={onApprove}
                 className="block bg-primary hover:opacity-50 text-white px-6 py-2.5 rounded hover:cursor-pointer"
               >
-                {t("next")}
+                {t("consentAgree")}
               </a>
             </div>
           </div>
