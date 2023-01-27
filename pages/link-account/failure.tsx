@@ -9,6 +9,7 @@ import { useRouter } from "next/router";
 import React from "react";
 import { assetPrefix } from "../../next.config";
 import i18n from "i18"
+import { RestKycCheckStepv2 } from "infrastructure/rest/personal";
 
 type Props = {};
 
@@ -71,8 +72,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         };
       };
     };
-  } = await RestKycCheckStep({
-    payload: { registerId: uuid as string },
+  } = await RestKycCheckStepv2({
+    registerId: uuid as string,
   })
     .then((res) => {
       return { res };

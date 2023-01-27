@@ -11,6 +11,7 @@ import { RestKycCheckStep } from "infrastructure";
 import { serverSideRenderReturnConditions } from "@/utils/serverSideRenderReturnConditions";
 import { concateRedirectUrlParams } from "@/utils/concateRedirectUrlParams";
 import i18n from "i18";
+import { RestKycCheckStepv2 } from "infrastructure/rest/personal";
 
 type Props = {};
 
@@ -93,8 +94,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         };
       };
     };
-  } = await RestKycCheckStep({
-    payload: { registerId: uuid as string },
+  } = await RestKycCheckStepv2({
+    registerId: uuid as string,
   })
     .then((res) => {
       return { res };
