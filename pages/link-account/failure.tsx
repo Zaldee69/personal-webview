@@ -12,6 +12,7 @@ import i18n from "i18";
 import { RestKycCheckStepv2 } from "infrastructure/rest/personal";
 import { concateRedirectUrlParams } from "@/utils/concateRedirectUrlParams";
 import { NextParsedUrlQuery } from "next/dist/server/request-meta";
+import { getFRFailedCount } from "@/utils/frFailedCountGetterSetter";
 
 type Props = {
   checkStepResultDataRoute: TKycCheckStepResponseData["data"]["route"];
@@ -24,6 +25,8 @@ const LinkAccountFailure = (props: Props) => {
     reject_by_user?: "1";
   } = router.query;
   const { t }: any = i18n;
+
+  const failedCount = getFRFailedCount("count");
 
   return (
     <div className="px-10 pt-16 pb-9 text-center">
@@ -48,13 +51,7 @@ const LinkAccountFailure = (props: Props) => {
         ) : (
           <></>
         )
-      ) : (
-        <div className="mt-14">
-          <p className="poppins-regular text-xs text-neutral200">
-            {t("linkAccountFailedSubtitle")}
-          </p>
-        </div>
-      )}
+      ) : <></>}
       {props.checkStepResultDataRoute === "penautan_consent" ? (
         routerQuery.redirect_url && (
           <div className="mt-20 text-primary text-base poppins-medium underline hover:cursor-pointer">
@@ -63,6 +60,14 @@ const LinkAccountFailure = (props: Props) => {
             </a>
           </div>
         )
+      ) : failedCount >= 5 ? (
+        routerQuery.redirect_url ? (
+          <div className="mt-20 text-primary text-base poppins-medium underline hover:cursor-pointer">
+            <a href={concateRedirectUrlParams(routerQuery.redirect_url, "")}>
+              <a>{t("livenessSuccessButtonTitle")}</a>
+            </a>
+          </div>
+        ) : <></>
       ) : (
         <div className="mt-20 text-primary text-base poppins-medium underline hover:cursor-pointer">
           <Link
@@ -86,7 +91,6 @@ const LinkAccountFailure = (props: Props) => {
     </div>
   );
 };
-
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const cQuery = context.query;
   const uuid =
@@ -118,7 +122,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   serverSideRenderReturnConditionsResult["props"] = {
     ...serverSideRenderReturnConditionsResult["props"],
-    checkStepResultDataRoute: checkStepResult.res?.data.route || null,
+    checkStepResultDataRoute: checkStepResult.res?.data?.route || null,
   };
 
   return serverSideRenderReturnConditionsResult;
