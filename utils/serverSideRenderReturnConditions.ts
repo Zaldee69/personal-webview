@@ -205,7 +205,31 @@ export const serverSideRenderReturnConditions = ({
         return { props: {} };
       }
     } else {
-      // ?
+      if (
+        checkStepResult.res?.data?.errors?.[0] === "registrationId tidak valid"
+      ) {
+        const params: any = { ...cQuery, request_id: uuid };
+        const queryString = new URLSearchParams(params as any).toString();
+        if (
+          currentPathnameWithoutParams ===
+            `${assetPrefix}/link-account/failure` ||
+          currentPathnameWithoutParams === "/link-account/failure"
+        ) {
+          return {
+            props: {},
+          };
+        }
+
+        return {
+          redirect: {
+            permanent: false,
+            destination: handleRoute("link-account/failure?" + queryString),
+          },
+          props: {},
+        };
+      } else {
+        return { props: {} };
+      }
     }
   }
 

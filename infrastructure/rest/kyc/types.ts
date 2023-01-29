@@ -23,6 +23,7 @@ export type TKycCheckStepResponseData = {
     pin_form?: boolean; // shown when status === 'D' || status === 'F'
     reason_code: TReasonCode;
     route: "penautan" | "penautan_consent";
+    errors?: string[]
   };
 };
 
