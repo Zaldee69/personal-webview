@@ -472,7 +472,6 @@ const ModalConsent = ({
           };
 
           const params = {
-            ...queryWithDynamicRedirectURL,
             status: "F",
             reason: "user already exist",
           };
@@ -481,20 +480,20 @@ const ModalConsent = ({
           if (queryWithDynamicRedirectURL.redirect_url?.length) {
             const currentRedirectUrl =
               queryWithDynamicRedirectURL.redirect_url as string;
-            const currentRedirectUrlArr = currentRedirectUrl.split("%3F");
+            const currentRedirectUrlArr = currentRedirectUrl.split("?");
 
             if (currentRedirectUrlArr.length > 1) {
               // current redirect_url has param
               queryWithDynamicRedirectURL.redirect_url =
                 currentRedirectUrlArr[0] +
-                "%3F" +
+                "?" +
                 currentRedirectUrlArr[1] +
-                "%26" +
+                "&" +
                 queryString;
             } else {
               // current redirect_url no has param
               queryWithDynamicRedirectURL.redirect_url =
-                currentRedirectUrlArr[0] + "%3F" + queryString;
+                currentRedirectUrlArr[0] + "?" + queryString;
             }
           }
 
@@ -512,7 +511,6 @@ const ModalConsent = ({
         };
 
         const params = {
-          ...queryWithDynamicRedirectURL,
           status: "F",
           reason: "something wrong",
         };
@@ -521,20 +519,20 @@ const ModalConsent = ({
         if (queryWithDynamicRedirectURL.redirect_url?.length) {
           const currentRedirectUrl =
             queryWithDynamicRedirectURL.redirect_url as string;
-          const currentRedirectUrlArr = currentRedirectUrl.split("%3F");
+          const currentRedirectUrlArr = currentRedirectUrl.split("?");
 
           if (currentRedirectUrlArr.length > 1) {
             // current redirect_url has param
             queryWithDynamicRedirectURL.redirect_url =
               currentRedirectUrlArr[0] +
-              "%3F" +
+              "?" +
               currentRedirectUrlArr[1] +
-              "%26" +
+              "&" +
               queryString;
           } else {
             // current redirect_url no has param
             queryWithDynamicRedirectURL.redirect_url =
-              currentRedirectUrlArr[0] + "%3F" + queryString;
+              currentRedirectUrlArr[0] + "?" + queryString;
           }
         }
 
@@ -566,7 +564,6 @@ const ModalConsent = ({
     };
 
     const params = {
-      ...queryWithDynamicRedirectURL,
       status: "F",
       reason: "reject by user",
     };
@@ -575,20 +572,19 @@ const ModalConsent = ({
     if (queryWithDynamicRedirectURL.redirect_url?.length) {
       const currentRedirectUrl =
         queryWithDynamicRedirectURL.redirect_url as string;
-      const currentRedirectUrlArr = currentRedirectUrl.split("%3F");
+      const currentRedirectUrlArr = currentRedirectUrl.split("?");
 
       if (currentRedirectUrlArr.length > 1) {
-        // current redirect_url has param
         queryWithDynamicRedirectURL.redirect_url =
           currentRedirectUrlArr[0] +
-          "%3F" +
+          "?" +
           currentRedirectUrlArr[1] +
-          "%26" +
+          "&" +
           queryString;
       } else {
         // current redirect_url no has param
         queryWithDynamicRedirectURL.redirect_url =
-          currentRedirectUrlArr[0] + "%3F" + queryString;
+          currentRedirectUrlArr[0] + "?" + queryString;
       }
     }
 
