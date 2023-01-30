@@ -1,6 +1,5 @@
 import { handleRoute } from "@/utils/handleRoute";
 import { serverSideRenderReturnConditions } from "@/utils/serverSideRenderReturnConditions";
-import { RestKycCheckStep } from "infrastructure";
 import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
 import { GetServerSideProps } from "next";
 import Image from "next/image";
@@ -12,7 +11,7 @@ import i18n from "i18";
 import { RestKycCheckStepv2 } from "infrastructure/rest/personal";
 import { concateRedirectUrlParams } from "@/utils/concateRedirectUrlParams";
 import { NextParsedUrlQuery } from "next/dist/server/request-meta";
-import { getFRFailedCount } from "@/utils/frFailedCountGetterSetter";
+import { getFRFailedCount, resetFRFailedCount } from "@/utils/frFailedCountGetterSetter";
 
 type Props = {
   checkStepResultDataRoute: TKycCheckStepResponseData["data"]["route"];
@@ -60,10 +59,10 @@ const LinkAccountFailure = (props: Props) => {
             </a>
           </div>
         )
-      ) : failedCount >= 5 ? (
+      ) : failedCount >= 5 && props.checkStepResultDataRoute !== null ? (
         routerQuery.redirect_url ? (
           <div className="mt-20 text-primary text-base poppins-medium underline hover:cursor-pointer">
-            <a href={concateRedirectUrlParams(routerQuery.redirect_url, "")}>
+            <a onClick={() => resetFRFailedCount("count")} href={concateRedirectUrlParams(routerQuery.redirect_url, "")}>
               <a>{t("livenessSuccessButtonTitle")}</a>
             </a>
           </div>
