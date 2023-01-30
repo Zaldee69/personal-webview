@@ -211,9 +211,11 @@ export const serverSideRenderReturnConditions = ({
         const params: any = { ...cQuery, request_id: uuid };
         const queryString = new URLSearchParams(params as any).toString();
         if (
-          currentPathnameWithoutParams ===
+          (currentPathnameWithoutParams ===
             `${assetPrefix}/link-account/failure` ||
-          currentPathnameWithoutParams === "/link-account/failure"
+          currentPathnameWithoutParams === "/link-account/failure") || (   currentPathnameWithoutParams ===
+            `${assetPrefix}/link-account` ||
+          currentPathnameWithoutParams === "/link-account")
         ) {
           return {
             props: {},
