@@ -375,10 +375,8 @@ const FRModal = ({ modal, setModal, tilakaName, formSetter }: IModal) => {
           }
           toast.dismiss("info");
           toast.error(res.message, { icon: <XIcon /> });
-          const doCounting: number = getFRFailedCount("count") + 1;
-          setFRFailedCount("count", doCounting);
-          const newCount: number = getFRFailedCount("count");
-          if (newCount >= 5) {
+          setFRFailedCount("count", res.data.failMfa)
+          if (res.data.failMfa >= 5) {
             doRedirect("link-account/failure");
           }
         }

@@ -52,6 +52,9 @@ export type TPersonalFaceRecognitionRequestData = {
 export type TPersonalFaceRecognitionResponseData = {
   success: boolean;
   message: string;
+  data: {
+    failMfa: number
+  }
 };
 
 export type TPersonalCheckStepv2Response = {
