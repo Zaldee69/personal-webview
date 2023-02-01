@@ -716,6 +716,7 @@ const ModalConsent = ({
 
     let queryWithDynamicRedirectURL = {
       ...modalConsent.data?.queryWithDynamicRedirectURL,
+      tilaka_name: tilakaName,
     };
     const params = {
       status: "F",
