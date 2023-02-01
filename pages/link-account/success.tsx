@@ -2,7 +2,7 @@ import { assetPrefix } from "../../next.config";
 import { NextParsedUrlQuery } from "next/dist/server/request-meta";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { restLogout } from "infrastructure/rest/b2b";
 import { handleRoute } from "./../../utils/handleRoute";
 import { GetServerSideProps } from "next";
@@ -23,12 +23,83 @@ const LinkAccountSuccess = (props: Props) => {
     redirect_url?: string;
   } = router.query;
   const isSigning: boolean = routerQuery.signing === "1";
+  const [redirectUrl, setRedirectUrl] = useState<string>(
+    routerQuery.redirect_url as string
+  );
 
   const { t }: any = i18n;
 
   useEffect(() => {
     if (!routerIsReady) return;
     if (!isSigning) {
+      let queryWithDynamicRedirectURL = {
+        ...routerQuery,
+      };
+      const params = {
+        "request-id": queryWithDynamicRedirectURL.request_id,
+        "tilaka-name": queryWithDynamicRedirectURL.tilaka_name,
+      };
+      let queryString = new URLSearchParams(params as any).toString();
+
+      if (queryWithDynamicRedirectURL.redirect_url?.length) {
+        const currentRedirectUrl =
+          queryWithDynamicRedirectURL.redirect_url as string;
+        const currentRedirectUrlArr = currentRedirectUrl.split("?");
+
+        if (currentRedirectUrlArr.length > 1) {
+          if (
+            currentRedirectUrlArr[1].includes("request-id") &&
+            currentRedirectUrlArr[1].includes("tilaka-name")
+          ) {
+            queryWithDynamicRedirectURL.redirect_url =
+              currentRedirectUrlArr[0] +
+              "?" +
+              currentRedirectUrlArr[1] +
+              "&" +
+              queryString;
+          } else if (currentRedirectUrlArr[1].includes("request-id")) {
+            const additionParams = {
+              ...params,
+              "tilaka-name": queryWithDynamicRedirectURL.tilaka_name,
+            };
+            queryString = new URLSearchParams(additionParams as any).toString();
+
+            queryWithDynamicRedirectURL.redirect_url =
+              currentRedirectUrlArr[0] +
+              "?" +
+              currentRedirectUrlArr[1] +
+              "&" +
+              queryString;
+          } else if (currentRedirectUrlArr[1].includes("tilaka-name")) {
+            const additionParams = {
+              ...params,
+              "request-id": queryWithDynamicRedirectURL.request_id,
+            };
+            queryString = new URLSearchParams(additionParams as any).toString();
+
+            queryWithDynamicRedirectURL.redirect_url =
+              currentRedirectUrlArr[0] +
+              "?" +
+              currentRedirectUrlArr[1] +
+              "&" +
+              queryString;
+          } else {
+            // manualy input redirect_url on url
+            queryWithDynamicRedirectURL.redirect_url =
+              currentRedirectUrlArr[0] +
+              "?" +
+              currentRedirectUrlArr[1] +
+              "&" +
+              queryString;
+          }
+        } else {
+          // current redirect_url no has param
+          queryWithDynamicRedirectURL.redirect_url =
+            currentRedirectUrlArr[0] + "?" + queryString;
+        }
+      }
+
+      setRedirectUrl(queryWithDynamicRedirectURL.redirect_url as string);
       restLogout({});
     } else {
       setTimeout(() => {
@@ -58,9 +129,9 @@ const LinkAccountSuccess = (props: Props) => {
           {t("linkAccountSuccessSubtitle")}
         </p>
       </div>
-      {!isSigning && routerQuery.redirect_url && (
+      {!isSigning && redirectUrl && (
         <div className="mt-20 text-primary text-base poppins-medium underline hover:cursor-pointer">
-          <a href={concateRedirectUrlParams(routerQuery.redirect_url, "")}>
+          <a href={concateRedirectUrlParams(redirectUrl, "")}>
             <a>{t("livenessSuccessButtonTitle")}</a>
           </a>
         </div>
@@ -79,7 +150,7 @@ const LinkAccountSuccess = (props: Props) => {
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const cQuery = context.query;
-  const isNotRedirect: boolean = true
+  const isNotRedirect: boolean = true;
   const uuid =
     cQuery.transaction_id || cQuery.request_id || cQuery.registration_id;
 
@@ -104,7 +175,11 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       return { err };
     });
 
-  return serverSideRenderReturnConditions({ context, checkStepResult, isNotRedirect });
+  return serverSideRenderReturnConditions({
+    context,
+    checkStepResult,
+    isNotRedirect,
+  });
 };
 
 export default LinkAccountSuccess;

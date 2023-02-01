@@ -17,7 +17,6 @@ import {
 } from "infrastructure/rest/b2b";
 import { GetServerSideProps } from "next";
 import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
-import { RestKycCheckStep } from "infrastructure";
 import { serverSideRenderReturnConditions } from "@/utils/serverSideRenderReturnConditions";
 import FRCamera from "@/components/FRCamera";
 import i18n from "i18";
@@ -462,20 +461,15 @@ const ModalConsent = ({
     })
       .then((res) => {
         if (res.success) {
-          router.replace({
-            pathname: handleRoute("link-account/success"),
-            query: { ...modalConsent.data?.queryWithDynamicRedirectURL },
-          });
-        } else {
           let queryWithDynamicRedirectURL = {
             ...modalConsent.data?.queryWithDynamicRedirectURL,
+            tilaka_name: tilakaName,
           };
-
           const params = {
-            status: "F",
-            reason: "user already exist",
+            "request-id": queryWithDynamicRedirectURL.request_id,
+            "tilaka-name": queryWithDynamicRedirectURL.tilaka_name,
           };
-          const queryString = new URLSearchParams(params as any).toString();
+          let queryString = new URLSearchParams(params as any).toString();
 
           if (queryWithDynamicRedirectURL.redirect_url?.length) {
             const currentRedirectUrl =
@@ -483,13 +477,132 @@ const ModalConsent = ({
             const currentRedirectUrlArr = currentRedirectUrl.split("?");
 
             if (currentRedirectUrlArr.length > 1) {
-              // current redirect_url has param
+              if (
+                currentRedirectUrlArr[1].includes("request-id") &&
+                currentRedirectUrlArr[1].includes("tilaka-name")
+              ) {
+                // do nothing, return redirect_url from response checkPassword with not addition params
+                queryWithDynamicRedirectURL.redirect_url =
+                  currentRedirectUrlArr[0] +
+                  "?" +
+                  currentRedirectUrlArr[1] +
+                  "&";
+              } else if (currentRedirectUrlArr[1].includes("request-id")) {
+                const additionParams = {
+                  ...params,
+                  "tilaka-name": queryWithDynamicRedirectURL.tilaka_name,
+                };
+                queryString = new URLSearchParams(
+                  additionParams as any
+                ).toString();
+
+                queryWithDynamicRedirectURL.redirect_url =
+                  currentRedirectUrlArr[0] +
+                  "?" +
+                  currentRedirectUrlArr[1] +
+                  "&" +
+                  queryString;
+              } else if (currentRedirectUrlArr[1].includes("tilaka-name")) {
+                const additionParams = {
+                  ...params,
+                  "request-id": queryWithDynamicRedirectURL.request_id,
+                };
+                queryString = new URLSearchParams(
+                  additionParams as any
+                ).toString();
+
+                queryWithDynamicRedirectURL.redirect_url =
+                  currentRedirectUrlArr[0] +
+                  "?" +
+                  currentRedirectUrlArr[1] +
+                  "&" +
+                  queryString;
+              } else {
+                // manualy input redirect_url on url
+                queryWithDynamicRedirectURL.redirect_url =
+                  currentRedirectUrlArr[0] +
+                  "?" +
+                  currentRedirectUrlArr[1] +
+                  "&" +
+                  queryString;
+              }
+            } else {
+              // current redirect_url no has param
               queryWithDynamicRedirectURL.redirect_url =
-                currentRedirectUrlArr[0] +
-                "?" +
-                currentRedirectUrlArr[1] +
-                "&" +
-                queryString;
+                currentRedirectUrlArr[0] + "?" + queryString;
+            }
+          }
+
+          router.replace({
+            pathname: handleRoute("link-account/success"),
+            query: { ...queryWithDynamicRedirectURL },
+          });
+        } else {
+          let queryWithDynamicRedirectURL = {
+            ...modalConsent.data?.queryWithDynamicRedirectURL,
+            tilaka_name: tilakaName,
+          };
+          const params = {
+            status: "F",
+            reason: "user already exist",
+          };
+          let queryString = new URLSearchParams(params as any).toString();
+
+          if (queryWithDynamicRedirectURL.redirect_url?.length) {
+            const currentRedirectUrl =
+              queryWithDynamicRedirectURL.redirect_url as string;
+            const currentRedirectUrlArr = currentRedirectUrl.split("?");
+
+            if (currentRedirectUrlArr.length > 1) {
+              if (
+                currentRedirectUrlArr[1].includes("request-id") &&
+                currentRedirectUrlArr[1].includes("tilaka-name")
+              ) {
+                queryWithDynamicRedirectURL.redirect_url =
+                  currentRedirectUrlArr[0] +
+                  "?" +
+                  currentRedirectUrlArr[1] +
+                  "&" +
+                  queryString;
+              } else if (currentRedirectUrlArr[1].includes("request-id")) {
+                const additionParams = {
+                  ...params,
+                  "tilaka-name": queryWithDynamicRedirectURL.tilaka_name,
+                };
+                queryString = new URLSearchParams(
+                  additionParams as any
+                ).toString();
+
+                queryWithDynamicRedirectURL.redirect_url =
+                  currentRedirectUrlArr[0] +
+                  "?" +
+                  currentRedirectUrlArr[1] +
+                  "&" +
+                  queryString;
+              } else if (currentRedirectUrlArr[1].includes("tilaka-name")) {
+                const additionParams = {
+                  ...params,
+                  "request-id": queryWithDynamicRedirectURL.request_id,
+                };
+                queryString = new URLSearchParams(
+                  additionParams as any
+                ).toString();
+
+                queryWithDynamicRedirectURL.redirect_url =
+                  currentRedirectUrlArr[0] +
+                  "?" +
+                  currentRedirectUrlArr[1] +
+                  "&" +
+                  queryString;
+              } else {
+                // manualy input redirect_url on url
+                queryWithDynamicRedirectURL.redirect_url =
+                  currentRedirectUrlArr[0] +
+                  "?" +
+                  currentRedirectUrlArr[1] +
+                  "&" +
+                  queryString;
+              }
             } else {
               // current redirect_url no has param
               queryWithDynamicRedirectURL.redirect_url =
@@ -508,13 +621,13 @@ const ModalConsent = ({
       .catch((err) => {
         let queryWithDynamicRedirectURL = {
           ...modalConsent.data?.queryWithDynamicRedirectURL,
+          tilaka_name: tilakaName,
         };
-
         const params = {
           status: "F",
           reason: "something wrong",
         };
-        const queryString = new URLSearchParams(params as any).toString();
+        let queryString = new URLSearchParams(params as any).toString();
 
         if (queryWithDynamicRedirectURL.redirect_url?.length) {
           const currentRedirectUrl =
@@ -522,13 +635,55 @@ const ModalConsent = ({
           const currentRedirectUrlArr = currentRedirectUrl.split("?");
 
           if (currentRedirectUrlArr.length > 1) {
-            // current redirect_url has param
-            queryWithDynamicRedirectURL.redirect_url =
-              currentRedirectUrlArr[0] +
-              "?" +
-              currentRedirectUrlArr[1] +
-              "&" +
-              queryString;
+            if (
+              currentRedirectUrlArr[1].includes("request-id") &&
+              currentRedirectUrlArr[1].includes("tilaka-name")
+            ) {
+              queryWithDynamicRedirectURL.redirect_url =
+                currentRedirectUrlArr[0] +
+                "?" +
+                currentRedirectUrlArr[1] +
+                "&" +
+                queryString;
+            } else if (currentRedirectUrlArr[1].includes("request-id")) {
+              const additionParams = {
+                ...params,
+                "tilaka-name": queryWithDynamicRedirectURL.tilaka_name,
+              };
+              queryString = new URLSearchParams(
+                additionParams as any
+              ).toString();
+
+              queryWithDynamicRedirectURL.redirect_url =
+                currentRedirectUrlArr[0] +
+                "?" +
+                currentRedirectUrlArr[1] +
+                "&" +
+                queryString;
+            } else if (currentRedirectUrlArr[1].includes("tilaka-name")) {
+              const additionParams = {
+                ...params,
+                "request-id": queryWithDynamicRedirectURL.request_id,
+              };
+              queryString = new URLSearchParams(
+                additionParams as any
+              ).toString();
+
+              queryWithDynamicRedirectURL.redirect_url =
+                currentRedirectUrlArr[0] +
+                "?" +
+                currentRedirectUrlArr[1] +
+                "&" +
+                queryString;
+            } else {
+              // manualy input redirect_url on url
+              queryWithDynamicRedirectURL.redirect_url =
+                currentRedirectUrlArr[0] +
+                "?" +
+                currentRedirectUrlArr[1] +
+                "&" +
+                queryString;
+            }
           } else {
             // current redirect_url no has param
             queryWithDynamicRedirectURL.redirect_url =
@@ -562,12 +717,11 @@ const ModalConsent = ({
     let queryWithDynamicRedirectURL = {
       ...modalConsent.data?.queryWithDynamicRedirectURL,
     };
-
     const params = {
       status: "F",
       reason: "reject by user",
     };
-    const queryString = new URLSearchParams(params as any).toString();
+    let queryString = new URLSearchParams(params as any).toString();
 
     if (queryWithDynamicRedirectURL.redirect_url?.length) {
       const currentRedirectUrl =
@@ -575,12 +729,51 @@ const ModalConsent = ({
       const currentRedirectUrlArr = currentRedirectUrl.split("?");
 
       if (currentRedirectUrlArr.length > 1) {
-        queryWithDynamicRedirectURL.redirect_url =
-          currentRedirectUrlArr[0] +
-          "?" +
-          currentRedirectUrlArr[1] +
-          "&" +
-          queryString;
+        if (
+          currentRedirectUrlArr[1].includes("request-id") &&
+          currentRedirectUrlArr[1].includes("tilaka-name")
+        ) {
+          queryWithDynamicRedirectURL.redirect_url =
+            currentRedirectUrlArr[0] +
+            "?" +
+            currentRedirectUrlArr[1] +
+            "&" +
+            queryString;
+        } else if (currentRedirectUrlArr[1].includes("request-id")) {
+          const additionParams = {
+            ...params,
+            "tilaka-name": queryWithDynamicRedirectURL.tilaka_name,
+          };
+          queryString = new URLSearchParams(additionParams as any).toString();
+
+          queryWithDynamicRedirectURL.redirect_url =
+            currentRedirectUrlArr[0] +
+            "?" +
+            currentRedirectUrlArr[1] +
+            "&" +
+            queryString;
+        } else if (currentRedirectUrlArr[1].includes("tilaka-name")) {
+          const additionParams = {
+            ...params,
+            "request-id": queryWithDynamicRedirectURL.request_id,
+          };
+          queryString = new URLSearchParams(additionParams as any).toString();
+
+          queryWithDynamicRedirectURL.redirect_url =
+            currentRedirectUrlArr[0] +
+            "?" +
+            currentRedirectUrlArr[1] +
+            "&" +
+            queryString;
+        } else {
+          // manualy input redirect_url on url
+          queryWithDynamicRedirectURL.redirect_url =
+            currentRedirectUrlArr[0] +
+            "?" +
+            currentRedirectUrlArr[1] +
+            "&" +
+            queryString;
+        }
       } else {
         // current redirect_url no has param
         queryWithDynamicRedirectURL.redirect_url =
