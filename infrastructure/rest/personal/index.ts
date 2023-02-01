@@ -97,7 +97,7 @@ export const RestPersonalFaceRecognition = ({
   payload: TPersonalFaceRecognitionRequestData;
 }): Promise<TPersonalFaceRecognitionResponseData> => {
   return axios
-    .post<TPersonalSetPasswordResponseData>(
+    .post<TPersonalFaceRecognitionResponseData>(
       `${BASE_URL}/face-verification`,
       payload,
       {
