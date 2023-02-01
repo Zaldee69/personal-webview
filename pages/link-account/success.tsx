@@ -52,11 +52,7 @@ const LinkAccountSuccess = (props: Props) => {
             currentRedirectUrlArr[1].includes("tilaka-name")
           ) {
             queryWithDynamicRedirectURL.redirect_url =
-              currentRedirectUrlArr[0] +
-              "?" +
-              currentRedirectUrlArr[1] +
-              "&" +
-              queryString;
+              currentRedirectUrlArr[0] + "?" + currentRedirectUrlArr[1] + "&";
           } else if (currentRedirectUrlArr[1].includes("request-id")) {
             const additionParams = {
               ...params,
