@@ -28,6 +28,7 @@ const LinkAccountFailure = (props: Props) => {
     redirect_url?: string;
     tilaka_name?: string;
     reject_by_user?: "1";
+    account_locked?: "1";
   } = router.query;
   const [redirectUrl, setRedirectUrl] = useState<string>(
     routerQuery.redirect_url as string
@@ -48,6 +49,12 @@ const LinkAccountFailure = (props: Props) => {
     }
     if (queryWithDynamicRedirectURL.tilaka_name) {
       params["tilaka-name"] = queryWithDynamicRedirectURL.tilaka_name;
+    }
+    if (queryWithDynamicRedirectURL.status) {
+      params["status"] = queryWithDynamicRedirectURL.status;
+    }
+    if (queryWithDynamicRedirectURL.reason) {
+      params["reason"] = queryWithDynamicRedirectURL.reason;
     }
 
     let queryString = new URLSearchParams(params as any).toString();
@@ -136,12 +143,25 @@ const LinkAccountFailure = (props: Props) => {
         <></>
       )}
       {props.checkStepResultDataRoute === "penautan_consent" ? (
-        redirectUrl && (
+        routerQuery.account_locked === "1" ? (
           <div className="mt-20 text-primary text-base poppins-medium underline hover:cursor-pointer">
-            <a href={concateRedirectUrlParams(redirectUrl, "")}>
-              {t("livenessSuccessButtonTitle")}
-            </a>
+            <Link
+              href={{
+                pathname: handleRoute("link-account"),
+                query: { ...router.query },
+              }}
+            >
+              <a>{t("linkAccountTilaka")}</a>
+            </Link>
           </div>
+        ) : (
+          redirectUrl && (
+            <div className="mt-20 text-primary text-base poppins-medium underline hover:cursor-pointer">
+              <a href={concateRedirectUrlParams(redirectUrl, "")}>
+                {t("livenessSuccessButtonTitle")}
+              </a>
+            </div>
+          )
         )
       ) : failedCount >= 5 && props.checkStepResultDataRoute !== null ? (
         redirectUrl ? (
