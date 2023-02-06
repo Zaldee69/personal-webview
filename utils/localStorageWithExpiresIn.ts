@@ -19,7 +19,7 @@ type TredirectTo = UrlObject | string;
  * @param key string
  * @returns boolean
  */
-function removeStorage(key: string): boolean {
+export const removeStorageWithExpiresIn = (key: string): boolean => {
   try {
     localStorage.removeItem(key);
     localStorage.removeItem(key + "_expiresIn");
@@ -33,7 +33,7 @@ function removeStorage(key: string): boolean {
     return false;
   }
   return true;
-}
+};
 
 /**
  * Retrieves a key from localStorage previously set with setStorage()
@@ -41,11 +41,11 @@ function removeStorage(key: string): boolean {
  * @param redirectTo string
  * @returns string | null
  */
-function getStorage(
+export const getStorageWithExpiresIn = (
   key: string,
   redirectTo?: TredirectTo,
   redirectQuery?: NextParsedUrlQuery
-): string | null {
+): string | null => {
   var now = Date.now(); //epoch time, lets deal only with integer
   // set expiration for storage
   var expiresIn: string | number | null = localStorage.getItem(
@@ -61,7 +61,7 @@ function getStorage(
     // Expired
     // expiresIn === 0 indicate that expiresIn not exist on localStorage
     if (expiresIn !== 0) {
-      removeStorage(key);
+      removeStorageWithExpiresIn(key);
       if (redirectTo) {
         Router.replace({
           pathname: redirectTo as string,
@@ -99,7 +99,7 @@ function getStorage(
       return null;
     }
   }
-}
+};
 
 /**
  * Writes a key into localStorage setting a expire time
@@ -108,7 +108,11 @@ function getStorage(
  * @param expires number
  * @returns boolean
  */
-function setStorage(key: string, value: string, expires: number): boolean {
+export const setStorageWithExpiresIn = (
+  key: string,
+  value: string,
+  expires: number
+): boolean => {
   if (expires === undefined || expires === null) {
     expires = 24 * 60 * 60; // default: seconds for 1 day
   } else {
@@ -131,20 +135,4 @@ function setStorage(key: string, value: string, expires: number): boolean {
     return false;
   }
   return true;
-}
-
-/**
- * Export functions
- */
-export {
-  removeStorage as removeStorageWithExpiresIn,
-  getStorage as getStorageWithExpiresIn,
-  setStorage as setStorageWithExpiresIn,
 };
-
-/**
- * login
- * login/v2
- * signing
- * signing/v2
- */
