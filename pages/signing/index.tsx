@@ -28,6 +28,10 @@ import { concateRedirectUrlParams } from "@/utils/concateRedirectUrlParams";
 import i18n from "i18";
 import Loading from "@/components/Loading";
 import { RestKycCheckStepv2 } from "infrastructure/rest/personal";
+import {
+  getStorageWithExpiresIn,
+  removeStorageWithExpiresIn,
+} from "@/utils/localStorageWithExpiresIn";
 
 type TFontSig =
   | "Adine-Kirnberg"
@@ -58,25 +62,29 @@ const Signing = () => {
   const res = useSelector((state: RootState) => state.document);
   const { t }: any = i18n;
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    if (!routerIsReady) return;
+
+    const token = getStorageWithExpiresIn("token", handleRoute("login"), {
+      ...router.query,
+    });
     const count = parseInt(localStorage.getItem("count") as string);
     localStorage.setItem("count", count ? count.toString() : "0");
-    if (routerIsReady) {
-      getUserName({}).then((res) => {
-        const data = JSON.parse(res.data);
-        setData(data.name);
-      });
-      dispatch(
-        getDocument({
-          company_id,
-          transaction_id: (request_id as string) || (transaction_id as string),
-          token,
-        } as TDocumentProps)
-      );
-      if (res.response.status === "REJECTED") {
-        localStorage.removeItem("token");
-      }
+
+    getUserName({}).then((res) => {
+      const data = JSON.parse(res.data);
+      setData(data.name);
+    });
+    dispatch(
+      getDocument({
+        company_id,
+        transaction_id: (request_id as string) || (transaction_id as string),
+        token,
+      } as TDocumentProps)
+    );
+    if (res.response.status === "REJECTED") {
+      removeStorageWithExpiresIn("token");
     }
+
     if (!token) {
       router.replace({
         pathname: handleRoute("login"),
@@ -151,26 +159,26 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const params = { ...cQuery, registration_id: uuid };
   const queryString = new URLSearchParams(params as any).toString();
 
-    const checkStepResult: {
-      res?: TKycCheckStepResponseData;
-      err?: {
-        response: {
-          data: {
-            success: boolean;
-            message: string;
-            data: { errors: string[] };
-          };
+  const checkStepResult: {
+    res?: TKycCheckStepResponseData;
+    err?: {
+      response: {
+        data: {
+          success: boolean;
+          message: string;
+          data: { errors: string[] };
         };
       };
-    } = await RestKycCheckStepv2({
-      registerId: uuid as string,
+    };
+  } = await RestKycCheckStepv2({
+    registerId: uuid as string,
+  })
+    .then((res) => {
+      return { res };
     })
-      .then((res) => {
-        return {res}
-      })
-      .catch((err) => {
-        return {err}
-      });
+    .catch((err) => {
+      return { err };
+    });
 
   return serverSideRenderReturnConditions({ context, checkStepResult });
 };
@@ -583,7 +591,7 @@ export const OTPModal: React.FC<Active> = ({ modal, setModal }) => {
           const count = parseInt(localStorage.getItem("count") as string);
           if (count >= 5) {
             setEndTimeToZero();
-            localStorage.removeItem("token");
+            removeStorageWithExpiresIn("token");
             localStorage.setItem("count", "0");
             restLogout({});
             router.replace({

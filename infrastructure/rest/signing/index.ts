@@ -1,3 +1,4 @@
+import { getStorageWithExpiresIn } from "@/utils/localStorageWithExpiresIn";
 import axios from "axios";
 import {
   TSigningRequestData,
@@ -12,7 +13,7 @@ const BASE_URL =
 
 export const restSigning = ({
   payload,
-  token = localStorage.getItem("token"),
+  token = getStorageWithExpiresIn("token"),
 }: {
   payload: TSigningRequestData;
   token?: string | null;
@@ -35,10 +36,10 @@ export const RestSigningAuthPIN = ({
   payload: TSigningAuthPINRequestData;
   token?: string | null;
 }): Promise<TSigningAuthPINResponseData> => {
-  const isAsync = payload.async === "true" 
+  const isAsync = payload.async === "true";
   return axios
     .post<TSigningAuthPINResponseData>(
-     `${BASE_URL}/${isAsync ? "v2/" : ""}signing-authpin`,
+      `${BASE_URL}/${isAsync ? "v2/" : ""}signing-authpin`,
       {
         pin: payload.pin,
         otp_pin: payload.otp_pin,
@@ -64,7 +65,7 @@ export const RestSigningAuthPIN = ({
 
 export const RestSigningDownloadSignedPDF = ({
   request_id,
-  token = localStorage.getItem("token_v2"),
+  token = getStorageWithExpiresIn("token_v2"),
 }: {
   request_id: string;
   token?: string | null;
