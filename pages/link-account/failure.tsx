@@ -18,6 +18,7 @@ import {
 
 type Props = {
   checkStepResultDataRoute: TKycCheckStepResponseData["data"]["route"];
+  checkStepResultResponseData: string[];
 };
 
 const LinkAccountFailure = (props: Props) => {
@@ -163,7 +164,9 @@ const LinkAccountFailure = (props: Props) => {
             </div>
           )
         )
-      ) : failedCount >= 5 && props.checkStepResultDataRoute !== null ? (
+      ) : (failedCount >= 5 && props.checkStepResultDataRoute !== null) ||
+        props.checkStepResultResponseData[0] ===
+          "registrationId tidak valid" ? (
         redirectUrl ? (
           <div className="mt-20 text-primary text-base poppins-medium underline hover:cursor-pointer">
             <a
@@ -231,6 +234,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   serverSideRenderReturnConditionsResult["props"] = {
     ...serverSideRenderReturnConditionsResult["props"],
     checkStepResultDataRoute: checkStepResult.res?.data?.route || null,
+    checkStepResultResponseData: checkStepResult.res?.data.errors || null,
   };
 
   return serverSideRenderReturnConditionsResult;
