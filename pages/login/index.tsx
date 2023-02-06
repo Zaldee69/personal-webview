@@ -160,6 +160,13 @@ const Login = ({}: Props) => {
                   ...queryWithDynamicRedirectURL,
                 },
               });
+            } else if(router.query.setting === "2"){
+              router.replace({
+                pathname: handleRoute("set-mfa"),
+                query: {
+                  ...queryWithDynamicRedirectURL,
+                },
+              });
             } else {
               router.replace({
                 pathname: handleRoute("signing"),

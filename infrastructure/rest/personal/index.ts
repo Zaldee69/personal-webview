@@ -13,6 +13,7 @@ import {
   TPersonalFaceRecognitionResponseData,
   TPersonalCheckStepv2Response,
   TPersonalApproveConsentResponse,
+  TPersonalFaceRecognitionRequestDataV2,
 } from "./types";
 
 import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
@@ -99,6 +100,28 @@ export const RestPersonalFaceRecognition = ({
   return axios
     .post<TPersonalFaceRecognitionResponseData>(
       `${BASE_URL}/face-verification`,
+      payload,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    )
+    .then((res) => res.data)
+    .catch((err) => {
+      throw err;
+    });
+};
+
+
+export const RestPersonalFaceRecognitionV2 = ({
+  payload,
+}: {
+  payload: TPersonalFaceRecognitionRequestDataV2;
+}): Promise<TPersonalFaceRecognitionResponseData> => {
+  return axios
+    .post<TPersonalFaceRecognitionResponseData>(
+      `${BASE_URL}/checkFr`,
       payload,
       {
         headers: {
