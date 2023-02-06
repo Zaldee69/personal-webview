@@ -21,7 +21,7 @@ import { toast } from "react-toastify";
 type IModalFR = {
   isShowModalFr: boolean;
   setShowModalFr: React.Dispatch<React.SetStateAction<boolean>>;
-  geTypeMfa: () => void
+  geTypeMfa: () => void;
 };
 
 type IOtpModalConfrimation = {
@@ -32,8 +32,8 @@ type IOtpModalConfrimation = {
 
 const SetMfa = () => {
   const { t }: any = i18n;
-
   const router = useRouter();
+  const dispatch: AppDispatch = useDispatch();
 
   const [isShowModalFr, setShowModalFr] = useState<boolean>(false);
   const [isShowOtpModalConfirmation, setIsShowOtpModalConfirmation] =
@@ -58,14 +58,33 @@ const SetMfa = () => {
           payload: {
             mfa_type: mfaMethod,
           },
-        }).then((res) => {
-          setIsShowOtpModalConfirmation(false);
-          geTypeMfa()
-          toast("Penggantian MFA berhasil", {
-            type: "success",
-            toastId: "success",
+        })
+          .then((res) => {
+            setIsShowOtpModalConfirmation(false);
+            geTypeMfa();
+            toast("Penggantian MFA berhasil", {
+              type: "success",
+              toastId: "success",
+            });
+          })
+          .catch((err) => {
+            setIsShowOtpModalConfirmation(false);
+            toast.dismiss("info");
+            if (err.response?.status === 401) {
+              toast.error("Anda harus login terlebih dahulu", {
+                icon: <XIcon />,
+              });
+              dispatch(resetInitalState());
+              router.replace({
+                pathname: handleRoute("login"),
+                query: { ...router.query, setting: "2" },
+              });
+            } else {
+              toast.error(err.response?.data?.message || "Terjadi kesalahan", {
+                icon: <XIcon />,
+              });
+            }
           });
-        });
       } else {
         toast("Metode otentikasi anda sudah OTP", {
           type: "info",
@@ -79,26 +98,26 @@ const SetMfa = () => {
 
   const geTypeMfa = () => {
     getUserName({})
-        .then((res) => {
-          const data = JSON.parse(res.data);
-          setDefaultMfa(data?.typeMfa?.toLowerCase());
-          setMfaMethod(data?.typeMfa?.toLowerCase());
-        })
-        .catch((err) => {
-          if (err.response?.status === 401) {
-            toast("Anda harus login terlebih dahulu", {
-              type: "error",
-              toastId: "error",
-              position: "top-center",
-              icon: XIcon,
-            });
-            router.replace({
-              pathname: handleRoute("login"),
-              query: { ...router.query, setting: "2" },
-            });
-          }
-        });
-  }
+      .then((res) => {
+        const data = JSON.parse(res.data);
+        setDefaultMfa(data?.typeMfa?.toLowerCase());
+        setMfaMethod(data?.typeMfa?.toLowerCase());
+      })
+      .catch((err) => {
+        if (err.response?.status === 401) {
+          toast("Anda harus login terlebih dahulu", {
+            type: "error",
+            toastId: "error",
+            position: "top-center",
+            icon: XIcon,
+          });
+          router.replace({
+            pathname: handleRoute("login"),
+            query: { ...router.query, setting: "2" },
+          });
+        }
+      });
+  };
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -108,7 +127,7 @@ const SetMfa = () => {
         query: { ...router.query, setting: "2" },
       });
     } else {
-      geTypeMfa()
+      geTypeMfa();
     }
   }, [router.isReady, router]);
 
@@ -181,7 +200,12 @@ const SetMfa = () => {
           </label>
         </div>
         <div className="poppins-regular justify-center flex-col-reverse md:flex-row flex gap-3 md:justify-end mt-10">
-          <button onClick={() => setMfaMethod(defaultMfa)} className="text-primary font-semibold">Batal</button>
+          <button
+            onClick={() => setMfaMethod(defaultMfa)}
+            className="text-primary font-semibold"
+          >
+            Batal
+          </button>
           <button
             onClick={() => onClickHandler("confirmation")}
             disabled={defaultMfa === mfaMethod}
@@ -241,7 +265,7 @@ const FRModal = ({ isShowModalFr, setShowModalFr, geTypeMfa }: IModalFR) => {
               type: "success",
               toastId: "success",
             });
-            geTypeMfa()
+            geTypeMfa();
           });
         } else {
           setIsFRSuccess(false);
@@ -252,7 +276,7 @@ const FRModal = ({ isShowModalFr, setShowModalFr, geTypeMfa }: IModalFR) => {
           if (newCount >= 5) {
             dispatch(resetInitalState());
             toast.error("Anda sudah gagal FR 5 kali", { icon: <XIcon /> });
-            setFRFailedCount("set_mfa_count", 0)
+            setFRFailedCount("set_mfa_count", 0);
             localStorage.removeItem("token");
             doRedirect("login");
           } else {

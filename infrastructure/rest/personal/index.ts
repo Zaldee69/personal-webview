@@ -136,6 +136,7 @@ export const RestPersonalFaceRecognitionV2 = ({
     });
 };
 
+
 export const RestKycCheckStepv2 = ({
   registerId,
 }: {
