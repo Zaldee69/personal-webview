@@ -76,3 +76,7 @@ export type TPersonalApproveConsentResponse = {
     reason: string;
   };
 };
+
+export type TPersonalFaceRecognitionRequestDataV2 = {
+  face_image: string
+}
