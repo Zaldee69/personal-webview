@@ -30,7 +30,6 @@ import {
   removeStorageWithExpiresIn,
   setStorageWithExpiresIn,
 } from "@/utils/localStorageWithExpiresIn";
-import jwt from "jsonwebtoken";
 import { getExpFromToken } from "@/utils/getExpFromToken";
 
 interface IPropsLogin {}
@@ -91,11 +90,6 @@ const Login = ({}: IPropsLogin) => {
       if (showAutoLogoutInfo === "1") {
         setAutoLogoutModal(true);
       }
-
-      const token = getStorageWithExpiresIn("token_v2");
-      const decodedToken = jwt.decode(token as string);
-
-      console.log("decoded token", decodedToken);
     }
   }, [router.isReady]); // eslint-disable-line react-hooks/exhaustive-deps
 
