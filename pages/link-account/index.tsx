@@ -193,6 +193,19 @@ const LinkAccount = (props: Props) => {
     ) {
       toast.error(data.data.message, { icon: <XIcon /> });
     } else if (
+      data.data.message ===
+        "Saat ini akun Anda terkunci. Silahkan coba login beberapa saat lagi." &&
+      data.status === "FULLFILLED" &&
+      !data.data.success
+    ) {
+      router.replace({
+        pathname: handleRoute("link-account/failure"),
+        query: {
+          ...router.query,
+          account_locked: "1",
+        },
+      });
+    } else if (
       data.status === "REJECTED" ||
       (data.status === "FULLFILLED" && !data.data.success)
     ) {
@@ -612,14 +625,23 @@ const ModalConsent = ({
               queryWithDynamicRedirectURL.redirect_url =
                 currentRedirectUrlArr[0] + "?" + queryString;
             }
-          }
 
-          router.replace({
-            pathname: handleRoute("link-account/failure"),
-            query: {
-              ...queryWithDynamicRedirectURL,
-            },
-          });
+            router.replace({
+              pathname: handleRoute("link-account/failure"),
+              query: {
+                ...queryWithDynamicRedirectURL,
+              },
+            });
+          } else {
+            // redirect_url not exist
+            router.replace({
+              pathname: handleRoute("link-account/failure"),
+              query: {
+                ...queryWithDynamicRedirectURL,
+                ...params,
+              },
+            });
+          }
         }
       })
       .catch((err) => {
@@ -693,14 +715,23 @@ const ModalConsent = ({
             queryWithDynamicRedirectURL.redirect_url =
               currentRedirectUrlArr[0] + "?" + queryString;
           }
-        }
 
-        router.replace({
-          pathname: handleRoute("link-account/failure"),
-          query: {
-            ...queryWithDynamicRedirectURL,
-          },
-        });
+          router.replace({
+            pathname: handleRoute("link-account/failure"),
+            query: {
+              ...queryWithDynamicRedirectURL,
+            },
+          });
+        } else {
+          // redirect_url not exist
+          router.replace({
+            pathname: handleRoute("link-account/failure"),
+            query: {
+              ...queryWithDynamicRedirectURL,
+              ...params,
+            },
+          });
+        }
       });
     // catch to penautan failure with
   };
@@ -784,15 +815,25 @@ const ModalConsent = ({
         queryWithDynamicRedirectURL.redirect_url =
           currentRedirectUrlArr[0] + "?" + queryString;
       }
-    }
 
-    router.replace({
-      pathname: handleRoute("link-account/failure"),
-      query: {
-        ...queryWithDynamicRedirectURL,
-        reject_by_user: "1",
-      },
-    });
+      router.replace({
+        pathname: handleRoute("link-account/failure"),
+        query: {
+          ...queryWithDynamicRedirectURL,
+          reject_by_user: "1",
+        },
+      });
+    } else {
+      // redirect_url not exist
+      router.replace({
+        pathname: handleRoute("link-account/failure"),
+        query: {
+          ...queryWithDynamicRedirectURL,
+          ...params,
+          reject_by_user: "1",
+        },
+      });
+    }
   };
 
   return modalConsent.show ? (
