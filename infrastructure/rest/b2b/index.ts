@@ -1,3 +1,4 @@
+import { getStorageWithExpiresIn } from "@/utils/localStorageWithExpiresIn";
 import axios from "axios";
 import {
   TSetDefaultSignatureRequestData,
@@ -14,7 +15,7 @@ const BASE_URL =
 
 export const restSetDefaultSignature = ({
   payload,
-  token = localStorage.getItem("token"),
+  token = getStorageWithExpiresIn("token"),
 }: {
   payload: TSetDefaultSignatureRequestData;
   token?: string | null;
@@ -37,7 +38,7 @@ export const restSetDefaultSignature = ({
 
 export const restSetDefaultMFA = ({
   payload,
-  token = localStorage.getItem("token"),
+  token = getStorageWithExpiresIn("token"),
 }: {
   payload: TSetDefaultMFARequestData;
   token?: string | null;
@@ -62,7 +63,7 @@ export const RestConfirmCertificate = (
   body: TConfirmCertificateRequestData,
   token?: string | null
 ): Promise<TConfirmCertificateResponseData> => {
-  token = token ? token : localStorage.getItem("token");
+  token = token ? token : getStorageWithExpiresIn("token");
   return axios
     .post<TConfirmCertificateResponseData>(`${BASE_URL}/confirm`, body, {
       headers: {
@@ -80,7 +81,7 @@ export const RestRegisteredCertificate = (
   body: TGetRegisteredCertificateRequestData,
   token?: string | null
 ): Promise<TGetRegisteredCertificateResponseData> => {
-  token = token ? token : localStorage.getItem("token");
+  token = token ? token : getStorageWithExpiresIn("token");
   return axios
     .get<TGetRegisteredCertificateResponseData>(
       `${BASE_URL}/registered?companyid=${body.company_id}`,
@@ -98,7 +99,7 @@ export const RestRegisteredCertificate = (
 };
 
 export const restGetOtp = ({
-  token = localStorage.getItem("token"),
+  token = getStorageWithExpiresIn("token"),
 }: {
   token?: string | null;
 }): Promise<any> => {
@@ -117,7 +118,7 @@ export const restGetOtp = ({
 };
 
 export const getUserName = ({
-  token = localStorage.getItem("token"),
+  token = getStorageWithExpiresIn("token"),
 }: {
   token?: string | null;
 }): Promise<any> => {
@@ -137,7 +138,7 @@ export const getUserName = ({
 
 export const getCertificateList = ({
   params,
-  token = localStorage.getItem("token"),
+  token = getStorageWithExpiresIn("token"),
 }: {
   params?: string;
   token?: string | null;

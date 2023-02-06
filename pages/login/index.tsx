@@ -21,6 +21,12 @@ import { serverSideRenderReturnConditions } from "@/utils/serverSideRenderReturn
 import i18n from "i18";
 import Loading from "@/components/Loading";
 import { RestKycCheckStepv2 } from "infrastructure/rest/personal";
+import {
+  getStorageWithExpiresIn,
+  removeStorageWithExpiresIn,
+  setStorageWithExpiresIn,
+} from "@/utils/localStorageWithExpiresIn";
+import { getExpFromToken } from "@/utils/getExpFromToken";
 
 type Props = {};
 
@@ -80,9 +86,18 @@ const Login = ({}: Props) => {
 
   useEffect(() => {
     if (data.status === "FULLFILLED" && data.data.success) {
-      localStorage.setItem("token", data.data.data[0] as string);
+      setStorageWithExpiresIn(
+        "token",
+        data.data.data[0],
+        getExpFromToken(data.data.data[0]) as number
+      );
+
       if (rememberMe) {
-        localStorage.setItem("token", data.data.data[0] as string);
+        setStorageWithExpiresIn(
+          "token",
+          data.data.data[0],
+          getExpFromToken(data.data.data[0]) as number
+        );
         localStorage.setItem("refresh_token", data.data.data[1] as string);
       }
 
@@ -97,7 +112,7 @@ const Login = ({}: Props) => {
     const receiveMessage = (event: MessageEvent) => {
       const dataToken = event.data.token;
       const existingToken: TEventMessageDataToken =
-        dataToken || localStorage.getItem("token");
+        dataToken || getStorageWithExpiresIn("token");
 
       // rendered by iframe
       if (dataToken) {
@@ -317,27 +332,27 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const cQuery = context.query;
   const uuid =
     cQuery.transaction_id || cQuery.request_id || cQuery.registration_id;
-  
-    const checkStepResult: {
-      res?: TKycCheckStepResponseData;
-      err?: {
-        response: {
-          data: {
-            success: boolean;
-            message: string;
-            data: { errors: string[] };
-          };
+
+  const checkStepResult: {
+    res?: TKycCheckStepResponseData;
+    err?: {
+      response: {
+        data: {
+          success: boolean;
+          message: string;
+          data: { errors: string[] };
         };
       };
-    } = await RestKycCheckStepv2({
-      registerId: uuid as string,
+    };
+  } = await RestKycCheckStepv2({
+    registerId: uuid as string,
+  })
+    .then((res) => {
+      return { res };
     })
-      .then((res) => {
-        return {res}
-      })
-      .catch((err) => {
-        return {err}
-      });
+    .catch((err) => {
+      return { err };
+    });
 
   const serverSideRenderReturnConditionsResult =
     serverSideRenderReturnConditions({ context, checkStepResult });
@@ -411,7 +426,7 @@ const LoginQueue = ({
   const { t }: any = i18n;
 
   const onLoginFailed = useCallback(() => {
-    localStorage.removeItem("token");
+    removeStorageWithExpiresIn("token");
     localStorage.removeItem("refresh_token");
     toast(t("loginQueueErrorText"), {
       type: "error",
@@ -429,7 +444,12 @@ const LoginQueue = ({
     getUserName({ token: existingToken })
       .then((_) => {
         // token valid and redirect to authenticated page
-        localStorage.setItem("token", existingToken as string);
+        setStorageWithExpiresIn(
+          "token",
+          existingToken as string,
+          getExpFromToken(existingToken as string) as number
+        );
+
         doIn();
       })
       .catch((_) => {

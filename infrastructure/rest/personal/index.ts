@@ -17,6 +17,7 @@ import {
 } from "./types";
 
 import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
+import { getStorageWithExpiresIn } from "@/utils/localStorageWithExpiresIn";
 
 const BASE_URL =
   process.env.NEXT_PUBLIC_PERSONAL_API_URL || "https://dev-api.tilaka.id";
@@ -103,7 +104,7 @@ export const RestPersonalFaceRecognition = ({
       payload,
       {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          Authorization: `Bearer ${getStorageWithExpiresIn("token")}`,
         },
       }
     )
@@ -164,7 +165,7 @@ export const RestPersonalApproveConsent = ({
       },
       {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          Authorization: `Bearer ${getStorageWithExpiresIn("token")}`,
         },
       }
     )

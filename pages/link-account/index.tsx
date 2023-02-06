@@ -33,6 +33,8 @@ import {
   getFRFailedCount,
   resetFRFailedCount,
 } from "@/utils/frFailedCountGetterSetter";
+import { setStorageWithExpiresIn } from "@/utils/localStorageWithExpiresIn";
+import { getExpFromToken } from "@/utils/getExpFromToken";
 
 type Props = {};
 
@@ -115,7 +117,11 @@ const LinkAccount = (props: Props) => {
         queryWithDynamicRedirectURL["redirect_url"] = data.data.message;
       }
       localStorage.setItem("refresh_token", data.data.data[1] as string);
-      localStorage.setItem("token", data.data.data[0] as string);
+      setStorageWithExpiresIn(
+        "token",
+        data.data.data[0] as string,
+        getExpFromToken(data.data.data[0]) as number
+      );
 
       if (signing === "1" || setting === "1") {
         getCertificateList({ params: "" as string }).then((res) => {
@@ -375,7 +381,7 @@ const FRModal = ({ modal, setModal, tilakaName, formSetter }: IModal) => {
           }
           toast.dismiss("info");
           toast.error(res.message, { icon: <XIcon /> });
-          setFRFailedCount("count", res.data.failMfa)
+          setFRFailedCount("count", res.data.failMfa);
           if (res.data.failMfa >= 5) {
             doRedirect("link-account/failure");
           }

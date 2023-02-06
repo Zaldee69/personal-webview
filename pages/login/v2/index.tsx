@@ -25,6 +25,13 @@ import { NextParsedUrlQuery } from "next/dist/server/request-meta";
 import i18n from "i18";
 import { GetServerSideProps } from "next";
 import Loading from "@/components/Loading";
+import {
+  getStorageWithExpiresIn,
+  removeStorageWithExpiresIn,
+  setStorageWithExpiresIn,
+} from "@/utils/localStorageWithExpiresIn";
+import jwt from "jsonwebtoken";
+import { getExpFromToken } from "@/utils/getExpFromToken";
 
 interface IPropsLogin {}
 
@@ -84,13 +91,23 @@ const Login = ({}: IPropsLogin) => {
       if (showAutoLogoutInfo === "1") {
         setAutoLogoutModal(true);
       }
+
+      const token = getStorageWithExpiresIn("token_v2");
+      const decodedToken = jwt.decode(token as string);
+
+      console.log("decoded token", decodedToken);
     }
   }, [router.isReady]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (isSubmitted && data.status === "FULLFILLED" && data.data.success) {
       localStorage.setItem("count_v2", "0");
-      localStorage.setItem("token_v2", data.data.data[0] as string);
+      setStorageWithExpiresIn(
+        "token_v2",
+        data.data.data[0],
+        getExpFromToken(data.data.data[0]) as number
+      );
+
       localStorage.setItem("refresh_token_v2", data.data.data[1] as string);
 
       doIn(data);
@@ -112,7 +129,7 @@ const Login = ({}: IPropsLogin) => {
     const receiveMessage = (event: MessageEvent) => {
       const dataToken = event.data.token;
       const existingToken: TEventMessageDataToken =
-        dataToken || localStorage.getItem("token_v2");
+        dataToken || getStorageWithExpiresIn("token_v2");
 
       // rendered by iframe
       if (dataToken) {
@@ -155,7 +172,10 @@ const Login = ({}: IPropsLogin) => {
     }
 
     getCertificateList({
-      token: localStorage.getItem("token_v2"),
+      token: getStorageWithExpiresIn("token_v2", handleRoute("login/v2"), {
+        ...queryWithDynamicRedirectURL,
+        showAutoLogoutInfo: "1",
+      }),
     }).then((res) => {
       const certif = JSON.parse(res.data);
       if (!id) {
@@ -418,7 +438,7 @@ const LoginQueue = ({
   const { t }: any = i18n;
 
   const onLoginFailed = useCallback(() => {
-    localStorage.removeItem("token_v2");
+    removeStorageWithExpiresIn("token_v2");
     localStorage.removeItem("refresh_token_v2");
     toast(t("loginQueueErrorText"), {
       type: "error",
@@ -436,7 +456,11 @@ const LoginQueue = ({
     getUserName({ token: existingToken })
       .then((_) => {
         // token valid and redirect to authenticated page
-        localStorage.setItem("token_v2", existingToken as string);
+        setStorageWithExpiresIn(
+          "token_v2",
+          existingToken as string,
+          getExpFromToken(existingToken as string) as number
+        );
         doIn();
       })
       .catch((_) => {

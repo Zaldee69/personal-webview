@@ -28,6 +28,10 @@ import EyeIcon3 from "@/public/icons/EyeIcon3";
 import CheckEvalGrayIcon from "@/public/icons/CheckOvalGrayIcon";
 import CheckEvalGreenIcon from "@/public/icons/CheckOvalGreenIcon";
 import { ViewerV2 } from "@/components/ViewerV2";
+import {
+  getStorageWithExpiresIn,
+  removeStorageWithExpiresIn,
+} from "@/utils/localStorageWithExpiresIn";
 
 interface IParameterFromRequestSign {
   user?: string;
@@ -162,7 +166,16 @@ const SigningWithRead = () => {
   };
 
   useEffect(() => {
-    const token_v2 = localStorage.getItem("token_v2");
+    if (!routerIsReady) return;
+
+    const token_v2 = getStorageWithExpiresIn(
+      "token_v2",
+      handleRoute("login/v2"),
+      {
+        ...router.query,
+        showAutoLogoutInfo: "1",
+      }
+    );
     const count = parseInt(localStorage.getItem("count_v2") as string);
     localStorage.setItem("count_v2", count ? count.toString() : "0");
     if (!token_v2) {
@@ -173,7 +186,7 @@ const SigningWithRead = () => {
     } else {
       setShouldRender(true);
     }
-    if (token_v2 && routerIsReady) {
+    if (token_v2) {
       setShouldDisableSubmit(true);
       RestSigningDownloadSignedPDF({
         request_id: routerQuery.request_id as string,
@@ -204,7 +217,7 @@ const SigningWithRead = () => {
                   restLogout({
                     token: localStorage.getItem("refresh_token_v2"),
                   });
-                  localStorage.removeItem("token_v2");
+                  removeStorageWithExpiresIn("token_v2");
                   localStorage.removeItem("refresh_token_v2");
                   router.replace({
                     pathname: handleRoute("login/v2"),
@@ -268,7 +281,7 @@ const SigningWithRead = () => {
           } else {
             if (err.response.status === 401) {
               restLogout({ token: localStorage.getItem("refresh_token_v2") });
-              localStorage.removeItem("token_v2");
+              removeStorageWithExpiresIn("token_v2");
               localStorage.removeItem("refresh_token_v2");
               router.replace({
                 pathname: handleRoute("login/v2"),
@@ -532,7 +545,16 @@ const SigningWithoutRead = () => {
   };
 
   useEffect(() => {
-    const token_v2 = localStorage.getItem("token_v2");
+    if (!routerIsReady) return;
+
+    const token_v2 = getStorageWithExpiresIn(
+      "token_v2",
+      handleRoute("login/v2"),
+      {
+        ...router.query,
+        showAutoLogoutInfo: "1",
+      }
+    );
     const count = parseInt(localStorage.getItem("count_v2") as string);
     localStorage.setItem("count_v2", count ? count.toString() : "0");
     if (!token_v2) {
@@ -543,7 +565,7 @@ const SigningWithoutRead = () => {
     } else {
       setShouldRender(true);
     }
-    if (token_v2 && routerIsReady) {
+    if (token_v2) {
       setShouldDisableSubmit(true);
       RestSigningDownloadSignedPDF({
         request_id: routerQuery.request_id as string,
@@ -574,7 +596,7 @@ const SigningWithoutRead = () => {
                   restLogout({
                     token: localStorage.getItem("refresh_token_v2"),
                   });
-                  localStorage.removeItem("token_v2");
+                  removeStorageWithExpiresIn("token_v2");
                   localStorage.removeItem("refresh_token_v2");
                   router.replace({
                     pathname: handleRoute("login/v2"),
@@ -638,7 +660,7 @@ const SigningWithoutRead = () => {
           } else {
             if (err.response.status === 401) {
               restLogout({ token: localStorage.getItem("refresh_token_v2") });
-              localStorage.removeItem("token_v2");
+              removeStorageWithExpiresIn("token_v2");
               localStorage.removeItem("refresh_token_v2");
               router.replace({
                 pathname: handleRoute("login/v2"),
@@ -1005,7 +1027,10 @@ const FRModal: React.FC<IModal> = ({
         user: routerQuery.user as string,
         async: routerQuery.async as string,
       },
-      token: localStorage.getItem("token_v2"),
+      token: getStorageWithExpiresIn("token_v2", handleRoute("login/v2"), {
+        ...router.query,
+        showAutoLogoutInfo: "1",
+      }),
     })
       .then((res) => {
         if (res.success) {
@@ -1040,7 +1065,7 @@ const FRModal: React.FC<IModal> = ({
         setModal(false);
         if (err.response?.status === 401) {
           restLogout({ token: localStorage.getItem("refresh_token_v2") });
-          localStorage.removeItem("token_v2");
+          removeStorageWithExpiresIn("token_v2");
           localStorage.removeItem("refresh_token_v2");
           router.replace({
             pathname: handleRoute("login/v2"),
@@ -1147,7 +1172,10 @@ const OTPModal: React.FC<IModal> = ({
         user: routerQuery.user as string,
         async: routerQuery.async as string,
       },
-      token: localStorage.getItem("token_v2"),
+      token: getStorageWithExpiresIn("token_v2", handleRoute("login/v2"), {
+        ...router.query,
+        showAutoLogoutInfo: "1",
+      }),
     })
       .then((res) => {
         if (res.success) {
@@ -1182,7 +1210,7 @@ const OTPModal: React.FC<IModal> = ({
         setValues(["", "", "", "", "", ""]);
         if (err.response?.status === 401) {
           restLogout({ token: localStorage.getItem("refresh_token_v2") });
-          localStorage.removeItem("token_v2");
+          removeStorageWithExpiresIn("token_v2");
           localStorage.removeItem("refresh_token_v2");
           router.replace({
             pathname: handleRoute("login/v2"),
@@ -1228,7 +1256,12 @@ const OTPModal: React.FC<IModal> = ({
   };
 
   const handleTriggerSendOTP = () => {
-    restGetOtp({ token: localStorage.getItem("token_v2") })
+    restGetOtp({
+      token: getStorageWithExpiresIn("token_v2", handleRoute("login/v2"), {
+        ...router.query,
+        showAutoLogoutInfo: "1",
+      }),
+    })
       .then((res) => {
         if (res.success) {
           timerHandler();
@@ -1249,7 +1282,7 @@ const OTPModal: React.FC<IModal> = ({
       .catch((err) => {
         if (err?.request?.status === 401) {
           restLogout({ token: localStorage.getItem("refresh_token_v2") });
-          localStorage.removeItem("token_v2");
+          removeStorageWithExpiresIn("token_v2");
           localStorage.removeItem("refresh_token_v2");
           router.replace({
             pathname: handleRoute("login/v2"),
