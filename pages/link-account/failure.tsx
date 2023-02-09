@@ -165,7 +165,7 @@ const LinkAccountFailure = (props: Props) => {
           )
         )
       ) : (failedCount >= 5 && props.checkStepResultDataRoute !== null) ||
-        props.checkStepResultResponseData[0] ===
+        props.checkStepResultResponseData?.[0] ===
           "registrationId tidak valid" ? (
         redirectUrl ? (
           <div className="mt-20 text-primary text-base poppins-medium underline hover:cursor-pointer">
