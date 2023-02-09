@@ -182,7 +182,7 @@ const LinkAccount = (props: Props) => {
       (data.data.message ===
         `Invalid Username / Password for Tilaka Name ${form?.tilaka_name}` ||
         data.data.message === "User Not Found" ||
-        data.data.message === "NIK Not Equals ON Tilaka System")
+        data.data.message === "NIK Not Equals ON Tilaka System" || data.data.message === "Error, tilaka Name not valid")
     ) {
       toast.dismiss();
       toast.error(t("invalidUsernamePassword"));
