@@ -40,6 +40,7 @@ const SetMfa = () => {
     useState<boolean>(false);
   const [mfaMethod, setMfaMethod] = useState<"fr" | "otp" | null>(null);
   const [defaultMfa, setDefaultMfa] = useState<"fr" | "otp">("fr");
+  const [isShowPage, setIsShowpage] = useState<boolean>(false)
 
   const handleFormOnChange = (e: React.FormEvent<HTMLInputElement>): void => {
     setMfaMethod(e.currentTarget.value as "fr" | "otp");
@@ -121,17 +122,19 @@ const SetMfa = () => {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
+    if(!router.isReady) return
     if (!token) {
       router.push({
         pathname: handleRoute("login"),
         query: { ...router.query, setting: "2" },
       });
     } else {
+      setIsShowpage(true)
       geTypeMfa();
     }
-  }, [router.isReady, router]);
+  }, [router.isReady]);
 
-  return (
+  return isShowPage && (
     <>
       <Head>
         <title>Setting MFA</title>
