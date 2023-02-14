@@ -44,7 +44,7 @@ const Index = () => {
         name === "fileFotoKtp" || name === "fileFotoSelfie"
           ? await fileToBase64(files?.[0] as File)
           : name === "nik"
-          ? value.trim()
+          ? value.replace(/\s/g, "")
           : value.trimStart(),
     });
 
@@ -101,7 +101,7 @@ const Index = () => {
     if (isShouldRedirectToOnProcessPage && !nikErrorMessage) {
       router.push({
         pathname: handleRoute("manual-form/on-process"),
-        ...router.query,
+        query: {...router.query},
       });
     }
   };

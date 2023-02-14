@@ -1,3 +1,4 @@
+import { assetPrefix } from "next.config";
 import Image from "next/image";
 import React from "react";
 
@@ -16,7 +17,7 @@ const PreviewImage = ({ imageBase64, onDeleteImageHandler, name }: Props) => {
         style={{ padding: "4px 7px 2px 7px" }}
         className="bg-neutral200 rounded-full right-5 top-5 absolute"
       >
-        <Image src="/images/trash.svg" height={15} width={15} alt="trash" />
+        <Image src={`${assetPrefix}/images/trash.svg`} height={15} width={15} alt="trash" />
       </button>
       <img
         className="rounded-md"
