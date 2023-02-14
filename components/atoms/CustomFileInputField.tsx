@@ -38,7 +38,7 @@ const CustomFileInputField = ({
             id={name}
             className="hidden"
             type="file"
-            accept="image/*"
+            accept="image/jpg, image/jpeg, image/png"
             onChange={onChangeHandler}
           />
           <label htmlFor={name}>
