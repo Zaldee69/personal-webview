@@ -147,6 +147,14 @@
   }
 }
 
+.input-file-style {
+  background-image: url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' rx='6' ry='6' stroke='%23C1C7D0FF' stroke-width='3' stroke-dasharray='8' stroke-dashoffset='51' stroke-linecap='square'/%3e%3c/svg%3e");
+}
+
+.input-file-style__error {
+  background-image: url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' rx='6' ry='6' stroke='%23FF5630FF' stroke-width='3' stroke-dasharray='8' stroke-dashoffset='51' stroke-linecap='square'/%3e%3c/svg%3e");
+}
+
 .circle {
   width: 182px;
   height: 178px;
