@@ -186,5 +186,58 @@
   "customerConsentText": "Customer Consent",
   "consentAgree": "Setuju",
   "consentDisagree": "Tidak Setuju",
-  "consentLinkAccountFailedSubtitleRejectByUser": "Anda tidak setuju untuk melakukan penautan akun."
+  "consentLinkAccountFailedSubtitleRejectByUser": "Anda tidak setuju untuk melakukan penautan akun.",
+  "manualForm": {
+    "title": "Verifikasi Manual",
+    "nik": {
+      "label": "NIK",
+      "placeholder": "Masukkan nomor e-KTP"
+    },
+    "name": {
+      "label": "Nama Lengkap",
+      "placeholder": "Masukkan nama lengkap sesuai e-KTP"
+    },
+    "email": {
+      "label": "Email"
+    },
+    "photoKtp": {
+      "label": "Foto e-KTP",
+      "uploadPhoto": "Unggah Foto e-KTP",
+      "errorMessage1": "Foto e-KTP wajib diunggah",
+      "errorMessage2": "Foto e-KTP tidak memenuhi ketentuan",
+      "termTitle": "Ketentuan foto e-KTP",
+      "term1": "Foto e-KTP terlihat dengan jelas.",
+      "term2": "Data pada e-KTP dapat dibaca.",
+      "term3": "Ekstensi dokumen berupa .JPG / .JPEG /.PNG dengan batas ukuran 2MB."
+    },
+    "photoSelfie": {
+      "label": "Foto Selfie",
+      "uploadPhoto": "Unggah Foto Selfie",
+      "errorMessage1": "Foto Selfie wajib diunggah",
+      "errorMessage2": "Foto Selfie tidak memenuhi ketentuan",
+      "termTitle": "Ketentuan foto selfie",
+      "term1": "Wajah menghadap depan dan terlihat dengan jelas.",
+      "term2": "Lepaskan atribut seperti kacamata topi dan masker, serta rambut tidak menutupi wajah.",
+      "term3": "Pastikan pencahayaan baik, tidak terlalu terang atau terlalu gelap.",
+      "term4": "Ekstensi dokumen berupa .JPG / .JPEG /.PNG dengan batas ukuran 2MB dan batas resolusi minimal 200 x 200 pixel."
+    },
+    "extensionAndSizeRequirement": "Max. 2MB (.jpg/.jpeg/.png)",
+    "resolutionMinimum": "Resolusi min. 200 x 200 pixel"
+  },
+  "forgotPassword": {
+    "title": "Lupa Kata Sandi",
+    "placeholder": "Masukkan Email"
+  },
+  "forgotTilakaName": {
+    "title": "Lupa Tilaka Name",
+    "placeholder": "Masukkan Email"
+  },
+  "send": "Kirim",
+  "upload": "Unggah",
+  "registrationInProcessTitle": "Pendaftaran Dalam Proses",
+  "registrationInProcessSubtitle": "Pendaftaran Anda sedang dalam proses verifikasi. Mohon periksa email Anda secara berkala dalam 1x24 jam.",
+  "emailWasSend": "Email Telah Dikirim",
+  "checkEmail": "Silahkan periksa email Anda untuk mereset kata sandi Anda.",
+  "checkEmail2": "Silahkan periksa email Anda untuk melihat informasi Tilaka Name."
+
 }

@@ -22,8 +22,7 @@ const Index = () => {
           alt="liveness-success-ill"
         />
         <p className="text-md text-neutral200 mt-14">
-          Pendaftaran Anda sedang dalam proses verifikasi. Mohon periksa email
-          Anda secara berkala dalam 1x24 jam.
+        {t("registrationInProcessSubtitle")}
         </p>
         <div className="mt-20 text-primary text-base poppins-medium underline hover:cursor-pointer">
           {routerQuery.redirect_url && (

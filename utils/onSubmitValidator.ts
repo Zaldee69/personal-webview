@@ -1,3 +1,7 @@
+import i18n from "i18";
+
+const {t}: any = i18n
+
 export const onSubmitValidator = {
   nikValidator: (nik: string) => {
     const nikLength = nik.length;
@@ -19,7 +23,7 @@ export const onSubmitValidator = {
   },
   requiredInput: (value: string, prefix: string, suffix: string) => {
     if (value.length < 1) {
-      return prefix + " wajib " + suffix;
+      return suffix === "fileFotoKtp" ? t("manualForm.photoKtp.errorMessage2") : t("manualForm.photoSelfie.errorMessage2")
     } else {
       return "";
     }

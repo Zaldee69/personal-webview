@@ -7,6 +7,7 @@ import ReCAPTCHA from "react-google-recaptcha";
 import { assetPrefix } from "../../next.config";
 import { GetServerSideProps } from "next";
 import { handleRoute } from "@/utils/handleRoute";
+import i18n from "i18";
 
 type Props = {};
 
@@ -22,12 +23,14 @@ const ForgotPassword = (props: Props) => {
   const handleFormOnChange = (e: React.FormEvent<HTMLInputElement>): void => {
     formSetter({ ...form, [e.currentTarget.name]: e.currentTarget.value });
   };
+  const {t}: any = i18n
   const handleFormOnSubmit = (e: React.SyntheticEvent): void => {
     e.preventDefault();
 
     const target = e.target as typeof e.target & {
       email: { value: Tform["email"] };
     };
+
 
     const email = target.email.value;
 
@@ -47,13 +50,13 @@ const ForgotPassword = (props: Props) => {
   return (
     <>
       <Head>
-        <title>Lupa Kata Sandi</title>
+        <title>{t("forgotPassword.title")}</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
-      <div className="px-5 py-9 min-h-screen flex flex-col justify-between">
-        <div>
+      <div className="py-9 max-w-md items-center mx-auto flex flex-col justify-between">
+        <div className="w-full px-5" >
           <p className="font-poppins text-lg font-semibold text-neutral800">
-            Lupa Kata Sandi
+            {t("forgotPassword.title")}
           </p>
           <div className="flex justify-center mt-6">
             <Image
@@ -76,9 +79,9 @@ const ForgotPassword = (props: Props) => {
                     </div>
                     <div className="mt-1 relative">
                       <input
-                        type="text"
+                        type="email"
                         name="email"
-                        placeholder="Masukkan Email"
+                        placeholder={t("forgotPassword.placeholder")}
                         value={form.email}
                         onChange={handleFormOnChange}
                         className="px-2.5 py-3 w-full focus:outline-none text-sm text-neutral800 placeholder:text-neutral50 font-poppins border border-neutral40 rounded-md"
@@ -88,9 +91,9 @@ const ForgotPassword = (props: Props) => {
                   <button
                     type="submit"
                     disabled={!form.email}
-                    className="mt-48 w-full p-2.5 text-base disabled:opacity-50 text-white font-medium font-poppins rounded-sm bg-primary"
+                    className="mt-32 bg-primary btn text-white block mx-auto w-fit px-6 poppins-regular mb-5 h-10 rounded-md"
                   >
-                    KIRIM
+                    {t("send")}
                   </button>
                 </form>
               </div>
@@ -117,16 +120,16 @@ const ForgotPassword = (props: Props) => {
   );
 };
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  const params = context.query;
-  const queryString = new URLSearchParams(params as any).toString();
-  return {
-    redirect: {
-      permanent: false,
-      destination: handleRoute("?" + queryString),
-    },
-  };
-};
+// export const getServerSideProps: GetServerSideProps = async (context) => {
+//   const params = context.query;
+//   const queryString = new URLSearchParams(params as any).toString();
+//   return {
+//     redirect: {
+//       permanent: false,
+//       destination: handleRoute("?" + queryString),
+//     },
+//   };
+// };
 
 export default ForgotPassword;
 
@@ -134,6 +137,9 @@ const ModalSuccess: React.FC<{
   modal: boolean;
   setModal: Dispatch<SetStateAction<boolean>>;
 }> = ({ modal, setModal }) => {
+
+  const {t}: any = i18n
+
   return modal ? (
     <div
       style={{ backgroundColor: "rgba(0, 0, 0, .5)" }}
@@ -141,7 +147,7 @@ const ModalSuccess: React.FC<{
     >
       <div className="bg-white max-w-md mt-20 px-3 pt-7 pb-4 rounded-xl w-full mx-5">
         <p className="font-poppins block text-center pb-5  whitespace-nowrap  font-semibold ">
-          Email Telah Dikirim
+        {t("emailWasSend")}
         </p>
         <div className="mt-5 text-center">
           <Image
@@ -152,13 +158,13 @@ const ModalSuccess: React.FC<{
           />
         </div>
         <p className="text-neutral800 text-base font-normal mt-8 font-poppins text-center">
-          Silahkan periksa email Anda untuk mereset kata sandi Anda.
+        {t("checkEmail")}
         </p>
         <button
           onClick={() => setModal(false)}
           className="text-neutral80 font-poppins font-medium w-full mt-14 mx-auto rounded-sm py-2"
         >
-          TUTUP
+         {t("close")}
         </button>
       </div>
     </div>
