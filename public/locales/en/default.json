@@ -186,5 +186,58 @@
   "customerConsentText": "Customer Consent",
   "consentAgree": "Agree",
   "consentDisagree": "Disagree",
-  "consentLinkAccountFailedSubtitleRejectByUser": "You do not agree to link accounts"
+  "consentLinkAccountFailedSubtitleRejectByUser": "You do not agree to link accounts",
+  "manualForm": {
+    "title": "Manual Verification",
+    "nik": {
+      "label": "nik",
+      "placeholder": "Input NIK"
+    },
+    "name": {
+      "label": "Full Name",
+      "placeholder": "Input full name "
+    },
+    "email": {
+      "label": "Email"
+    },
+    "photoKtp": {
+      "label": "Photo e-KTP",
+      "uploadPhoto": "Upload e-KTP Image",
+      "errorMessage1": "e-KTP image must be uploaded",
+      "errorMessage2": "e-KTP image does not met requirement",
+      "termTitle": "e-KTP Requirement",
+      "term1": "e-KTP image clear and visible.",
+      "term2": "e-KTP data are readable.",
+      "term3": "Ensure image extension in .JPG  .JPEG / .PNG with maximum file size 2MB."
+    },
+    "photoSelfie": {
+      "label": "Photo Selfie",
+      "uploadPhoto": "Upload Selfie Image",
+      "errorMessage1": "Selfie image must be uploaded",
+      "errorMessage2": "Selfie image does not met requirement",
+      "termTitle": "Selfie Image Requirement",
+      "term1": "Face facing forward and visible.",
+      "term2": "Take off any accessories such as glasses, hat, face masks, and hair doesn’t cover the face.",
+      "term3": "Ensure the lighting is good, not too bright and not too dark.",
+      "term4": "Ensure image extension in .JPG  .JPEG / .PNG with maximum file size 2MB and minimum resolution 200x200 pixel"
+    },
+    "uploadPhoto": "Unggah Foto",
+    "extensionAndSizeRequirement": "Max. 2MB (.jpg/.jpeg/.png)",
+    "resolutionMinimum": "Resolution min. 200 x 200 pixel"
+  },
+  "forgotPassword": {
+    "title": "Forgot Password",
+    "placeholder": "Input Email"
+  },
+  "forgotTilakaName": {
+    "title": "Forgot Tilaka Name",
+    "placeholder": "Input Email"
+  },
+  "send": "Send",
+  "upload": "Upload",
+  "registrationInProcessTitle": "Registration In Process",
+  "registrationInProcessSubtitle": "Your registration is in the verification process. Please check your email regularly within 1x24 hours.",
+  "emailWasSend": "Email Send",
+  "checkEmail": "Please check your email to reset your password.",
+  "checkEmail2": "Please check your email for Tilaka Name information."
 }
