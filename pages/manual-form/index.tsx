@@ -258,9 +258,8 @@ const PhotoKtpTermModal = ({ show, fileFotoKtpRef }: TModal) => {
           {t("manualForm.photoKtp.termTitle")}
         </h1>
         <div className="text-center mt-5 max-w-md">
-          <Image
+          <img
             src={`${assetPrefix}/images/ktpGuide.png`}
-            layout="responsive"
             width="100%"
             height="40px"
             alt="Photo e-KTP Term"
@@ -301,9 +300,8 @@ const PhotoSelfieTermModal = ({ show, fileFotoSelfieRef }: TModal) => {
           {t("manualForm.photoSelfie.termTitle")}
         </h1>
         <div className="text-center mt-5 max-w-md">
-          <Image
+          <img
             src={`${assetPrefix}/images/selfieGuide.png`}
-            layout="responsive"
             width="100%"
             height="40px"
             alt="Photo e-KTP Term"
