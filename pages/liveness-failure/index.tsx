@@ -11,9 +11,8 @@ import { assetPrefix } from "../../next.config";
 import i18n from "i18";
 import { RestKycCheckStepv2 } from "infrastructure/rest/personal";
 
-
 const LivenessFailure = () => {
-  const {t} : any = i18n
+  const { t }: any = i18n;
   const router = useRouter();
   const routerQuery = router.query;
   const uuid =
@@ -25,6 +24,16 @@ const LivenessFailure = () => {
     register_id: uuid,
   };
   const queryString = new URLSearchParams(params as any).toString();
+  const reason_code = routerQuery.reason_code;
+  const message =
+    reason_code === "1"
+      ? t("ekycFailed.errorCode1")
+      : reason_code === "2"
+      ? t("ekycFailed.errorCode2")
+      : reason_code === "3"
+      ? t("ekycFailed.errorCode3")
+      : t("livenessFailed3xSubtitle");
+
   return (
     <>
       <Head>
@@ -34,16 +43,17 @@ const LivenessFailure = () => {
       <div className="px-5 pt-8 sm:w-full md:w-4/5 mx-auto">
         <div className="flex flex-col gap-20 items-center justify-center">
           <h1 className="text-center text-neutral800 poppins-semibold text-xl">
-            {t("livenessFailedTitle")}
+            {t("ekycFailed.title")}
           </h1>
           <Image
             src={`${assetPrefix}/images/livenessFail.svg`}
             width={200}
             height={200}
+            alt="liveness failed"
           />
           <div className="flex flex-col items-center gap-10 ">
-            <p className="text-center poppins-regular text-neutral">
-              {t("livenessFailed3xSubtitle")}
+            <p className="text-center poppins-regular text-neutral800">
+            {message}
             </p>
             {routerQuery.redirect_url && (
               <a
@@ -85,10 +95,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     registerId: uuid as string,
   })
     .then((res) => {
-      return {res}
+      return { res };
     })
     .catch((err) => {
-      return {err}
+      return { err };
     });
 
   return serverSideRenderReturnConditions({ context, checkStepResult });

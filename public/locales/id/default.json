@@ -238,6 +238,12 @@
   "registrationInProcessSubtitle": "Pendaftaran Anda sedang dalam proses verifikasi. Mohon periksa email Anda secara berkala dalam 1x24 jam.",
   "emailWasSend": "Email Telah Dikirim",
   "checkEmail": "Silahkan periksa email Anda untuk mereset kata sandi Anda.",
-  "checkEmail2": "Silahkan periksa email Anda untuk melihat informasi Tilaka Name."
+  "checkEmail2": "Silahkan periksa email Anda untuk melihat informasi Tilaka Name.",
+  "ekycFailed": {
+    "title": "e-KYC Gagal",
+    "errorCode1": "Gagal pemeriksaan Dukcapil",
+    "errorCode2": "Gagal Liveness",
+    "errorCode3": "Registration ID Expired"
+  }
 
 }
