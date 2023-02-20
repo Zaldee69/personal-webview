@@ -21,7 +21,7 @@ const ForgotPassword = (props: Props) => {
   const [reCaptchaSuccess, reCaptchaSuccessSetter] = useState<boolean>(false);
 
   const handleFormOnChange = (e: React.FormEvent<HTMLInputElement>): void => {
-    formSetter({ ...form, [e.currentTarget.name]: e.currentTarget.value });
+    formSetter({ ...form, [e.currentTarget.name]: e.currentTarget.value.trim() });
   };
   const {t}: any = i18n
   const handleFormOnSubmit = (e: React.SyntheticEvent): void => {
@@ -79,7 +79,7 @@ const ForgotPassword = (props: Props) => {
                     </div>
                     <div className="mt-1 relative">
                       <input
-                        type="email"
+                        type="text"
                         name="email"
                         placeholder={t("forgotPassword.placeholder")}
                         value={form.email}

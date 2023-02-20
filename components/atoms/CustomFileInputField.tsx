@@ -12,6 +12,7 @@ type Props = {
   name: string;
   imageBase64: string;
   inputRef: React.MutableRefObject<HTMLInputElement | null>;
+  showMaxResolution: boolean;
   onChangeHandler: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onDeleteImageHandler: (name: string) => void;
   onLabelClicked: (name: string) => void;
@@ -23,6 +24,7 @@ const CustomFileInputField = ({
   name,
   imageBase64,
   inputRef,
+  showMaxResolution,
   onChangeHandler,
   onDeleteImageHandler,
   onLabelClicked,
@@ -69,7 +71,7 @@ const CustomFileInputField = ({
               {t("upload")} {label}
               </p>
               <p className="text-placeholder text-center mb-0">
-                Max. 2MB (.jpg/.jpeg/.png) <br /> {t("manualForm.resolutionMinimum")}
+                Max. 2MB (.jpg/.jpeg/.png) <br /> {showMaxResolution && t("manualForm.resolutionMinimum")}
               </p>
             </div>
           </div>

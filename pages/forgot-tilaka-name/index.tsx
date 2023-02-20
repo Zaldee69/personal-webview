@@ -23,7 +23,7 @@ const ForgotTilakaName = (props: Props) => {
   const {t}: any = i18n
 
   const handleFormOnChange = (e: React.FormEvent<HTMLInputElement>): void => {
-    formSetter({ ...form, [e.currentTarget.name]: e.currentTarget.value });
+    formSetter({ ...form, [e.currentTarget.name]: e.currentTarget.value.trim() });
   };
   const handleFormOnSubmit = (e: React.SyntheticEvent): void => {
     e.preventDefault();
@@ -79,7 +79,7 @@ const ForgotTilakaName = (props: Props) => {
                     </div>
                     <div className="mt-1 relative">
                       <input
-                        type="email"
+                        type="text"
                         name="email"
                         placeholder={t("forgotTilakaName.placeholder")}
                         value={form.email}
