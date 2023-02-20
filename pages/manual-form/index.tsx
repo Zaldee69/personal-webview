@@ -61,27 +61,28 @@ const Index = () => {
   });
 
   const resolutionChecker = (file: File | undefined) => {
-    const img: HTMLImageElement = document.createElement("img");
-
-    img.src = URL.createObjectURL(file as Blob);
-
-    if (img.width < 200 || img.height < 200) return false;
+    return new Promise((resolve) => {
+      const img: HTMLImageElement = document.createElement("img");
+      img.onload = () => resolve({ width: img.width, height: img.height });
+      img.src = URL.createObjectURL(file as Blob);
+    });
   };
 
   const onChangeHandler = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value, name, files } = e.target;
     const file: File = files?.[0] as File;
+    const { width, height } = (await resolutionChecker(file)) as any;
     const isEligibleImage: boolean =
       files?.[0].type === "application/pdf" ||
-      resolutionChecker(file) ||
-      file.size < 202400;
+      file.size > 202400 ||
+      ((height < 200 || width < 200) && name === "fileFotoSelfie");
 
     const ref = {
       fileFotoKtpRef,
       fileFotoSelfieRef,
     };
 
-    if (isEligibleImage) {
+    if (!isEligibleImage) {
       setForm({
         ...form,
         [name]:
@@ -212,6 +213,7 @@ const Index = () => {
           onChangeHandler={onChangeHandler}
           onLabelClicked={onLabelClicked}
           inputRef={fileFotoKtpRef}
+          showMaxResolution={false}
         />
         <CustomFileInputField
           label={t("manualForm.photoSelfie.label")}
@@ -222,6 +224,7 @@ const Index = () => {
           onDeleteImageHandler={onDeleteImageHandler}
           onLabelClicked={onLabelClicked}
           inputRef={fileFotoSelfieRef}
+          showMaxResolution
         />
         <button
           type="submit"
@@ -294,34 +297,42 @@ const PhotoSelfieTermModal = ({ show, fileFotoSelfieRef }: TModal) => {
   }, [show.selfie]);
 
   return show.selfie ? (
-    <ModalLayout>
-      <div className="md:px-10 py-3">
-        <h1 className="text-lg font-bold">
-          {t("manualForm.photoSelfie.termTitle")}
-        </h1>
-        <div className="text-center mt-5 max-w-md">
-          <img
-            src={`${assetPrefix}/images/selfieGuide.png`}
-            width="100%"
-            height="40px"
-            alt="Photo e-KTP Term"
-          />
+    <div
+      style={{ backgroundColor: "rgba(0, 0, 0, .5)" }}
+      className="fixed z-50 flex items-center transition-all duration-1000 justify-center w-full left-0 top-0 h-full"
+    >
+      <div className="bg-white max-w-md pt-5 px-2 pb-3 rounded-md w-full ">
+        <div className="md:px-10  py-3">
+          <h1 className="text-lg font-bold">
+            {t("manualForm.photoSelfie.termTitle")}
+          </h1>
+          <div className="text-center mt-5 max-w-md">
+            <img
+              src={`${assetPrefix}/images/selfieGuide.png`}
+              width="100%"
+              height="40px"
+              alt="Photo e-KTP Term"
+            />
+          </div>
+          <ul
+            className="px-5 mt-10 text-sm md:text-base list-disc"
+            style={{ listStyle: "initial !important" }}
+          >
+            <li>{t("manualForm.photoSelfie.term1")}</li>
+            <li className="mt-2">{t("manualForm.photoSelfie.term2")}</li>
+            <li className="mt-2">{t("manualForm.photoSelfie.term3")}</li>
+            <li className="mt-2">{t("manualForm.photoSelfie.term4")}</li>
+          </ul>
+          <button
+            onClick={() => fileFotoSelfieRef?.current?.click()}
+            type="button"
+            className="bg-primary btn font-semibold text-white block ml-auto w-fit px-6 poppins-regular mb-5 mt-7 rounded-md h-10 hover:opacity-50"
+          >
+            {t("upload")}
+          </button>
         </div>
-        <ul className="px-5 mt-10" style={{ listStyle: "initial" }}>
-          <li>{t("manualForm.photoSelfie.term1")}</li>
-          <li className="mt-2">{t("manualForm.photoSelfie.term2")}</li>
-          <li className="mt-2">{t("manualForm.photoSelfie.term3")}</li>
-          <li className="mt-2">{t("manualForm.photoSelfie.term4")}</li>
-        </ul>
-        <button
-          onClick={() => fileFotoSelfieRef?.current?.click()}
-          type="button"
-          className="bg-primary btn font-semibold text-white block ml-auto w-fit px-6 poppins-regular mb-5 mt-7 rounded-md h-10 hover:opacity-50"
-        >
-          {t("upload")}
-        </button>
       </div>
-    </ModalLayout>
+    </div>
   ) : null;
 };
 

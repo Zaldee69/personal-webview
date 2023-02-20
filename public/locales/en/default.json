@@ -201,7 +201,7 @@
       "label": "Email"
     },
     "photoKtp": {
-      "label": "Photo e-KTP",
+      "label": "e-KTP",
       "uploadPhoto": "Upload e-KTP Image",
       "errorMessage1": "e-KTP image must be uploaded",
       "errorMessage2": "e-KTP image does not met requirement",
@@ -211,7 +211,7 @@
       "term3": "Ensure image extension in .JPG  .JPEG / .PNG with maximum file size 2MB."
     },
     "photoSelfie": {
-      "label": "Photo Selfie",
+      "label": "Selfie",
       "uploadPhoto": "Upload Selfie Image",
       "errorMessage1": "Selfie image must be uploaded",
       "errorMessage2": "Selfie image does not met requirement",
