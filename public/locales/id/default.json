@@ -244,6 +244,9 @@
     "errorCode1": "Gagal pemeriksaan Dukcapil",
     "errorCode2": "Gagal Liveness",
     "errorCode3": "Registration ID Expired"
+  },
+  "linkAccountFailed5x": {
+    "title": "Otentikasi Identitas Gagal",
+    "subtitle": "Mohon lakukan proses verifikasi penautan akun secara manual melalui link yang diterima di email Anda"
   }
-
 }
