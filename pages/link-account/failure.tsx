@@ -118,7 +118,7 @@ const LinkAccountFailure = (props: Props) => {
   }, [routerIsReady, routerQuery]);
 
   return (
-    <div className="px-10 pt-16 pb-9 text-center">
+    <div className="px-10 max-w-md mx-auto pt-16 pb-9 text-center">
       <p className="text-base poppins-semibold text-neutral800">
         {t("linkAccountFailedTitle")}
       </p>
@@ -130,6 +130,16 @@ const LinkAccountFailure = (props: Props) => {
           alt="liveness-failure-ill"
         />
       </div>
+      {failedCount >= 5 && (
+        <>
+          <h1 className="text-base mt-5 poppins-semibold text-neutral800">
+          {t("linkAccountFailed5x.title")}
+          </h1>
+          <p className="text-center mt-1 poppins-regular text-neutral800" >
+          {t("linkAccountFailed5x.subtitle")}
+          </p>
+        </>
+      )}
       {props.checkStepResultDataRoute === "penautan_consent" ? (
         routerQuery.reject_by_user === "1" ? (
           <div className="mt-14">
