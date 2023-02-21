@@ -69,13 +69,20 @@ const Index = () => {
   };
 
   const onChangeHandler = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    let isEligibleImage: boolean = true;
     const { value, name, files } = e.target;
     const file: File = files?.[0] as File;
-    const { width, height } = (await resolutionChecker(file)) as any;
-    const isEligibleImage: boolean =
-      files?.[0].type === "application/pdf" ||
-      file.size > 2000000 ||
-      ((height < 200 || width < 200) && name === "fileFotoSelfie");
+    const fileType = ["jpg", "jpeg", "png"];
+    const isEligibleFileType: boolean = fileType.some((el) =>
+      file.name.includes(el)
+    );
+
+    if (isEligibleFileType) {
+      const { width, height } = (await resolutionChecker(file)) as any;
+      isEligibleImage =
+        file.size > 2000000 ||
+        ((height < 200 || width < 200) && name === "fileFotoSelfie");
+    }
 
     const ref = {
       fileFotoKtpRef,
