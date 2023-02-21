@@ -74,7 +74,7 @@ const Index = () => {
     const { width, height } = (await resolutionChecker(file)) as any;
     const isEligibleImage: boolean =
       files?.[0].type === "application/pdf" ||
-      file.size > 202400 ||
+      file.size > 2000000 ||
       ((height < 200 || width < 200) && name === "fileFotoSelfie");
 
     const ref = {
