@@ -23,7 +23,7 @@ const ForgotTilakaName = (props: Props) => {
   const {t}: any = i18n
 
   const handleFormOnChange = (e: React.FormEvent<HTMLInputElement>): void => {
-    formSetter({ ...form, [e.currentTarget.name]: e.currentTarget.value.trim() });
+    formSetter({ ...form, [e.currentTarget.name]: e.currentTarget.value.replace(/\s/g, "") });
   };
   const handleFormOnSubmit = (e: React.SyntheticEvent): void => {
     e.preventDefault();
