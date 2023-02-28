@@ -177,7 +177,7 @@ const Form: React.FC = () => {
             query.reason_code = res.data.reason_code;
 
             if ((res.data.reason_code === "1")) {
-              router.replace({
+             return router.replace({
                 pathname: handleRoute("liveness-failure"),
                 query,
               });
