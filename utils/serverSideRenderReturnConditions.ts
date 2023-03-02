@@ -205,6 +205,7 @@ export const serverSideRenderReturnConditions = ({
         return { props: {} };
       }
     } else {
+
       if (
         checkStepResult.res?.data?.errors?.[0] === "registrationId tidak valid"
       ) {
@@ -218,7 +219,7 @@ export const serverSideRenderReturnConditions = ({
             `${assetPrefix}/link-account/success` ||
           currentPathnameWithoutParams === "/link-account/success" ||
           currentPathnameWithoutParams === `${assetPrefix}/link-account` ||
-          currentPathnameWithoutParams === "/link-account"
+          currentPathnameWithoutParams === "/link-account" || isNotRedirect
         ) {
           return {
             props: {},

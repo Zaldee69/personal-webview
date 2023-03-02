@@ -332,6 +332,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const cQuery = context.query;
   const uuid =
     cQuery.transaction_id || cQuery.request_id || cQuery.registration_id;
+  const isNotRedirect: boolean = true
 
   const checkStepResult: {
     res?: TKycCheckStepResponseData;
@@ -355,7 +356,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     });
 
   const serverSideRenderReturnConditionsResult =
-    serverSideRenderReturnConditions({ context, checkStepResult });
+    serverSideRenderReturnConditions({ context, checkStepResult, isNotRedirect });
 
   serverSideRenderReturnConditionsResult["props"] = {
     ...serverSideRenderReturnConditionsResult["props"],
