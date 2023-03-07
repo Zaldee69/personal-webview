@@ -35,6 +35,7 @@ import {
 } from "@/utils/frFailedCountGetterSetter";
 import { setStorageWithExpiresIn } from "@/utils/localStorageWithExpiresIn";
 import { getExpFromToken } from "@/utils/getExpFromToken";
+import Link from "next/link";
 
 type Props = {};
 
@@ -182,7 +183,8 @@ const LinkAccount = (props: Props) => {
       (data.data.message ===
         `Invalid Username / Password for Tilaka Name ${form?.tilaka_name}` ||
         data.data.message === "User Not Found" ||
-        data.data.message === "NIK Not Equals ON Tilaka System" || data.data.message === "Error, tilaka Name not valid")
+        data.data.message === "NIK Not Equals ON Tilaka System" ||
+        data.data.message === "Error, tilaka Name not valid")
     ) {
       toast.dismiss();
       toast.error(t("invalidUsernamePassword"));
@@ -310,14 +312,11 @@ const LinkAccount = (props: Props) => {
                 alt="lineVertical"
               />
             </div>
-            <a
-              target="_blank"
-              rel="noopener noreferrer"
-              href={`${process.env.NEXT_PUBLIC_PORTAL_URL}/public/forgot-tilaka-name.xhtml`}
-              className="poppins-regular text-primary text-xs"
-            >
-              {t("linkAccountForgotTilakaName")}
-            </a>
+            <Link href={handleRoute("forgot-tilaka-name")} passHref>
+              <a className="poppins-regular text-primary text-xs">
+                {t("linkAccountForgotTilakaName")}
+              </a>
+            </Link>
           </div>
           <button
             type="submit"

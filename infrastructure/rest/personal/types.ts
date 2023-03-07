@@ -20,6 +20,17 @@ export type TPersonalRequestChangePasswordResponseData = {
   data: string[] | null;
 };
 
+export type TPersonalRequestTilakaNameRequestData = {
+  email?: string;
+  recaptcha_response?: string;
+};
+
+export type TPersonalRequestTilakaNameResponseData = {
+  success: boolean;
+  message: string;
+  data: string[] | null;
+};
+
 export type TPersonalChangePasswordRequestData = {
   request_id: string;
   password: string;
@@ -53,8 +64,8 @@ export type TPersonalFaceRecognitionResponseData = {
   success: boolean;
   message: string;
   data: {
-    failMfa: number
-  }
+    failMfa: number;
+  };
 };
 
 export type TPersonalCheckStepv2Response = {
@@ -78,5 +89,5 @@ export type TPersonalApproveConsentResponse = {
 };
 
 export type TPersonalFaceRecognitionRequestDataV2 = {
-  face_image: string
-}
+  face_image: string;
+};
