@@ -11,9 +11,10 @@ import {
   TPersonalSetPasswordResponseData,
   TPersonalFaceRecognitionRequestData,
   TPersonalFaceRecognitionResponseData,
-  TPersonalCheckStepv2Response,
   TPersonalApproveConsentResponse,
   TPersonalFaceRecognitionRequestDataV2,
+  TPersonalRequestTilakaNameRequestData,
+  TPersonalRequestTilakaNameResponseData,
 } from "./types";
 
 import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
@@ -52,6 +53,22 @@ export const RestPersonalRequestChangePassword = ({
       setPersonalChangePasswordTokenToLocalStorage(res.data.data?.[0] || null);
       return res.data;
     })
+    .catch((err) => {
+      throw err;
+    });
+};
+
+export const RestPersonalRequestTilakaName = ({
+  payload,
+}: {
+  payload: TPersonalRequestTilakaNameRequestData;
+}): Promise<TPersonalRequestTilakaNameResponseData> => {
+  return axios
+    .post<TPersonalRequestTilakaNameResponseData>(
+      `${BASE_URL}/requestTilakaName`,
+      payload
+    )
+    .then((res) => res.data)
     .catch((err) => {
       throw err;
     });
@@ -114,7 +131,6 @@ export const RestPersonalFaceRecognition = ({
     });
 };
 
-
 export const RestPersonalFaceRecognitionV2 = ({
   payload,
 }: {
@@ -135,7 +151,6 @@ export const RestPersonalFaceRecognitionV2 = ({
       throw err;
     });
 };
-
 
 export const RestKycCheckStepv2 = ({
   registerId,

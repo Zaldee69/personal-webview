@@ -31,6 +31,7 @@ import {
   setStorageWithExpiresIn,
 } from "@/utils/localStorageWithExpiresIn";
 import { getExpFromToken } from "@/utils/getExpFromToken";
+import Link from "next/link";
 
 interface IPropsLogin {}
 
@@ -289,14 +290,29 @@ const Login = ({}: IPropsLogin) => {
                 {type.password === "password" ? <EyeIcon /> : <EyeIconOff />}
               </button>
             </div>
-            <a
-              className="m-5 text-center font-poppins text-primary"
-              target="_blank"
-              rel="noopener noreferrer"
-              href={`${process.env.NEXT_PUBLIC_PORTAL_URL}/public/reset-pass-req.xhtml`}
-            >
-              {t("linkAccountForgotPasswordButton")}
-            </a>
+            <div className="flex justify-center items-center mt-5">
+              <a
+                className="poppins-regular text-primary"
+                target="_blank"
+                rel="noopener noreferrer"
+                href={`${process.env.NEXT_PUBLIC_PORTAL_URL}/public/reset-pass-req.xhtml`}
+              >
+                {t("linkAccountForgotPasswordButton")}
+              </a>
+              <div className="block mx-2.5">
+                <Image
+                  src={`${assetPrefix}/images/lineVertical.svg`}
+                  width="8px"
+                  height="24px"
+                  alt="lineVertical"
+                />
+              </div>
+              <Link href={handleRoute("forgot-tilaka-name")} passHref>
+                <a className="poppins-regular text-primary">
+                  {t("linkAccountForgotTilakaName")}
+                </a>
+              </Link>
+            </div>
           </div>
           <button
             type="submit"
