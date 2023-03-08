@@ -1,2 +1,2 @@
 include:
-  - remote: 'https://gitlab.tilaka.id/devops/tilaka-gitlab-cicd/raw/master/autodevops-template.yml'
+  - remote: 'https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.tilaka.id/devops/tilaka-gitlab-cicd/raw/master/autodevops-template.yml'
