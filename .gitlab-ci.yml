@@ -1,4 +1,4 @@
 include: 
-  - project: '/devops/tilaka-gitlab-cicd'
+  - project: 'devops/tilaka-gitlab-cicd'
     refs: 'master'
     file: 'autodevops-template.yml'
