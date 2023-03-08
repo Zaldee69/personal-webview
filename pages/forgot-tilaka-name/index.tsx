@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useRef, useState } from "react";
 import Image from "next/image";
 import { toast } from "react-toastify";
 import XIcon from "../../public/icons/XIcon";
@@ -17,6 +17,8 @@ type Tform = {
 };
 
 const ForgotTilakaName = (props: Props) => {
+  const recaptchaRef = useRef<ReCAPTCHA>(null);
+
   const [form, formSetter] = useState<Tform>({});
   const [modalSuccess, modalSuccessSetter] = useState<boolean>(false);
   const [reCaptchaSuccess, reCaptchaSuccessSetter] = useState<boolean>(false);
@@ -29,6 +31,7 @@ const ForgotTilakaName = (props: Props) => {
       [e.currentTarget.name]: e.currentTarget.value.replace(/\s/g, ""),
     });
   };
+
   const handleFormOnSubmit = (e: React.SyntheticEvent): void => {
     e.preventDefault();
 
@@ -52,6 +55,8 @@ const ForgotTilakaName = (props: Props) => {
             icon: <XIcon />,
           });
         }
+
+        resetCaptcha();
       })
       .catch((err) => {
         if (
@@ -73,12 +78,21 @@ const ForgotTilakaName = (props: Props) => {
             }
           );
         }
+
+        resetCaptcha();
       });
   };
+
   const handleOnChangeReCaptcha = (value: string | null): void => {
     if (value === null) reCaptchaSuccessSetter(false);
     reCaptchaSuccessSetter(true);
     formSetter({ ...form, recaptcha_response: value as string });
+  };
+
+  const resetCaptcha = () => {
+    recaptchaRef.current?.reset();
+    reCaptchaSuccessSetter(false);
+    formSetter({ ...form, recaptcha_response: undefined });
   };
 
   return (
@@ -133,6 +147,7 @@ const ForgotTilakaName = (props: Props) => {
               </div>
             ) : (
               <ReCAPTCHA
+                ref={recaptchaRef}
                 sitekey={
                   process.env.NEXT_PUBLIC_RECAPTCHA_SITEKEY || "wrong-sitekey"
                 }
