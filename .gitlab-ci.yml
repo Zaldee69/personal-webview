@@ -1,1 +1,4 @@
-include: 'https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.tilaka.id/devops/tilaka-gitlab-cicd/raw/master/autodevops-template.yml'
+include: 
+  - project: '/devops/tilaka-gitlab-cicd'
+    refs: 'master'
+    file: 'autodevops-template.yml'
