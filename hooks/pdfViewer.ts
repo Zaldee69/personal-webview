@@ -42,7 +42,7 @@ type TRequestSignJson = {
 type TSigner = {
   user_identifier: string;
   page: string;
-  pageType: "signer_signature_page_all" | "signer_signature_page_selective";
+  pageType: string;
 };
 
 type TSigners = TSigner[];
@@ -92,7 +92,7 @@ export const onChangeaddSigner = (signer: TSigner, currentType: string, currentN
   return null; 
 }
 
-export const onDraggableWrapperToCanvasImage = (
+export const editSignatureToCanvasImage = (
   base64: string,
   user_identifier: TSigner["user_identifier"],
   requestSignJson: TRequestSignJson
