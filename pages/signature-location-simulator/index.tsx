@@ -12,6 +12,7 @@ import ChevronLeft24 from "@/public/icons/ChevronLeft24";
 import ChevronRight24 from "@/public/icons/ChevronRight24";
 import { generateFormatedSignerPage } from "@/utils/generateFormatedSignerPage";
 import useDocument from "@/hooks/useDocument";
+import { generateArrSignature, generateArrSignatureProperty, onChangeaddSigner, editSignatureToCanvasImage, updateDraggableCoordinate } from "@/hooks/pdfViewer"
 import { fileToBase64 } from "@/utils/fileToBase64";
 import Draggable, { DraggableEventHandler } from "react-draggable";
 import { Resizable, ResizeCallbackData } from "react-resizable";
@@ -78,7 +79,7 @@ type TRequestSignJson = {
 type TSigner = {
   user_identifier: string;
   page: string;
-  pageType: "signer_signature_page_all" | "signer_signature_page_selective";
+  pageType: string;
 };
 
 type TSigners = TSigner[];
@@ -99,7 +100,7 @@ type TDraggableWrapper = {
   onDraggableStop: (data: TDraggableData) => void;
   onDraggableWrapperToCanvasImage: (
     base64: string,
-    user_identifier: TSigner["user_identifier"]
+    user_identifier: TSigner["user_identifier"],
   ) => void;
   pageIndex: number;
 };
@@ -361,35 +362,12 @@ const PdfViewerBox = ({
     const currentName = e.currentTarget.name;
     const currentValue = e.currentTarget.value;
 
-    if (
-      currentType === "text" &&
-      currentName === "signer_signature_user_identifier"
-    ) {
-      // add signer user identifier
-      setSigner({ ...signer, user_identifier: currentValue });
-    } else if (
-      currentType === "radio" &&
-      currentName === "signer_signature_page" &&
-      currentValue === "signer_signature_page_all"
-    ) {
-      // add signer page all
-      setSigner({ ...signer, pageType: currentValue });
-    } else if (
-      currentType === "radio" &&
-      currentName === "signer_signature_page" &&
-      currentValue === "signer_signature_page_selective"
-    ) {
-      // add signer page selective
-      setSigner({ ...signer, pageType: currentValue });
-    } else if (
-      currentType === "text" &&
-      currentName === "signer_signature_page_selective_text"
-    ) {
-      // add signer page selective
-      setSigner({ ...signer, page: currentValue });
-    } else {
-      return;
+    const result = onChangeaddSigner(signer, currentType, currentName, currentValue);
+
+    if(!result){
+      return
     }
+    setSigner(result)
   };
   const onChangeSignerEdit = (
     e: React.FormEvent<HTMLInputElement>,
@@ -534,101 +512,11 @@ const PdfViewerBox = ({
     base64: string,
     user_identifier: TSigner["user_identifier"]
   ) => {
-    const newSignatureIndex = requestSignJson.signatures.findIndex(
-      (x) => x.user_identifier === user_identifier
-    );
-
-    const newSignatureArr = requestSignJson.signatures.map((x) => x);
-
-    newSignatureArr[newSignatureIndex] = {
-      ...newSignatureArr[newSignatureIndex],
-      signature_image: base64,
-    };
-
-    const requestSignJsonMock = {
-      ...requestSignJson,
-      signatures: newSignatureArr,
-    };
-
-    setRequestSignJson(requestSignJsonMock);
-    onGenerateJson(requestSignJsonMock);
+    const result = editSignatureToCanvasImage(base64,user_identifier,requestSignJson)
+    
+    setRequestSignJson(result);
+    onGenerateJson(result);
   };
-  const generateArrSignature = (signers: TSigners): TSignature[] => {
-    return signers.map((el, elIdx) => ({
-      ...requestSignJson.signatures[elIdx],
-      user_identifier: el.user_identifier,
-    }));
-  };
-  const generateArrSignatureProperty = (
-    signers: TSigners
-  ): TSignatureProperty[] => {
-    let arrSignatureProperty: TSignatureProperty[] =
-      requestSignJson.list_pdf?.[0]?.signatures.map((x) => x);
-
-    signers.forEach((el, elIdx) => {
-      const signerPagesString = generateFormatedSignerPage(el.page);
-      const signerPagesStringToArr = signerPagesString.split(",");
-
-      signerPagesStringToArr.forEach((page, pageIdx) => {
-        // skip when it already exits in array
-        if (
-          requestSignJson.list_pdf?.[0]?.signatures.findIndex(
-            (x) =>
-              x.page_number === parseInt(page) &&
-              x.user_identifier === el.user_identifier
-          ) !== -1
-        ) {
-          return;
-        }
-
-        const signatureProperty = {
-          coordinate_x: 0,
-          coordinate_y: 0,
-          height: SIGNATURE_PROPERTY_HEIGHT_DEFAULT,
-          width: SIGNATURE_PROPERTY_WIDTH_DEFAULT,
-          user_identifier: el.user_identifier,
-          page_number: parseInt(page),
-        };
-        arrSignatureProperty.push(signatureProperty);
-      });
-    });
-
-    // filter
-    const signerValid: {
-      user_identifier: TSigner["user_identifier"];
-      page_number: TSignatureProperty["page_number"];
-    }[] = [];
-    signers.forEach((el) => {
-      const signerPagesString = generateFormatedSignerPage(el.page);
-      const signerPagesStringToArr = signerPagesString.split(",");
-
-      signerPagesStringToArr.forEach((page) => {
-        if (signerPagesString.includes(page)) {
-          signerValid.push({
-            user_identifier: el.user_identifier,
-            page_number: parseInt(page),
-          });
-        }
-      });
-    });
-
-    arrSignatureProperty = arrSignatureProperty.filter((sp) => {
-      if (
-        signerValid.findIndex(
-          (sv) =>
-            sv.user_identifier === sp.user_identifier &&
-            sv.page_number === sp.page_number
-        ) !== -1
-      ) {
-        return sp;
-      } else {
-        return;
-      }
-    });
-
-    return arrSignatureProperty;
-  };
-
   /**
    * Document page
    */
@@ -675,12 +563,12 @@ const PdfViewerBox = ({
     // after add signers at firstly or on edit
     const requestSignJsonMock = {
       ...requestSignJson,
-      signatures: generateArrSignature(signers),
+      signatures: generateArrSignature(signers, requestSignJson),
       list_pdf: [
         {
           file: requestSignJson.list_pdf[0].file,
           file_name: requestSignJson.list_pdf[0].file_name,
-          signatures: generateArrSignatureProperty(signers),
+          signatures: generateArrSignatureProperty(signers,requestSignJson),
         },
       ],
     };
@@ -695,38 +583,10 @@ const PdfViewerBox = ({
   useEffect(() => {
     if (!requestSignJson.list_pdf.length) return;
 
-    const newSignaturePropertyArr: TSignatureProperty[] =
-      requestSignJson?.list_pdf?.[0]?.signatures.map((e) => e) || [];
-    const currentDraggableIndex = newSignaturePropertyArr.findIndex(
-      (x) =>
-        x.page_number === draggableData.page_number &&
-        x.user_identifier === draggableData.user_identifier
-    );
+    const signJson = updateDraggableCoordinate(requestSignJson,draggableData)
 
-    if (currentDraggableIndex !== -1) {
-      newSignaturePropertyArr[currentDraggableIndex] = {
-        coordinate_x: draggableData.x,
-        coordinate_y: draggableData.y,
-        height: draggableData.height,
-        width: draggableData.width,
-        user_identifier: draggableData.user_identifier,
-        page_number: draggableData.page_number,
-      };
-    }
-
-    const requestSignJsonMock: TRequestSignJson = {
-      ...requestSignJson,
-      list_pdf: [
-        {
-          file: requestSignJson.list_pdf[0].file,
-          file_name: requestSignJson.list_pdf[0].file_name,
-          signatures: newSignaturePropertyArr,
-        },
-      ],
-    };
-
-    setRequestSignJson(requestSignJsonMock);
-    onGenerateJson(requestSignJsonMock);
+    setRequestSignJson(signJson);
+    onGenerateJson(signJson);
   }, [draggableData]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
