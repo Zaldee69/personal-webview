@@ -5,8 +5,10 @@ import EyeIconOff from "./../../public/icons/EyeIconOff";
 import { useRouter } from "next/router";
 import Head from "next/head";
 import { assetPrefix } from "../../next.config";
-import { GetServerSideProps } from "next";
-import { handleRoute } from "@/utils/handleRoute";
+import { RestPersonalResetPassword } from "infrastructure/rest/personal";
+import { toast } from "react-toastify";
+import XIcon from "@/public/icons/XIcon";
+import CheckOvalIcon from "@/public/icons/CheckOvalIcon";
 
 type Props = {};
 
@@ -34,7 +36,7 @@ const LinkAccount = (props: Props) => {
     confirm_password: "",
   });
 
-  const { key, ...routerQuery } = router.query;
+  const { kunciRahasia: key, ...routerQuery } = router.query;
   const keyExist: boolean = key ? true : false;
   const submitShouldDisabled: boolean =
     !keyExist ||
@@ -101,15 +103,44 @@ const LinkAccount = (props: Props) => {
     };
 
     const password = target.password.value;
-    const confirm_password = target.confirm_password.value;
 
-    alert(JSON.stringify({ password, confirm_password, key }, null, 4));
-
-    // success?
-    router.replace({
-      pathname: router.pathname + "/success",
-      query: { key, ...routerQuery },
-    });
+    RestPersonalResetPassword({ payload: { password, token: key as string } })
+      .then((res) => {
+        if (res.success) {
+          toast.success("Berhasil mengganti kata sandi!", {
+            icon: <CheckOvalIcon />,
+          });
+          router.replace({
+            pathname: router.pathname + "/success",
+            query: { kunciRahasia: key, ...routerQuery },
+          });
+        } else {
+          toast.error(res.message || "Gagal request reset password", {
+            icon: <XIcon />,
+          });
+        }
+      })
+      .catch((err) => {
+        if (
+          err.response?.data?.message &&
+          err.response?.data?.data?.errors?.[0]
+        ) {
+          toast.error(
+            `${err.response?.data?.message}, ${err.response?.data?.data?.errors?.[0]}`,
+            {
+              icon: <XIcon />,
+            }
+          );
+        } else {
+          toast.error(
+            err.response?.data?.message ||
+              "Kesalahan pada saat request reset password",
+            {
+              icon: <XIcon />,
+            }
+          );
+        }
+      });
   };
 
   return (
@@ -202,17 +233,6 @@ const LinkAccount = (props: Props) => {
       </div>
     </>
   );
-};
-
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  const params = context.query;
-  const queryString = new URLSearchParams(params as any).toString();
-  return {
-    redirect: {
-      permanent: false,
-      destination: handleRoute("?" + queryString),
-    },
-  };
 };
 
 export default LinkAccount;

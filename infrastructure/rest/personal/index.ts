@@ -15,6 +15,8 @@ import {
   TPersonalFaceRecognitionRequestDataV2,
   TPersonalRequestTilakaNameRequestData,
   TPersonalRequestTilakaNameResponseData,
+  TPersonalRequestResetPasswordRequestData,
+  TPersonalRequestResetPasswordResponseData,
 } from "./types";
 
 import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
@@ -66,6 +68,22 @@ export const RestPersonalRequestTilakaName = ({
   return axios
     .post<TPersonalRequestTilakaNameResponseData>(
       `${BASE_URL}/requestTilakaName`,
+      payload
+    )
+    .then((res) => res.data)
+    .catch((err) => {
+      throw err;
+    });
+};
+
+export const RestPersonalRequestResetPassword = ({
+  payload,
+}: {
+  payload: TPersonalRequestResetPasswordRequestData;
+}): Promise<TPersonalRequestResetPasswordResponseData> => {
+  return axios
+    .post<TPersonalRequestResetPasswordResponseData>(
+      `${BASE_URL}/pRequestResetPassword`,
       payload
     )
     .then((res) => res.data)
