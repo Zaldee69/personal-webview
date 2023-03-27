@@ -36,6 +36,7 @@ import {
 import { setStorageWithExpiresIn } from "@/utils/localStorageWithExpiresIn";
 import { getExpFromToken } from "@/utils/getExpFromToken";
 import Link from "next/link";
+import { getEncodedCurrentUrl } from "@/utils/getEncodedCurrentUrl";
 
 type Props = {};
 
@@ -296,14 +297,17 @@ const LinkAccount = (props: Props) => {
             </div>
           </label>
           <div className="flex justify-center items-center mt-10">
-            <a
-              target="_blank"
-              rel="noopener noreferrer"
-              href={`${process.env.NEXT_PUBLIC_PORTAL_URL}/public/reset-pass-req.xhtml`}
-              className="poppins-regular text-primary text-xs"
+            <Link
+              href={{
+                pathname: handleRoute("forgot-password"),
+                // query: { redirect_url: getEncodedCurrentUrl() },
+              }}
+              passHref
             >
-              {t("linkAccountForgotPasswordButton")}
-            </a>
+              <a className="poppins-regular text-primary text-xs">
+                {t("linkAccountForgotPasswordButton")}
+              </a>
+            </Link>
             <div className="block mx-2.5">
               <Image
                 src={`${assetPrefix}/images/lineVertical.svg`}

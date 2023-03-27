@@ -1,29 +1,37 @@
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useRef, useState } from "react";
 import Image from "next/image";
 import { toast } from "react-toastify";
 import XIcon from "../../public/icons/XIcon";
 import Head from "next/head";
 import ReCAPTCHA from "react-google-recaptcha";
 import { assetPrefix } from "../../next.config";
-import { GetServerSideProps } from "next";
-import { handleRoute } from "@/utils/handleRoute";
 import i18n from "i18";
+import { TPersonalRequestResetPasswordRequestData } from "infrastructure/rest/personal/types";
+import { RestPersonalRequestResetPassword } from "infrastructure/rest/personal";
 
 type Props = {};
 
 type Tform = {
   email?: string;
+  recaptcha_response?: string;
 };
 
 const ForgotPassword = (props: Props) => {
+  const recaptchaRef = useRef<ReCAPTCHA>(null);
+
   const [form, formSetter] = useState<Tform>({});
   const [modalSuccess, modalSuccessSetter] = useState<boolean>(false);
   const [reCaptchaSuccess, reCaptchaSuccessSetter] = useState<boolean>(false);
 
+  const { t }: any = i18n;
+
   const handleFormOnChange = (e: React.FormEvent<HTMLInputElement>): void => {
-    formSetter({ ...form, [e.currentTarget.name]: e.currentTarget.value.replace(/\s/g, "") });
+    formSetter({
+      ...form,
+      [e.currentTarget.name]: e.currentTarget.value.replace(/\s/g, ""),
+    });
   };
-  const {t}: any = i18n
+
   const handleFormOnSubmit = (e: React.SyntheticEvent): void => {
     e.preventDefault();
 
@@ -31,20 +39,60 @@ const ForgotPassword = (props: Props) => {
       email: { value: Tform["email"] };
     };
 
-
     const email = target.email.value;
 
-    if (email === "failure") {
-      toast.error("Email tidak ditemukan", {
-        icon: <XIcon />,
+    const data: TPersonalRequestResetPasswordRequestData = {
+      email: (email as string) || undefined,
+      recaptcha_response: (form.recaptcha_response as string) || undefined,
+    };
+
+    RestPersonalRequestResetPassword({ payload: data })
+      .then((res) => {
+        if (res.success) {
+          modalSuccessSetter(true);
+        } else {
+          toast.error(res.message || "Gagal request reset password", {
+            icon: <XIcon />,
+          });
+        }
+
+        resetCaptcha();
+      })
+      .catch((err) => {
+        if (
+          err.response?.data?.message &&
+          err.response?.data?.data?.errors?.[0]
+        ) {
+          toast.error(
+            `${err.response?.data?.message}, ${err.response?.data?.data?.errors?.[0]}`,
+            {
+              icon: <XIcon />,
+            }
+          );
+        } else {
+          toast.error(
+            err.response?.data?.message ||
+              "Kesalahan pada saat request reset password",
+            {
+              icon: <XIcon />,
+            }
+          );
+        }
+
+        resetCaptcha();
       });
-    } else {
-      modalSuccessSetter(true);
-    }
   };
+
   const handleOnChangeReCaptcha = (value: string | null): void => {
     if (value === null) reCaptchaSuccessSetter(false);
     reCaptchaSuccessSetter(true);
+    formSetter({ ...form, recaptcha_response: value as string });
+  };
+
+  const resetCaptcha = () => {
+    recaptchaRef.current?.reset();
+    reCaptchaSuccessSetter(false);
+    formSetter({ ...form, recaptcha_response: undefined });
   };
 
   return (
@@ -54,7 +102,7 @@ const ForgotPassword = (props: Props) => {
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
       <div className="py-9 max-w-md items-center mx-auto flex flex-col justify-between">
-        <div className="w-full px-5" >
+        <div className="w-full px-5">
           <p className="font-poppins text-lg font-semibold text-neutral800">
             {t("forgotPassword.title")}
           </p>
@@ -99,7 +147,10 @@ const ForgotPassword = (props: Props) => {
               </div>
             ) : (
               <ReCAPTCHA
-                sitekey="6LclJZggAAAAANygA1YWpx_qqrJybrVLHZBanCrs"
+                ref={recaptchaRef}
+                sitekey={
+                  process.env.NEXT_PUBLIC_RECAPTCHA_SITEKEY || "wrong-sitekey"
+                }
                 onChange={handleOnChangeReCaptcha}
               />
             )}
@@ -120,25 +171,13 @@ const ForgotPassword = (props: Props) => {
   );
 };
 
-// export const getServerSideProps: GetServerSideProps = async (context) => {
-//   const params = context.query;
-//   const queryString = new URLSearchParams(params as any).toString();
-//   return {
-//     redirect: {
-//       permanent: false,
-//       destination: handleRoute("?" + queryString),
-//     },
-//   };
-// };
-
 export default ForgotPassword;
 
 const ModalSuccess: React.FC<{
   modal: boolean;
   setModal: Dispatch<SetStateAction<boolean>>;
 }> = ({ modal, setModal }) => {
-
-  const {t}: any = i18n
+  const { t }: any = i18n;
 
   return modal ? (
     <div
@@ -147,7 +186,7 @@ const ModalSuccess: React.FC<{
     >
       <div className="bg-white max-w-md mt-20 px-3 pt-7 pb-4 rounded-xl w-full mx-5">
         <p className="font-poppins block text-center pb-5  whitespace-nowrap  font-semibold ">
-        {t("emailWasSend")}
+          {t("emailWasSend")}
         </p>
         <div className="mt-5 text-center">
           <Image
@@ -158,13 +197,13 @@ const ModalSuccess: React.FC<{
           />
         </div>
         <p className="text-neutral800 text-base font-normal mt-8 font-poppins text-center">
-        {t("checkEmail")}
+          {t("checkEmail")}
         </p>
         <button
           onClick={() => setModal(false)}
           className="text-neutral80 font-poppins font-medium w-full mt-14 mx-auto rounded-sm py-2"
         >
-         {t("close")}
+          {t("close")}
         </button>
       </div>
     </div>

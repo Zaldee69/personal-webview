@@ -31,6 +31,18 @@ export type TPersonalRequestTilakaNameResponseData = {
   data: string[] | null;
 };
 
+export type TPersonalRequestResetPasswordRequestData = {
+  email?: string;
+  recaptcha_response?: string;
+};
+
+export type TPersonalRequestResetPasswordResponseData = {
+  success: boolean;
+  message: string;
+  token: string | null;
+  user_identifier: string | null;
+};
+
 export type TPersonalChangePasswordRequestData = {
   request_id: string;
   password: string;
