@@ -48,13 +48,13 @@ const SetMfa = () => {
 
   const onClickHandler = (clickEventType: "submit" | "confirmation") => {
     if (clickEventType === "confirmation") {
-      if (mfaMethod === "fr") {
+      if (mfaMethod === "otp") {
         setShowModalFr(true);
       } else {
         setIsShowOtpModalConfirmation(true);
       }
     } else {
-      if (mfaMethod === "otp" && mfaMethod !== defaultMfa) {
+      if (mfaMethod === "fr" && mfaMethod !== defaultMfa) {
         restSetDefaultMFA({
           payload: {
             mfa_type: mfaMethod,
@@ -261,7 +261,7 @@ const FRModal = ({ isShowModalFr, setShowModalFr, geTypeMfa }: IModalFR) => {
           setShowModalFr(false);
           restSetDefaultMFA({
             payload: {
-              mfa_type: "fr",
+              mfa_type: "otp",
             },
           }).then((res) => {
             toast("Penggantian MFA berhasil", {
@@ -352,14 +352,14 @@ const OtpModalConfirmation = ({
               Konfirmasi Perubahan Metode Otentikasi
             </p>
             <p className="mt-8 text-sm text-center">
-              Apa Anda yakin mengubah metode otentikasi menjadi OTP via email?
+              Apa Anda yakin mengubah metode otentikasi menjadi Face Recognition?
             </p>
           </div>
         </div>
-        <div className="poppins-regular justify-center flex-col-reverse  flex gap-3  mt-5">
+        <div className="poppins-regular justify-center items-center flex-col-reverse  flex gap-3  mt-5">
           <button
             onClick={() => setIsShowOtpModalConfirmation(false)}
-            className="text-primary font-semibold"
+            className="text-primary fit-content font-semibold"
           >
             Batal
           </button>
