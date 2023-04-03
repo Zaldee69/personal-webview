@@ -5,11 +5,12 @@ import { GetServerSideProps } from "next";
 import Head from "next/head";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import React from "react";
+import React, { useEffect } from "react";
 import Footer from "../../components/Footer";
 import { assetPrefix } from "../../next.config";
 import i18n from "i18";
 import { RestKycCheckStepv2 } from "infrastructure/rest/personal";
+import { handleRoute } from "@/utils/handleRoute";
 
 const LivenessFailure = () => {
   const { t }: any = i18n;
@@ -33,7 +34,17 @@ const LivenessFailure = () => {
       : reason_code === "3"
       ? t("ekycFailed.errorCode3")
       : t("livenessFailed3xSubtitle");
-
+  const isRedirectToManualForm = reason_code === "1" || reason_code === "2"
+  useEffect(() => {
+    if (isRedirectToManualForm) {
+      setTimeout(() => {
+        router.push({
+          pathname: handleRoute("manual-form"),
+          query: routerQuery,
+        });
+      },5000)
+    }
+  }, []);
   return (
     <>
       <Head>
@@ -54,6 +65,13 @@ const LivenessFailure = () => {
           <div className="flex flex-col items-center gap-10 ">
             <p className="text-center poppins-regular text-neutral800">
             {message}
+            {
+              isRedirectToManualForm && (
+                <p className="text-center poppins-regular text-neutral800">
+                {t("ekycFailed.subtitle")}
+                </p>
+              )
+            }
             </p>
             {routerQuery.redirect_url && (
               <a

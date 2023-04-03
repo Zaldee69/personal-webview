@@ -58,6 +58,7 @@ export type TPersonalSetPasswordRequestData = {
   register_id: string;
   token: string;
   password: string;
+  tilaka_name?: string | null;
 };
 
 export type TPersonalSetPasswordResponseData = {
@@ -103,3 +104,20 @@ export type TPersonalApproveConsentResponse = {
 export type TPersonalFaceRecognitionRequestDataV2 = {
   face_image: string;
 };
+
+export type TPersonalPManualRegRequestData = {
+  nik: string;
+  name: string;
+  email: string;
+  register_id: string;
+  photo_selfie: string;
+  photo_ktp: string;
+}
+
+export type TPersonalPManualRegResponseData = {
+  success: boolean;
+  message: string;
+  token: string | null;
+  channel_type: string | null;
+  tilaka_name: string | null;
+}
