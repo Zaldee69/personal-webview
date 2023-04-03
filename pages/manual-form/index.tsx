@@ -9,16 +9,20 @@ import { handleRoute } from "@/utils/handleRoute";
 import { onSubmitValidator } from "@/utils/onSubmitValidator";
 import { assetPrefix } from "next.config";
 import { useRouter } from "next/router";
+import { toast } from "react-toastify";
 import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import i18n from "i18";
+import { RestPersonalPManualReg } from "infrastructure";
+import { TPersonalPManualRegRequestData } from "infrastructure/rest/personal/types";
+import XIcon from "@/public/icons/XIcon";
 
 type TForm = {
   nik: string;
   email: string;
   name: string;
-  fileFotoKtp: string;
-  fileFotoSelfie: string;
+  photo_ktp: string;
+  photo_selfie: string;
 };
 
 type TModal = {
@@ -32,23 +36,24 @@ type TModal = {
 
 const Index = () => {
   const router = useRouter();
+  const { request_id, ...restRouterQuery } = router.query
   const { t }: any = i18n;
   const fileFotoKtpRef = useRef<HTMLInputElement>(null);
   const fileFotoSelfieRef = useRef<HTMLInputElement>(null);
 
   const [form, setForm] = useState<TForm>({
-    nik: "1234567890123456",
-    email: "johndoe@yopmail.com",
-    name: "John Doe",
-    fileFotoKtp: "",
-    fileFotoSelfie: "",
+    nik: "",
+    email: "",
+    name: "",
+    photo_ktp: "",
+    photo_selfie: "",
   });
 
   const [errorMessage, setErrorMessage] = useState({
     nik: "",
     name: "",
-    fileFotoKtp: "",
-    fileFotoSelfie: "",
+    photo_ktp: "",
+    photo_selfie: "",
   });
 
   const [modal, setModal] = useState<TModal>({
@@ -69,31 +74,43 @@ const Index = () => {
   };
 
   const onChangeHandler = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    let isEligibleImage: boolean = true;
+    let isErrorImage: boolean = false;
     const { value, name, files } = e.target;
+    let isEligibleFileType: boolean = true;
     const file: File = files?.[0] as File;
-    const fileType = ["jpg", "jpeg", "png"];
-    const isEligibleFileType: boolean = fileType.some((el) =>
-      file.name.includes(el)
-    );
-
-    if (isEligibleFileType) {
-      const { width, height } = (await resolutionChecker(file)) as any;
-      isEligibleImage =
-        file.size > 2000000 ||
-        ((height < 200 || width < 200) && name === "fileFotoSelfie");
+    if(name === "photo_ktp" || name === "photo_selfie"){
+      const fileType = ["jpg", "jpeg", "png"];
+      isEligibleFileType = fileType.some((el) =>
+        file?.name.includes(el)
+      );
+  
+      if (isEligibleFileType) {
+        const { width, height } = (await resolutionChecker(file)) as any;
+        isErrorImage =
+          file.size < 2000000 ||
+          ((height < 200 || width < 200) && name === "photo_selfie");
+      }
     }
+
 
     const ref = {
       fileFotoKtpRef,
       fileFotoSelfieRef,
     };
 
-    if (!isEligibleImage) {
+    if (isErrorImage || !isEligibleFileType) {
+      setErrorMessage((prev) => ({
+        ...prev,
+        [name]:
+          name === "photo_ktp"
+            ? t("manualForm.photoKtp.errorMessage2")
+            : t("manualForm.photoSelfie.errorMessage2"),
+      }));
+    } else {
       setForm({
         ...form,
         [name]:
-          name === "fileFotoKtp" || name === "fileFotoSelfie"
+          name === "photo_ktp" || name === "photo_selfie"
             ? await fileToBase64(file)
             : name === "nik"
             ? value.replace(/\s/g, "")
@@ -102,17 +119,9 @@ const Index = () => {
       setErrorMessage({
         nik: "",
         name: "",
-        fileFotoKtp: "",
-        fileFotoSelfie: "",
+        photo_ktp: "",
+        photo_selfie: "",
       });
-    } else {
-      setErrorMessage((prev) => ({
-        ...prev,
-        [name]:
-          name === "fileFotoKtp"
-            ? t("manualForm.photoKtp.errorMessage2")
-            : t("manualForm.photoSelfie.errorMessage2"),
-      }));
     }
 
     setModal({
@@ -130,38 +139,72 @@ const Index = () => {
     setModal({
       ...modal,
       show: {
-        ktp: name === "fileFotoKtp" ? true : false,
-        selfie: name === "fileFotoSelfie" ? true : false,
+        ktp: name === "photo_ktp" ? true : false,
+        selfie: name === "photo_selfie" ? true : false,
       },
       fileFotoKtpRef,
     });
   };
 
-  const isShouldRedirectToOnProcessPage =
-    errorMessage.fileFotoKtp.length < 1 &&
-    errorMessage.fileFotoSelfie.length < 1 &&
-    form.fileFotoKtp.length > 1 &&
-    form.fileFotoSelfie.length > 1;
+  // const isShouldRedirectToOnProcessPage =
+  //   errorMessage.fileFotoKtp.length < 1 &&
+  //   errorMessage.fileFotoSelfie.length < 1 &&
+  //   form.fileFotoKtp.length > 1 &&
+  //   form.fileFotoSelfie.length > 1;
 
-  const onsubmitHandler = (e: React.FormEvent<HTMLFormElement>) => {
+  const onsubmitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setErrorMessage({
       ...errorMessage,
-      fileFotoKtp:
-        (form.fileFotoKtp.length < 1 &&
+      photo_ktp:
+        (form.photo_ktp.length < 1 &&
           t("manualForm.photoKtp.errorMessage1")) ||
-        errorMessage.fileFotoKtp,
-      fileFotoSelfie:
-        (form.fileFotoSelfie.length < 1 &&
+        errorMessage.photo_ktp,
+        photo_selfie:
+        (form.photo_selfie.length < 1 &&
           t("manualForm.photoSelfie.errorMessage1")) ||
-        errorMessage.fileFotoSelfie,
+        errorMessage.photo_selfie,
     });
 
-    if (isShouldRedirectToOnProcessPage) {
-      router.push({
-        pathname: handleRoute("manual-form/on-process"),
-        query: { ...router.query },
+    try {
+      const formReq: TPersonalPManualRegRequestData = {
+        ...form,
+        register_id: request_id as string,
+      }
+      const res = await RestPersonalPManualReg(formReq)
+      if(!res.success){
+        return toast.error(res.message || "gagal", { icon: <XIcon/> })
+      }
+
+      const query: any = {
+        ...restRouterQuery,
+        request_id,
+        token: res.token,
+      }
+
+      if(res.channel_type === "REGULAR"){
+        router.push({
+          pathname: handleRoute("manual-form/final"),
+          query,
+        });
+      } else {
+        router.push({
+          pathname: handleRoute("manual-form/on-process"),
+          query: { ...router.query },
+        });
+      }
+
+    } catch (err: any){
+      if (err.response?.data?.data?.errors?.[0]) {
+        toast.error(
+            `${err.response?.data?.message}, ${err.response?.data?.data?.errors?.[0]}`,
+            { icon: <XIcon /> }
+        );
+      } else {
+      toast.error(err.response?.data?.message || "gagal", {
+          icon: <XIcon />,
       });
+      }
     }
   };
 
@@ -187,8 +230,6 @@ const Index = () => {
           value={form.nik}
           onChangeHandler={onChangeHandler}
           isError={errorMessage.nik.length > 1}
-          isDisabled
-          isReadonly
         />
         <ErrorMessage errorMessage={errorMessage.nik} />
         <Label htmlFor="name" title={t("manualForm.name.label")} isDisabled />
@@ -198,8 +239,6 @@ const Index = () => {
           value={form.name}
           onChangeHandler={onChangeHandler}
           isError={errorMessage.name.length > 1}
-          isDisabled
-          isReadonly
         />
         <ErrorMessage errorMessage={errorMessage.name} />
         <Label htmlFor="email" title={t("manualForm.email.label")} isDisabled />
@@ -208,14 +247,12 @@ const Index = () => {
           placeholder={t("manualForm.email.placeholder")}
           value={form.email}
           onChangeHandler={onChangeHandler}
-          isDisabled
-          isReadonly
         />
         <CustomFileInputField
           name="fileFotoKtp"
           label={t("manualForm.photoKtp.label")}
-          imageBase64={form.fileFotoKtp}
-          errorMessage={errorMessage.fileFotoKtp}
+          imageBase64={form.photo_ktp}
+          errorMessage={errorMessage.photo_ktp}
           onDeleteImageHandler={onDeleteImageHandler}
           onChangeHandler={onChangeHandler}
           onLabelClicked={onLabelClicked}
@@ -225,8 +262,8 @@ const Index = () => {
         <CustomFileInputField
           label={t("manualForm.photoSelfie.label")}
           name="fileFotoSelfie"
-          errorMessage={errorMessage.fileFotoSelfie}
-          imageBase64={form.fileFotoSelfie}
+          errorMessage={errorMessage.photo_selfie}
+          imageBase64={form.photo_selfie}
           onChangeHandler={onChangeHandler}
           onDeleteImageHandler={onDeleteImageHandler}
           onLabelClicked={onLabelClicked}

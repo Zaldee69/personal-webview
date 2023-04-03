@@ -17,6 +17,8 @@ import {
   TPersonalRequestTilakaNameResponseData,
   TPersonalRequestResetPasswordRequestData,
   TPersonalRequestResetPasswordResponseData,
+  TPersonalPManualRegRequestData,
+  TPersonalPManualRegResponseData
 } from "./types";
 
 import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
@@ -208,3 +210,15 @@ export const RestPersonalApproveConsent = ({
       throw err;
     });
 };
+
+export const RestPersonalPManualReg = (payload :TPersonalPManualRegRequestData): Promise<TPersonalPManualRegResponseData> => {
+  return axios
+    .post<TPersonalPManualRegResponseData>(
+      `${BASE_URL}/pManualReg`,
+      payload,
+    )
+    .then((res) => res.data)
+    .catch((err) => {
+      throw err;
+    });
+}

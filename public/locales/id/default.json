@@ -198,7 +198,8 @@
       "placeholder": "Masukkan nama lengkap sesuai e-KTP"
     },
     "email": {
-      "label": "Email"
+      "label": "Email",
+      "placeholder": "Masukkan email"
     },
     "photoKtp": {
       "label": "Foto e-KTP",
@@ -241,6 +242,7 @@
   "checkEmail2": "Silahkan periksa email Anda untuk melihat informasi Tilaka Name.",
   "ekycFailed": {
     "title": "e-KYC Gagal",
+    "subtitle": "Anda akan diarahkan ke halaman Verifikasi Manual dalam 5 detik untuk melanjutkan proses registrasi",
     "errorCode1": "Gagal pemeriksaan Dukcapil",
     "errorCode2": "Gagal Liveness",
     "errorCode3": "Registration ID Expired"
