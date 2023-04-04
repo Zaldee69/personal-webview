@@ -87,7 +87,7 @@ const Index = () => {
       if (isEligibleFileType) {
         const { width, height } = (await resolutionChecker(file)) as any;
         isErrorImage =
-          file.size < 2000000 ||
+          file.size > 2000000 ||
           ((height < 200 || width < 200) && name === "photo_selfie");
       }
     }
@@ -249,7 +249,7 @@ const Index = () => {
           onChangeHandler={onChangeHandler}
         />
         <CustomFileInputField
-          name="fileFotoKtp"
+          name="photo_ktp"
           label={t("manualForm.photoKtp.label")}
           imageBase64={form.photo_ktp}
           errorMessage={errorMessage.photo_ktp}
@@ -261,7 +261,7 @@ const Index = () => {
         />
         <CustomFileInputField
           label={t("manualForm.photoSelfie.label")}
-          name="fileFotoSelfie"
+          name="photo_selfie"
           errorMessage={errorMessage.photo_selfie}
           imageBase64={form.photo_selfie}
           onChangeHandler={onChangeHandler}
