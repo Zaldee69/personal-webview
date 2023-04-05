@@ -203,6 +203,13 @@ const RevokeMekari = () => {
       } else {
         toast.dismiss("verification");
         if (result.data.status === "F") {
+          toast( "You have failed 3 times \nYou will be redirected to the next page, please wait...",
+            {
+              type: "error",
+              autoClose: 5000,
+              position: "top-center",
+            }
+          );
           setIsLoading(false);
           if (routerQuery.redirect_url) {
             setTimeout(() => {
