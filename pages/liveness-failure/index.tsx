@@ -67,9 +67,19 @@ const LivenessFailure = () => {
             {message}
             {
               isRedirectToManualForm && (
-                <p className="text-center poppins-regular text-neutral800">
-                {t("ekycFailed.subtitle")}
-                </p>
+                <div>
+                  <div className="hidden lg:block">
+                    <p className="text-center poppins-regular text-neutral800">
+                    {t("ekycFailed.subtitle1")} <br/>
+                    {t("ekycFailed.subtitle2")}
+                    </p>
+                  </div>
+                  <div className="block lg:hidden">
+                    <p className="text-center text-red-100 poppins-regular text-neutral800">
+                    {t("ekycFailed.subtitle")}
+                    </p>
+                  </div>
+                </div>
               )
             }
             </p>
