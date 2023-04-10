@@ -112,8 +112,8 @@ const Index = () => {
         [name]:
           name === "photo_ktp" || name === "photo_selfie"
             ? await fileToBase64(file)
-            : name === "nik" || name === "email"
-            ? value.replace(/\s/g, "")
+            : name === "nik" ?  value.replace(/[^0-9]/g, "")
+            : name === "email" ? value.replace(/\s/g, "")
             : value.trimStart(),
       });
       setErrorMessage({
