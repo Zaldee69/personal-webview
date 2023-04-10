@@ -200,7 +200,7 @@ const Form: React.FC = () => {
         <title>{t("finalFormTitle")}</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
-      <div className="px-5 pt-8 sm:w-full md:w-4/5 mx-auto">
+      <div className="px-5 pt-8 max-w-md mx-auto">
         <h1 className="font-poppins font-semibold text-xl">
           {t("finalFormTitle")}
         </h1>
@@ -364,7 +364,7 @@ const Form: React.FC = () => {
           </div>
           <button
             disabled={disabled as boolean}
-            className={`bg-primary mt-10 md:mx-auto md:block md:w-1/4 uppercase text-white font-poppins w-full mx-auto rounded-sm h-9 disabled:opacity-50
+            className={`bg-primary mt-10 md:mx-auto md:block uppercase text-white font-poppins w-full mx-auto rounded-sm h-9 disabled:opacity-50
           }`}
           >
             {t("CTA")}
