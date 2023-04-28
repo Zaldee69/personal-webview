@@ -56,3 +56,19 @@ export interface ISigningDownloadSignedPDFResponseData {
   status: "PROCESS" | "UNAUTHORIZED" | "DENIED" | "DONE";
   signed_pdf: ISignedPDF[] | null;
 }
+
+export interface ISigningAuthhashsignRequestData {
+  params: {
+    id: string;
+    user: string;
+  };
+  payload: {
+    face_image?: string;
+    otp_pin?: string;
+  };
+}
+export interface ISigningAuthhashsignResponseData {
+  success: boolean;
+  message: string;
+  data: any;
+}
