@@ -57,6 +57,8 @@ export const getStorageWithExpiresIn = (
     expiresIn = 0;
   }
 
+  expiresIn = parseInt(expiresIn as string);
+
   if (expiresIn < now) {
     // Expired
     // expiresIn === 0 indicate that expiresIn not exist on localStorage

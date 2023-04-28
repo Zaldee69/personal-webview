@@ -6,6 +6,8 @@ import {
   TSigningAuthPINRequestData,
   TSigningAuthPINResponseData,
   ISigningDownloadSignedPDFResponseData,
+  ISigningAuthhashsignResponseData,
+  ISigningAuthhashsignRequestData,
 } from "./types";
 
 const BASE_URL =
@@ -80,6 +82,32 @@ export const RestSigningDownloadSignedPDF = ({
         headers: {
           Authorization: `Bearer ${token}`,
         },
+      }
+    )
+    .then((res) => res.data)
+    .catch((err) => {
+      throw err;
+    });
+};
+
+export const RestSigningAuthhashsign = ({
+  params,
+  payload,
+  token = getStorageWithExpiresIn("token_hashsign"),
+}: {
+  params: ISigningAuthhashsignRequestData["params"];
+  payload: ISigningAuthhashsignRequestData["payload"];
+  token?: string | null;
+}): Promise<ISigningAuthhashsignResponseData> => {
+  return axios
+    .post<ISigningAuthhashsignResponseData>(
+      `${BASE_URL}/signing-authhashsign`,
+      payload,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        params,
       }
     )
     .then((res) => res.data)
