@@ -217,7 +217,8 @@ function SettingSignatureAndMFA({}: Props) {
     <div
       style={{
         backgroundColor: themeConfigurationAvaliabilityChecker(
-          themeConfiguration?.data.background as string, "BG"
+          themeConfiguration?.data.background as string,
+          "BG"
         ),
       }}
     >
@@ -434,9 +435,9 @@ function SettingSignatureAndMFA({}: Props) {
             </label>
           </div>
           <Button
-            size="full"
+            size="none"
             type="submit"
-            className="mt-8 p-3 text-base bg-primary w-full"
+            className="mt-8 px-6 py-2.5 text-base bg-primary block mx-auto"
             style={{
               backgroundColor: themeConfigurationAvaliabilityChecker(
                 themeConfiguration?.data.buttonColor as string
@@ -445,7 +446,7 @@ function SettingSignatureAndMFA({}: Props) {
           >
             {t("next")}
           </Button>
-          <Footer/>
+          <Footer />
         </form>
         <div
           className={[

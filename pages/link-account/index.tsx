@@ -129,6 +129,7 @@ const LinkAccount = (props: Props) => {
         getExpFromToken(data.data.data[0]) as number
       );
 
+      // penautan and penautan_consent will redirected to /linking/* result page
       if (signing === "1" || setting === "1") {
         getCertificateList({ params: "" as string }).then((res) => {
           const certif = JSON.parse(res.data);
@@ -325,7 +326,11 @@ const LinkAccount = (props: Props) => {
                     themeConfiguration?.data.actionFontColor as string
                   ),
                 }}
-                className={buttonVariants({ variant: "ghost", size: "none", className: "text-xs" })}
+                className={buttonVariants({
+                  variant: "ghost",
+                  size: "none",
+                  className: "text-xs",
+                })}
               >
                 {t("linkAccountForgotPasswordButton")}
               </a>
@@ -339,12 +344,18 @@ const LinkAccount = (props: Props) => {
               />
             </div>
             <Link href={handleRoute("forgot-tilaka-name")} passHref>
-              <a style={{
+              <a
+                style={{
                   color: themeConfigurationAvaliabilityChecker(
                     themeConfiguration?.data.actionFontColor as string
                   ),
                 }}
-                className={buttonVariants({ variant: "ghost", size: "none", className: "text-xs" })}>
+                className={buttonVariants({
+                  variant: "ghost",
+                  size: "none",
+                  className: "text-xs",
+                })}
+              >
                 {t("linkAccountForgotTilakaName")}
               </a>
             </Link>
@@ -352,8 +363,8 @@ const LinkAccount = (props: Props) => {
           <Button
             type="submit"
             disabled={!form.tilaka_name || !form.password}
-            size="full"
-            className="mt-8 p-2.5 uppercase text-base font-medium"
+            size="none"
+            className="mt-8 p-2.5 uppercase text-base font-medium block mx-auto"
             style={{
               backgroundColor: themeConfigurationAvaliabilityChecker(
                 themeConfiguration?.data.buttonColor as string

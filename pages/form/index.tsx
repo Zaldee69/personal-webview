@@ -325,11 +325,14 @@ const Form: React.FC = () => {
   }, [router.isReady, request_id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <div style={{
-      backgroundColor: themeConfigurationAvaliabilityChecker(
-        themeConfiguration?.data.background as string, "BG"
-      ),
-    }} >
+    <div
+      style={{
+        backgroundColor: themeConfigurationAvaliabilityChecker(
+          themeConfiguration?.data.background as string,
+          "BG"
+        ),
+      }}
+    >
       <Head>
         <title>{t("finalFormTitle")}</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
@@ -498,14 +501,14 @@ const Form: React.FC = () => {
           </div>
           <Button
             disabled={disabled as boolean}
-          type="submit"
-
-          style={{
-            backgroundColor: themeConfigurationAvaliabilityChecker(
-              themeConfiguration?.data.buttonColor as string
-            ),
-          }}
-          className="uppercase mt-24"
+            type="submit"
+            style={{
+              backgroundColor: themeConfigurationAvaliabilityChecker(
+                themeConfiguration?.data.buttonColor as string
+              ),
+            }}
+            className="mt-24 p-2.5 block mx-auto"
+            size="none"
           >
             {t("CTA")}
           </Button>
