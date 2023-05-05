@@ -11,6 +11,11 @@ import { serverSideRenderReturnConditions } from "@/utils/serverSideRenderReturn
 import { concateRedirectUrlParams } from "@/utils/concateRedirectUrlParams";
 import i18n from "i18";
 import { RestKycCheckStepv2 } from "infrastructure/rest/personal";
+import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/app/store";
+import Footer from "@/components/Footer";
+import { buttonVariants } from "@/components/atoms/Button";
 
 type Props = {};
 
@@ -28,6 +33,8 @@ const LinkAccountSuccess = (props: Props) => {
   );
 
   const { t }: any = i18n;
+
+  const themeConfiguration = useSelector((state: RootState) => state.theme);
 
   useEffect(() => {
     if (!routerIsReady) return;
@@ -113,7 +120,15 @@ const LinkAccountSuccess = (props: Props) => {
   }, [isSigning, routerIsReady]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <div className="px-10 pt-16 pb-9 text-center">
+    <div
+      style={{
+        backgroundColor: themeConfigurationAvaliabilityChecker(
+          themeConfiguration?.data.background as string,
+          "BG"
+        ),
+      }}
+      className="px-10 h-screen pt-16 pb-9 text-center"
+    >
       <p className="text-base poppins-semibold text-neutral800">
         {routerQuery.setting === "1"
           ? t("linkAccountSuccessTitle1")
@@ -135,20 +150,24 @@ const LinkAccountSuccess = (props: Props) => {
         </p>
       </div>
       {!isSigning && redirectUrl && (
-        <div className="mt-20 text-primary text-base poppins-medium underline hover:cursor-pointer">
-          <a href={concateRedirectUrlParams(redirectUrl, "")}>
-            <a>{t("livenessSuccessButtonTitle")}</a>
+        <a href={concateRedirectUrlParams(redirectUrl, "")}>
+          <a
+            style={{
+              color: themeConfigurationAvaliabilityChecker(
+                themeConfiguration?.data.actionFontColor as string
+              ),
+            }}
+            className={buttonVariants({
+              variant: "link",
+              size: "none",
+              className: "font-medium",
+            })}
+          >
+            {t("livenessSuccessButtonTitle")}
           </a>
-        </div>
+        </a>
       )}
-      <div className="mt-11 flex justify-center">
-        <Image
-          src={`${assetPrefix}/images/poweredByTilaka.svg`}
-          alt="powered-by-tilaka"
-          width="80px"
-          height="41.27px"
-        />
-      </div>
+      <Footer />
     </div>
   );
 };

@@ -112,7 +112,7 @@ export type TPersonalPManualRegRequestData = {
   register_id: string;
   photo_selfie: string;
   photo_ktp: string;
-}
+};
 
 export type TPersonalPManualRegResponseData = {
   success: boolean;
@@ -120,4 +120,14 @@ export type TPersonalPManualRegResponseData = {
   token: string | null;
   channel_type: string | null;
   tilaka_name: string | null;
-}
+};
+
+export type TThemeResponse = {
+  data: {
+    logo: string;
+    background: string;
+    buttonColor: string;
+    actionFontColor: string;
+    toastColor: string;
+  };
+};

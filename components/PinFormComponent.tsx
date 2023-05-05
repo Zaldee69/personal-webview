@@ -4,6 +4,7 @@ import ArrowLeftIcon from "@/public/icons/ArrowLeftIcon";
 import DeleteIcon from "@/public/icons/DeleteIcon";
 import Image from "next/image";
 import { assetPrefix } from "next.config";
+import Footer from "./Footer";
 
 interface IPropsPinFormComponent {
   title: string;
@@ -219,14 +220,7 @@ const PinFormComponent = (props: IPropsPinFormComponent): JSX.Element => {
         </div>
       )}
       {props.showPoweredByTilaka && (
-        <div className="mt-7 flex justify-center">
-          <Image
-            src={`${assetPrefix}/images/poweredByTilaka.svg`}
-            alt="powered-by-tilaka"
-            width="80px"
-            height="41.27px"
-          />
-        </div>
+        <Footer addMarginBottom />
       )}
     </div>
   );

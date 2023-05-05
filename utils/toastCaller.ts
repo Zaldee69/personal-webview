@@ -4,7 +4,7 @@ import XIcon from './../public/icons/XIcon';
 import i18n from "i18";
 
 
-const toastCaller = (props : TLoginInitialState) => {
+const toastCaller = (props : TLoginInitialState, bgColor: string | undefined) => {
   const {t}: any = i18n
     if (props.status === "PENDING") {
         toast(`Loading...`, {
@@ -12,6 +12,9 @@ const toastCaller = (props : TLoginInitialState) => {
           toastId: "info",
           isLoading: true,
           position: "top-center",
+          style: {
+            backgroundColor: bgColor,
+          },
         });
       } else if (props.status === "FULLFILLED" && props.data.success) {
         toast.dismiss("info");

@@ -14,6 +14,10 @@ import i18n from "i18";
 import { assetPrefix } from "../../next.config";
 import { handleRoute } from "@/utils/handleRoute";
 import { concateRedirectUrlParams } from "@/utils/concateRedirectUrlParams";
+import Button from "@/components/atoms/Button";
+import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/app/store";
 
 interface InputType {
   password: string | number;
@@ -53,6 +57,7 @@ const Form: React.FC = () => {
   });
 
   const { t }: any = i18n;
+  const themeConfiguration = useSelector((state: RootState) => state.theme);
 
   const [isChecked, setIsCheked] = useState<boolean>(false);
   const disabled =
@@ -195,7 +200,11 @@ const Form: React.FC = () => {
 }
 
   return (
-    <>
+    <div style={{
+      backgroundColor: themeConfigurationAvaliabilityChecker(
+        themeConfiguration?.data.background as string, "BG"
+      ),
+    }}>
       <Head>
         <title>{t("finalFormTitle")}</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
@@ -362,17 +371,23 @@ const Form: React.FC = () => {
               </a>
             </label>
           </div>
-          <button
-            disabled={disabled as boolean}
-            className={`bg-primary mt-10 md:mx-auto md:block uppercase text-white font-poppins w-full mx-auto rounded-sm h-9 disabled:opacity-50
+          <Button
+          style={{
+            backgroundColor: themeConfigurationAvaliabilityChecker(
+              themeConfiguration?.data.buttonColor as string
+            ),
+          }}
+           className={`mt-10 uppercase h-9 
           }`}
+            disabled={disabled as boolean}
+            size="full"
           >
             {t("CTA")}
-          </button>
+          </Button>
         </form>
         <Footer />
       </div>
-    </>
+    </div>
   );
 };
 

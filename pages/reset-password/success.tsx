@@ -4,6 +4,10 @@ import { assetPrefix } from "../../next.config";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { concateRedirectUrlParams } from "@/utils/concateRedirectUrlParams";
+import Footer from "@/components/Footer";
+import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/app/store";
 
 type Props = {};
 
@@ -28,6 +32,7 @@ const LinkAccount = (props: Props) => {
   const [currentSecond, setCurrentSecond] = useState(timeoutInSecond);
 
   const { redirect_url } = router.query;
+  const themeConfiguration = useSelector((state: RootState) => state.theme);
 
   useEffect(() => {
     if (!router.isReady || !redirect_url || !autoRedirect) return;
@@ -51,7 +56,11 @@ const LinkAccount = (props: Props) => {
   }, [router.isReady, currentSecond]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <>
+    <div style={{
+      backgroundColor: themeConfigurationAvaliabilityChecker(
+        themeConfiguration?.data.background as string, "BG"
+      ),
+    }}>
       <Head>
         <title>Pengaturan Ulang Kata Sandi Berhasil</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
@@ -78,16 +87,9 @@ const LinkAccount = (props: Props) => {
             </p>
           )}
         </div>
-        <div className="mt-32 flex justify-center">
-          <Image
-            src={`${assetPrefix}/images/poweredByTilaka.svg`}
-            alt="powered-by-tilaka"
-            width="80px"
-            height="41.27px"
-          />
-        </div>
+        <Footer/>
       </div>
-    </>
+    </div>
   );
 };
 

@@ -1,11 +1,28 @@
 import Image from "next/image";
-import { assetPrefix } from "../next.config"
+import { assetPrefix } from "../next.config";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/app/store";
 
-const Footer = () => {
+const Footer = ({ addMarginBottom }: { addMarginBottom?: boolean }) => {
+  const themeConfiguration = useSelector((state: RootState) => state.theme);
+
   return (
-    <div className="flex absolute right-0 left-0 justify-center">
-      <Image src={`${assetPrefix}/images/tilaka-logo.svg`} alt="tilaka-logo" width={100} height={100} />
-    </div>
+    <footer
+      className={`flex justify-center bg-transparent pt-5 ${
+        !addMarginBottom && "pb-3"
+      }`}
+    >
+      <div
+        className="bg-contain w-20 h-20 bg-center bg-no-repeat"
+        style={{
+          backgroundImage: `url(${
+            !themeConfiguration?.data.logo
+              ? `${assetPrefix}/images/tilaka-logo.svg`
+              : `data:image/png;base64,${themeConfiguration?.data.logo}`
+          })`,
+        }}
+      ></div>
+    </footer>
   );
 };
 

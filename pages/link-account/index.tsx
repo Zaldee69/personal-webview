@@ -37,6 +37,9 @@ import { setStorageWithExpiresIn } from "@/utils/localStorageWithExpiresIn";
 import { getExpFromToken } from "@/utils/getExpFromToken";
 import Link from "next/link";
 import { getEncodedCurrentUrl } from "@/utils/getEncodedCurrentUrl";
+import Footer from "@/components/Footer";
+import Button, { buttonVariants } from "@/components/atoms/Button";
+import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
 
 type Props = {};
 
@@ -82,6 +85,7 @@ const LinkAccount = (props: Props) => {
     router.query;
   const dispatch: AppDispatch = useDispatch();
   const data = useSelector((state: RootState) => state.login);
+  const themeConfiguration = useSelector((state: RootState) => state.theme);
 
   const handleFormOnChange = (e: React.FormEvent<HTMLInputElement>): void => {
     formSetter({ ...form, [e.currentTarget.name]: e.currentTarget.value });
@@ -222,7 +226,14 @@ const LinkAccount = (props: Props) => {
   }, [data.status]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <>
+    <div
+      style={{
+        backgroundColor: themeConfigurationAvaliabilityChecker(
+          themeConfiguration?.data.background as string,
+          "BG"
+        ),
+      }}
+    >
       <Head>
         <title>
           {setting === "1" ? t("finalFormTitle") : t("linkAccountTitle")}
@@ -308,7 +319,14 @@ const LinkAccount = (props: Props) => {
               }}
               passHref
             >
-              <a className="poppins-regular text-primary text-xs">
+              <a
+                style={{
+                  color: themeConfigurationAvaliabilityChecker(
+                    themeConfiguration?.data.actionFontColor as string
+                  ),
+                }}
+                className={buttonVariants({ variant: "ghost", size: "none", className: "text-xs" })}
+              >
                 {t("linkAccountForgotPasswordButton")}
               </a>
             </Link>
@@ -321,27 +339,31 @@ const LinkAccount = (props: Props) => {
               />
             </div>
             <Link href={handleRoute("forgot-tilaka-name")} passHref>
-              <a className="poppins-regular text-primary text-xs">
+              <a style={{
+                  color: themeConfigurationAvaliabilityChecker(
+                    themeConfiguration?.data.actionFontColor as string
+                  ),
+                }}
+                className={buttonVariants({ variant: "ghost", size: "none", className: "text-xs" })}>
                 {t("linkAccountForgotTilakaName")}
               </a>
             </Link>
           </div>
-          <button
+          <Button
             type="submit"
             disabled={!form.tilaka_name || !form.password}
-            className="mt-16 px-6 py-2.5 uppercase text-base poppins-regular disabled:opacity-50 text-white rounded-sm bg-primary block mx-auto"
+            size="full"
+            className="mt-8 p-2.5 uppercase text-base font-medium"
+            style={{
+              backgroundColor: themeConfigurationAvaliabilityChecker(
+                themeConfiguration?.data.buttonColor as string
+              ),
+            }}
           >
             {setting === "1" ? t("linkAccountCTA1") : t("linkAccountCTA")}
-          </button>
+          </Button>
         </form>
-        <div className="mt-8 flex justify-center">
-          <Image
-            src={`${assetPrefix}/images/poweredByTilaka.svg`}
-            alt="powered-by-tilaka"
-            width="80px"
-            height="41.27px"
-          />
-        </div>
+        <Footer />
       </div>
       <FRModal
         formSetter={formSetter}
@@ -355,13 +377,15 @@ const LinkAccount = (props: Props) => {
         modalConsent={modalConsent}
         setModalConsent={setModalConsent}
       />
-    </>
+    </div>
   );
 };
 
 const FRModal = ({ modal, setModal, tilakaName, formSetter }: IModal) => {
   const [isFRSuccess, setIsFRSuccess] = useState<boolean>(false);
   const controller = new AbortController();
+
+  const themeConfiguration = useSelector((state: RootState) => state.theme);
 
   const { t }: any = i18n;
   const router = useRouter();
@@ -446,7 +470,7 @@ const FRModal = ({ modal, setModal, tilakaName, formSetter }: IModal) => {
             tokenIdentifier="token_v2"
             callbackCaptureProcessor={captureProcessor}
           />
-          <button
+          <Button
             onClick={() => {
               controller.abort();
               toast.dismiss("info");
@@ -457,10 +481,16 @@ const FRModal = ({ modal, setModal, tilakaName, formSetter }: IModal) => {
                 password: "",
               });
             }}
-            className="bg-primary btn uppercase text-white poppins-regular w-full mt-5 mx-auto rounded-sm h-9 font-semibold hover:opacity-50"
+            size="full"
+            className="mt-5 uppercase text-base font-medium h-9"
+            style={{
+              backgroundColor: themeConfigurationAvaliabilityChecker(
+                themeConfiguration?.data.buttonColor as string
+              ),
+            }}
           >
             {t("cancel")}
-          </button>
+          </Button>
         </>
       </div>
     </div>
@@ -476,6 +506,8 @@ const ModalConsent = ({
   const controller = new AbortController();
   const router = useRouter();
   const { t }: any = i18n;
+
+  const themeConfiguration = useSelector((state: RootState) => state.theme);
 
   const onApprove = () => {
     RestPersonalApproveConsent({
@@ -868,16 +900,31 @@ const ModalConsent = ({
                 {t("linkAccountConsentText")}
               </p>
             </div>
-            <div className="flex justify-end mt-5">
-              <button
+            <div className="flex justify-end items-center gap-3 mt-5">
+              <Button
                 onClick={onReject}
-                className="bg-white text-primary hover:opacity-50  px-6 py-2.5 rounded hover:cursor-pointer"
+                size="none"
+                variant="ghost"
+                className="text-base font-base h-2 hover:opacity-50"
+                style={{
+                  color: themeConfigurationAvaliabilityChecker(
+                    themeConfiguration?.data.actionFontColor as string
+                  ),
+                }}
               >
                 {t("consentDisagree")}
-              </button>
+              </Button>
               <a
                 onClick={onApprove}
-                className="block bg-primary hover:opacity-50 text-white px-6 py-2.5 rounded hover:cursor-pointer"
+                className={buttonVariants({
+                  size: "none",
+                  className: "font-base py-2.5 mx-0",
+                })}
+                style={{
+                  backgroundColor: themeConfigurationAvaliabilityChecker(
+                    themeConfiguration?.data.buttonColor as string
+                  ),
+                }}
               >
                 {t("consentAgree")}
               </a>

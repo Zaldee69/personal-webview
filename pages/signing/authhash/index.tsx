@@ -33,6 +33,8 @@ import { PinInput } from "react-input-pin-code";
 import { RestSigningAuthhashsign } from "infrastructure";
 import FRCamera from "@/components/FRCamera";
 import { concateRedirectUrlParams } from "@/utils/concateRedirectUrlParams";
+import Button, { buttonVariants } from "@/components/atoms/Button";
+import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
 
 interface IPropsLogin {}
 
@@ -68,6 +70,8 @@ const FRModal: React.FC<IModal> = ({
     fr?: "1";
   } & IParameterFromRequestSign = router.query;
   const [isFRSuccess, setIsFRSuccess] = useState<boolean>(false);
+  const themeConfiguration = useSelector((state: RootState) => state.theme);
+
 
   const signingFailure = (message: string) => {
     callbackFailure({ message, status: "Gagal" });
@@ -178,12 +182,18 @@ const FRModal: React.FC<IModal> = ({
             countIdentifier="count_hashsign"
             callbackCaptureProcessor={captureProcessor}
           />
-          <button
+          <Button
             onClick={() => setModal(!modal)}
-            className="text-primary btn uppercase bg-white font-poppins w-full mt-5 mx-auto rounded-sm h-9 font-semibold hover:opacity-50"
+            size="full"
+            className="mt-5 uppercase text-base mb-2 font-medium h-9"
+            style={{
+              backgroundColor: themeConfigurationAvaliabilityChecker(
+                themeConfiguration?.data.buttonColor as string
+              ),
+            }}
           >
             {t("cancel")}
-          </button>
+          </Button>
         </>
       </div>
     </div>
@@ -207,6 +217,9 @@ const OTPModal: React.FC<IModal> = ({
 
   const [values, setValues] = useState(["", "", "", "", "", ""]);
 
+  const themeConfiguration = useSelector((state: RootState) => state.theme);
+
+
   const { t }: any = i18n;
 
   const signingFailure = (message: string) => {
@@ -218,6 +231,9 @@ const OTPModal: React.FC<IModal> = ({
       toastId: "loading",
       isLoading: true,
       position: "top-center",
+      style: {
+        backgroundColor: themeConfiguration?.data.toastColor as string,
+      },
     });
     RestSigningAuthhashsign({
       params: {
@@ -331,6 +347,9 @@ const OTPModal: React.FC<IModal> = ({
             toastId: "info",
             isLoading: false,
             position: "top-center",
+            style: {
+              backgroundColor: themeConfiguration?.data.toastColor as string,
+            },
           });
         } else {
           toast.error(res.message, {
@@ -398,30 +417,49 @@ const OTPModal: React.FC<IModal> = ({
           />
           <div className="flex font-poppins justify-center text-sm gap-1 mt-5">
             <p className="text-neutral200">{t("dindtReceiveOtp")}</p>
-            <div className="text-primary font-semibold">
+            <div style={{
+      color: themeConfigurationAvaliabilityChecker(
+        themeConfiguration?.data.actionFontColor as string
+      ),
+    }} className="font-semibold">
               {!isCountDone ? (
-                <button onClick={handleTriggerSendOTP}>{t("resend")}</button>
+                <Button variant="ghost" style={{
+                  color: themeConfigurationAvaliabilityChecker(
+                    themeConfiguration?.data.actionFontColor as string
+                  ),
+                }}  className="mx-0" size="none" onClick={handleTriggerSendOTP}>{t("resend")}</Button>
               ) : (
                 `0:${timeRemaining}`
               )}
             </div>
           </div>
-          <button
+          <Button
+            style={{
+              backgroundColor: themeConfigurationAvaliabilityChecker(
+                themeConfiguration?.data.buttonColor as string
+              ),
+            }}
             disabled={values.join("").length < 6}
             onClick={onClickHandler}
-            className="bg-primary btn mt-16 disabled:bg-[#DAE6F8] disabled:text-[#6B778C]/30 hover:opacity-70 text-white font-poppins mx-auto rounded-sm py-2.5 px-6 font-semibold"
+            className="mt-16 py-3"
+            size="lg"
           >
             {t("confirm")}
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => {
               setValues(["", "", "", "", "", ""]);
               setModal(!modal);
             }}
-            className="  text-primary font-poppins mt-4 hover:opacity-50 w-full mx-auto rounded-sm h-9 font-semibold"
+            className="font-semibold mt-2"
+            variant="ghost" style={{
+              color: themeConfigurationAvaliabilityChecker(
+                themeConfiguration?.data.actionFontColor as string
+              ),
+            }}
           >
             {t("cancel")}
-          </button>
+          </Button>
         </div>
       </div>
     </div>
@@ -434,6 +472,9 @@ const SigningSuccess = () => {
     redirect_url?: string;
   } & IParameterFromRequestSign = router.query;
 
+  const themeConfiguration = useSelector((state: RootState) => state.theme);
+
+
   const params = {
     user_identifier: routerQuery.user,
     request_id: routerQuery.request_id,
@@ -444,7 +485,11 @@ const SigningSuccess = () => {
   const { t }: any = i18n;
 
   return (
-    <div className="px-10 pt-16 pb-9 text-center flex flex-col justify-center min-h-screen">
+    <div style={{
+      backgroundColor: themeConfigurationAvaliabilityChecker(
+        themeConfiguration?.data.background as string, "BG"
+      ),
+    }} className="px-10 pt-16 pb-9 text-center flex flex-col justify-center min-h-screen">
       <div>
         <p className="font-poppins text-lg font-semibold text-neutral800">
           {t("authenticationSuccessTitle")}
@@ -465,25 +510,25 @@ const SigningSuccess = () => {
       </div>
       <div className="mt-32">
         {routerQuery.redirect_url && (
-          <div className="text-primary text-base font-medium font-poppins underline hover:cursor-pointer">
             <a
               href={concateRedirectUrlParams(
                 routerQuery.redirect_url,
                 queryString
               )}
             >
-              <span>{t("livenessSuccessButtonTitle")}</span>
+              <span style={{
+              color: themeConfigurationAvaliabilityChecker(
+                themeConfiguration?.data.actionFontColor as string
+              ),
+            }}
+            className={buttonVariants({
+              variant: "link",
+              size: "none",
+              className: "font-medium",
+            })} >{t("livenessSuccessButtonTitle")}</span>
             </a>
-          </div>
         )}
-        <div className="mt-8 flex justify-center">
-          <Image
-            src={`${assetPrefix}/images/poweredByTilaka.svg`}
-            alt="powered-by-tilaka"
-            width="80px"
-            height="41.27px"
-          />
-        </div>
+        <Footer/>
       </div>
     </div>
   );
@@ -495,6 +540,9 @@ const SigningFailure = () => {
     redirect_url?: string;
   } & IParameterFromRequestSign = router.query;
 
+  const themeConfiguration = useSelector((state: RootState) => state.theme);
+
+
   const params = {
     user_identifier: routerQuery.user,
     id: routerQuery.id,
@@ -503,7 +551,11 @@ const SigningFailure = () => {
   const { t }: any = i18n;
 
   return (
-    <div className="px-10 pt-16 pb-9 text-center flex flex-col justify-center min-h-screen">
+    <div style={{
+      backgroundColor: themeConfigurationAvaliabilityChecker(
+        themeConfiguration?.data.background as string, "BG"
+      ),
+    }} className="px-10 pt-16 pb-9 text-center flex flex-col justify-center min-h-screen">
       <div>
         <p className="font-poppins text-lg font-semibold text-neutral800">
           {t("signFailed")}
@@ -531,18 +583,20 @@ const SigningFailure = () => {
                 queryString
               )}
             >
-              <span>{t("livenessSuccessButtonTitle")}</span>
+              <span style={{
+              color: themeConfigurationAvaliabilityChecker(
+                themeConfiguration?.data.actionFontColor as string
+              ),
+            }}
+            className={buttonVariants({
+              variant: "link",
+              size: "none",
+              className: "font-medium",
+            })} >{t("livenessSuccessButtonTitle")}</span>
             </a>
           </div>
         )}
-        <div className="mt-8 flex justify-center">
-          <Image
-            src={`${assetPrefix}/images/poweredByTilaka.svg`}
-            alt="powered-by-tilaka"
-            width="80px"
-            height="41.27px"
-          />
-        </div>
+        <Footer/>
       </div>
     </div>
   );
@@ -577,6 +631,9 @@ const Login = ({}: IPropsLogin) => {
     setTilakaName(user as string);
   }, [router.isReady]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  const themeConfiguration = useSelector((state: RootState) => state.theme);
+
+
   useEffect(() => {
     if (isSubmitted && data.status === "FULLFILLED" && data.data.success) {
       localStorage.setItem("count_hashsign", "0");
@@ -593,7 +650,7 @@ const Login = ({}: IPropsLogin) => {
 
       doIn(data);
 
-      toastCaller(data);
+      toastCaller(data, themeConfiguration?.data.toastColor as string);
     } else if (data.status === "FULLFILLED" && !data.data.success) {
       toast(data.data.message || "Ada kesalahan", {
         type: "error",
@@ -743,7 +800,11 @@ const Login = ({}: IPropsLogin) => {
   }
 
   return (
-    <>
+    <div style={{
+      backgroundColor: themeConfigurationAvaliabilityChecker(
+        themeConfiguration?.data.background as string, "BG"
+      ),
+    }}>
       <Head>
         <title>Tilaka</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
@@ -811,13 +872,18 @@ const Login = ({}: IPropsLogin) => {
               </Link>
             </div>
           </div>
-          <button
+          <Button
+           style={{
+            backgroundColor: themeConfigurationAvaliabilityChecker(
+              themeConfiguration?.data.buttonColor as string
+            ),
+          }}
+          className="uppercase mt-24"
             type="submit"
             disabled={password.length < 1}
-            className="bg-primary disabled:opacity-50 mt-32 text-xl uppercase md:mx-auto md:block md:w-1/4 text-white font-poppins w-full mx-auto rounded-sm h-11"
           >
             {t("loginCTA")}
-          </button>
+          </Button>
         </form>
 
         <Footer />
@@ -835,7 +901,7 @@ const Login = ({}: IPropsLogin) => {
           callbackFailure={mfaCallbackFailure}
         />
       </div>
-    </>
+    </div>
   );
 };
 

@@ -29,12 +29,16 @@ import {
 import { getExpFromToken } from "@/utils/getExpFromToken";
 import Link from "next/link";
 import { getEncodedCurrentUrl } from "@/utils/getEncodedCurrentUrl";
+import Button, { buttonVariants } from "@/components/atoms/Button";
+import { TThemeResponse } from "infrastructure/rest/personal/types";
+import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
 
 type Props = {};
 
 type ModalProps = {
   certifModal: boolean;
   setCertifModal: React.Dispatch<React.SetStateAction<boolean>>;
+  theme: TThemeResponse | undefined;
 };
 
 type TEventMessageDataToken = string | undefined;
@@ -49,6 +53,7 @@ const Login = ({}: Props) => {
     password: "password",
   });
   const [rememberMe, setRememberMe] = useState<boolean>(false);
+  const [theme, setTheme] = useState<TThemeResponse>();
   const [loginQueue, setLoginQueue] = useState<{
     queue: boolean;
     data: { existingToken: TEventMessageDataToken };
@@ -57,6 +62,7 @@ const Login = ({}: Props) => {
   const { t }: any = i18n;
   const dispatch: AppDispatch = useDispatch();
   const data = useSelector((state: RootState) => state.login);
+  const themeConfiguration = useSelector((state: RootState) => state.theme);
   const router = useRouter();
   const { channel_id, tilaka_name, company_id, transaction_id, signing } =
     router.query;
@@ -66,6 +72,10 @@ const Login = ({}: Props) => {
       setTilakaName(tilaka_name as string);
     }
   }, [router.isReady]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    setTheme(themeConfiguration);
+  }, [themeConfiguration.status]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // When the component mounts
   useEffect(() => {
@@ -105,7 +115,7 @@ const Login = ({}: Props) => {
 
       doIn(data);
     }
-    toastCaller(data);
+    toastCaller(data, themeConfiguration?.data.toastColor as string);
   }, [data.status]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
@@ -248,9 +258,22 @@ const Login = ({}: Props) => {
     );
   }
 
+  if (themeConfiguration.status === "PENDING") return null;
+
   return (
-    <>
-      <CertifModal setCertifModal={setCertifModal} certifModal={certifModal} />
+    <div
+      style={{
+        backgroundColor: themeConfigurationAvaliabilityChecker(
+          themeConfiguration?.data.background as string,
+          "BG"
+        ),
+      }}
+    >
+      <CertifModal
+        setCertifModal={setCertifModal}
+        certifModal={certifModal}
+        theme={theme}
+      />
       <Head>
         <title>Tilaka</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
@@ -315,7 +338,14 @@ const Login = ({}: Props) => {
                 }}
                 passHref
               >
-                <a className="poppins-regular text-primary">
+                <a
+                  style={{
+                    color: themeConfigurationAvaliabilityChecker(
+                      theme?.data.actionFontColor as string
+                    ),
+                  }}
+                  className={buttonVariants({ variant: "ghost", size: "none" })}
+                >
                   {t("linkAccountForgotPasswordButton")}
                 </a>
               </Link>
@@ -328,23 +358,35 @@ const Login = ({}: Props) => {
                 />
               </div>
               <Link href={handleRoute("forgot-tilaka-name")} passHref>
-                <a className="poppins-regular text-primary">
+                <a
+                  style={{
+                    color: themeConfigurationAvaliabilityChecker(
+                      theme?.data.actionFontColor as string
+                    ),
+                  }}
+                  className={buttonVariants({ variant: "ghost", size: "none" })}
+                >
                   {t("linkAccountForgotTilakaName")}
                 </a>
               </Link>
             </div>
           </div>
-          <button
+          <Button
             type="submit"
+            style={{
+              backgroundColor: themeConfigurationAvaliabilityChecker(
+                theme?.data.buttonColor as string
+              ),
+            }}
+            className="uppercase mt-24"
             disabled={password.length < 1}
-            className="bg-primary uppercase disabled:opacity-50 mt-32 text-xl md:mx-auto md:block md:w-1/4 text-white poppins-regular w-full mx-auto rounded-sm h-11"
           >
             {t("loginCTA")}
-          </button>
+          </Button>
         </form>
         <Footer />
       </div>
-    </>
+    </div>
   );
 };
 
@@ -391,14 +433,14 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
 export default Login;
 
-const CertifModal = ({ certifModal, setCertifModal }: ModalProps) => {
+const CertifModal = ({ certifModal, setCertifModal, theme }: ModalProps) => {
   const { t }: any = i18n;
   return certifModal ? (
     <div
       style={{ backgroundColor: "rgba(0, 0, 0, .5)" }}
       className="fixed z-50 flex items-start transition-all duration-1000 pb-3 justify-center w-full left-0 top-0 h-full "
     >
-      <div className="bg-white max-w-md mt-20 pt-5 px-2 pb-3 rounded-xl w-full mx-5">
+      <div className="bg-white max-w-md mt-20 pt-5 px-2 pb-4 rounded-xl w-full mx-5">
         <p className="text-center font-poppins font-semibold">
           {t("dontHaveCertifTitle")}
         </p>
@@ -413,18 +455,32 @@ const CertifModal = ({ certifModal, setCertifModal }: ModalProps) => {
             {t("dontHaveCertifSubtitle")}
           </p>
         </div>
-        <button className="bg-primary uppercase btn mt-8 disabled:opacity-50 text-white font-poppins w-full mx-auto rounded-sm h-9">
+        <Button
+          style={{
+            backgroundColor: themeConfigurationAvaliabilityChecker(
+              theme?.data.buttonColor as string
+            ),
+          }}
+          size="full"
+          className=" mt-8 disabled:opacity-50 text-white h-9"
+        >
           {t("createNewCertif")}
-        </button>
-        <button
+        </Button>
+        <Button
+          variant="ghost"
           onClick={() => {
             // restLogout({})
             setCertifModal(false);
           }}
-          className="  text-[#97A0AF] uppercase font-poppins w-full mt-4  mx-auto rounded-sm h-9"
+          className="uppercase w-full mt-4 mx-auto rounded-sm h-9"
+          style={{
+            color: themeConfigurationAvaliabilityChecker(
+              theme?.data.actionFontColor as string
+            ),
+          }}
         >
           {t("cancel")}
-        </button>
+        </Button>
       </div>
     </div>
   ) : null;

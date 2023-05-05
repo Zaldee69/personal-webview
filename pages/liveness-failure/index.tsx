@@ -11,11 +11,16 @@ import { assetPrefix } from "../../next.config";
 import i18n from "i18";
 import { RestKycCheckStepv2 } from "infrastructure/rest/personal";
 import { handleRoute } from "@/utils/handleRoute";
+import { buttonVariants } from "@/components/atoms/Button";
+import { RootState } from "@/redux/app/store";
+import { useSelector } from "react-redux";
+import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
 
 const LivenessFailure = () => {
   const { t }: any = i18n;
   const router = useRouter();
   const routerQuery = router.query;
+  const themeConfiguration = useSelector((state: RootState) => state.theme);
   const uuid =
     routerQuery.transaction_id ||
     routerQuery.request_id ||
@@ -34,7 +39,7 @@ const LivenessFailure = () => {
       : reason_code === "3"
       ? t("ekycFailed.errorCode3")
       : t("livenessFailed3xSubtitle");
-  const isRedirectToManualForm = reason_code === "1" || reason_code === "2"
+  const isRedirectToManualForm = reason_code === "1" || reason_code === "2";
   useEffect(() => {
     if (isRedirectToManualForm) {
       setTimeout(() => {
@@ -42,11 +47,15 @@ const LivenessFailure = () => {
           pathname: handleRoute("manual-form"),
           query: routerQuery,
         });
-      },5000)
+      }, 5000);
     }
   }, []);
   return (
-    <>
+    <div className="h-screen" style={{
+      backgroundColor: themeConfigurationAvaliabilityChecker(
+        themeConfiguration?.data.background as string, "BG"
+      ),
+    }}>
       <Head>
         <title>Liveness</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
@@ -64,24 +73,22 @@ const LivenessFailure = () => {
           />
           <div className="flex flex-col items-center gap-10 ">
             <p className="text-center poppins-regular text-neutral800">
-            {message}
-            {
-              isRedirectToManualForm && (
+              {message}
+              {isRedirectToManualForm && (
                 <div>
                   <div className="hidden lg:block">
                     <p className="text-center poppins-regular text-neutral800">
-                    {t("ekycFailed.subtitle1")} <br/>
-                    {t("ekycFailed.subtitle2")}
+                      {t("ekycFailed.subtitle1")} <br />
+                      {t("ekycFailed.subtitle2")}
                     </p>
                   </div>
                   <div className="block lg:hidden">
                     <p className="text-center text-red-100 poppins-regular text-neutral800">
-                    {t("ekycFailed.subtitle")}
+                      {t("ekycFailed.subtitle")}
                     </p>
                   </div>
                 </div>
-              )
-            }
+              )}
             </p>
             {routerQuery.redirect_url && (
               <a
@@ -90,7 +97,18 @@ const LivenessFailure = () => {
                   queryString
                 )}
               >
-                <span className="text-center poppins-semibold underline-offset-1	underline  text-primary">
+                <span
+                  style={{
+                    color: themeConfigurationAvaliabilityChecker(
+                      themeConfiguration?.data.actionFontColor as string
+                    ),
+                  }}
+                  className={buttonVariants({
+                    variant: "link",
+                    size: "none",
+                    className: "font-semibold",
+                  })}
+                >
                   {t("livenessSuccessButtonTitle")}
                 </span>
               </a>
@@ -99,7 +117,7 @@ const LivenessFailure = () => {
         </div>
         <Footer />
       </div>
-    </>
+    </div>
   );
 };
 

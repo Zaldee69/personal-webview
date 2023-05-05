@@ -4,15 +4,25 @@ import { useRouter } from "next/router";
 import React from "react";
 import { assetPrefix } from "../../next.config";
 import i18n from "i18";
+import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
+import { buttonVariants } from "@/components/atoms/Button";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/app/store";
+import Footer from "@/components/Footer";
 
 type Props = {};
 
 const FormSuccess = (props: Props) => {
   const router = useRouter();
   const routerQuery = router.query;
-  const {t} : any = i18n
+  const { t }: any = i18n;
+  const themeConfiguration = useSelector((state: RootState) => state.theme);
   return (
-    <div className="px-10 pt-16 pb-9 text-center">
+    <div style={{
+      backgroundColor: themeConfigurationAvaliabilityChecker(
+        themeConfiguration?.themeConfiguration?.data.background as string, "BG"
+      ),
+    }} className="px-10 pt-16 pb-9 text-center">
       <p className="text-base poppins-semibold text-neutral800">
         {t("livenessSuccessTitle")}
       </p>
@@ -32,6 +42,16 @@ const FormSuccess = (props: Props) => {
       <div className="mt-20 text-primary text-base poppins-medium underline hover:cursor-pointer">
         {routerQuery.redirect_url && (
           <a
+            style={{
+              color: themeConfigurationAvaliabilityChecker(
+                themeConfiguration?.data.actionFontColor as string
+              ),
+            }}
+            className={buttonVariants({
+              variant: "link",
+              size: "none",
+              className: "font-semibold",
+            })}
             href={concateRedirectUrlParams(
               routerQuery.redirect_url as string,
               ""
@@ -41,14 +61,7 @@ const FormSuccess = (props: Props) => {
           </a>
         )}
       </div>
-      <div className="mt-11 flex justify-center">
-        <Image
-          src={`${assetPrefix}/images/poweredByTilaka.svg`}
-          alt="powered-by-tilaka"
-          width="80px"
-          height="41.27px"
-        />
-      </div>
+      <Footer />
     </div>
   );
 };

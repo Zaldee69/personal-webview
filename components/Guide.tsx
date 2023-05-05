@@ -3,18 +3,31 @@ import React from "react";
 import Head from "next/head";
 import i18n from "i18";
 import Footer from "@/components/Footer";
-import { assetPrefix } from 'next.config';
+import { assetPrefix } from "next.config";
+import Button from "./atoms/Button";
+import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
+import { RootState } from "@/redux/app/store";
+import { useSelector } from "react-redux";
 
 interface Props {
   setIsClicked: React.Dispatch<React.SetStateAction<boolean>>;
-  isDisabled: boolean
+  isDisabled: boolean;
 }
 
-const Guide = ({setIsClicked, isDisabled}: Props) => {
+const Guide = ({ setIsClicked, isDisabled }: Props) => {
   const { t }: any = i18n;
 
+  const themeConfiguration = useSelector((state: RootState) => state.theme);
+
   return (
-    <>
+    <div
+      style={{
+        backgroundColor: themeConfigurationAvaliabilityChecker(
+          themeConfiguration?.data.background as string,
+          "BG"
+        ),
+      }}
+    >
       <Head>
         <title>Panduan Liveness</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
@@ -24,7 +37,7 @@ const Guide = ({setIsClicked, isDisabled}: Props) => {
         <span className="poppins-regular text-sm block mt-4">
           {t("guideTitle")}
         </span>
-        <div className="flex flex-col gap-5 my-6" >
+        <div className="flex flex-col gap-5 my-6">
           <div className="grid poppins-regular text-sm grid-cols-2 items-center grid-flow-col">
             <Image
               alt="guide-1"
@@ -53,12 +66,21 @@ const Guide = ({setIsClicked, isDisabled}: Props) => {
             <p>{t("guideSubtitle3")}</p>
           </div>
         </div>
-        <button disabled={isDisabled} onClick={() => setIsClicked(true)} className="bg-primary disabled:opacity-75 btn md:mx-auto md:block md:w-1/4 text-white poppins-regular w-full mx-auto rounded-sm h-9 ">
+        <Button
+          style={{
+            backgroundColor: themeConfigurationAvaliabilityChecker(
+              themeConfiguration?.data.buttonColor as string
+            ),
+          }}
+          disabled={isDisabled}
+          onClick={() => setIsClicked(true)}
+          size="sm"
+        >
           {t("startButton")}
-        </button>
+        </Button>
         <Footer />
       </div>
-    </>
+    </div>
   );
 };
 

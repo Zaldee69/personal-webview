@@ -18,11 +18,13 @@ import {
   TPersonalRequestResetPasswordRequestData,
   TPersonalRequestResetPasswordResponseData,
   TPersonalPManualRegRequestData,
-  TPersonalPManualRegResponseData
+  TPersonalPManualRegResponseData,
+  TThemeResponse,
 } from "./types";
 
 import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
 import { getStorageWithExpiresIn } from "@/utils/localStorageWithExpiresIn";
+import { initialState } from "@/redux/slices/themeSlice";
 
 const BASE_URL =
   process.env.NEXT_PUBLIC_PERSONAL_API_URL || "https://dev-api.tilaka.id";
@@ -211,14 +213,29 @@ export const RestPersonalApproveConsent = ({
     });
 };
 
-export const RestPersonalPManualReg = (payload :TPersonalPManualRegRequestData): Promise<TPersonalPManualRegResponseData> => {
+export const RestPersonalPManualReg = (
+  payload: TPersonalPManualRegRequestData
+): Promise<TPersonalPManualRegResponseData> => {
   return axios
-    .post<TPersonalPManualRegResponseData>(
-      `${BASE_URL}/pManualReg`,
-      payload,
-    )
+    .post<TPersonalPManualRegResponseData>(`${BASE_URL}/pManualReg`, payload)
     .then((res) => res.data)
     .catch((err) => {
       throw err;
     });
-}
+};
+
+export const RestThemeConfiguration = (
+  uuid?: string
+): Promise<TThemeResponse> => {
+  return axios
+    .get(`${BASE_URL}/channel/get_webview_configuration?channel_id=${uuid}`)
+    .then((res) => {
+      if(res.data.success){
+        return res.data;
+      }
+      return initialState
+    })
+    .catch((err) => {
+      throw err;
+    });
+};

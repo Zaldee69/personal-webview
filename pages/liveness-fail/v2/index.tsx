@@ -6,8 +6,8 @@ import Footer from "../../../components/Footer";
 import i18n from "i18";
 import { useRouter } from "next/router";
 import { assetPrefix } from "../../../next.config";
-import { AppDispatch } from "@/redux/app/store";
-import { useDispatch } from "react-redux";
+import { AppDispatch, RootState } from "@/redux/app/store";
+import { useDispatch, useSelector } from "react-redux";
 import { setIsDone } from "@/redux/slices/livenessSlice";
 import { handleRoute } from "@/utils/handleRoute";
 import { GetServerSideProps } from "next";
@@ -15,6 +15,8 @@ import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
 import { RestKycCheckStep } from "infrastructure";
 import { serverSideRenderReturnConditions } from "@/utils/serverSideRenderReturnConditions";
 import { concateRedirectUrlParams } from "@/utils/concateRedirectUrlParams";
+import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
+import Button from "@/components/atoms/Button";
 
 const LivenessFail = () => {
   const router = useRouter();
@@ -22,6 +24,8 @@ const LivenessFail = () => {
   const dispatch: AppDispatch = useDispatch();
 
   const { t }: any = i18n;
+
+  const themeConfiguration = useSelector((state: RootState) => state.theme);
 
   const resetStorage = () => {
     setGagalCounter(0);
@@ -36,7 +40,6 @@ const LivenessFail = () => {
       });
     }
   };
-
 
   useEffect(() => {
     if (gagalCounter > 2) localStorage.removeItem("tlk-counter1");
@@ -62,20 +65,32 @@ const LivenessFail = () => {
     } else {
       return (
         <Link
+          passHref
           href={{
             pathname: handleRoute("liveness/v2"),
             query: { ...router.query },
           }}
         >
-          <button className="bg-primary btn md:mx-auto md:block md:w-1/4 text-white poppins-regular w-full mx-auto rounded-sm h-9">
+          <Button
+            size="sm"
+            style={{
+              backgroundColor: themeConfigurationAvaliabilityChecker(
+                themeConfiguration?.data.buttonColor as string
+              ),
+            }}
+          >
             {t("livenessFailedButtonTitle")}
-          </button>
+          </Button>
         </Link>
       );
     }
   };
   return (
-    <>
+    <div className="h-screen" style={{
+      backgroundColor: themeConfigurationAvaliabilityChecker(
+        themeConfiguration?.data.background as string, "BG"
+      ),
+    }} >
       <Head>
         <title>Liveness</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
@@ -101,38 +116,37 @@ const LivenessFail = () => {
         </div>
         <Footer />
       </div>
-    </>
+    </div>
   );
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-    const cQuery = context.query;
-    const uuid =
-      cQuery.transaction_id || cQuery.request_id || cQuery.registration_id;
-  
-    const checkStepResult: {
-      res?: TKycCheckStepResponseData;
-      err?: {
-        response: {
-          data: {
-            success: boolean;
-            message: string;
-            data: { errors: string[] };
-          };
+  const cQuery = context.query;
+  const uuid =
+    cQuery.transaction_id || cQuery.request_id || cQuery.registration_id;
+
+  const checkStepResult: {
+    res?: TKycCheckStepResponseData;
+    err?: {
+      response: {
+        data: {
+          success: boolean;
+          message: string;
+          data: { errors: string[] };
         };
       };
-    } = await RestKycCheckStep({
-      payload: { registerId: uuid as string },
+    };
+  } = await RestKycCheckStep({
+    payload: { registerId: uuid as string },
+  })
+    .then((res) => {
+      return { res };
     })
-      .then((res) => {
-        return { res };
-      })
-      .catch((err) => {
-        return { err };
-      });
-  
-    return serverSideRenderReturnConditions({ context, checkStepResult });
-  };
+    .catch((err) => {
+      return { err };
+    });
 
+  return serverSideRenderReturnConditions({ context, checkStepResult });
+};
 
 export default LivenessFail;

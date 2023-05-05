@@ -16,6 +16,11 @@ import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
 import { RestKycCheckStep } from "infrastructure";
 import { serverSideRenderReturnConditions } from "@/utils/serverSideRenderReturnConditions";
 import { assetPrefix } from "../../next.config";
+import Button from "@/components/atoms/Button";
+import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/app/store";
+import Footer from "@/components/Footer";
 
 type Props = {};
 
@@ -51,6 +56,8 @@ const SettingSignature = ({}: Props) => {
       convertToDataURL();
     }
   };
+
+  const themeConfiguration = useSelector((state: RootState) => state.theme);
 
   useEffect(() => {
     if (router.isReady) {
@@ -94,6 +101,9 @@ const SettingSignature = ({}: Props) => {
       toastId: "info",
       isLoading: true,
       position: "top-center",
+      style: {
+        backgroundColor: themeConfiguration?.data.toastColor as string,
+      },
     });
     const signature_image = sigPad.current
       .getTrimmedCanvas()
@@ -197,12 +207,16 @@ const SettingSignature = ({}: Props) => {
   };
 
   return (
-    <>
+    <div style={{
+      backgroundColor: themeConfigurationAvaliabilityChecker(
+        themeConfiguration?.data.background as string, "BG"
+      ),
+    }} >
       <Head>
         <title>{t("settingSignatureTitle")}</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
-      <div className="bg-white p-4 max-w-md mx-auto">
+      <div className="p-4 max-w-md mx-auto">
         <h1 className="text-xl poppins-semibold mt-2">
           {t("settingSignatureTitle")}
         </h1>
@@ -347,23 +361,22 @@ const SettingSignature = ({}: Props) => {
               </label>
             </div>
           </div>
-          <button
+          <Button
+            size="full"
             type="submit"
-            className="mt-8 p-3 text-base poppins-regular text-white bg-primary w-full"
+            className="mt-8 p-2.5 uppercase text-base font-medium"
+            style={{
+              backgroundColor: themeConfigurationAvaliabilityChecker(
+                themeConfiguration?.data.buttonColor as string
+              ),
+            }}
           >
             {t("next")}
-          </button>
-          <div className="mt-11 flex justify-center">
-            <Image
-              src={`${assetPrefix}/images/poweredByTilaka.svg`}
-              alt="powered-by-tilaka"
-              width="80px"
-              height="41.27px"
-            />
-          </div>
+          </Button>
+          <Footer/>
         </form>
       </div>
-    </>
+    </div>
   );
 };
 

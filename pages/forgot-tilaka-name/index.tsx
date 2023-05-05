@@ -8,6 +8,10 @@ import { assetPrefix } from "../../next.config";
 import i18n from "i18";
 import { RestPersonalRequestTilakaName } from "infrastructure/rest/personal";
 import { TPersonalRequestTilakaNameRequestData } from "infrastructure/rest/personal/types";
+import Button from "@/components/atoms/Button";
+import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
+import { RootState } from "@/redux/app/store";
+import { useSelector } from "react-redux";
 
 type Props = {};
 
@@ -22,6 +26,8 @@ const ForgotTilakaName = (props: Props) => {
   const [form, formSetter] = useState<Tform>({});
   const [modalSuccess, modalSuccessSetter] = useState<boolean>(false);
   const [reCaptchaSuccess, reCaptchaSuccessSetter] = useState<boolean>(false);
+  const themeConfiguration = useSelector((state: RootState) => state.theme);
+
 
   const { t }: any = i18n;
 
@@ -96,7 +102,11 @@ const ForgotTilakaName = (props: Props) => {
   };
 
   return (
-    <>
+    <div style={{
+      backgroundColor: themeConfigurationAvaliabilityChecker(
+        themeConfiguration?.data.background as string
+      ),
+    }} >
       <Head>
         <title>{t("forgotTilakaName.title")}</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
@@ -136,13 +146,19 @@ const ForgotTilakaName = (props: Props) => {
                       />
                     </div>
                   </label>
-                  <button
+                  <Button
                     type="submit"
+                    size="sm"
                     disabled={!form.email}
-                    className="mt-32 bg-primary btn text-white block mx-auto w-fit px-6 poppins-regular mb-5 h-10 rounded-md"
+                    className="mt-32  mb-5 h-10"
+                    style={{
+                      backgroundColor: themeConfigurationAvaliabilityChecker(
+                        themeConfiguration?.data.buttonColor as string
+                      ),
+                    }}
                   >
                     {t("send")}
-                  </button>
+                  </Button>
                 </form>
               </div>
             ) : (
@@ -167,7 +183,7 @@ const ForgotTilakaName = (props: Props) => {
         </div>
       </div>
       <ModalSuccess modal={modalSuccess} setModal={modalSuccessSetter} />
-    </>
+    </div>
   );
 };
 

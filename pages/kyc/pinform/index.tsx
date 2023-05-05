@@ -7,6 +7,9 @@ import { RestPersonalSetPassword } from "infrastructure/rest/personal";
 import { NextParsedUrlQuery } from "next/dist/server/request-meta";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
+import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/app/store";
 
 type Props = {};
 
@@ -50,6 +53,9 @@ const PinFormDedicatedChannel = (props: Props) => {
   const [isProcessed, setIsProcessed] = useState<boolean>(false);
 
   const digitLength: number = 6;
+
+  const themeConfiguration = useSelector((state: RootState) => state.theme);
+
 
   const onClickNumberHandlerCallback = (value: number) => {};
   const onClickDeleteHandlerCallback = () => {};
@@ -319,7 +325,12 @@ const PinFormDedicatedChannel = (props: Props) => {
   if (!shouldRender) return;
 
   return (
-    <div className="flex justify-center items-center min-h-screen px-3 pt-3 pb-5">
+    <div style={{
+      backgroundColor: themeConfigurationAvaliabilityChecker(
+        themeConfiguration?.data.background as string,
+        "BG"
+      ),
+    }} className="flex justify-center items-center min-h-screen px-3 pt-3 pb-5">
       {isConfirmMode ? (
         <div className="max-w- w-full" style={{ maxWidth: "331px" }}>
           <PinFormComponent

@@ -31,8 +31,8 @@ import Initializing from "@/components/atoms/Initializing";
 import { ActionGuide1, ActionGuide2 } from "@/components/atoms/ActionGuide";
 import { actionText } from "@/utils/actionText";
 import { assetPrefix } from "next.config";
-import ImageDebugger from "@/components/ImageDebugger";
 import { log } from "@/utils/logging";
+import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
 
 type TQueryParams = {
   request_id?: string;
@@ -65,6 +65,8 @@ const Liveness = () => {
   );
   const images = useSelector((state: RootState) => state.liveness.images);
   const isDone = useSelector((state: RootState) => state.liveness.isDone);
+  const themeConfiguration = useSelector((state: RootState) => state.theme);
+
   const { t }: any = i18n;
 
   const currentIndex =
@@ -106,6 +108,9 @@ const Liveness = () => {
       toastId: "loading",
       isLoading: true,
       position: "top-center",
+      style: {
+        backgroundColor: themeConfiguration?.data.toastColor as string,
+      },
     });
 
     RestLivenessV2GenerateAction(body)
@@ -271,6 +276,9 @@ const Liveness = () => {
         toastId: "load",
         isLoading: true,
         position: "top-center",
+        style: {
+          backgroundColor: themeConfiguration?.data.toastColor as string,
+        },
       });
       setIsDisabled(true);
     } else if (humanDone && isClicked) {
@@ -289,7 +297,12 @@ const Liveness = () => {
     return <Guide setIsClicked={setIsClicked} isDisabled={isDisabled} />;
 
   return (
-    <>
+    <div style={{
+      backgroundColor: themeConfigurationAvaliabilityChecker(
+        themeConfiguration?.data.background as string,
+        "BG"
+      ),
+    }} >
       <Head>
         <title>Liveness</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
@@ -364,7 +377,7 @@ const Liveness = () => {
         <Footer />
         <UnsupportedDeviceModal />
       </div>
-    </>
+    </div>
   );
 };
 

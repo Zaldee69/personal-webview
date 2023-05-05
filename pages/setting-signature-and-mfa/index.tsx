@@ -17,6 +17,11 @@ import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
 import { serverSideRenderReturnConditions } from "@/utils/serverSideRenderReturnConditions";
 import i18n from "i18";
 import { RestKycCheckStepv2 } from "infrastructure/rest/personal";
+import Button from "@/components/atoms/Button";
+import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/app/store";
+import Footer from "@/components/Footer";
 
 type Props = {};
 
@@ -59,6 +64,8 @@ function SettingSignatureAndMFA({}: Props) {
     }
   };
 
+  const themeConfiguration = useSelector((state: RootState) => state.theme);
+
   useEffect(() => {
     if (router.isReady) {
       getUserName({}).then((res) => {
@@ -86,6 +93,9 @@ function SettingSignatureAndMFA({}: Props) {
       toastId: "info",
       isLoading: true,
       position: "top-center",
+      style: {
+        backgroundColor: themeConfiguration?.data.toastColor as string,
+      },
     });
     const signature_image = sigPad.current
       .getTrimmedCanvas()
@@ -204,12 +214,18 @@ function SettingSignatureAndMFA({}: Props) {
   };
 
   return (
-    <>
+    <div
+      style={{
+        backgroundColor: themeConfigurationAvaliabilityChecker(
+          themeConfiguration?.data.background as string, "BG"
+        ),
+      }}
+    >
       <Head>
         <title>{t("settingSignatureTitleAndMFA")}</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
-      <div className="bg-white p-4 max-w-md mx-auto">
+      <div className="p-4 max-w-md mx-auto">
         <h1 className="text-xl poppins-semibold mt-2">
           {t("settingSignatureTitleAndMFA")}
         </h1>
@@ -417,15 +433,19 @@ function SettingSignatureAndMFA({}: Props) {
               </p>
             </label>
           </div>
-          <button
+          <Button
+            size="full"
             type="submit"
-            className="mt-8 p-3 text-base poppins-regular text-white bg-primary w-full"
+            className="mt-8 p-3 text-base bg-primary w-full"
+            style={{
+              backgroundColor: themeConfigurationAvaliabilityChecker(
+                themeConfiguration?.data.buttonColor as string
+              ),
+            }}
           >
             {t("next")}
-          </button>
-          <div className="mt-8 flex justify-center">
-            <img src="images/poweredByTilaka.svg" alt="powered-by-tilaka" />
-          </div>
+          </Button>
+          <Footer/>
         </form>
         <div
           className={[
@@ -468,7 +488,7 @@ function SettingSignatureAndMFA({}: Props) {
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }
 

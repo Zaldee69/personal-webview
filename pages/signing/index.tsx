@@ -32,6 +32,8 @@ import {
   getStorageWithExpiresIn,
   removeStorageWithExpiresIn,
 } from "@/utils/localStorageWithExpiresIn";
+import Button from "@/components/atoms/Button";
+import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
 
 type TFontSig =
   | "Adine-Kirnberg"
@@ -61,6 +63,8 @@ const Signing = () => {
   const dispatch: AppDispatch = useDispatch();
   const res = useSelector((state: RootState) => state.document);
   const { t }: any = i18n;
+  const themeConfiguration = useSelector((state: RootState) => state.theme);
+
   useEffect(() => {
     if (!routerIsReady) return;
 
@@ -94,7 +98,14 @@ const Signing = () => {
   }, [routerIsReady]);
 
   return (
-    <>
+    <div
+      style={{
+        backgroundColor: themeConfigurationAvaliabilityChecker(
+          themeConfiguration?.data.background as string,
+          "BG"
+        ),
+      }}
+    >
       <Head>
         <title>{t("sign")}</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
@@ -108,7 +119,7 @@ const Signing = () => {
           <Footer />
         </>
       ) : (
-        <div className=" pt-8 pb-10 sm:w-full bg-[#f4f5f7] h-full relative  mx-auto">
+        <div className=" pt-8 pb-10 sm:w-full h-full relative  mx-auto">
           {" "}
           <FRModal modal={openFRModal} setModal={setopenFRModal} />
           <Configuration
@@ -134,54 +145,61 @@ const Signing = () => {
           />
           <div className="px-5 fixed w-full flex justify-center items-center bottom-0">
             {res.response.data.document && (
-              <button
+              <Button
+                style={{
+                  backgroundColor: themeConfigurationAvaliabilityChecker(
+                    themeConfiguration?.data.buttonColor as string,
+                    "BG"
+                  ),
+                }}
+                size="full"
                 onClick={() =>
                   res.response.data.mfa.toLowerCase() == "fr"
                     ? setopenFRModal(true)
                     : setOtpModal(true)
                 }
-                className="bg-primary uppercase btn  md:w-1/4 my-5 text-white poppins-regular w-full mx-5 rounded-sm h-9"
+                className=" uppercase"
               >
                 {t("sign")}
-              </button>
+              </Button>
             )}
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 };
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  const cQuery = context.query;
-  const uuid =
-    cQuery.transaction_id || cQuery.request_id || cQuery.registration_id;
-  const params = { ...cQuery, registration_id: uuid };
-  const queryString = new URLSearchParams(params as any).toString();
+// export const getServerSideProps: GetServerSideProps = async (context) => {
+//   const cQuery = context.query;
+//   const uuid =
+//     cQuery.transaction_id || cQuery.request_id || cQuery.registration_id;
+//   const params = { ...cQuery, registration_id: uuid };
+//   const queryString = new URLSearchParams(params as any).toString();
 
-  const checkStepResult: {
-    res?: TKycCheckStepResponseData;
-    err?: {
-      response: {
-        data: {
-          success: boolean;
-          message: string;
-          data: { errors: string[] };
-        };
-      };
-    };
-  } = await RestKycCheckStepv2({
-    registerId: uuid as string,
-  })
-    .then((res) => {
-      return { res };
-    })
-    .catch((err) => {
-      return { err };
-    });
+//   const checkStepResult: {
+//     res?: TKycCheckStepResponseData;
+//     err?: {
+//       response: {
+//         data: {
+//           success: boolean;
+//           message: string;
+//           data: { errors: string[] };
+//         };
+//       };
+//     };
+//   } = await RestKycCheckStepv2({
+//     registerId: uuid as string,
+//   })
+//     .then((res) => {
+//       return { res };
+//     })
+//     .catch((err) => {
+//       return { err };
+//     });
 
-  return serverSideRenderReturnConditions({ context, checkStepResult });
-};
+//   return serverSideRenderReturnConditions({ context, checkStepResult });
+// };
 
 export default Signing;
 
@@ -230,6 +248,7 @@ export const FRModal: React.FC<Active | any> = ({ modal, setModal }) => {
   const routerQuery = router.query;
   const [isFRSuccess, setIsFRSuccess] = useState<boolean>(false);
   const { t }: any = i18n;
+  const themeConfiguration = useSelector((state: RootState) => state.theme);
 
   useEffect(() => {
     if (isFRSuccess && modal) {
@@ -258,7 +277,7 @@ export const FRModal: React.FC<Active | any> = ({ modal, setModal }) => {
               />
             </div>
 
-            <button
+            <Button
               onClick={() => {
                 setModal(!modal);
                 setIsFRSuccess(false);
@@ -271,10 +290,16 @@ export const FRModal: React.FC<Active | any> = ({ modal, setModal }) => {
                   );
                 }
               }}
-              className="bg-primary btn uppercase text-white poppins-regular w-full mt-5 mx-auto rounded-sm h-9"
+              size="full"
+              className="uppercase mt-5 h-9"
+              style={{
+                backgroundColor: themeConfigurationAvaliabilityChecker(
+                  themeConfiguration?.data.buttonColor as string
+                ),
+              }}
             >
               {t("close")}
-            </button>
+            </Button>
           </div>
         ) : (
           <>
@@ -285,12 +310,19 @@ export const FRModal: React.FC<Active | any> = ({ modal, setModal }) => {
               {t("frSubtitle1")}
             </span>
             <FRCamera setModal={setModal} setIsFRSuccess={setIsFRSuccess} />
-            <button
+            <Button
               onClick={() => setModal(!modal)}
-              className="bg-primary btn uppercase text-white poppins-regular w-full mt-5 mx-auto rounded-sm h-9"
+              size="full"
+              className="uppercase mt-5 h-9"
+              style={{
+                backgroundColor: themeConfigurationAvaliabilityChecker(
+                  themeConfiguration?.data.buttonColor as string,
+                  "BG"
+                ),
+              }}
             >
               {t("cancel")}
-            </button>
+            </Button>
           </>
         )}
       </div>
@@ -307,6 +339,8 @@ const ChooseFontModal: React.FC<Active> = ({ modal, setModal, tilakaName }) => {
     setSig(e.currentTarget);
   };
   const { t }: any = i18n;
+
+  const themeConfiguration = useSelector((state: RootState) => state.theme);
 
   const convertToDataURL = async () => {
     const canvas = await html2canvas(sig.parentNode.children[1], {
@@ -412,21 +446,32 @@ const ChooseFontModal: React.FC<Active> = ({ modal, setModal, tilakaName }) => {
             </label>
           </div>
         </div>
-        <button
+        <Button
+          style={{
+            backgroundColor: themeConfigurationAvaliabilityChecker(
+              themeConfiguration?.data.buttonColor as string
+            ),
+          }}
+          size="full"
+          className="uppercase mt-5 block h-9 text-white"
           onClick={() => {
             setModal(!modal);
             convertToDataURL();
           }}
-          className="bg-primary btn uppercase text-white poppins-regular w-full mt-5 mx-auto rounded-sm h-9"
         >
           {t("save")}
-        </button>
-        <button
+        </Button>
+        <Button
+          style={{
+            color: themeConfigurationAvaliabilityChecker(
+              themeConfiguration?.data.actionFontColor as string
+            ),
+          }}
+          className="uppercase"
           onClick={() => setModal(!modal)}
-          className="  text-[#97A0AF] uppercase poppins-regular w-full  mx-auto rounded-sm h-9"
         >
           {t("cancel")}
-        </button>
+        </Button>
       </div>
     </div>
   ) : null;
@@ -441,6 +486,8 @@ const ChooseScratchModal: React.FC<Active> = ({ modal, setModal }) => {
     dispatch(addScratch(scratch));
   };
 
+  const themeConfiguration = useSelector((state: RootState) => state.theme);
+
   const { t }: any = i18n;
 
   return modal ? (
@@ -453,21 +500,32 @@ const ChooseScratchModal: React.FC<Active> = ({ modal, setModal }) => {
           {t("signatureOption1")}
         </p>
         <SignaturePad sigPad={sigPad} />
-        <button
+        <Button
           onClick={(e) => {
             setModal(!modal);
             onClickHandler(e);
           }}
-          className="bg-primary btn  text-white poppins-regular w-full mt-5 mx-auto rounded-sm h-9"
+          style={{
+            backgroundColor: themeConfigurationAvaliabilityChecker(
+              themeConfiguration?.data.buttonColor as string
+            ),
+          }}
+          size="full"
+          className="uppercase mt-5 h-9 text-white"
         >
           {t("save")}
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={() => setModal(!modal)}
-          className="  text-[#97A0AF]  poppins-regular w-full mt-3  mx-auto rounded-sm h-9"
+          style={{
+            color: themeConfigurationAvaliabilityChecker(
+              themeConfiguration?.data.actionFontColor as string
+            ),
+          }}
+          className="uppercase"
         >
           {t("cancel")}
-        </button>
+        </Button>
       </div>
     </div>
   ) : null;
@@ -492,6 +550,8 @@ export const OTPModal: React.FC<Active> = ({ modal, setModal }) => {
     localStorage.endTime = +new Date() + interval;
   };
 
+  const themeConfiguration = useSelector((state: RootState) => state.theme);
+
   const timerHandler = () => {
     setInterval(function () {
       const date: any = new Date();
@@ -514,6 +574,9 @@ export const OTPModal: React.FC<Active> = ({ modal, setModal }) => {
             toastId: "info",
             isLoading: false,
             position: "top-center",
+            style: {
+              backgroundColor: themeConfiguration?.data.toastColor as string,
+            },
           });
           timerHandler();
           reset();
@@ -546,6 +609,9 @@ export const OTPModal: React.FC<Active> = ({ modal, setModal }) => {
       toastId: "loading",
       isLoading: true,
       position: "top-center",
+      style: {
+        backgroundColor: themeConfiguration?.data.toastColor as string,
+      },
     });
     restSigning({
       payload: {
@@ -663,30 +729,65 @@ export const OTPModal: React.FC<Active> = ({ modal, setModal }) => {
             />
             <div className="flex poppins-regular justify-center text-sm gap-1 mt-5">
               <p className="text-neutral200">{t("dindtReceiveOtp")}</p>
-              <div className="text-primary font-semibold">
+              <div
+                style={{
+                  color: themeConfigurationAvaliabilityChecker(
+                    themeConfiguration?.data.actionFontColor as string,
+                    "BG"
+                  ),
+                }}
+                className="font-semibold"
+              >
                 {!isCountDone ? (
-                  <button onClick={handleTriggerSendOTP}>{t("resend")}</button>
+                  <Button
+                    variant="ghost"
+                    style={{
+                      color: themeConfigurationAvaliabilityChecker(
+                        themeConfiguration?.data.actionFontColor as string,
+                        "BG"
+                      ),
+                    }}
+                    className="mx-0"
+                    size="none"
+                    onClick={handleTriggerSendOTP}
+                  >
+                    {t("resend")}
+                  </Button>
                 ) : (
                   `0:${timeRemaining}`
                 )}
               </div>
             </div>
-            <button
+            <Button
               disabled={values.join("").length < 6}
               onClick={onClickHandler}
-              className="bg-primary disabled:bg-[#DAE6F8] btn mt-16 disabled:text-[#6B778C]/30 mx-auto flex text-white poppins-regular rounded-sm py-2.5 px-6 font-semibold"
+              style={{
+                backgroundColor: themeConfigurationAvaliabilityChecker(
+                  themeConfiguration?.data.buttonColor as string,
+                  "BG"
+                ),
+              }}
+              className="mt-16 block mx-auto py-3"
+              size="lg"
             >
               {t("confirm")}
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={() => {
                 setValues(["", "", "", "", "", ""]);
                 setModal(!modal);
               }}
-              className="text-primary poppins-regular mt-4 hover:opacity-50 w-full mx-auto rounded-sm h-9 font-semibold"
+              className="font-semibold mt-2"
+              variant="ghost"
+              style={{
+                color: themeConfigurationAvaliabilityChecker(
+                  themeConfiguration?.data.actionFontColor as string,
+                  "BG"
+                ),
+              }}
             >
               {t("cancel")}
-            </button>
+            </Button>
           </>
         )}
       </div>
