@@ -165,46 +165,54 @@ const Form: React.FC = () => {
     const password = target.password.value;
 
     try {
-        const res = await RestPersonalSetPassword({
-            payload: { tilaka_name, password, token: token as string, register_id: request_id as string },
-        })
-        if (res.success) {
-            toast.success(res?.message || "berhasil", {
-              icon: <CheckOvalIcon />,
-            });
-  
-            const query: any = {
-              request_id,
-              ...restRouterQuery,
-            };
-  
-            router.replace({
-              pathname: handleRoute("manual-form/success"),
-              query,
-            });
-          } else {
-            toast.error(res?.message || "gagal", { icon: <XIcon /> });
-          }
-    } catch (err: any){
-        if (err.response?.data?.data?.errors?.[0]) {
-        toast.error(
-            `${err.response?.data?.message}, ${err.response?.data?.data?.errors?.[0]}`,
-            { icon: <XIcon /> }
-        );
-        } else {
-        toast.error(err.response?.data?.message || "gagal", {
-            icon: <XIcon />,
+      const res = await RestPersonalSetPassword({
+        payload: {
+          tilaka_name,
+          password,
+          token: token as string,
+          register_id: request_id as string,
+        },
+      });
+      if (res.success) {
+        toast.success(res?.message || "berhasil", {
+          icon: <CheckOvalIcon />,
         });
-        }
+
+        const query: any = {
+          request_id,
+          ...restRouterQuery,
+        };
+
+        router.replace({
+          pathname: handleRoute("manual-form/success"),
+          query,
+        });
+      } else {
+        toast.error(res?.message || "gagal", { icon: <XIcon /> });
+      }
+    } catch (err: any) {
+      if (err.response?.data?.data?.errors?.[0]) {
+        toast.error(
+          `${err.response?.data?.message}, ${err.response?.data?.data?.errors?.[0]}`,
+          { icon: <XIcon /> }
+        );
+      } else {
+        toast.error(err.response?.data?.message || "gagal", {
+          icon: <XIcon />,
+        });
+      }
     }
-}
+  };
 
   return (
-    <div style={{
-      backgroundColor: themeConfigurationAvaliabilityChecker(
-        themeConfiguration?.data.background as string, "BG"
-      ),
-    }}>
+    <div
+      style={{
+        backgroundColor: themeConfigurationAvaliabilityChecker(
+          themeConfiguration?.data.background as string,
+          "BG"
+        ),
+      }}
+    >
       <Head>
         <title>{t("finalFormTitle")}</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
@@ -372,15 +380,14 @@ const Form: React.FC = () => {
             </label>
           </div>
           <Button
-          style={{
-            backgroundColor: themeConfigurationAvaliabilityChecker(
-              themeConfiguration?.data.buttonColor as string
-            ),
-          }}
-           className={`mt-10 uppercase h-9 
-          }`}
+            style={{
+              backgroundColor: themeConfigurationAvaliabilityChecker(
+                themeConfiguration?.data.buttonColor as string
+              ),
+            }}
+            className={`mt-10 uppercase h-9 mx-auto block`}
             disabled={disabled as boolean}
-            size="full"
+            size="none"
           >
             {t("CTA")}
           </Button>

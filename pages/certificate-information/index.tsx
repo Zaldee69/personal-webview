@@ -180,9 +180,9 @@ function CertificateInformation({}: Props) {
           </p>
         )}
         <Button
-          size="full"
+          size="none"
           onClick={(e) => handleConfirm(e)}
-          className="mt-8 p-2.5 uppercase text-base font-medium"
+          className="mt-8 p-2.5 uppercase text-base font-medium block mx-auto w-48"
           style={{
             backgroundColor: themeConfigurationAvaliabilityChecker(
               themeConfiguration?.data.buttonColor as string
@@ -191,27 +191,29 @@ function CertificateInformation({}: Props) {
         >
           {t("confirmCertif")}
         </Button>
-        <a
-          target="_blank"
-          rel="noreferrer"
-          href="https://cantikatnt.atlassian.net/servicedesk/customer/portal/2/group/8/create/27"
-          style={{
-            color: themeConfigurationAvaliabilityChecker(
-              themeConfiguration?.data.buttonColor as string
-            ),
-            borderColor: themeConfigurationAvaliabilityChecker(
-              themeConfiguration?.data.buttonColor as string
-            ),
-          }}
-          className={buttonVariants({
-            variant: "link",
-            size: "full",
-            className:
-              "font-medium inline-block uppercase  text-center mt-4 p-2.5 border",
-          })}
-        >
-          {t("complain")}
-        </a>
+        <div className="w-full flex justify-center">
+          <a
+            target="_blank"
+            rel="noreferrer"
+            href="https://cantikatnt.atlassian.net/servicedesk/customer/portal/2/group/8/create/27"
+            style={{
+              color: themeConfigurationAvaliabilityChecker(
+                themeConfiguration?.data.buttonColor as string
+              ),
+              borderColor: themeConfigurationAvaliabilityChecker(
+                themeConfiguration?.data.buttonColor as string
+              ),
+            }}
+            className={buttonVariants({
+              variant: "link",
+              size: "none",
+              className:
+                "font-medium uppercase text-center mt-4 p-2.5 border inline-block mx-auto w-48",
+            })}
+          >
+            {t("complain")}
+          </a>
+        </div>
         <Footer />
       </div>
     </div>

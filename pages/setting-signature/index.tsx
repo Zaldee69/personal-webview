@@ -207,11 +207,14 @@ const SettingSignature = ({}: Props) => {
   };
 
   return (
-    <div style={{
-      backgroundColor: themeConfigurationAvaliabilityChecker(
-        themeConfiguration?.data.background as string, "BG"
-      ),
-    }} >
+    <div
+      style={{
+        backgroundColor: themeConfigurationAvaliabilityChecker(
+          themeConfiguration?.data.background as string,
+          "BG"
+        ),
+      }}
+    >
       <Head>
         <title>{t("settingSignatureTitle")}</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
@@ -362,9 +365,9 @@ const SettingSignature = ({}: Props) => {
             </div>
           </div>
           <Button
-            size="full"
+            size="none"
             type="submit"
-            className="mt-8 p-2.5 uppercase text-base font-medium"
+            className="mt-8 px-6 py-2.5 text-base bg-primary block mx-auto"
             style={{
               backgroundColor: themeConfigurationAvaliabilityChecker(
                 themeConfiguration?.data.buttonColor as string
@@ -373,7 +376,7 @@ const SettingSignature = ({}: Props) => {
           >
             {t("next")}
           </Button>
-          <Footer/>
+          <Footer />
         </form>
       </div>
     </div>
