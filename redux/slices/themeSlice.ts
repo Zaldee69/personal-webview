@@ -17,7 +17,7 @@ export const initialState: TThemeResponse & Status = {
 export const getTheme = createAsyncThunk(
   "personal/theme",
   async ({ uuid }: { uuid?: string }) => {
-    const res = RestThemeConfiguration(uuid).then((res) => res);
+    const res = RestThemeConfiguration(uuid).then((res) => res).catch((err) => {throw err});
     return res;
   }
 );
