@@ -209,7 +209,7 @@ function SettingSignatureAndMFA({}: Props) {
         <title>{t("settingSignatureTitleAndMFA")}</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
-      <div className="bg-white p-4">
+      <div className="bg-white p-4 max-w-md mx-auto">
         <h1 className="text-xl poppins-semibold mt-2">
           {t("settingSignatureTitleAndMFA")}
         </h1>
@@ -493,10 +493,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     registerId: uuid as string,
   })
     .then((res) => {
-      return {res}
+      return { res };
     })
     .catch((err) => {
-      return {err}
+      return { err };
     });
 
   return serverSideRenderReturnConditions({

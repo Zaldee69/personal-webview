@@ -6,7 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
-import { assetPrefix } from "../../next.config";
+import { assetPrefix } from "../../../next.config";
 import i18n from "i18";
 import { RestKycCheckStepv2 } from "infrastructure/rest/personal";
 import { concateRedirectUrlParams } from "@/utils/concateRedirectUrlParams";
@@ -26,7 +26,6 @@ const LinkAccountFailure = (props: Props) => {
   const { t }: any = i18n;
   const routerIsReady = router.isReady;
   const routerQuery: NextParsedUrlQuery & {
-    setting?: "1";
     redirect_url?: string;
     tilaka_name?: string;
     reject_by_user?: "1";
@@ -121,9 +120,7 @@ const LinkAccountFailure = (props: Props) => {
   return (
     <div className="px-10 max-w-md mx-auto pt-16 pb-9 text-center">
       <p className="text-base poppins-semibold text-neutral800">
-        {routerQuery.setting === "1"
-          ? t("linkAccountFailedTitle1")
-          : t("linkAccountFailedTitle")}
+        {t("linkAccountFailedTitle")}
       </p>
       <div className="mt-20">
         <Image
@@ -200,11 +197,7 @@ const LinkAccountFailure = (props: Props) => {
               query: { ...router.query },
             }}
           >
-            <a>
-              {routerQuery.setting === "1"
-                ? t("linkAccountTilaka1")
-                : t("linkAccountTilaka")}
-            </a>
+            <a>{t("linkAccountTilaka")}</a>
           </Link>
         </div>
       )}

@@ -1,10 +1,10 @@
-import { assetPrefix } from "../../next.config";
+import { assetPrefix } from "../../../next.config";
 import { NextParsedUrlQuery } from "next/dist/server/request-meta";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { restLogout } from "infrastructure/rest/b2b";
-import { handleRoute } from "./../../utils/handleRoute";
+import { handleRoute } from "./../../../utils/handleRoute";
 import { GetServerSideProps } from "next";
 import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
 import { serverSideRenderReturnConditions } from "@/utils/serverSideRenderReturnConditions";
@@ -18,7 +18,6 @@ const LinkAccountSuccess = (props: Props) => {
   const router = useRouter();
   const routerIsReady: boolean = router.isReady;
   const routerQuery: NextParsedUrlQuery & {
-    setting?: "1";
     signing?: "1";
     redirect_url?: string;
   } = router.query;
@@ -115,9 +114,7 @@ const LinkAccountSuccess = (props: Props) => {
   return (
     <div className="px-10 pt-16 pb-9 text-center">
       <p className="text-base poppins-semibold text-neutral800">
-        {routerQuery.setting === "1"
-          ? t("linkAccountSuccessTitle1")
-          : t("linkAccountSuccessTitle")}
+        {t("linkAccountSuccessTitle")}
       </p>
       <div className="mt-20">
         <Image
@@ -129,9 +126,7 @@ const LinkAccountSuccess = (props: Props) => {
       </div>
       <div className="mt-14">
         <p className="poppins-regular text-xs text-neutral200">
-          {routerQuery.setting === "1"
-            ? t("linkAccountSuccessSubtitle1")
-            : t("linkAccountSuccessSubtitle")}
+          {t("linkAccountSuccessSubtitle")}
         </p>
       </div>
       {!isSigning && redirectUrl && (

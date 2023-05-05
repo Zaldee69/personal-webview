@@ -224,12 +224,14 @@ const LinkAccount = (props: Props) => {
   return (
     <>
       <Head>
-        <title>{t("linkAccountTitle")}</title>
+        <title>
+          {setting === "1" ? t("finalFormTitle") : t("linkAccountTitle")}
+        </title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
-      <div className="px-5 py-9">
+      <div className="px-5 py-9 max-w-md mx-auto">
         <p className="text-lg poppins-semibold text-neutral800">
-          {t("linkAccountTitle")}
+          {setting === "1" ? t("finalFormTitle") : t("linkAccountTitle")}
         </p>
         <div className="flex justify-center mt-6">
           <Image
@@ -241,7 +243,9 @@ const LinkAccount = (props: Props) => {
         </div>
         {nikRegistered && (
           <p className="poppins-regular text-sm text-neutral800 mt-5">
-            {t("linkAccountSubtitle")}
+            {setting === "1"
+              ? t("linkAccountSubtitle1")
+              : t("linkAccountSubtitle")}
           </p>
         )}
         <form onSubmit={handleFormOnSubmit}>
@@ -386,7 +390,7 @@ const FRModal = ({ modal, setModal, tilakaName, formSetter }: IModal) => {
           });
           setIsFRSuccess(true);
           resetFRFailedCount("count");
-          doRedirect("link-account/success");
+          doRedirect("link-account/linking/success");
         } else {
           setIsFRSuccess(false);
           setModal(false);
@@ -399,7 +403,7 @@ const FRModal = ({ modal, setModal, tilakaName, formSetter }: IModal) => {
           toast.error(res.message, { icon: <XIcon /> });
           setFRFailedCount("count", res.data.failMfa);
           if (res.data.failMfa >= 5) {
-            doRedirect("link-account/failure");
+            doRedirect("link-account/linking/failure");
           }
         }
       })
@@ -416,7 +420,7 @@ const FRModal = ({ modal, setModal, tilakaName, formSetter }: IModal) => {
           setFRFailedCount("count", doCounting);
           const newCount: number = getFRFailedCount("count");
           if (newCount >= 5) {
-            doRedirect("link-account/failure");
+            doRedirect("link-account/linking/failure");
           }
         }
       });
@@ -554,7 +558,7 @@ const ModalConsent = ({
           }
 
           router.replace({
-            pathname: handleRoute("link-account/success"),
+            pathname: handleRoute("link-account/linking/success"),
             query: { ...queryWithDynamicRedirectURL },
           });
         } else {
@@ -630,7 +634,7 @@ const ModalConsent = ({
             }
 
             router.replace({
-              pathname: handleRoute("link-account/failure"),
+              pathname: handleRoute("link-account/linking/failure"),
               query: {
                 ...queryWithDynamicRedirectURL,
               },
@@ -638,7 +642,7 @@ const ModalConsent = ({
           } else {
             // redirect_url not exist
             router.replace({
-              pathname: handleRoute("link-account/failure"),
+              pathname: handleRoute("link-account/linking/failure"),
               query: {
                 ...queryWithDynamicRedirectURL,
                 ...params,
@@ -720,7 +724,7 @@ const ModalConsent = ({
           }
 
           router.replace({
-            pathname: handleRoute("link-account/failure"),
+            pathname: handleRoute("link-account/linking/failure"),
             query: {
               ...queryWithDynamicRedirectURL,
             },
@@ -728,7 +732,7 @@ const ModalConsent = ({
         } else {
           // redirect_url not exist
           router.replace({
-            pathname: handleRoute("link-account/failure"),
+            pathname: handleRoute("link-account/linking/failure"),
             query: {
               ...queryWithDynamicRedirectURL,
               ...params,
@@ -820,7 +824,7 @@ const ModalConsent = ({
       }
 
       router.replace({
-        pathname: handleRoute("link-account/failure"),
+        pathname: handleRoute("link-account/linking/failure"),
         query: {
           ...queryWithDynamicRedirectURL,
           reject_by_user: "1",
@@ -829,7 +833,7 @@ const ModalConsent = ({
     } else {
       // redirect_url not exist
       router.replace({
-        pathname: handleRoute("link-account/failure"),
+        pathname: handleRoute("link-account/linking/failure"),
         query: {
           ...queryWithDynamicRedirectURL,
           ...params,
