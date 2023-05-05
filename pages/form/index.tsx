@@ -488,8 +488,7 @@ const Form: React.FC = () => {
           </div>
           <button
             disabled={disabled as boolean}
-            className={`bg-primary mt-10 md:mx-auto md:block md:w-1/4 uppercase text-white font-poppins w-full mx-auto rounded-sm h-9 disabled:opacity-50
-          }`}
+            className={`bg-primary mt-10 uppercase text-white font-poppins px-4 py-1 block mx-auto rounded-sm h-9 disabled:opacity-50`}
           >
             {t("CTA")}
           </button>

@@ -53,6 +53,7 @@
   "linkAccountForgotPasswordButton": "Forgot Password",
   "linkAccountForgotTilakaName": "Forgot Tilaka Name",
   "linkAccountCTA": "Link Account",
+  "linkAccountCTA1": "Activate Account",
   "tilakaNameOrPasswordWrong": "Tilaka Name / Password is incorrect",
   "createPinTitle": "Create PIN",
   "createPinSubtitle": "Create 6-digit PIN to use Digital Signature service securely",

@@ -329,9 +329,9 @@ const LinkAccount = (props: Props) => {
           <button
             type="submit"
             disabled={!form.tilaka_name || !form.password}
-            className="mt-16 w-full p-2.5 uppercase text-base poppins-regular disabled:opacity-50 text-white rounded-sm bg-primary"
+            className="mt-16 px-6 py-2.5 uppercase text-base poppins-regular disabled:opacity-50 text-white rounded-sm bg-primary block mx-auto"
           >
-            {t("linkAccountCTA")}
+            {setting === "1" ? t("linkAccountCTA1") : t("linkAccountCTA")}
           </button>
         </form>
         <div className="mt-8 flex justify-center">

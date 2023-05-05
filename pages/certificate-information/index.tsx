@@ -167,7 +167,7 @@ function CertificateInformation({}: Props) {
       )}
       <button
         onClick={(e) => handleConfirm(e)}
-        className="mt-8 p-2.5 uppercase text-base text-white bg-primary w-full font-medium rounded-sm"
+        className="mt-8 p-2.5 uppercase text-base text-white bg-primary w-48 block mx-auto font-medium rounded-sm"
       >
         {t("confirmCertif")}
       </button>
@@ -175,7 +175,7 @@ function CertificateInformation({}: Props) {
         target="_blank"
         rel="noreferrer"
         href="https://cantikatnt.atlassian.net/servicedesk/customer/portal/2/group/8/create/27"
-        className="mt-4 p-2.5 uppercase text-base text-primary bg-white w-full font-medium rounded-sm border border-primary inline-block text-center"
+        className="mt-4 p-2.5 uppercase text-base text-primary bg-white w-48 block mx-auto font-medium rounded-sm border border-primary text-center"
       >
         {t("complain")}
       </a>

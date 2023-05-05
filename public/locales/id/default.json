@@ -58,6 +58,7 @@
   "linkAccountForgotPasswordButton": "Lupa Kata Sandi",
   "linkAccountForgotTilakaName": "Lupa Tilaka Name",
   "linkAccountCTA": "Tautkan Akun",
+  "linkAccountCTA1": "Aktivasi Akun",
   "tilakaNameOrPasswordWrong": "Tilaka Name / Kata Sandi Salah",
   "createPinTitle": "Buat PIN",
   "createPinSubtitle": "Buat 6-digit PIN untuk menggunakan layanan Tanda Tangan Digital dengan aman",
