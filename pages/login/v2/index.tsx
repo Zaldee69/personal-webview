@@ -33,6 +33,8 @@ import {
 import { getExpFromToken } from "@/utils/getExpFromToken";
 import Link from "next/link";
 import { getEncodedCurrentUrl } from "@/utils/getEncodedCurrentUrl";
+import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
+import Button, { buttonVariants } from "@/components/atoms/Button";
 
 interface IPropsLogin {}
 
@@ -86,6 +88,8 @@ const Login = ({}: IPropsLogin) => {
 
   const { t }: any = i18n;
 
+  const themeConfiguration = useSelector((state: RootState) => state.theme);
+
   useEffect(() => {
     if (router.isReady) {
       setTilakaName(user as string);
@@ -108,7 +112,7 @@ const Login = ({}: IPropsLogin) => {
 
       doIn(data);
 
-      toastCaller(data);
+      toastCaller(data, themeConfiguration?.data.toastColor as string);
     } else if (data.status === "FULLFILLED" && !data.data.success) {
       toast(data.data.message || "Ada kesalahan", {
         type: "error",
@@ -246,7 +250,11 @@ const Login = ({}: IPropsLogin) => {
   }
 
   return (
-    <>
+    <div className="h-screen" style={{
+      backgroundColor: themeConfigurationAvaliabilityChecker(
+        themeConfiguration?.data.background as string, "BG"
+      ),
+    }} >
       <CertifModal setCertifModal={setCertifModal} certifModal={certifModal} />
       <AutoLogoutInfoModal
         modal={autoLogoutModal}
@@ -299,7 +307,12 @@ const Login = ({}: IPropsLogin) => {
                 }}
                 passHref
               >
-                <a className="poppins-regular text-primary">
+                <a style={{
+                    color: themeConfigurationAvaliabilityChecker(
+                      themeConfiguration?.data.actionFontColor as string
+                    ),
+                  }}
+                  className={buttonVariants({ variant: "ghost", size: "none" })}>
                   {t("linkAccountForgotPasswordButton")}
                 </a>
               </Link>
@@ -312,23 +325,33 @@ const Login = ({}: IPropsLogin) => {
                 />
               </div>
               <Link href={handleRoute("forgot-tilaka-name")} passHref>
-                <a className="poppins-regular text-primary">
+                <a style={{
+                    color: themeConfigurationAvaliabilityChecker(
+                      themeConfiguration?.data.actionFontColor as string
+                    ),
+                  }}
+                  className={buttonVariants({ variant: "ghost", size: "none" })}>
                   {t("linkAccountForgotTilakaName")}
                 </a>
               </Link>
             </div>
           </div>
-          <button
+          <Button
             type="submit"
+            style={{
+              backgroundColor: themeConfigurationAvaliabilityChecker(
+                themeConfiguration?.data.buttonColor as string
+              ),
+            }}
+            className="uppercase mt-24 text-white"
             disabled={password.length < 1}
-            className="bg-primary disabled:opacity-50 mt-32 text-xl uppercase md:mx-auto md:block md:w-1/4 text-white font-poppins w-full mx-auto rounded-sm h-11"
           >
             {t("loginCTA")}
-          </button>
+          </Button>
         </form>
         <Footer />
       </div>
-    </>
+    </div>
   );
 };
 

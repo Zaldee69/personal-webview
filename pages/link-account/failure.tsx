@@ -15,6 +15,11 @@ import {
   getFRFailedCount,
   resetFRFailedCount,
 } from "@/utils/frFailedCountGetterSetter";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/app/store";
+import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
+import Footer from "@/components/Footer";
+import { buttonVariants } from "@/components/atoms/Button";
 
 type Props = {
   checkStepResultDataRoute: TKycCheckStepResponseData["data"]["route"];
@@ -35,6 +40,8 @@ const LinkAccountFailure = (props: Props) => {
   const [redirectUrl, setRedirectUrl] = useState<string>(
     routerQuery.redirect_url as string
   );
+
+  const themeConfiguration = useSelector((state: RootState) => state.theme);
 
   const failedCount = getFRFailedCount("count");
 
@@ -119,45 +126,124 @@ const LinkAccountFailure = (props: Props) => {
   }, [routerIsReady, routerQuery]);
 
   return (
-    <div className="px-10 max-w-md mx-auto pt-16 pb-9 text-center">
-      <p className="text-base poppins-semibold text-neutral800">
-        {routerQuery.setting === "1"
-          ? t("linkAccountFailedTitle1")
-          : t("linkAccountFailedTitle")}
-      </p>
-      <div className="mt-20">
-        <Image
-          src={`${assetPrefix}/images/linkAccountFailure.svg`}
-          width="196px"
-          height="196px"
-          alt="liveness-failure-ill"
-        />
-      </div>
-      {failedCount >= 5 && (
-        <>
-          <h1 className="text-base mt-5 poppins-semibold text-neutral800">
-            {t("linkAccountFailed5x.title")}
-          </h1>
-          <p className="text-center mt-1 poppins-regular text-neutral800">
-            {t("linkAccountFailed5x.subtitle")}
-          </p>
-        </>
-      )}
-      {props.checkStepResultDataRoute === "penautan_consent" ? (
-        routerQuery.reject_by_user === "1" ? (
-          <div className="mt-14">
-            <p className="poppins-regular text-xs text-neutral200">
-              {t("consentLinkAccountFailedSubtitleRejectByUser")}
+    <div
+      className="h-screen"
+      style={{
+        backgroundColor: themeConfigurationAvaliabilityChecker(
+          themeConfiguration?.data.background as string,
+          "BG"
+        ),
+      }}
+    >
+      <div className="px-10 max-w-md mx-auto pt-16 pb-9 text-center">
+        <p className="text-base poppins-semibold text-neutral800">
+          {routerQuery.setting === "1"
+            ? t("linkAccountFailedTitle1")
+            : t("linkAccountFailedTitle")}
+        </p>
+        <div className="mt-20">
+          <Image
+            src={`${assetPrefix}/images/linkAccountFailure.svg`}
+            width="196px"
+            height="196px"
+            alt="liveness-failure-ill"
+          />
+        </div>
+        {failedCount >= 5 && (
+          <>
+            <h1 className="text-base mt-5 poppins-semibold text-neutral800">
+              {t("linkAccountFailed5x.title")}
+            </h1>
+            <p className="text-center mt-1 poppins-regular text-neutral800">
+              {t("linkAccountFailed5x.subtitle")}
             </p>
-          </div>
+          </>
+        )}
+        {props.checkStepResultDataRoute === "penautan_consent" ? (
+          routerQuery.reject_by_user === "1" ? (
+            <div className="mt-14">
+              <p className="poppins-regular text-xs text-neutral200">
+                {t("consentLinkAccountFailedSubtitleRejectByUser")}
+              </p>
+            </div>
+          ) : (
+            <></>
+          )
         ) : (
           <></>
-        )
-      ) : (
-        <></>
-      )}
-      {props.checkStepResultDataRoute === "penautan_consent" ? (
-        routerQuery.account_locked === "1" ? (
+        )}
+        {props.checkStepResultDataRoute === "penautan_consent" ? (
+          routerQuery.account_locked === "1" ? (
+            <div className="mt-20 text-primary text-base poppins-medium underline hover:cursor-pointer">
+              <Link
+                href={{
+                  pathname: handleRoute("link-account"),
+                  query: { ...router.query },
+                }}
+              >
+                <a
+                  style={{
+                    color: themeConfigurationAvaliabilityChecker(
+                      themeConfiguration?.data.actionFontColor as string
+                    ),
+                  }}
+                  className={buttonVariants({
+                    variant: "link",
+                    size: "none",
+                    className: "font-medium",
+                  })}
+                >
+                  {t("linkAccountTilaka")}
+                </a>
+              </Link>
+            </div>
+          ) : (
+            redirectUrl && (
+              <div className="mt-20 text-primary text-base poppins-medium underline hover:cursor-pointer">
+                <a
+                  style={{
+                    color: themeConfigurationAvaliabilityChecker(
+                      themeConfiguration?.data.actionFontColor as string
+                    ),
+                  }}
+                  className={buttonVariants({
+                    variant: "link",
+                    size: "none",
+                    className: "font-medium",
+                  })}
+                  href={concateRedirectUrlParams(redirectUrl, "")}
+                >
+                  {t("livenessSuccessButtonTitle")}
+                </a>
+              </div>
+            )
+          )
+        ) : (failedCount >= 5 && props.checkStepResultDataRoute !== null) ||
+          props.checkStepResultResponseData?.[0] ===
+            "registrationId tidak valid" ? (
+          redirectUrl ? (
+            <div className="mt-20 text-primary text-base poppins-medium underline hover:cursor-pointer">
+              <a
+                style={{
+                  color: themeConfigurationAvaliabilityChecker(
+                    themeConfiguration?.data.actionFontColor as string
+                  ),
+                }}
+                className={buttonVariants({
+                  variant: "link",
+                  size: "none",
+                  className: "font-medium",
+                })}
+                onClick={() => resetFRFailedCount("count")}
+                href={concateRedirectUrlParams(redirectUrl, "")}
+              >
+                {t("livenessSuccessButtonTitle")}
+              </a>
+            </div>
+          ) : (
+            <></>
+          )
+        ) : (
           <div className="mt-20 text-primary text-base poppins-medium underline hover:cursor-pointer">
             <Link
               href={{
@@ -165,56 +251,26 @@ const LinkAccountFailure = (props: Props) => {
                 query: { ...router.query },
               }}
             >
-              <a>{t("linkAccountTilaka")}</a>
+              <a
+                style={{
+                  color: themeConfigurationAvaliabilityChecker(
+                    themeConfiguration?.data.actionFontColor as string
+                  ),
+                }}
+                className={buttonVariants({
+                  variant: "link",
+                  size: "none",
+                  className: "font-medium",
+                })}
+              >
+                {routerQuery.setting === "1"
+                  ? t("linkAccountTilaka1")
+                  : t("linkAccountTilaka")}
+              </a>
             </Link>
           </div>
-        ) : (
-          redirectUrl && (
-            <div className="mt-20 text-primary text-base poppins-medium underline hover:cursor-pointer">
-              <a href={concateRedirectUrlParams(redirectUrl, "")}>
-                {t("livenessSuccessButtonTitle")}
-              </a>
-            </div>
-          )
-        )
-      ) : (failedCount >= 5 && props.checkStepResultDataRoute !== null) ||
-        props.checkStepResultResponseData?.[0] ===
-          "registrationId tidak valid" ? (
-        redirectUrl ? (
-          <div className="mt-20 text-primary text-base poppins-medium underline hover:cursor-pointer">
-            <a
-              onClick={() => resetFRFailedCount("count")}
-              href={concateRedirectUrlParams(redirectUrl, "")}
-            >
-              {t("livenessSuccessButtonTitle")}
-            </a>
-          </div>
-        ) : (
-          <></>
-        )
-      ) : (
-        <div className="mt-20 text-primary text-base poppins-medium underline hover:cursor-pointer">
-          <Link
-            href={{
-              pathname: handleRoute("link-account"),
-              query: { ...router.query },
-            }}
-          >
-            <a>
-              {routerQuery.setting === "1"
-                ? t("linkAccountTilaka1")
-                : t("linkAccountTilaka")}
-            </a>
-          </Link>
-        </div>
-      )}
-      <div className="mt-11 flex justify-center">
-        <Image
-          src={`${assetPrefix}/images/poweredByTilaka.svg`}
-          alt="powered-by-tilaka"
-          width="80px"
-          height="41.27px"
-        />
+        )}
+        <Footer />
       </div>
     </div>
   );

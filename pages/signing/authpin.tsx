@@ -5,6 +5,9 @@ import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { concateRedirectUrlParams } from "@/utils/concateRedirectUrlParams";
 import i18n from "i18";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/app/store";
+import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
 
 type Props = {};
 
@@ -31,6 +34,7 @@ const AuthPinForm = (props: Props) => {
   const [isButtonNumberDisabled, setIsButtonNumberDisabled] =
     useState<boolean>(false);
   const [isProcessed, setIsProcessed] = useState<boolean>(false);
+  const themeConfiguration = useSelector((state: RootState) => state.theme);
 
   const digitLength: number = 6;
   const { t }: any = i18n;
@@ -49,7 +53,7 @@ const AuthPinForm = (props: Props) => {
         user: user || "",
         pin,
         id: id || "",
-        async: router.query.async as string
+        async: router.query.async as string,
       },
     })
       .then((res) => {
@@ -133,7 +137,15 @@ const AuthPinForm = (props: Props) => {
   if (!shouldRender) return;
 
   return (
-    <div className="flex justify-center items-center min-h-screen px-3 pt-3 pb-5">
+    <div
+      style={{
+        backgroundColor: themeConfigurationAvaliabilityChecker(
+          themeConfiguration?.data.background as string,
+          "BG"
+        ),
+      }}
+      className="flex justify-center items-center min-h-screen px-3 pt-3 pb-5"
+    >
       <div className="max-w- w-full" style={{ maxWidth: "331px" }}>
         <PinFormComponent
           key="pinFormKey"

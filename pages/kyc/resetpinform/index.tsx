@@ -5,6 +5,9 @@ import { NextParsedUrlQuery } from "next/dist/server/request-meta";
 import { useRouter } from "next/router";
 import React, { useState, useEffect } from "react";
 import i18n from "i18";
+import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/app/store";
 
 type Props = {};
 
@@ -38,6 +41,9 @@ const PinFormDedicatedChannel = (props: Props) => {
   const [isConfirmMode, setIsConfirmMode] = useState<boolean>(false);
   const [isRequestCheckStatus, setIsRequestCheckStatus] =
     useState<boolean>(false);
+
+  const themeConfiguration = useSelector((state: RootState) => state.theme);
+
 
   const digitLength: number = 6;
   const onClickNumberHandlerCallback = (value: number) => {};
@@ -134,7 +140,12 @@ const PinFormDedicatedChannel = (props: Props) => {
 
 
   return (
-    <div className="flex justify-center items-center min-h-screen px-3 pt-3 pb-5">
+    <div style={{
+      backgroundColor: themeConfigurationAvaliabilityChecker(
+        themeConfiguration?.data.background as string,
+        "BG"
+      ),
+    }} className="flex justify-center items-center min-h-screen px-3 pt-3 pb-5">
       {isConfirmMode ? (
         <div className="w-full" style={{ maxWidth: "331px" }}>
           <PinFormComponent

@@ -8,6 +8,10 @@ import { assetPrefix } from "../../next.config";
 import i18n from "i18";
 import { TPersonalRequestResetPasswordRequestData } from "infrastructure/rest/personal/types";
 import { RestPersonalRequestResetPassword } from "infrastructure/rest/personal";
+import Button from "@/components/atoms/Button";
+import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
+import { RootState } from "@/redux/app/store";
+import { useSelector } from "react-redux";
 
 type Props = {};
 
@@ -24,6 +28,8 @@ const ForgotPassword = (props: Props) => {
   const [reCaptchaSuccess, reCaptchaSuccessSetter] = useState<boolean>(false);
 
   const { t }: any = i18n;
+
+  const themeConfiguration = useSelector((state: RootState) => state.theme);
 
   const handleFormOnChange = (e: React.FormEvent<HTMLInputElement>): void => {
     formSetter({
@@ -96,7 +102,13 @@ const ForgotPassword = (props: Props) => {
   };
 
   return (
-    <>
+    <div
+      style={{
+        backgroundColor: themeConfigurationAvaliabilityChecker(
+          themeConfiguration?.data.background as string, "BG"
+        ),
+      }}
+    >
       <Head>
         <title>{t("forgotPassword.title")}</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
@@ -136,13 +148,19 @@ const ForgotPassword = (props: Props) => {
                       />
                     </div>
                   </label>
-                  <button
+                  <Button
                     type="submit"
+                    size="sm"
                     disabled={!form.email}
-                    className="mt-32 bg-primary btn text-white block mx-auto w-fit px-6 poppins-regular mb-5 h-10 rounded-md"
+                    className="mt-32  mb-5 h-10"
+                    style={{
+                      backgroundColor: themeConfigurationAvaliabilityChecker(
+                        themeConfiguration?.data.buttonColor as string
+                      ),
+                    }}
                   >
                     {t("send")}
-                  </button>
+                  </Button>
                 </form>
               </div>
             ) : (
@@ -167,7 +185,7 @@ const ForgotPassword = (props: Props) => {
         </div>
       </div>
       <ModalSuccess modal={modalSuccess} setModal={modalSuccessSetter} />
-    </>
+    </div>
   );
 };
 

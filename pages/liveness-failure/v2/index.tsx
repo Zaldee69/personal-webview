@@ -7,16 +7,20 @@ import { GetServerSideProps } from "next";
 import Head from "next/head";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import React, {useEffect} from "react";
+import React, { useEffect } from "react";
 import Footer from "../../../components/Footer";
 import { assetPrefix } from "../../../next.config";
 import i18n from "i18";
-
+import { buttonVariants } from "@/components/atoms/Button";
+import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/app/store";
 
 const LivenessFailure = () => {
-  const {t} : any = i18n
+  const { t }: any = i18n;
   const router = useRouter();
   const routerQuery = router.query;
+  const themeConfiguration = useSelector((state: RootState) => state.theme);
   const uuid =
     routerQuery.transaction_id ||
     routerQuery.request_id ||
@@ -24,22 +28,27 @@ const LivenessFailure = () => {
   const params = {
     register_id: uuid,
   };
-  
+
   const queryString = new URLSearchParams(params as any).toString();
-  
+
   useEffect(() => {
-    if(routerQuery.redirect_url) {
+    if (routerQuery.redirect_url) {
       setTimeout(() => {
         router.push({
           pathname: routerQuery.redirect_url as string,
-          query: queryString
-        })
-      }, 5000)
+          query: queryString,
+        });
+      }, 5000);
     }
-  }, [router.isReady])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [router.isReady]);
 
   return (
-    <>
+    <div className="h-screen" style={{
+      backgroundColor: themeConfigurationAvaliabilityChecker(
+        themeConfiguration?.data.background as string, "BG"
+      ),
+    }}>
       <Head>
         <title>Liveness</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
@@ -53,6 +62,7 @@ const LivenessFailure = () => {
             src={`${assetPrefix}/images/livenessFail.svg`}
             width={200}
             height={200}
+            alt="Liveness Fail"
           />
           <div className="flex flex-col items-center gap-10 ">
             <p className="text-center poppins-regular text-neutral">
@@ -65,7 +75,18 @@ const LivenessFailure = () => {
                   queryString
                 )}
               >
-                <span className="text-center poppins-semibold underline-offset-1	underline  text-primary">
+                <span
+                  style={{
+                    color: themeConfigurationAvaliabilityChecker(
+                      themeConfiguration?.data.actionFontColor as string
+                    ),
+                  }}
+                  className={buttonVariants({
+                    variant: "link",
+                    size: "none",
+                    className: "font-semibold",
+                  })}
+                >
                   {t("livenessSuccessButtonTitle")}
                 </span>
               </a>
@@ -74,7 +95,7 @@ const LivenessFailure = () => {
         </div>
         <Footer />
       </div>
-    </>
+    </div>
   );
 };
 

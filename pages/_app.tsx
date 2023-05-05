@@ -1,7 +1,7 @@
 import type { AppProps } from "next/app";
 import { ToastContainer } from "react-toastify";
 import { store } from "../redux/app/store";
-import { Provider } from "react-redux";
+import { Provider, connect } from "react-redux";
 import { useRouter } from "next/router";
 import "react-toastify/dist/ReactToastify.min.css";
 import "../styles/globals.css";
@@ -14,6 +14,7 @@ import { initialStateDocumentSlice } from "@/redux/slices/documentSlice";
 import { initialStateLivenessSlice } from "@/redux/slices/livenessSlice";
 import { initialStateLoginSlice } from "@/redux/slices/loginSlice";
 import { initialStateSignatureSlice } from "@/redux/slices/signatureSlice";
+import { getTheme, intialStateThemeSlice } from "@/redux/slices/themeSlice";
 
 type TcontextClass = {
   success: string;
@@ -40,10 +41,27 @@ function MyApp({ Component, pageProps }: AppProps) {
 
   i18n.changeLanguage(lang as string);
 
+  const getThemeConfiguration = () => {
+    store.dispatch(
+      getTheme({
+        uuid:
+          (router.query.channel_id as string) ||
+          (router.query.request_id as string),
+      })
+    );
+  };
+
   const [showChild, setShowChild] = useState<boolean>(false);
+
   useEffect(() => {
+    if (!router.isReady) return;
+    getThemeConfiguration();
+  }, [router.isReady]);
+
+  store.subscribe(() => {
+    if (store.getState().theme.status === "PENDING") return;
     setShowChild(true);
-  }, []);
+  });
 
   if (!showChild) {
     return null;
@@ -67,6 +85,7 @@ function MyApp({ Component, pageProps }: AppProps) {
             liveness: initialStateLivenessSlice,
             login: initialStateLoginSlice,
             signature: initialStateSignatureSlice,
+            theme: intialStateThemeSlice,
           }}
         >
           <ToastContainer

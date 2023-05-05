@@ -5,7 +5,7 @@ export type TLoginPayload = {
   company_id: string;
 };
 
-type Status = {
+export type Status = {
   status: "PENDING" | "FULLFILLED" | "REJECTED" | "IDDLE";
 };
 

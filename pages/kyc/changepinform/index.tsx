@@ -8,12 +8,15 @@ import {
 import { NextParsedUrlQuery } from "next/dist/server/request-meta";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
+import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/app/store";
 
 type Props = {};
 
 const ChangePinDedicatedChannel = (props: Props) => {
   const router = useRouter();
-  const {t} : any = i18n
+  const { t }: any = i18n;
   const {
     random,
     request_id,
@@ -47,7 +50,7 @@ const ChangePinDedicatedChannel = (props: Props) => {
 
   const digitLength: number = 6;
 
-  // console.log(isRandom)
+  const themeConfiguration = useSelector((state: RootState) => state.theme);
 
   const onClickNumberHandlerCallback = (value: number) => {};
   const onClickDeleteHandlerCallback = () => {};
@@ -151,7 +154,7 @@ const ChangePinDedicatedChannel = (props: Props) => {
           if (res.message.toLowerCase().includes("password")) {
             setOldPinErrorAfterSubmit({
               isError: true,
-              message: t("authPinError1")
+              message: t("authPinError1"),
             });
           } else {
             setOldPinErrorAfterSubmit({
@@ -196,7 +199,15 @@ const ChangePinDedicatedChannel = (props: Props) => {
   if (!shouldRender) return;
 
   return (
-    <div className="flex justify-center items-center min-h-screen px-3 pt-3 pb-5">
+    <div
+      style={{
+        backgroundColor: themeConfigurationAvaliabilityChecker(
+          themeConfiguration?.data.background as string,
+          "BG"
+        ),
+      }}
+      className="flex justify-center items-center min-h-screen px-3 pt-3 pb-5"
+    >
       {!isNewPinMode ? (
         <div className="max-w-xs w-full">
           <PinFormComponent

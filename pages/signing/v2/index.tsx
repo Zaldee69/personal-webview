@@ -32,6 +32,11 @@ import {
   getStorageWithExpiresIn,
   removeStorageWithExpiresIn,
 } from "@/utils/localStorageWithExpiresIn";
+import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
+import { RootState } from "@/redux/app/store";
+import { useSelector } from "react-redux";
+import Button, { buttonVariants } from "@/components/atoms/Button";
+import Footer from "@/components/Footer";
 
 interface IParameterFromRequestSign {
   user?: string;
@@ -121,6 +126,8 @@ const SigningWithRead = () => {
   >([]);
   const [viewedDoc, setViewDocBase64] =
     useState<IModalViewer["viewedDoc"]>(null);
+
+  const themeConfiguration = useSelector((state: RootState) => state.theme);
 
   const agreeOnChange = (e: ChangeEvent<HTMLInputElement>) => {
     setAgree(e.target.checked);
@@ -346,7 +353,15 @@ const SigningWithRead = () => {
         viewedDoc={viewedDoc}
       />
 
-      <div className="px-10 py-8 text-center flex flex-col justify-center min-h-screen">
+      <div
+        style={{
+          backgroundColor: themeConfigurationAvaliabilityChecker(
+            themeConfiguration?.data.background as string,
+            "BG"
+          ),
+        }}
+        className="px-10 py-8 text-center flex flex-col justify-center min-h-screen"
+      >
         <div>
           <p
             className="font-poppins text-lg font-semibold text-neutral800 text-left mx-auto"
@@ -465,26 +480,23 @@ const SigningWithRead = () => {
           </div>
         </div>
         <div className="mt-8">
-          <button
+          <Button
             disabled={shouldDisableSubmit || !read || !agree}
-            className="bg-primary disabled:bg-primary70 hover:opacity-50 disabled:hover:opacity-100 text-white disabled:text-neutral200 font-poppins rounded-md px-6 py-2.5"
+            size="none"
+            className="px-6 py-2.5"
+            style={{
+              backgroundColor: themeConfigurationAvaliabilityChecker(
+                themeConfiguration?.data.buttonColor as string
+              ),
+            }}
             onClick={() =>
               typeMFA === "FR" ? setopenFRModal(true) : setOtpModal(true)
             }
           >
             {t("sign")}
-          </button>
+          </Button>
         </div>
-        <div className="mt-6">
-          <div className="flex justify-center">
-            <Image
-              src={`${assetPrefix}/images/poweredByTilaka.svg`}
-              alt="powered-by-tilaka"
-              width="80px"
-              height="41.27px"
-            />
-          </div>
-        </div>
+        <Footer />
       </div>
     </div>
   );
@@ -515,6 +527,8 @@ const SigningWithoutRead = () => {
   const [agree, setAgree] = useState<boolean>(false);
   const [openFRModal, setopenFRModal] = useState<boolean>(false);
   const [otpModal, setOtpModal] = useState<boolean>(false);
+
+  const themeConfiguration = useSelector((state: RootState) => state.theme);
 
   const agreeOnChange = (e: ChangeEvent<HTMLInputElement>) => {
     setAgree(e.target.checked);
@@ -712,7 +726,15 @@ const SigningWithoutRead = () => {
         documentList={documentList}
       />
 
-      <div className="px-10 py-8 text-center flex flex-col justify-center min-h-screen">
+      <div
+        style={{
+          backgroundColor: themeConfigurationAvaliabilityChecker(
+            themeConfiguration?.data.background as string,
+            "BG"
+          ),
+        }}
+        className="px-10 py-8 text-center flex flex-col justify-center min-h-screen"
+      >
         <div>
           <p
             className="font-poppins text-lg font-semibold text-neutral800 text-left mx-auto"
@@ -793,26 +815,22 @@ const SigningWithoutRead = () => {
           </div>
         </div>
         <div className="mt-8">
-          <button
+          <Button
+            style={{
+              backgroundColor: themeConfigurationAvaliabilityChecker(
+                themeConfiguration?.data.buttonColor as string
+              ),
+            }}
+            className="px-6 py-2.5"
             disabled={shouldDisableSubmit || !agree}
-            className="bg-primary disabled:bg-primary70 hover:opacity-50 disabled:hover:opacity-100 text-white disabled:text-neutral200 font-poppins rounded-md px-6 py-2.5"
             onClick={() =>
               typeMFA === "FR" ? setopenFRModal(true) : setOtpModal(true)
             }
           >
             {t("sign")}
-          </button>
+          </Button>
         </div>
-        <div className="mt-6">
-          <div className="flex justify-center">
-            <Image
-              src={`${assetPrefix}/images/poweredByTilaka.svg`}
-              alt="powered-by-tilaka"
-              width="80px"
-              height="41.27px"
-            />
-          </div>
-        </div>
+        <Footer />
       </div>
     </div>
   );
@@ -831,10 +849,20 @@ const SigningSuccess = (props: TPropsSigningSuccess) => {
   };
   const queryString = new URLSearchParams(params as any).toString();
 
+  const themeConfiguration = useSelector((state: RootState) => state.theme);
+
   const { t }: any = i18n;
 
   return (
-    <div className="px-10 pt-16 pb-9 text-center flex flex-col justify-center min-h-screen">
+    <div
+      style={{
+        backgroundColor: themeConfigurationAvaliabilityChecker(
+          themeConfiguration?.data.background as string,
+          "BG"
+        ),
+      }}
+      className="px-10 pt-16 pb-9 text-center flex flex-col justify-center min-h-screen"
+    >
       <div>
         <p className="font-poppins text-lg font-semibold text-neutral800">
           {t("signSuccess")}
@@ -857,6 +885,16 @@ const SigningSuccess = (props: TPropsSigningSuccess) => {
         {routerQuery.redirect_url && (
           <div className="text-primary text-base font-medium font-poppins underline hover:cursor-pointer">
             <a
+              style={{
+                color: themeConfigurationAvaliabilityChecker(
+                  themeConfiguration?.data.actionFontColor as string
+                ),
+              }}
+              className={buttonVariants({
+                variant: "link",
+                size: "none",
+                className: "font-medium",
+              })}
               href={concateRedirectUrlParams(
                 routerQuery.redirect_url,
                 queryString
@@ -891,10 +929,20 @@ const SigningOnProgress = (props: TPropsSigningSuccess) => {
   };
   const queryString = new URLSearchParams(params as any).toString();
 
+  const themeConfiguration = useSelector((state: RootState) => state.theme);
+
   const { t }: any = i18n;
 
   return (
-    <div className="pt-16 px-1 pb-9 text-center flex flex-col justify-center min-h-screen">
+    <div
+      style={{
+        backgroundColor: themeConfigurationAvaliabilityChecker(
+          themeConfiguration?.data.background as string,
+          "BG"
+        ),
+      }}
+      className="pt-16 px-1 pb-9 text-center flex flex-col justify-center min-h-screen"
+    >
       <div>
         <p className="font-poppins text-lg font-semibold text-neutral800">
           {t("authenticationSuccessTitle")}
@@ -917,6 +965,16 @@ const SigningOnProgress = (props: TPropsSigningSuccess) => {
         {routerQuery.redirect_url && (
           <div className="text-primary text-base font-medium font-poppins underline hover:cursor-pointer">
             <a
+              style={{
+                color: themeConfigurationAvaliabilityChecker(
+                  themeConfiguration?.data.actionFontColor as string
+                ),
+              }}
+              className={buttonVariants({
+                variant: "link",
+                size: "none",
+                className: "font-medium",
+              })}
               href={concateRedirectUrlParams(
                 routerQuery.redirect_url,
                 queryString
@@ -945,6 +1003,8 @@ const SigningFailure = (props: TPropsSigningFailure) => {
     redirect_url?: string;
   } & IParameterFromRequestSign = router.query;
 
+  const themeConfiguration = useSelector((state: RootState) => state.theme);
+
   const params = {
     user_identifier: routerQuery.user,
     request_id: routerQuery.request_id,
@@ -954,7 +1014,15 @@ const SigningFailure = (props: TPropsSigningFailure) => {
   const { t }: any = i18n;
 
   return (
-    <div className="px-10 pt-16 pb-9 text-center flex flex-col justify-center min-h-screen">
+    <div
+      style={{
+        backgroundColor: themeConfigurationAvaliabilityChecker(
+          themeConfiguration?.data.background as string,
+          "BG"
+        ),
+      }}
+      className="px-10 pt-16 pb-9 text-center flex flex-col justify-center min-h-screen"
+    >
       <div>
         <p className="font-poppins text-lg font-semibold text-neutral800">
           {t("signFailed")}
@@ -977,6 +1045,16 @@ const SigningFailure = (props: TPropsSigningFailure) => {
         {routerQuery.redirect_url && (
           <div className="text-primary text-base font-medium font-poppins underline hover:cursor-pointer">
             <a
+              style={{
+                color: themeConfigurationAvaliabilityChecker(
+                  themeConfiguration?.data.actionFontColor as string
+                ),
+              }}
+              className={buttonVariants({
+                variant: "link",
+                size: "none",
+                className: "font-medium",
+              })}
               href={concateRedirectUrlParams(
                 routerQuery.redirect_url,
                 queryString
@@ -986,14 +1064,7 @@ const SigningFailure = (props: TPropsSigningFailure) => {
             </a>
           </div>
         )}
-        <div className="mt-8 flex justify-center">
-          <Image
-            src={`${assetPrefix}/images/poweredByTilaka.svg`}
-            alt="powered-by-tilaka"
-            width="80px"
-            height="41.27px"
-          />
-        </div>
+        <Footer />
       </div>
     </div>
   );
@@ -1012,6 +1083,8 @@ const FRModal: React.FC<IModal> = ({
     fr?: "1";
   } & IParameterFromRequestSign = router.query;
   const [isFRSuccess, setIsFRSuccess] = useState<boolean>(false);
+
+  const themeConfiguration = useSelector((state: RootState) => state.theme);
 
   const signingFailure = (message: string) => {
     callbackFailure(
@@ -1120,12 +1193,18 @@ const FRModal: React.FC<IModal> = ({
             countIdentifier="count_v2"
             callbackCaptureProcessor={captureProcessor}
           />
-          <button
+          <Button
             onClick={() => setModal(!modal)}
-            className="text-primary btn uppercase bg-white font-poppins w-full mt-5 mx-auto rounded-sm h-9 font-semibold hover:opacity-50"
+            size="full"
+            className="uppercase mt-5 mb-2 h-9"
+            style={{
+              backgroundColor: themeConfigurationAvaliabilityChecker(
+                themeConfiguration?.data.buttonColor as string
+              ),
+            }}
           >
             {t("cancel")}
-          </button>
+          </Button>
         </>
       </div>
     </div>
@@ -1148,6 +1227,8 @@ const OTPModal: React.FC<IModal> = ({
     fr?: "1";
   } & IParameterFromRequestSign = router.query;
 
+  const themeConfiguration = useSelector((state: RootState) => state.theme);
+
   const [values, setValues] = useState(["", "", "", "", "", ""]);
 
   const { t }: any = i18n;
@@ -1164,6 +1245,9 @@ const OTPModal: React.FC<IModal> = ({
       toastId: "loading",
       isLoading: true,
       position: "top-center",
+      style: {
+        backgroundColor: themeConfiguration?.data.toastColor as string,
+      },
     });
     RestSigningAuthPIN({
       payload: {
@@ -1272,6 +1356,9 @@ const OTPModal: React.FC<IModal> = ({
             toastId: "info",
             isLoading: false,
             position: "top-center",
+            style: {
+              backgroundColor: themeConfiguration?.data.toastColor as string,
+            },
           });
         } else {
           toast.error(res.message, {
@@ -1339,30 +1426,65 @@ const OTPModal: React.FC<IModal> = ({
           />
           <div className="flex font-poppins justify-center text-sm gap-1 mt-5">
             <p className="text-neutral200">{t("dindtReceiveOtp")}</p>
-            <div className="text-primary font-semibold">
+            <div
+              style={{
+                color: themeConfigurationAvaliabilityChecker(
+                  themeConfiguration?.data.actionFontColor as string,
+                  "BG"
+                ),
+              }}
+              className="font-semibold"
+            >
               {!isCountDone ? (
-                <button onClick={handleTriggerSendOTP}>{t("resend")}</button>
+                <Button
+                  variant="ghost"
+                  style={{
+                    color: themeConfigurationAvaliabilityChecker(
+                      themeConfiguration?.data.actionFontColor as string,
+                      "BG"
+                    ),
+                  }}
+                  className="mx-0"
+                  size="none"
+                  onClick={handleTriggerSendOTP}
+                >
+                  {t("resend")}
+                </Button>
               ) : (
                 `0:${timeRemaining}`
               )}
             </div>
           </div>
-          <button
+          <Button
             disabled={values.join("").length < 6}
             onClick={onClickHandler}
-            className="bg-primary btn mt-16 disabled:bg-[#DAE6F8] disabled:text-[#6B778C]/30 hover:opacity-70 text-white font-poppins mx-auto rounded-sm py-2.5 px-6 font-semibold"
+            style={{
+              backgroundColor: themeConfigurationAvaliabilityChecker(
+                themeConfiguration?.data.buttonColor as string,
+                "BG"
+              ),
+            }}
+            className="mt-16 block mx-auto py-3"
+            size="lg"
           >
             {t("confirm")}
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => {
               setValues(["", "", "", "", "", ""]);
               setModal(!modal);
             }}
-            className="  text-primary font-poppins mt-4 hover:opacity-50 w-full mx-auto rounded-sm h-9 font-semibold"
+            className="font-semibold mt-2"
+            variant="ghost"
+            style={{
+              color: themeConfigurationAvaliabilityChecker(
+                themeConfiguration?.data.actionFontColor as string,
+                "BG"
+              ),
+            }}
           >
             {t("cancel")}
-          </button>
+          </Button>
         </div>
       </div>
     </div>
@@ -1375,6 +1497,7 @@ const ViewerModal: React.FC<IModalViewer> = ({ modal, onClose, viewedDoc }) => {
   const [totalPages, setTotalPages] = useState<number>(0);
   const [closeButtonShouldDisabled, setCloseButtonShouldDisabled] =
     useState<boolean>(true);
+  const themeConfiguration = useSelector((state: RootState) => state.theme);
 
   const handleScroll = (e: any) => {
     const scrollDiv: HTMLDivElement | null =
@@ -1437,16 +1560,20 @@ const ViewerModal: React.FC<IModalViewer> = ({ modal, onClose, viewedDoc }) => {
           />
         </div>
         <div className="px-2 py-3 flex justify-center">
-          <button
+          <Button
             disabled={closeButtonShouldDisabled}
-            className="bg-primary disabled:bg-primary70 hover:opacity-50 disabled:hover:opacity-100 text-white disabled:text-neutral200 font-poppins rounded-md px-6 py-2.5"
+            style={{
+              backgroundColor: themeConfigurationAvaliabilityChecker(
+                themeConfiguration?.data.buttonColor as string
+              ),
+            }}
             onClick={() => {
               onClose();
               setCloseButtonShouldDisabled(true);
             }}
           >
             {t("close")}
-          </button>
+          </Button>
         </div>
       </div>
     </div>

@@ -44,6 +44,7 @@ const FRCamera = ({
 
   const dispatch = useDispatch();
   const { t }: any = i18n;
+  const themeConfiguration = useSelector((state: RootState) => state.theme);
 
   const document = useSelector((state: RootState) => state.document);
   const signature = useSelector((state: RootState) => state.signature);
@@ -91,6 +92,9 @@ const FRCamera = ({
       toastId: "info",
       isLoading: true,
       position: "top-center",
+      style: {
+        backgroundColor: themeConfiguration?.data.toastColor as string,
+      },
     });
     const imageSrc = webcamRef?.current?.getScreenshot();
     if (callbackCaptureProcessor) {

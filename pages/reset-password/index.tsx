@@ -9,6 +9,11 @@ import { RestPersonalResetPassword } from "infrastructure/rest/personal";
 import { toast } from "react-toastify";
 import XIcon from "@/public/icons/XIcon";
 import CheckOvalIcon from "@/public/icons/CheckOvalIcon";
+import Button from "@/components/atoms/Button";
+import Footer from "@/components/Footer";
+import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/app/store";
 
 type Props = {};
 
@@ -35,6 +40,8 @@ const LinkAccount = (props: Props) => {
     password: "",
     confirm_password: "",
   });
+
+  const themeConfiguration = useSelector((state: RootState) => state.theme);
 
   const { kunciRahasia: key, ...routerQuery } = router.query;
   const keyExist: boolean = key ? true : false;
@@ -144,7 +151,11 @@ const LinkAccount = (props: Props) => {
   };
 
   return (
-    <>
+    <div style={{
+      backgroundColor: themeConfigurationAvaliabilityChecker(
+        themeConfiguration?.data.background as string, "BG"
+      ),
+    }} >
       <Head>
         <title>Pengaturan Ulang Kata Sandi</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
@@ -213,25 +224,24 @@ const LinkAccount = (props: Props) => {
                 </p>
               </div>
             </label>
-            <button
+            <Button
               type="submit"
+              size="full"
               disabled={submitShouldDisabled}
-              className="mt-7 w-full p-2.5 text-base disabled:opacity-50 text-white rounded-sm bg-primary"
+              className="mt-7 p-2.5 text-base"
+              style={{
+                backgroundColor: themeConfigurationAvaliabilityChecker(
+                  themeConfiguration?.data.buttonColor as string
+                ),
+              }}
             >
               BUAT KATA SANDI BARU
-            </button>
+            </Button>
           </form>
         </div>
-        <div className="mt-48 flex justify-center">
-          <Image
-            src={`${assetPrefix}/images/poweredByTilaka.svg`}
-            alt="powered-by-tilaka"
-            width="80px"
-            height="41.27px"
-          />
-        </div>
+        <Footer/>
       </div>
-    </>
+    </div>
   );
 };
 

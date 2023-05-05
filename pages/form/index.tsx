@@ -14,6 +14,10 @@ import i18n from "i18";
 import { assetPrefix } from "../../next.config";
 import { handleRoute } from "@/utils/handleRoute";
 import { concateRedirectUrlParams } from "@/utils/concateRedirectUrlParams";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/app/store";
+import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
+import Button from "@/components/atoms/Button";
 interface InputType {
   password: string | number;
   confirmPassword: string | number;
@@ -45,6 +49,8 @@ const Form: React.FC = () => {
     confirmPassword: "",
     tilakaName: "",
   });
+
+  const themeConfiguration = useSelector((state: RootState) => state.theme);
 
   const [type, setType] = useState<Type>({
     password: "password",
@@ -319,7 +325,11 @@ const Form: React.FC = () => {
   }, [router.isReady, request_id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <>
+    <div style={{
+      backgroundColor: themeConfigurationAvaliabilityChecker(
+        themeConfiguration?.data.background as string, "BG"
+      ),
+    }} >
       <Head>
         <title>{t("finalFormTitle")}</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
@@ -486,16 +496,23 @@ const Form: React.FC = () => {
               </a>
             </label>
           </div>
-          <button
+          <Button
             disabled={disabled as boolean}
-            className={`bg-primary mt-10 uppercase text-white font-poppins px-4 py-1 block mx-auto rounded-sm h-9 disabled:opacity-50`}
+          type="submit"
+
+          style={{
+            backgroundColor: themeConfigurationAvaliabilityChecker(
+              themeConfiguration?.data.buttonColor as string
+            ),
+          }}
+          className="uppercase mt-24"
           >
             {t("CTA")}
-          </button>
+          </Button>
         </form>
         <Footer />
       </div>
-    </>
+    </div>
   );
 };
 

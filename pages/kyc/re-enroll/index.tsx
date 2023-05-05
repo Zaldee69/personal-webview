@@ -29,6 +29,7 @@ import InitializingFailed from "@/components/atoms/InitializingFailed";
 import Initializing from "@/components/atoms/Initializing";
 import { ActionGuide1, ActionGuide2 } from "@/components/atoms/ActionGuide";
 import CheckOvalIcon from "@/public/icons/CheckOvalIcon";
+import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
 
 let human: any = undefined;
 
@@ -51,6 +52,7 @@ const ReEnrollMekari = () => {
   const { t }: any = i18n;
   const images = useSelector((state: RootState) => state.liveness.images);
   const isDone = useSelector((state: RootState) => state.liveness.isDone);
+  const themeConfiguration = useSelector((state: RootState) => state.theme);
 
   const currentIndex =
     actionList[currentActionIndex] === "look_straight"
@@ -129,6 +131,9 @@ const ReEnrollMekari = () => {
       toastId: "generateAction",
       isLoading: true,
       position: "top-center",
+      style: {
+        backgroundColor: themeConfiguration?.data.toastColor as string,
+      },
     });
 
     RestKycGenerateActionIssue(body)
@@ -136,7 +141,7 @@ const ReEnrollMekari = () => {
         if (result?.data) {
           toast.dismiss("generateAction");
           toast.success("Pembuatan daftar aksi sukses", {
-          icon: <CheckOvalIcon />,
+            icon: <CheckOvalIcon />,
           });
           setIsGenerateAction(false);
           setIsDisabled(false);
@@ -321,6 +326,9 @@ const ReEnrollMekari = () => {
         toastId: "load",
         isLoading: true,
         position: "top-center",
+        style: {
+          backgroundColor: themeConfiguration?.data.toastColor as string,
+        },
       });
       setIsDisabled(true);
     } else if (humanDone && isClicked) {
@@ -355,7 +363,14 @@ const ReEnrollMekari = () => {
     return <Guide setIsClicked={setIsClicked} isDisabled={isDisabled} />;
 
   return (
-    <>
+    <div
+      style={{
+        backgroundColor: themeConfigurationAvaliabilityChecker(
+          themeConfiguration?.data.background as string,
+          "BG"
+        ),
+      }}
+    >
       <Head>
         <title>Liveness</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
@@ -430,7 +445,7 @@ const ReEnrollMekari = () => {
         <Footer />
         <UnsupportedDeviceModal />
       </div>
-    </>
+    </div>
   );
 };
 

@@ -9,13 +9,19 @@ import React from "react";
 import { assetPrefix } from "../../../next.config";
 import i18n from "i18";
 import { useEffect } from "react";
+import { buttonVariants } from "@/components/atoms/Button";
+import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
+import { RootState } from "@/redux/app/store";
+import { useSelector } from "react-redux";
+import Footer from "@/components/Footer";
 
 type Props = {};
 
 const FormSuccess = (props: Props) => {
   const router = useRouter();
   const routerQuery = router.query;
-  const {t} : any = i18n
+  const { t }: any = i18n;
+  const themeConfiguration = useSelector((state: RootState) => state.theme);
 
   useEffect(() => {
     if(routerQuery.redirect_url) {
@@ -28,7 +34,11 @@ const FormSuccess = (props: Props) => {
   }, [router.isReady])
 
   return (
-    <div className="px-10 pt-16 pb-9 text-center">
+    <div style={{
+      backgroundColor: themeConfigurationAvaliabilityChecker(
+        themeConfiguration?.data.background as string, "BG"
+      ),
+    }} className="px-10 pt-16 pb-9 text-center h-screen">
       <p className="text-base poppins-semibold text-neutral800">
         {t("livenessSuccess")}
       </p>
@@ -40,9 +50,18 @@ const FormSuccess = (props: Props) => {
           alt="liveness-success-ill"
         />
       </div>
-      <div className="mt-20 text-primary text-base poppins-medium underline hover:cursor-pointer">
         {routerQuery.redirect_url && (
           <a
+            style={{
+              color: themeConfigurationAvaliabilityChecker(
+                themeConfiguration?.data.actionFontColor as string
+              ),
+            }}
+            className={buttonVariants({
+              variant: "link",
+              size: "none",
+              className: "font-medium",
+            })}
             href={concateRedirectUrlParams(
               routerQuery.redirect_url as string,
               ""
@@ -51,15 +70,7 @@ const FormSuccess = (props: Props) => {
             {t("livenessSuccessButtonTitle")}
           </a>
         )}
-      </div>
-      <div className="mt-11 flex justify-center">
-        <Image
-          src={`${assetPrefix}/images/poweredByTilaka.svg`}
-          alt="powered-by-tilaka"
-          width="80px"
-          height="41.27px"
-        />
-      </div>
+      <Footer />
     </div>
   );
 };

@@ -28,6 +28,7 @@ import { handleRoute } from "@/utils/handleRoute";
 import { concateRedirectUrlParams } from "@/utils/concateRedirectUrlParams";
 import { ActionGuide1, ActionGuide2 } from "@/components/atoms/ActionGuide";
 import CheckOvalIcon from "@/public/icons/CheckOvalIcon";
+import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
 
 let human: any = undefined;
 
@@ -48,6 +49,7 @@ const RevokeMekari = () => {
   const actionList = useSelector(
     (state: RootState) => state.liveness.actionList
   );
+  const themeConfiguration = useSelector((state: RootState) => state.theme);
   const images = useSelector((state: RootState) => state.liveness.images);
   const isDone = useSelector((state: RootState) => state.liveness.isDone);
 
@@ -79,6 +81,9 @@ const RevokeMekari = () => {
       toastId: "generateAction",
       isLoading: true,
       position: "top-center",
+      style: {
+        backgroundColor: themeConfiguration?.data.toastColor as string,
+      },
     });
 
     const body = {
@@ -296,6 +301,9 @@ const RevokeMekari = () => {
         toastId: "load",
         isLoading: true,
         position: "top-center",
+        style: {
+          backgroundColor: themeConfiguration?.data.toastColor as string,
+        },
       });
       setIsDisabled(true);
     } else if (humanDone && isClicked) {
@@ -330,7 +338,12 @@ const RevokeMekari = () => {
     return <Guide setIsClicked={setIsClicked} isDisabled={isDisabled} />;
 
   return (
-    <>
+    <div style={{
+      backgroundColor: themeConfigurationAvaliabilityChecker(
+        themeConfiguration?.data.background as string,
+        "BG"
+      ),
+    }}>
       <Head>
         <title>Liveness</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
@@ -405,7 +418,7 @@ const RevokeMekari = () => {
         <Footer />
         <UnsupportedDeviceModal />
       </div>
-    </>
+    </div>
   );
 };
 

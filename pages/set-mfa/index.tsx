@@ -1,21 +1,23 @@
+import Button from "@/components/atoms/Button";
 import Footer from "@/components/Footer";
 import FRCamera from "@/components/FRCamera";
 import InfoIcon from "@/public/icons/InfoIcon";
 import XIcon from "@/public/icons/XIcon";
-import { AppDispatch } from "@/redux/app/store";
+import { AppDispatch, RootState } from "@/redux/app/store";
 import { resetInitalState } from "@/redux/slices/loginSlice";
 import {
   getFRFailedCount,
   setFRFailedCount,
 } from "@/utils/frFailedCountGetterSetter";
 import { handleRoute } from "@/utils/handleRoute";
+import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
 import i18n from "i18";
 import { getUserName, restSetDefaultMFA } from "infrastructure/rest/b2b";
 import { RestPersonalFaceRecognitionV2 } from "infrastructure/rest/personal";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 
 type IModalFR = {
@@ -41,6 +43,8 @@ const SetMfa = () => {
   const [mfaMethod, setMfaMethod] = useState<"fr" | "otp" | null>(null);
   const [defaultMfa, setDefaultMfa] = useState<"fr" | "otp">("fr");
   const [isShowPage, setIsShowpage] = useState<boolean>(false)
+
+  const themeConfiguration = useSelector((state: RootState) => state.theme);
 
   const handleFormOnChange = (e: React.FormEvent<HTMLInputElement>): void => {
     setMfaMethod(e.currentTarget.value as "fr" | "otp");
@@ -91,6 +95,9 @@ const SetMfa = () => {
           type: "info",
           toastId: "info",
           position: "top-center",
+          style: {
+            backgroundColor: themeConfiguration?.data.toastColor as string,
+          },
         });
         setIsShowOtpModalConfirmation(false);
       }
@@ -135,7 +142,11 @@ const SetMfa = () => {
   }, [router.isReady]);
 
   return isShowPage && (
-    <>
+    <div style={{
+      backgroundColor: themeConfigurationAvaliabilityChecker(
+        themeConfiguration?.data.background as string, "BG"
+      ),
+    }} >
       <Head>
         <title>Setting MFA</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
@@ -202,20 +213,32 @@ const SetMfa = () => {
             </p>
           </label>
         </div>
-        <div className="poppins-regular justify-center flex-col-reverse md:flex-row flex gap-3 md:justify-end mt-10">
-          <button
+        <div className="justify-center flex-col-reverse md:flex-row flex gap-3 md:justify-end mt-10">
+          <Button
             onClick={() => setMfaMethod(defaultMfa)}
-            className="text-primary font-semibold"
+            className="mx-0"
+            size="none"
+            style={{
+              color: themeConfigurationAvaliabilityChecker(
+                themeConfiguration?.data.actionFontColor as string
+              ),
+            }}
           >
             Batal
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => onClickHandler("confirmation")}
             disabled={defaultMfa === mfaMethod}
-            className="bg-primary disabled:opacity-40 text-white w-fit mx-auto md:mx-0 px-4 py-2 rounded"
+            size="lg"
+            className="py-2 mx-0"
+            style={{
+              backgroundColor: themeConfigurationAvaliabilityChecker(
+                themeConfiguration?.data.buttonColor as string
+              ),
+            }}
           >
             Ubah Metode Otentikasi
-          </button>
+          </Button>
         </div>
         <FRModal
           isShowModalFr={isShowModalFr}
@@ -229,7 +252,7 @@ const SetMfa = () => {
         />
       </div>
       <Footer />
-    </>
+    </div>
   );
 };
 

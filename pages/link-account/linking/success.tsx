@@ -11,6 +11,11 @@ import { serverSideRenderReturnConditions } from "@/utils/serverSideRenderReturn
 import { concateRedirectUrlParams } from "@/utils/concateRedirectUrlParams";
 import i18n from "i18";
 import { RestKycCheckStepv2 } from "infrastructure/rest/personal";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/app/store";
+import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
+import Footer from "@/components/Footer";
+import { buttonVariants } from "@/components/atoms/Button";
 
 type Props = {};
 
@@ -27,6 +32,8 @@ const LinkAccountSuccess = (props: Props) => {
   );
 
   const { t }: any = i18n;
+
+  const themeConfiguration = useSelector((state: RootState) => state.theme);
 
   useEffect(() => {
     if (!routerIsReady) return;
@@ -112,7 +119,15 @@ const LinkAccountSuccess = (props: Props) => {
   }, [isSigning, routerIsReady]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <div className="px-10 pt-16 pb-9 text-center">
+    <div
+      style={{
+        backgroundColor: themeConfigurationAvaliabilityChecker(
+          themeConfiguration?.data.background as string,
+          "BG"
+        ),
+      }}
+      className="px-10 pt-16 pb-9 text-center h-screen"
+    >
       <p className="text-base poppins-semibold text-neutral800">
         {t("linkAccountSuccessTitle")}
       </p>
@@ -131,19 +146,24 @@ const LinkAccountSuccess = (props: Props) => {
       </div>
       {!isSigning && redirectUrl && (
         <div className="mt-20 text-primary text-base poppins-medium underline hover:cursor-pointer">
-          <a href={concateRedirectUrlParams(redirectUrl, "")}>
+          <a
+            style={{
+              color: themeConfigurationAvaliabilityChecker(
+                themeConfiguration?.data.actionFontColor as string
+              ),
+            }}
+            className={buttonVariants({
+              variant: "link",
+              size: "none",
+              className: "font-medium",
+            })}
+            href={concateRedirectUrlParams(redirectUrl, "")}
+          >
             <a>{t("livenessSuccessButtonTitle")}</a>
           </a>
         </div>
       )}
-      <div className="mt-11 flex justify-center">
-        <Image
-          src={`${assetPrefix}/images/poweredByTilaka.svg`}
-          alt="powered-by-tilaka"
-          width="80px"
-          height="41.27px"
-        />
-      </div>
+      <Footer />
     </div>
   );
 };

@@ -12,6 +12,11 @@ import { assetPrefix } from "../../next.config";
 import { handleRoute } from "./../../utils/handleRoute";
 import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
 import { RestKycCheckStep } from "infrastructure";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/app/store";
+import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
+import Footer from "@/components/Footer";
+import { buttonVariants } from "@/components/atoms/Button";
 
 type Props = {};
 
@@ -23,6 +28,8 @@ const SettingSignatureSuccess = (props: Props) => {
     redirect_url?: string;
   } = router.query;
   const isSigning: boolean = routerQuery.signing === "1";
+
+  const themeConfiguration = useSelector((state: RootState) => state.theme);
 
   const { t }: any = i18n;
 
@@ -38,10 +45,18 @@ const SettingSignatureSuccess = (props: Props) => {
         });
       }, 1000);
     }
-  }, [isSigning, routerIsReady]);  // eslint-disable-line react-hooks/exhaustive-deps
+  }, [isSigning, routerIsReady]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <div className="px-10 pt-16 pb-9 text-center">
+    <div
+      style={{
+        backgroundColor: themeConfigurationAvaliabilityChecker(
+          themeConfiguration?.data.background as string,
+          "BG"
+        ),
+      }}
+      className="px-10 pt-16 h-screen pb-9 text-center"
+    >
       <p className="text-base poppins-semibold text-neutral800">
         {t("settingSignatureSuccessTitle")}
       </p>
@@ -54,20 +69,23 @@ const SettingSignatureSuccess = (props: Props) => {
         />
       </div>
       {!isSigning && routerQuery.redirect_url && (
-        <div className="mt-20 text-primary text-base poppins-medium underline hover:cursor-pointer">
-          <a href={concateRedirectUrlParams(routerQuery.redirect_url, "")}>
-            <p>{t("settingSignatureSuccessButton")}</p>
-          </a>
-        </div>
+        <a
+          style={{
+            color: themeConfigurationAvaliabilityChecker(
+              themeConfiguration?.data.actionFontColor as string
+            ),
+          }}
+          className={buttonVariants({
+            variant: "link",
+            size: "none",
+            className: "font-medium mt-20",
+          })}
+          href={concateRedirectUrlParams(routerQuery.redirect_url, "")}
+        >
+          <p>{t("settingSignatureSuccessButton")}</p>
+        </a>
       )}
-      <div className="mt-11 flex justify-center">
-        <Image
-          src={`${assetPrefix}/images/poweredByTilaka.svg`}
-          alt="powered-by-tilaka"
-          width="80px"
-          height="41.27px"
-        />
-      </div>
+      <Footer />
     </div>
   );
 };

@@ -16,6 +16,9 @@ import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
 import { serverSideRenderReturnConditions } from "@/utils/serverSideRenderReturnConditions";
 import i18n from "i18";
 import { RestKycCheckStepv2 } from "infrastructure/rest/personal";
+import Button, { buttonVariants } from "@/components/atoms/Button";
+import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
+import Footer from "@/components/Footer";
 
 function CertificateInformation({}: Props) {
   const dispatch: AppDispatch = useDispatch();
@@ -23,6 +26,8 @@ function CertificateInformation({}: Props) {
   const router = useRouter();
   const { company_id } = router.query;
   const { t }: any = i18n;
+
+  const themeConfiguration = useSelector((state: RootState) => state.theme);
 
   const getRegisteredCertificate = () => {
     const body = {
@@ -110,77 +115,104 @@ function CertificateInformation({}: Props) {
       });
   };
   return (
-    <div className="bg-white p-4 poppins-regular max-w-md mx-auto">
-      <div className="flex justify-center">
-        <img src="images/certInfo.svg" alt="ill" />
-      </div>
-      <p className="text-sm text-neutral800">{t("certificateSubtitle")}</p>
-      <div className="mt-5">
-        <div className="flex items-center">
-          <p className="text-sm text-neutral800 font-normal w-24 pr-2">
-            {t("country")}
-          </p>
-          <p className="text-sm text-neutral800 font-medium">
-            {certificate.negara}
-          </p>
+    <div
+      style={{
+        backgroundColor: themeConfigurationAvaliabilityChecker(
+          themeConfiguration?.data.background as string
+        ),
+      }}
+    >
+      <div className="bg-white p-4 poppins-regular max-w-md mx-auto">
+        <div className="flex justify-center">
+          <img src="images/certInfo.svg" alt="ill" />
         </div>
-        <div className="flex items-center">
-          <p className="text-sm text-neutral800 font-normal w-24 pr-2">
-            {t("name")}
-          </p>
-          <p className="text-sm text-neutral800 font-medium">
-            {certificate.nama}
-          </p>
+        <p className="text-sm text-neutral800">{t("certificateSubtitle")}</p>
+        <div className="mt-5">
+          <div className="flex items-center">
+            <p className="text-sm text-neutral800 font-normal w-24 pr-2">
+              {t("country")}
+            </p>
+            <p className="text-sm text-neutral800 font-medium">
+              {certificate.negara}
+            </p>
+          </div>
+          <div className="flex items-center">
+            <p className="text-sm text-neutral800 font-normal w-24 pr-2">
+              {t("name")}
+            </p>
+            <p className="text-sm text-neutral800 font-medium">
+              {certificate.nama}
+            </p>
+          </div>
+          <div className="flex items-center">
+            <p className="text-sm text-neutral800 font-normal w-24 pr-2">
+              {t("organization")}
+            </p>
+            <p className="text-sm text-neutral800 font-medium">
+              {certificate.organisasi}
+            </p>
+          </div>
+          <div className="flex items-center">
+            <p className="text-sm text-neutral800 font-normal w-24 pr-2">
+              Email
+            </p>
+            <p className="text-sm text-neutral800 font-medium">
+              {certificate.emailAddress}
+            </p>
+          </div>
         </div>
-        <div className="flex items-center">
-          <p className="text-sm text-neutral800 font-normal w-24 pr-2">
-            {t("organization")}
+        {i18n.language == "en" ? (
+          <p className="text-xs text-neutral800 mt-4 font-normal text-justify">
+            <span className="font-semibold">
+              If there is no complaint filed within nine days,
+            </span>{" "}
+            user is deemed to have accepted that all the information in the
+            certificate is correct.
           </p>
-          <p className="text-sm text-neutral800 font-medium">
-            {certificate.organisasi}
+        ) : (
+          <p className="text-xs text-neutral800 mt-4 font-normal text-justify">
+            Apabila dalam jangka waktu{" "}
+            <span className="font-semibold">
+              sembilan hari kalender tidak ada keluhan,
+            </span>{" "}
+            maka pelanggan dianggap telah menerima bahwa semua informasi yang
+            terdapat dalam sertifikat adalah benar.
           </p>
-        </div>
-        <div className="flex items-center">
-          <p className="text-sm text-neutral800 font-normal w-24 pr-2">Email</p>
-          <p className="text-sm text-neutral800 font-medium">
-            {certificate.emailAddress}
-          </p>
-        </div>
-      </div>
-      {i18n.language == "en" ? (
-        <p className="text-xs text-neutral800 mt-4 font-normal text-justify">
-          <span className="font-semibold">
-            If there is no complaint filed within nine days,
-          </span>{" "}
-          user is deemed to have accepted that all the information in the
-          certificate is correct.
-        </p>
-      ) : (
-        <p className="text-xs text-neutral800 mt-4 font-normal text-justify">
-          Apabila dalam jangka waktu{" "}
-          <span className="font-semibold">
-            sembilan hari kalender tidak ada keluhan,
-          </span>{" "}
-          maka pelanggan dianggap telah menerima bahwa semua informasi yang
-          terdapat dalam sertifikat adalah benar.
-        </p>
-      )}
-      <button
-        onClick={(e) => handleConfirm(e)}
-        className="mt-8 p-2.5 uppercase text-base text-white bg-primary w-48 block mx-auto font-medium rounded-sm"
-      >
-        {t("confirmCertif")}
-      </button>
-      <a
-        target="_blank"
-        rel="noreferrer"
-        href="https://cantikatnt.atlassian.net/servicedesk/customer/portal/2/group/8/create/27"
-        className="mt-4 p-2.5 uppercase text-base text-primary bg-white w-48 block mx-auto font-medium rounded-sm border border-primary text-center"
-      >
-        {t("complain")}
-      </a>
-      <div className="mt-8 flex justify-center">
-        <img src="images/poweredByTilaka.svg" alt="powered-by-tilaka" />
+        )}
+        <Button
+          size="full"
+          onClick={(e) => handleConfirm(e)}
+          className="mt-8 p-2.5 uppercase text-base font-medium"
+          style={{
+            backgroundColor: themeConfigurationAvaliabilityChecker(
+              themeConfiguration?.data.buttonColor as string
+            ),
+          }}
+        >
+          {t("confirmCertif")}
+        </Button>
+        <a
+          target="_blank"
+          rel="noreferrer"
+          href="https://cantikatnt.atlassian.net/servicedesk/customer/portal/2/group/8/create/27"
+          style={{
+            color: themeConfigurationAvaliabilityChecker(
+              themeConfiguration?.data.buttonColor as string
+            ),
+            borderColor: themeConfigurationAvaliabilityChecker(
+              themeConfiguration?.data.buttonColor as string
+            ),
+          }}
+          className={buttonVariants({
+            variant: "link",
+            size: "full",
+            className:
+              "font-medium inline-block uppercase  text-center mt-4 p-2.5 border",
+          })}
+        >
+          {t("complain")}
+        </a>
+        <Footer />
       </div>
     </div>
   );

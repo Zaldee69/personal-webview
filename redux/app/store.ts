@@ -12,6 +12,7 @@ import signatureSlice, {
 import livenessSlice, {
   initialStateLivenessSlice,
 } from "../slices/livenessSlice";
+import themeSlice, { intialStateThemeSlice } from "../slices/themeSlice";
 
 export const store = configureStore({
   reducer: {
@@ -20,6 +21,7 @@ export const store = configureStore({
     certificate: certificateSlice,
     signature: signatureSlice,
     liveness: livenessSlice,
+    theme: themeSlice,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -30,7 +32,7 @@ export const store = configureStore({
     document: initialStateDocumentSlice,
     liveness: initialStateLivenessSlice,
     login: initialStateLoginSlice,
-    signature: initialStateSignatureSlice,
+    theme: intialStateThemeSlice,
   },
 });
 

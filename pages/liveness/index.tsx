@@ -29,11 +29,11 @@ import Initializing from "@/components/atoms/Initializing";
 import { ActionGuide1, ActionGuide2 } from "@/components/atoms/ActionGuide";
 import { actionText } from "@/utils/actionText";
 import { assetPrefix } from "next.config";
-import ImageDebugger from "@/components/ImageDebugger";
 import { GetServerSideProps } from "next";
 import { RestKycCheckStepv2 } from "infrastructure/rest/personal";
 import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
 import { serverSideRenderReturnConditions } from "@/utils/serverSideRenderReturnConditions";
+import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
 
 type TQueryParams = {
   request_id?: string;
@@ -66,6 +66,8 @@ const Liveness = () => {
   );
   const images = useSelector((state: RootState) => state.liveness.images);
   const isDone = useSelector((state: RootState) => state.liveness.isDone);
+  const themeConfiguration = useSelector((state: RootState) => state.theme);
+
   const { t }: any = i18n;
 
   const currentIndex =
@@ -107,6 +109,9 @@ const Liveness = () => {
       toastId: "generateAction",
       isLoading: true,
       position: "top-center",
+      style: {
+        backgroundColor: themeConfiguration?.data.toastColor as string,
+      },
     });
     RestKycCheckStep({
       payload: { registerId: routerQuery.request_id as string },
@@ -591,6 +596,9 @@ const Liveness = () => {
         toastId: "load",
         isLoading: true,
         position: "top-center",
+        style: {
+          backgroundColor: themeConfiguration?.data.toastColor as string,
+        },
       });
       setIsDisabled(true);
     } else if (humanDone && isClicked) {
@@ -609,8 +617,14 @@ const Liveness = () => {
     return <Guide setIsClicked={setIsClicked} isDisabled={isDisabled} />;
 
   return (
-    <>
-      {/* <ImageDebugger/> */}
+    <div
+      style={{
+        backgroundColor: themeConfigurationAvaliabilityChecker(
+          themeConfiguration?.data.background as string,
+          "BG"
+        ),
+      }}
+    >
       <Head>
         <title>Liveness</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
@@ -685,16 +699,16 @@ const Liveness = () => {
         <Footer />
         <UnsupportedDeviceModal />
       </div>
-    </>
+    </div>
   );
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const cQuery = context.query;
-  const isNotRedirect: boolean = true
+  const isNotRedirect: boolean = true;
   const uuid =
     cQuery.transaction_id || cQuery.request_id || cQuery.registration_id;
-    
+
   const checkStepResult: {
     res?: TKycCheckStepResponseData;
     err?: {
@@ -710,13 +724,17 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     registerId: uuid as string,
   })
     .then((res) => {
-      return {res}
+      return { res };
     })
     .catch((err) => {
-      return {err}
+      return { err };
     });
 
-  return serverSideRenderReturnConditions({ context, checkStepResult, isNotRedirect });
+  return serverSideRenderReturnConditions({
+    context,
+    checkStepResult,
+    isNotRedirect,
+  });
 };
 
 export default Liveness;

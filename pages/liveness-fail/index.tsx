@@ -6,8 +6,8 @@ import Footer from "../../components/Footer";
 import i18n from "i18";
 import { useRouter } from "next/router";
 import { assetPrefix } from "../../next.config";
-import { AppDispatch } from "@/redux/app/store";
-import { useDispatch } from "react-redux";
+import { AppDispatch, RootState } from "@/redux/app/store";
+import { useDispatch, useSelector } from "react-redux";
 import { setIsDone } from "@/redux/slices/livenessSlice";
 import { handleRoute } from "@/utils/handleRoute";
 import { GetServerSideProps } from "next";
@@ -15,11 +15,15 @@ import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
 import { serverSideRenderReturnConditions } from "@/utils/serverSideRenderReturnConditions";
 import { concateRedirectUrlParams } from "@/utils/concateRedirectUrlParams";
 import { RestKycCheckStepv2 } from "infrastructure/rest/personal";
+import Button from "@/components/atoms/Button";
+import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
 
 const LivenessFail = () => {
   const router = useRouter();
   const [gagalCounter, setGagalCounter] = useState(0);
   const dispatch: AppDispatch = useDispatch();
+
+  const themeConfiguration = useSelector((state: RootState) => state.theme);
 
   const { t }: any = i18n;
 
@@ -67,20 +71,36 @@ const LivenessFail = () => {
     } else {
       return (
         <Link
+          passHref
           href={{
             pathname: setPathName(router.query),
             query: { ...router.query },
           }}
         >
-          <button className="bg-primary btn md:mx-auto md:block md:w-1/4 text-white poppins-regular w-full mx-auto rounded-sm h-9">
+          <Button
+            size="sm"
+            style={{
+              backgroundColor: themeConfigurationAvaliabilityChecker(
+                themeConfiguration?.data.buttonColor as string
+              ),
+            }}
+          >
             {t("livenessFailedButtonTitle")}
-          </button>
+          </Button>
         </Link>
       );
     }
   };
   return (
-    <>
+    <div
+      className="h-full"
+      style={{
+        backgroundColor: themeConfigurationAvaliabilityChecker(
+          themeConfiguration?.data.background as string,
+          "BG"
+        ),
+      }}
+    >
       <Head>
         <title>Liveness</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
@@ -94,6 +114,7 @@ const LivenessFail = () => {
             src={`${assetPrefix}/images/livenessFail.svg`}
             width={200}
             height={200}
+            alt="liveness-fal"
           />
           <div className="flex flex-col gap-10 ">
             <span className="text-center poppins-regular text-neutral ">
@@ -104,9 +125,9 @@ const LivenessFail = () => {
           </div>
           <RedirectButton />
         </div>
-        <Footer />
+        <Footer  />
       </div>
-    </>
+    </div>
   );
 };
 
@@ -114,27 +135,27 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const cQuery = context.query;
   const uuid =
     cQuery.transaction_id || cQuery.request_id || cQuery.registration_id;
- 
-    const checkStepResult: {
-      res?: TKycCheckStepResponseData;
-      err?: {
-        response: {
-          data: {
-            success: boolean;
-            message: string;
-            data: { errors: string[] };
-          };
+
+  const checkStepResult: {
+    res?: TKycCheckStepResponseData;
+    err?: {
+      response: {
+        data: {
+          success: boolean;
+          message: string;
+          data: { errors: string[] };
         };
       };
-    } = await RestKycCheckStepv2({
-      registerId: uuid as string,
+    };
+  } = await RestKycCheckStepv2({
+    registerId: uuid as string,
+  })
+    .then((res) => {
+      return { res };
     })
-      .then((res) => {
-        return {res}
-      })
-      .catch((err) => {
-        return {err}
-      });
+    .catch((err) => {
+      return { err };
+    });
 
   return serverSideRenderReturnConditions({ context, checkStepResult });
 };

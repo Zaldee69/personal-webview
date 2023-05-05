@@ -16,6 +16,10 @@ import i18n from "i18";
 import { RestPersonalPManualReg } from "infrastructure";
 import { TPersonalPManualRegRequestData } from "infrastructure/rest/personal/types";
 import XIcon from "@/public/icons/XIcon";
+import Button from "@/components/atoms/Button";
+import { RootState } from "@/redux/app/store";
+import { useSelector } from "react-redux";
+import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
 
 type TForm = {
   nik: string;
@@ -36,10 +40,11 @@ type TModal = {
 
 const Index = () => {
   const router = useRouter();
-  const { request_id, ...restRouterQuery } = router.query
+  const { request_id, ...restRouterQuery } = router.query;
   const { t }: any = i18n;
   const fileFotoKtpRef = useRef<HTMLInputElement>(null);
   const fileFotoSelfieRef = useRef<HTMLInputElement>(null);
+  const themeConfiguration = useSelector((state: RootState) => state.theme);
 
   const [form, setForm] = useState<TForm>({
     nik: "",
@@ -78,12 +83,10 @@ const Index = () => {
     const { value, name, files } = e.target;
     let isEligibleFileType: boolean = true;
     const file: File = files?.[0] as File;
-    if(name === "photo_ktp" || name === "photo_selfie"){
+    if (name === "photo_ktp" || name === "photo_selfie") {
       const fileType = ["jpg", "jpeg", "png"];
-      isEligibleFileType = fileType.some((el) =>
-        file?.name.includes(el)
-      );
-  
+      isEligibleFileType = fileType.some((el) => file?.name.includes(el));
+
       if (isEligibleFileType) {
         const { width, height } = (await resolutionChecker(file)) as any;
         isErrorImage =
@@ -91,7 +94,6 @@ const Index = () => {
           ((height < 200 || width < 200) && name === "photo_selfie");
       }
     }
-
 
     const ref = {
       fileFotoKtpRef,
@@ -112,8 +114,10 @@ const Index = () => {
         [name]:
           name === "photo_ktp" || name === "photo_selfie"
             ? await fileToBase64(file)
-            : name === "nik" ?  value.replace(/[^0-9]/g, "")
-            : name === "email" ? value.replace(/\s/g, "")
+            : name === "nik"
+            ? value.replace(/[^0-9]/g, "")
+            : name === "email"
+            ? value.replace(/\s/g, "")
             : value.trimStart(),
       });
       setErrorMessage({
@@ -157,10 +161,9 @@ const Index = () => {
     setErrorMessage({
       ...errorMessage,
       photo_ktp:
-        (form.photo_ktp.length < 1 &&
-          t("manualForm.photoKtp.errorMessage1")) ||
+        (form.photo_ktp.length < 1 && t("manualForm.photoKtp.errorMessage1")) ||
         errorMessage.photo_ktp,
-        photo_selfie:
+      photo_selfie:
         (form.photo_selfie.length < 1 &&
           t("manualForm.photoSelfie.errorMessage1")) ||
         errorMessage.photo_selfie,
@@ -170,19 +173,19 @@ const Index = () => {
       const formReq: TPersonalPManualRegRequestData = {
         ...form,
         register_id: request_id as string,
-      }
-      const res = await RestPersonalPManualReg(formReq)
-      if(!res.success){
-        return toast.error(res.message || "gagal", { icon: <XIcon/> })
+      };
+      const res = await RestPersonalPManualReg(formReq);
+      if (!res.success) {
+        return toast.error(res.message || "gagal", { icon: <XIcon /> });
       }
 
       const query: any = {
         ...restRouterQuery,
         request_id,
         token: res.token,
-      }
+      };
 
-      if(res.channel_type === "REGULAR"){
+      if (res.channel_type === "REGULAR") {
         router.push({
           pathname: handleRoute("manual-form/final"),
           query,
@@ -193,17 +196,16 @@ const Index = () => {
           query: { ...router.query },
         });
       }
-
-    } catch (err: any){
+    } catch (err: any) {
       if (err.response?.data?.data?.errors?.[0]) {
         toast.error(
-            `${err.response?.data?.message}, ${err.response?.data?.data?.errors?.[0]}`,
-            { icon: <XIcon /> }
+          `${err.response?.data?.message}, ${err.response?.data?.data?.errors?.[0]}`,
+          { icon: <XIcon /> }
         );
       } else {
-      toast.error(err.response?.data?.message || "gagal", {
+        toast.error(err.response?.data?.message || "gagal", {
           icon: <XIcon />,
-      });
+        });
       }
     }
   };
@@ -220,6 +222,11 @@ const Index = () => {
   };
 
   return (
+    <div style={{
+      backgroundColor: themeConfigurationAvaliabilityChecker(
+        themeConfiguration?.data.background as string, "BG"
+      ),
+    }} >
     <div className="px-5 pt-8 max-w-md poppins-regular mx-auto">
       <h1 className="text-lg font-bold">{t("manualForm.title")}</h1>
       <form onSubmit={onsubmitHandler}>
@@ -270,12 +277,18 @@ const Index = () => {
           inputRef={fileFotoSelfieRef}
           showMaxResolution
         />
-        <button
+        <Button
           type="submit"
-          className="bg-primary btn font-semibold text-white block mx-auto w-fit px-6 poppins-regular mb-5 mt-7 rounded-md h-10 hover:opacity-50"
+          size="sm"
+          className="bg-primary btn font-semibold mt-7 h-9 hover:opacity-50"
+          style={{
+            backgroundColor: themeConfigurationAvaliabilityChecker(
+              themeConfiguration?.data.buttonColor as string
+            ),
+          }}
         >
           {t("send")}
-        </button>
+        </Button>
       </form>
       <PhotoKtpTermModal fileFotoKtpRef={fileFotoKtpRef} show={modal.show} />
       <PhotoSelfieTermModal
@@ -284,11 +297,13 @@ const Index = () => {
       />
       <Footer />
     </div>
+  </div>
   );
 };
 
 const PhotoKtpTermModal = ({ show, fileFotoKtpRef }: TModal) => {
   const { t }: any = i18n;
+  const themeConfiguration = useSelector((state: RootState) => state.theme);
 
   useEffect(() => {
     if (show.ktp) {
@@ -317,13 +332,19 @@ const PhotoKtpTermModal = ({ show, fileFotoKtpRef }: TModal) => {
           <li className="mt-2">{t("manualForm.photoKtp.term2")}</li>
           <li className="mt-2">{t("manualForm.photoKtp.term3")}</li>
         </ul>
-        <button
-          onClick={() => fileFotoKtpRef?.current?.click()}
+        <Button
           type="button"
-          className="bg-primary btn font-semibold text-white block ml-auto w-fit px-6 poppins-regular mb-5 mt-7 rounded-md h-10 hover:opacity-50"
+          className="font-semibold mt-7 h-9 flex mr-0"
+          size="lg"
+          style={{
+            backgroundColor: themeConfigurationAvaliabilityChecker(
+              themeConfiguration?.data.buttonColor as string
+            ),
+          }}
+          onClick={() => fileFotoKtpRef?.current?.click()}
         >
           {t("upload")}
-        </button>
+        </Button>
       </div>
     </ModalLayout>
   ) : null;
@@ -331,6 +352,7 @@ const PhotoKtpTermModal = ({ show, fileFotoKtpRef }: TModal) => {
 
 const PhotoSelfieTermModal = ({ show, fileFotoSelfieRef }: TModal) => {
   const { t }: any = i18n;
+  const themeConfiguration = useSelector((state: RootState) => state.theme);
 
   useEffect(() => {
     if (show.selfie) {
@@ -367,13 +389,19 @@ const PhotoSelfieTermModal = ({ show, fileFotoSelfieRef }: TModal) => {
             <li className="mt-2">{t("manualForm.photoSelfie.term3")}</li>
             <li className="mt-2">{t("manualForm.photoSelfie.term4")}</li>
           </ul>
-          <button
-            onClick={() => fileFotoSelfieRef?.current?.click()}
+          <Button
             type="button"
-            className="bg-primary btn font-semibold text-white block ml-auto w-fit px-6 poppins-regular mb-5 mt-7 rounded-md h-10 hover:opacity-50"
+            className="font-semibold mt-7 h-9 flex mr-0"
+            size="lg"
+            style={{
+              backgroundColor: themeConfigurationAvaliabilityChecker(
+                themeConfiguration?.data.buttonColor as string
+              ),
+            }}
+            onClick={() => fileFotoSelfieRef?.current?.click()}
           >
             {t("upload")}
-          </button>
+          </Button>
         </div>
       </div>
     </div>
