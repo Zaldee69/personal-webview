@@ -447,7 +447,7 @@ const SigningSuccess = () => {
     <div className="px-10 pt-16 pb-9 text-center flex flex-col justify-center min-h-screen">
       <div>
         <p className="font-poppins text-lg font-semibold text-neutral800">
-          {t("signSuccess")}
+          {t("authenticationSuccessTitle")}
         </p>
         <div className="mt-3">
           <Image
@@ -456,6 +456,11 @@ const SigningSuccess = () => {
             height="196px"
             alt="signing-success-ill"
           />
+        </div>
+        <div className="mt-3">
+          <p className="font-poppins text-sm whitespace-pre-line text-neutral800">
+            {t("authenticationSuccessSubtitle")}
+          </p>
         </div>
       </div>
       <div className="mt-32">
