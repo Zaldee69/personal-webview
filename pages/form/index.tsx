@@ -176,8 +176,8 @@ const Form: React.FC = () => {
           if (res.data.reason_code) {
             query.reason_code = res.data.reason_code;
 
-            if ((res.data.reason_code === "1")) {
-             return router.replace({
+            if (res.data.reason_code === "1") {
+              return router.replace({
                 pathname: handleRoute("liveness-failure"),
                 query,
               });
@@ -324,7 +324,7 @@ const Form: React.FC = () => {
         <title>{t("finalFormTitle")}</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
-      <div className="px-5 pt-8 sm:w-full md:w-4/5 mx-auto">
+      <div className="px-5 pt-8 max-w-md mx-auto">
         <h1 className="font-poppins font-semibold text-xl">
           {t("finalFormTitle")}
         </h1>

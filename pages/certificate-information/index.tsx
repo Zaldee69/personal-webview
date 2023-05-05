@@ -14,7 +14,7 @@ import { handleRoute } from "@/utils/handleRoute";
 import { GetServerSideProps } from "next";
 import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
 import { serverSideRenderReturnConditions } from "@/utils/serverSideRenderReturnConditions";
-import i18n from "i18"
+import i18n from "i18";
 import { RestKycCheckStepv2 } from "infrastructure/rest/personal";
 
 function CertificateInformation({}: Props) {
@@ -22,8 +22,8 @@ function CertificateInformation({}: Props) {
   const { certificate } = useSelector((state: RootState) => state.certificate);
   const router = useRouter();
   const { company_id } = router.query;
-  const {t}: any = i18n
-  
+  const { t }: any = i18n;
+
   const getRegisteredCertificate = () => {
     const body = {
       company_id: company_id as string,
@@ -44,13 +44,13 @@ function CertificateInformation({}: Props) {
               query: { ...router.query },
             });
             break;
-          
+
           default:
             toast("Gagal mengecek sertifikat", {
               type: "error",
               toastId: "error",
               position: "top-center",
-            }); 
+            });
             break;
         }
       });
@@ -89,7 +89,7 @@ function CertificateInformation({}: Props) {
           });
         }
       })
-      .catch((err) => { 
+      .catch((err) => {
         switch (err.response.status) {
           case 401:
             // unauthorized
@@ -98,43 +98,43 @@ function CertificateInformation({}: Props) {
               query: { ...router.query },
             });
             break;
-          
+
           default:
             toast("Gagal mengecek sertifikat", {
               type: "error",
               toastId: "error",
               position: "top-center",
-            }); 
+            });
             break;
         }
       });
   };
   return (
-    <div className="bg-white p-4 poppins-regular">
+    <div className="bg-white p-4 poppins-regular max-w-md mx-auto">
       <div className="flex justify-center">
         <img src="images/certInfo.svg" alt="ill" />
       </div>
-      <p className="text-sm text-neutral800">
-        {t("certificateSubtitle")}
-      </p>
+      <p className="text-sm text-neutral800">{t("certificateSubtitle")}</p>
       <div className="mt-5">
         <div className="flex items-center">
           <p className="text-sm text-neutral800 font-normal w-24 pr-2">
-          {t("country")}
+            {t("country")}
           </p>
           <p className="text-sm text-neutral800 font-medium">
             {certificate.negara}
           </p>
         </div>
         <div className="flex items-center">
-          <p className="text-sm text-neutral800 font-normal w-24 pr-2">{t("name")}</p>
+          <p className="text-sm text-neutral800 font-normal w-24 pr-2">
+            {t("name")}
+          </p>
           <p className="text-sm text-neutral800 font-medium">
             {certificate.nama}
           </p>
         </div>
         <div className="flex items-center">
           <p className="text-sm text-neutral800 font-normal w-24 pr-2">
-          {t("organization")}
+            {t("organization")}
           </p>
           <p className="text-sm text-neutral800 font-medium">
             {certificate.organisasi}
@@ -147,25 +147,24 @@ function CertificateInformation({}: Props) {
           </p>
         </div>
       </div>
-      {
-        i18n.language == "en" ? (
-          <p className="text-xs text-neutral800 mt-4 font-normal text-justify">
-        <span className="font-semibold">
-        If there is no complaint filed within nine days,
-        </span>{" "}
-        user is deemed to have accepted that all the information in the certificate is correct.
-      </p>
-        ) : (
-          <p className="text-xs text-neutral800 mt-4 font-normal text-justify">
-        Apabila dalam jangka waktu{" "}
-        <span className="font-semibold">
-          sembilan hari kalender tidak ada keluhan,
-        </span>{" "}
-        maka pelanggan dianggap telah menerima bahwa semua informasi yang
-        terdapat dalam sertifikat adalah benar.
-      </p>
-        )
-      }
+      {i18n.language == "en" ? (
+        <p className="text-xs text-neutral800 mt-4 font-normal text-justify">
+          <span className="font-semibold">
+            If there is no complaint filed within nine days,
+          </span>{" "}
+          user is deemed to have accepted that all the information in the
+          certificate is correct.
+        </p>
+      ) : (
+        <p className="text-xs text-neutral800 mt-4 font-normal text-justify">
+          Apabila dalam jangka waktu{" "}
+          <span className="font-semibold">
+            sembilan hari kalender tidak ada keluhan,
+          </span>{" "}
+          maka pelanggan dianggap telah menerima bahwa semua informasi yang
+          terdapat dalam sertifikat adalah benar.
+        </p>
+      )}
       <button
         onClick={(e) => handleConfirm(e)}
         className="mt-8 p-2.5 uppercase text-base text-white bg-primary w-full font-medium rounded-sm"
@@ -189,7 +188,7 @@ function CertificateInformation({}: Props) {
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const cQuery = context.query;
-  const isNotRedirect: boolean = true
+  const isNotRedirect: boolean = true;
   const uuid =
     cQuery.transaction_id || cQuery.request_id || cQuery.registration_id;
 
@@ -208,13 +207,17 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     registerId: uuid as string,
   })
     .then((res) => {
-      return {res}
+      return { res };
     })
     .catch((err) => {
-      return {err}
+      return { err };
     });
 
-  return serverSideRenderReturnConditions({ context, checkStepResult, isNotRedirect });
+  return serverSideRenderReturnConditions({
+    context,
+    checkStepResult,
+    isNotRedirect,
+  });
 };
 
 export default CertificateInformation;

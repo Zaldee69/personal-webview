@@ -202,7 +202,7 @@ const SettingSignature = ({}: Props) => {
         <title>{t("settingSignatureTitle")}</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
-      <div className="bg-white p-4">
+      <div className="bg-white p-4 max-w-md mx-auto">
         <h1 className="text-xl poppins-semibold mt-2">
           {t("settingSignatureTitle")}
         </h1>
