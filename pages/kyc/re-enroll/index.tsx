@@ -364,6 +364,7 @@ const ReEnrollMekari = () => {
 
   return (
     <div
+      className="min-h-screen"
       style={{
         backgroundColor: themeConfigurationAvaliabilityChecker(
           themeConfiguration?.data.background as string,
