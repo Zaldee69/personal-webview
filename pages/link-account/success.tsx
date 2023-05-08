@@ -160,13 +160,13 @@ const LinkAccountSuccess = (props: Props) => {
             className={buttonVariants({
               variant: "link",
               size: "none",
-              className: "font-medium",
+              className: "font-medium mt-20",
             })}
           >
             {t("livenessSuccessButtonTitle")}
           </a>
         </a>
-      )}
+        )}
       <Footer />
     </div>
   );

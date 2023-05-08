@@ -205,10 +205,9 @@ function CertificateInformation({}: Props) {
               ),
             }}
             className={buttonVariants({
-              variant: "link",
               size: "none",
               className:
-                "font-medium uppercase text-center mt-4 p-2.5 border inline-block mx-auto w-48",
+                "font-medium uppercase px-0 text-center mt-4 py-2.5 border inline-block mx-auto w-48",
             })}
           >
             {t("complain")}
