@@ -118,7 +118,7 @@ function CertificateInformation({}: Props) {
     <div
       style={{
         backgroundColor: themeConfigurationAvaliabilityChecker(
-          themeConfiguration?.data.background as string
+          themeConfiguration?.data.background as string, "BG"
         ),
       }}
     >
