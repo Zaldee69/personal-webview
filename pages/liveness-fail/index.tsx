@@ -93,7 +93,7 @@ const LivenessFail = () => {
   };
   return (
     <div
-      className="h-full"
+      className="h-screen"
       style={{
         backgroundColor: themeConfigurationAvaliabilityChecker(
           themeConfiguration?.data.background as string,

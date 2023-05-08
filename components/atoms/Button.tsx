@@ -3,7 +3,7 @@ import { VariantProps, cva } from "class-variance-authority";
 import { ButtonHTMLAttributes, FC, forwardRef } from "react";
 
 export const buttonVariants = cva(
-  "font-poppins inline-flex items-center justify-center hover:opacity-50 hover:cursor-pointer disabled:hover:cursor-not-allowed",
+  "poppins-regular inline-flex items-center justify-center hover:opacity-50 hover:cursor-pointer disabled:hover:cursor-not-allowed",
   {
     variants: {
       variant: {

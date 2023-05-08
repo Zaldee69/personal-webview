@@ -21,6 +21,7 @@ const Guide = ({ setIsClicked, isDisabled }: Props) => {
 
   return (
     <div
+      className="min-h-screen"
       style={{
         backgroundColor: themeConfigurationAvaliabilityChecker(
           themeConfiguration?.data.background as string,
