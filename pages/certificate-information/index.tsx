@@ -122,7 +122,7 @@ function CertificateInformation({}: Props) {
         ),
       }}
     >
-      <div className="bg-white p-4 poppins-regular max-w-md mx-auto">
+      <div className="p-4 poppins-regular max-w-md mx-auto">
         <div className="flex justify-center">
           <img src="images/certInfo.svg" alt="ill" />
         </div>
