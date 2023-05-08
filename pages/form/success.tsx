@@ -50,7 +50,7 @@ const FormSuccess = (props: Props) => {
         </p>
       </div>
       <div className="mt-20 text-primary text-base poppins-medium underline hover:cursor-pointer">
-        {/* {routerQuery.redirect_url && ( */}
+        {routerQuery.redirect_url && (
         <a
           href={concateRedirectUrlParams(
             routerQuery.redirect_url as string,
@@ -69,7 +69,7 @@ const FormSuccess = (props: Props) => {
         >
           {t("livenessSuccessButtonTitle")}
         </a>
-        {/* )} */}
+        )}
       </div>
       <Footer />
     </div>
