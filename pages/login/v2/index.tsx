@@ -336,6 +336,7 @@ const Login = ({}: IPropsLogin) => {
               </Link>
             </div>
           </div>
+          <div className="flex justify-center" >
           <Button
             type="submit"
             style={{
@@ -348,6 +349,7 @@ const Login = ({}: IPropsLogin) => {
           >
             {t("loginCTA")}
           </Button>
+          </div>
         </form>
         <Footer />
       </div>

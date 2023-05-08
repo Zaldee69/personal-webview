@@ -372,6 +372,7 @@ const Login = ({}: Props) => {
               </Link>
             </div>
           </div>
+          <div className="flex justify-center" >
           <Button
             type="submit"
             style={{
@@ -384,6 +385,7 @@ const Login = ({}: Props) => {
           >
             {t("loginCTA")}
           </Button>
+          </div>
         </form>
         <Footer />
       </div>
