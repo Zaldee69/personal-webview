@@ -44,6 +44,7 @@ function MyApp({ Component, pageProps }: AppProps) {
   const getThemeConfiguration = () => {
     store.dispatch(
       getTheme({
+        type: router.query.channel_id ? "channel_id" : router.query.request_id ? "request_id" : "channel_id",
         uuid:
           (router.query.channel_id as string) ||
           (router.query.request_id as string),

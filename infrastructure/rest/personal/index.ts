@@ -224,16 +224,22 @@ export const RestPersonalPManualReg = (
     });
 };
 
-export const RestThemeConfiguration = (
-  uuid?: string
-): Promise<TThemeResponse> => {
+export const RestThemeConfiguration = ({
+  uuid,
+  type,
+}: {
+  uuid?: string;
+  type?: "channel_id" | "request_id";
+}): Promise<TThemeResponse> => {
   return axios
-    .get(`${BASE_URL}/channel/get_webview_configuration?channel_id=${uuid}`)
+    .get(
+      `${BASE_URL}/channel/get_webview_configuration?${type}=${uuid}`
+    )
     .then((res) => {
-      if(res.data.success){
+      if (res.data.success) {
         return res.data;
       }
-      return initialState
+      return initialState;
     })
     .catch((err) => {
       throw err;

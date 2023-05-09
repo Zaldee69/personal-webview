@@ -153,7 +153,7 @@ const ForgotTilakaName = (props: Props) => {
                     className="mt-32  mb-5 h-10"
                     style={{
                       backgroundColor: themeConfigurationAvaliabilityChecker(
-                        themeConfiguration?.data.buttonColor as string
+                        themeConfiguration?.data.buttonColor as string, "BG"
                       ),
                     }}
                   >
