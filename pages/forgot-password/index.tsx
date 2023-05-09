@@ -103,6 +103,7 @@ const ForgotPassword = (props: Props) => {
 
   return (
     <div
+      className="h-screen"
       style={{
         backgroundColor: themeConfigurationAvaliabilityChecker(
           themeConfiguration?.data.background as string, "BG"

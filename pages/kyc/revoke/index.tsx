@@ -338,7 +338,7 @@ const RevokeMekari = () => {
     return <Guide setIsClicked={setIsClicked} isDisabled={isDisabled} />;
 
   return (
-    <div style={{
+    <div className="h-screen" style={{
       backgroundColor: themeConfigurationAvaliabilityChecker(
         themeConfiguration?.data.background as string,
         "BG"

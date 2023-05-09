@@ -72,7 +72,6 @@ const FRModal: React.FC<IModal> = ({
   const [isFRSuccess, setIsFRSuccess] = useState<boolean>(false);
   const themeConfiguration = useSelector((state: RootState) => state.theme);
 
-
   const signingFailure = (message: string) => {
     callbackFailure({ message, status: "Gagal" });
   };
@@ -218,7 +217,6 @@ const OTPModal: React.FC<IModal> = ({
   const [values, setValues] = useState(["", "", "", "", "", ""]);
 
   const themeConfiguration = useSelector((state: RootState) => state.theme);
-
 
   const { t }: any = i18n;
 
@@ -417,17 +415,28 @@ const OTPModal: React.FC<IModal> = ({
           />
           <div className="flex font-poppins justify-center text-sm gap-1 mt-5">
             <p className="text-neutral200">{t("dindtReceiveOtp")}</p>
-            <div style={{
-      color: themeConfigurationAvaliabilityChecker(
-        themeConfiguration?.data.actionFontColor as string
-      ),
-    }} className="font-semibold">
+            <div
+              style={{
+                color: themeConfigurationAvaliabilityChecker(
+                  themeConfiguration?.data.actionFontColor as string
+                ),
+              }}
+              className="font-semibold"
+            >
               {!isCountDone ? (
-                <Button variant="ghost" style={{
-                  color: themeConfigurationAvaliabilityChecker(
-                    themeConfiguration?.data.actionFontColor as string
-                  ),
-                }}  className="mx-0" size="none" onClick={handleTriggerSendOTP}>{t("resend")}</Button>
+                <Button
+                  variant="ghost"
+                  style={{
+                    color: themeConfigurationAvaliabilityChecker(
+                      themeConfiguration?.data.actionFontColor as string
+                    ),
+                  }}
+                  className="mx-0"
+                  size="none"
+                  onClick={handleTriggerSendOTP}
+                >
+                  {t("resend")}
+                </Button>
               ) : (
                 `0:${timeRemaining}`
               )}
@@ -452,7 +461,8 @@ const OTPModal: React.FC<IModal> = ({
               setModal(!modal);
             }}
             className="font-semibold mt-2"
-            variant="ghost" style={{
+            variant="ghost"
+            style={{
               color: themeConfigurationAvaliabilityChecker(
                 themeConfiguration?.data.actionFontColor as string
               ),
@@ -474,7 +484,6 @@ const SigningSuccess = () => {
 
   const themeConfiguration = useSelector((state: RootState) => state.theme);
 
-
   const params = {
     user_identifier: routerQuery.user,
     request_id: routerQuery.request_id,
@@ -485,11 +494,15 @@ const SigningSuccess = () => {
   const { t }: any = i18n;
 
   return (
-    <div style={{
-      backgroundColor: themeConfigurationAvaliabilityChecker(
-        themeConfiguration?.data.background as string, "BG"
-      ),
-    }} className="px-10 pt-16 pb-9 text-center flex flex-col justify-center min-h-screen">
+    <div
+      style={{
+        backgroundColor: themeConfigurationAvaliabilityChecker(
+          themeConfiguration?.data.background as string,
+          "BG"
+        ),
+      }}
+      className="px-10 pt-16 pb-9 text-center flex flex-col justify-center min-h-screen"
+    >
       <div>
         <p className="font-poppins text-lg font-semibold text-neutral800">
           {t("authenticationSuccessTitle")}
@@ -510,25 +523,29 @@ const SigningSuccess = () => {
       </div>
       <div className="mt-32">
         {routerQuery.redirect_url && (
-            <a
-              href={concateRedirectUrlParams(
-                routerQuery.redirect_url,
-                queryString
-              )}
+          <a
+            href={concateRedirectUrlParams(
+              routerQuery.redirect_url,
+              queryString
+            )}
+          >
+            <span
+              style={{
+                color: themeConfigurationAvaliabilityChecker(
+                  themeConfiguration?.data.actionFontColor as string
+                ),
+              }}
+              className={buttonVariants({
+                variant: "link",
+                size: "none",
+                className: "font-medium",
+              })}
             >
-              <span style={{
-              color: themeConfigurationAvaliabilityChecker(
-                themeConfiguration?.data.actionFontColor as string
-              ),
-            }}
-            className={buttonVariants({
-              variant: "link",
-              size: "none",
-              className: "font-medium",
-            })} >{t("livenessSuccessButtonTitle")}</span>
-            </a>
+              {t("livenessSuccessButtonTitle")}
+            </span>
+          </a>
         )}
-        <Footer/>
+        <Footer />
       </div>
     </div>
   );
@@ -542,7 +559,6 @@ const SigningFailure = () => {
 
   const themeConfiguration = useSelector((state: RootState) => state.theme);
 
-
   const params = {
     user_identifier: routerQuery.user,
     id: routerQuery.id,
@@ -551,11 +567,15 @@ const SigningFailure = () => {
   const { t }: any = i18n;
 
   return (
-    <div style={{
-      backgroundColor: themeConfigurationAvaliabilityChecker(
-        themeConfiguration?.data.background as string, "BG"
-      ),
-    }} className="px-10 pt-16 pb-9 text-center flex flex-col justify-center min-h-screen">
+    <div
+      style={{
+        backgroundColor: themeConfigurationAvaliabilityChecker(
+          themeConfiguration?.data.background as string,
+          "BG"
+        ),
+      }}
+      className="px-10 pt-16 pb-9 text-center flex flex-col justify-center min-h-screen"
+    >
       <div>
         <p className="font-poppins text-lg font-semibold text-neutral800">
           {t("signFailed")}
@@ -583,20 +603,24 @@ const SigningFailure = () => {
                 queryString
               )}
             >
-              <span style={{
-              color: themeConfigurationAvaliabilityChecker(
-                themeConfiguration?.data.actionFontColor as string
-              ),
-            }}
-            className={buttonVariants({
-              variant: "link",
-              size: "none",
-              className: "font-medium",
-            })} >{t("livenessSuccessButtonTitle")}</span>
+              <span
+                style={{
+                  color: themeConfigurationAvaliabilityChecker(
+                    themeConfiguration?.data.actionFontColor as string
+                  ),
+                }}
+                className={buttonVariants({
+                  variant: "link",
+                  size: "none",
+                  className: "font-medium",
+                })}
+              >
+                {t("livenessSuccessButtonTitle")}
+              </span>
             </a>
           </div>
         )}
-        <Footer/>
+        <Footer />
       </div>
     </div>
   );
@@ -632,7 +656,6 @@ const Login = ({}: IPropsLogin) => {
   }, [router.isReady]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const themeConfiguration = useSelector((state: RootState) => state.theme);
-
 
   useEffect(() => {
     if (isSubmitted && data.status === "FULLFILLED" && data.data.success) {
@@ -800,11 +823,15 @@ const Login = ({}: IPropsLogin) => {
   }
 
   return (
-    <div className="h-screen" style={{
-      backgroundColor: themeConfigurationAvaliabilityChecker(
-        themeConfiguration?.data.background as string, "BG"
-      ),
-    }}>
+    <div
+      className="h-screen"
+      style={{
+        backgroundColor: themeConfigurationAvaliabilityChecker(
+          themeConfiguration?.data.background as string,
+          "BG"
+        ),
+      }}
+    >
       <Head>
         <title>Tilaka</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
@@ -853,7 +880,14 @@ const Login = ({}: IPropsLogin) => {
                 }}
                 passHref
               >
-                <a className="poppins-regular text-primary">
+                <a
+                  style={{
+                    color: themeConfigurationAvaliabilityChecker(
+                      themeConfiguration?.data.actionFontColor as string
+                    ),
+                  }}
+                  className={buttonVariants({ variant: "ghost", size: "none" })}
+                >
                   {t("linkAccountForgotPasswordButton")}
                 </a>
               </Link>
@@ -866,7 +900,14 @@ const Login = ({}: IPropsLogin) => {
                 />
               </div>
               <Link href={handleRoute("forgot-tilaka-name")} passHref>
-                <a className="poppins-regular text-primary">
+                <a
+                  style={{
+                    color: themeConfigurationAvaliabilityChecker(
+                      themeConfiguration?.data.actionFontColor as string
+                    ),
+                  }}
+                  className={buttonVariants({ variant: "ghost", size: "none" })}
+                >
                   {t("linkAccountForgotTilakaName")}
                 </a>
               </Link>

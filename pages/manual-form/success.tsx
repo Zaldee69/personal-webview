@@ -18,7 +18,7 @@ const FormSuccess = (props: Props) => {
   const { t }: any = i18n;
   const themeConfiguration = useSelector((state: RootState) => state.theme);
   return (
-    <div style={{
+    <div  style={{
       backgroundColor: themeConfigurationAvaliabilityChecker(
         themeConfiguration?.data.background as string, "BG"
       ),

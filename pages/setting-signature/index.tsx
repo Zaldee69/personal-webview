@@ -208,6 +208,7 @@ const SettingSignature = ({}: Props) => {
 
   return (
     <div
+      className="h-screen"
       style={{
         backgroundColor: themeConfigurationAvaliabilityChecker(
           themeConfiguration?.data.background as string,
