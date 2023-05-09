@@ -104,7 +104,9 @@ const FRModal: React.FC<IModal> = ({
           setModal(false);
           toast.error(res.message || "Ada yang salah", { icon: <XIcon /> });
           const newCount =
-            parseInt(localStorage.getItem("count_hashsign") as string) + 1;
+            (isNaN(parseInt(localStorage.getItem("count_hashsign") as string))
+              ? 0
+              : parseInt(localStorage.getItem("count_hashsign") as string)) + 1;
           localStorage.setItem("count_hashsign", newCount.toString());
           const count = parseInt(
             localStorage.getItem("count_hashsign") as string
@@ -112,7 +114,7 @@ const FRModal: React.FC<IModal> = ({
           if (
             count >= 5 ||
             res.message.toLowerCase() ===
-              "penandatanganan dokumen gagal. gagal FR sudah 5 kali".toLocaleLowerCase()
+              "authhashsign gagal. gagal FR sudah 5 kali".toLocaleLowerCase()
           ) {
             signingFailure(res.message || "Ada yang salah");
           }
@@ -135,7 +137,9 @@ const FRModal: React.FC<IModal> = ({
             icon: <XIcon />,
           });
           const newCount =
-            parseInt(localStorage.getItem("count_hashsign") as string) + 1;
+            (isNaN(parseInt(localStorage.getItem("count_hashsign") as string))
+              ? 0
+              : parseInt(localStorage.getItem("count_hashsign") as string)) + 1;
           localStorage.setItem("count_hashsign", newCount.toString());
           const count = parseInt(
             localStorage.getItem("count_hashsign") as string
@@ -259,7 +263,9 @@ const OTPModal: React.FC<IModal> = ({
           setValues(["", "", "", "", "", ""]);
           toast.error(res.message || "Ada yang salah", { icon: <XIcon /> });
           const newCount =
-            parseInt(localStorage.getItem("count_hashsign") as string) + 1;
+            (isNaN(parseInt(localStorage.getItem("count_hashsign") as string))
+              ? 0
+              : parseInt(localStorage.getItem("count_hashsign") as string)) + 1;
           localStorage.setItem("count_hashsign", newCount.toString());
           const count = parseInt(
             localStorage.getItem("count_hashsign") as string
@@ -267,7 +273,7 @@ const OTPModal: React.FC<IModal> = ({
           if (
             count >= 5 ||
             res.message.toLowerCase() ===
-              "penandatanganan dokumen gagal. gagal FR sudah 5 kali".toLocaleLowerCase()
+              "authhashsign gagal. salah OTP sudah 5 kali".toLocaleLowerCase()
           ) {
             signingFailure(res.message || "Ada yang salah");
             setEndTimeToZero();
@@ -293,7 +299,9 @@ const OTPModal: React.FC<IModal> = ({
           });
           setValues(["", "", "", "", "", ""]);
           const newCount =
-            parseInt(localStorage.getItem("count_hashsign") as string) + 1;
+            (isNaN(parseInt(localStorage.getItem("count_hashsign") as string))
+              ? 0
+              : parseInt(localStorage.getItem("count_hashsign") as string)) + 1;
           localStorage.setItem("count_hashsign", newCount.toString());
           const count = parseInt(
             localStorage.getItem("count_hashsign") as string
@@ -659,7 +667,6 @@ const Login = ({}: IPropsLogin) => {
 
   useEffect(() => {
     if (isSubmitted && data.status === "FULLFILLED" && data.data.success) {
-      localStorage.setItem("count_hashsign", "0");
       setStorageWithExpiresIn(
         "token_hashsign",
         data.data.data[0],
