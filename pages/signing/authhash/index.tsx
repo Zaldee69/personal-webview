@@ -800,7 +800,7 @@ const Login = ({}: IPropsLogin) => {
   }
 
   return (
-    <div style={{
+    <div className="h-screen" style={{
       backgroundColor: themeConfigurationAvaliabilityChecker(
         themeConfiguration?.data.background as string, "BG"
       ),
@@ -872,7 +872,7 @@ const Login = ({}: IPropsLogin) => {
               </Link>
             </div>
           </div>
-          <Button
+          {/* <Button
            style={{
             backgroundColor: themeConfigurationAvaliabilityChecker(
               themeConfiguration?.data.buttonColor as string
@@ -880,6 +880,18 @@ const Login = ({}: IPropsLogin) => {
           }}
           className="uppercase mt-24"
             type="submit"
+            disabled={password.length < 1}
+          >
+            {t("loginCTA")}
+          </Button> */}
+          <Button
+            type="submit"
+            style={{
+              backgroundColor: themeConfigurationAvaliabilityChecker(
+                themeConfiguration?.data.buttonColor as string
+              ),
+            }}
+            className="uppercase mt-24 text-white"
             disabled={password.length < 1}
           >
             {t("loginCTA")}
