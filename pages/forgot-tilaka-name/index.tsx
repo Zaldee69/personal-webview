@@ -106,7 +106,9 @@ const ForgotTilakaName = (props: Props) => {
       backgroundColor: themeConfigurationAvaliabilityChecker(
         themeConfiguration?.data.background as string
       ),
-    }} >
+    }}
+    className="h-screen"
+     >
       <Head>
         <title>{t("forgotTilakaName.title")}</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
