@@ -56,7 +56,7 @@ const LinkAccount = (props: Props) => {
   }, [router.isReady, currentSecond]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <div style={{
+    <div className="h-screen" style={{
       backgroundColor: themeConfigurationAvaliabilityChecker(
         themeConfiguration?.data.background as string, "BG"
       ),

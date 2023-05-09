@@ -116,6 +116,7 @@ function CertificateInformation({}: Props) {
   };
   return (
     <div
+      className="h-screen"
       style={{
         backgroundColor: themeConfigurationAvaliabilityChecker(
           themeConfiguration?.data.background as string, "BG"
@@ -203,11 +204,13 @@ function CertificateInformation({}: Props) {
               borderColor: themeConfigurationAvaliabilityChecker(
                 themeConfiguration?.data.buttonColor as string
               ),
+              paddingLeft: 0,
+              paddingRight: 0,
             }}
             className={buttonVariants({
-              size: "none",
+              size:"none",
               className:
-                "font-medium uppercase px-0 text-center mt-4 py-2.5 border inline-block mx-auto w-48",
+                "border mt-3 py-2.5 uppercase text-base font-medium block mx-auto w-48",
             })}
           >
             {t("complain")}

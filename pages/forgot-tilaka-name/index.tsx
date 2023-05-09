@@ -104,7 +104,7 @@ const ForgotTilakaName = (props: Props) => {
   return (
     <div style={{
       backgroundColor: themeConfigurationAvaliabilityChecker(
-        themeConfiguration?.data.background as string
+        themeConfiguration?.data.background as string, "BG"
       ),
     }}
     className="h-screen"
