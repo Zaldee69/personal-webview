@@ -91,7 +91,6 @@ const FRModal: React.FC<IModal> = ({
     })
       .then((res) => {
         if (res.success) {
-          localStorage.setItem("count_hashsign", "0");
           toast.dismiss("info");
           toast(`Pencocokan berhasil`, {
             type: "success",
@@ -103,18 +102,10 @@ const FRModal: React.FC<IModal> = ({
           toast.dismiss("info");
           setModal(false);
           toast.error(res.message || "Ada yang salah", { icon: <XIcon /> });
-          const newCount =
-            (isNaN(parseInt(localStorage.getItem("count_hashsign") as string))
-              ? 0
-              : parseInt(localStorage.getItem("count_hashsign") as string)) + 1;
-          localStorage.setItem("count_hashsign", newCount.toString());
-          const count = parseInt(
-            localStorage.getItem("count_hashsign") as string
-          );
+
           if (
-            count >= 5 ||
             res.message.toLowerCase() ===
-              "authhashsign gagal. gagal FR sudah 5 kali".toLocaleLowerCase()
+            "authhashsign gagal. gagal FR sudah 5 kali".toLocaleLowerCase()
           ) {
             signingFailure(res.message || "Ada yang salah");
           }
@@ -136,15 +127,10 @@ const FRModal: React.FC<IModal> = ({
           toast.error(err.response?.data?.message || "Wajah tidak cocok", {
             icon: <XIcon />,
           });
-          const newCount =
-            (isNaN(parseInt(localStorage.getItem("count_hashsign") as string))
-              ? 0
-              : parseInt(localStorage.getItem("count_hashsign") as string)) + 1;
-          localStorage.setItem("count_hashsign", newCount.toString());
-          const count = parseInt(
-            localStorage.getItem("count_hashsign") as string
-          );
-          if (count >= 5) {
+          if (
+            err.response?.data?.message?.toLowerCase() ===
+            "authhashsign gagal. gagal FR sudah 5 kali".toLocaleLowerCase()
+          ) {
             signingFailure(err.response?.data?.message || "Ada yang salah");
           }
         }
@@ -182,7 +168,6 @@ const FRModal: React.FC<IModal> = ({
             setIsFRSuccess={setIsFRSuccess}
             signingFailedRedirectTo={AUTHHASH_PATHNAME}
             tokenIdentifier="token_hashsign"
-            countIdentifier="count_hashsign"
             callbackCaptureProcessor={captureProcessor}
           />
           <Button
@@ -254,7 +239,6 @@ const OTPModal: React.FC<IModal> = ({
         if (res.success) {
           setSuccessSigning(true);
           toast.dismiss("loading");
-          localStorage.setItem("count_hashsign", "0");
           setEndTimeToZero();
         } else {
           setSuccessSigning(false);
@@ -262,18 +246,10 @@ const OTPModal: React.FC<IModal> = ({
           setModal(false);
           setValues(["", "", "", "", "", ""]);
           toast.error(res.message || "Ada yang salah", { icon: <XIcon /> });
-          const newCount =
-            (isNaN(parseInt(localStorage.getItem("count_hashsign") as string))
-              ? 0
-              : parseInt(localStorage.getItem("count_hashsign") as string)) + 1;
-          localStorage.setItem("count_hashsign", newCount.toString());
-          const count = parseInt(
-            localStorage.getItem("count_hashsign") as string
-          );
+
           if (
-            count >= 5 ||
             res.message.toLowerCase() ===
-              "authhashsign gagal. salah OTP sudah 5 kali".toLocaleLowerCase()
+            "authhashsign gagal. salah OTP sudah 5 kali".toLocaleLowerCase()
           ) {
             signingFailure(res.message || "Ada yang salah");
             setEndTimeToZero();
@@ -298,15 +274,10 @@ const OTPModal: React.FC<IModal> = ({
             icon: <XIcon />,
           });
           setValues(["", "", "", "", "", ""]);
-          const newCount =
-            (isNaN(parseInt(localStorage.getItem("count_hashsign") as string))
-              ? 0
-              : parseInt(localStorage.getItem("count_hashsign") as string)) + 1;
-          localStorage.setItem("count_hashsign", newCount.toString());
-          const count = parseInt(
-            localStorage.getItem("count_hashsign") as string
-          );
-          if (count >= 5) {
+          if (
+            err.response?.data?.message?.toLowerCase() ===
+            "authhashsign gagal. salah OTP sudah 5 kali".toLocaleLowerCase()
+          ) {
             signingFailure(err.response?.data?.message || "Ada yang salah");
             setEndTimeToZero();
           }
@@ -719,21 +690,6 @@ const Login = ({}: IPropsLogin) => {
         });
       } else {
         if (certif[0].status == "Aktif") {
-          // router.replace({
-          //   pathname: handleRoute("signing/v2"),
-          //   query: {
-          //     ...queryWithDynamicRedirectURL,
-          //   },
-          // });
-          //
-          //
-          //
-          //
-          // mfa ->
-          // hit /authhashsign ->
-          // hapus token dari localStorage with removeStorageWithExpiresIn ->
-          // halaman hasil (berhasil/gagal)
-
           getUserName({ token: token_hashsign })
             .then((res) => {
               if (res.success) {
