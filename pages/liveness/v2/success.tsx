@@ -60,7 +60,7 @@ const FormSuccess = (props: Props) => {
             className={buttonVariants({
               variant: "link",
               size: "none",
-              className: "font-medium",
+              className: "font-medium mt-20",
             })}
             href={concateRedirectUrlParams(
               routerQuery.redirect_url as string,

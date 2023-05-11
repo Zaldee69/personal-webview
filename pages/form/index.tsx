@@ -326,7 +326,7 @@ const Form: React.FC = () => {
 
   return (
     <div
-      className="h-screen"
+      className="h-full"
       style={{
         backgroundColor: themeConfigurationAvaliabilityChecker(
           themeConfiguration?.data.background as string,
