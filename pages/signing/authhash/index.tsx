@@ -839,7 +839,7 @@ const Login = ({}: IPropsLogin) => {
               <Link
                 href={{
                   pathname: handleRoute("forgot-password"),
-                  // query: { redirect_url: getEncodedCurrentUrl() },
+                  query: router.query,
                 }}
                 passHref
               >
@@ -862,7 +862,10 @@ const Login = ({}: IPropsLogin) => {
                   alt="lineVertical"
                 />
               </div>
-              <Link href={handleRoute("forgot-tilaka-name")} passHref>
+              <Link href={{
+                pathname: handleRoute("forgot-tilaka-name"),
+                query: router.query
+              }} passHref>
                 <a
                   style={{
                     color: themeConfigurationAvaliabilityChecker(
