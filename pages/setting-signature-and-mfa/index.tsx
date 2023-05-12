@@ -215,7 +215,7 @@ function SettingSignatureAndMFA({}: Props) {
 
   return (
     <div 
-      className="h-full"
+      className="min-h-screen"
       style={{
         backgroundColor: themeConfigurationAvaliabilityChecker(
           themeConfiguration?.data.background as string,
