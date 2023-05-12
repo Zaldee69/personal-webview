@@ -222,7 +222,7 @@ const Index = () => {
   };
 
   return (
-    <div className="h-full" style={{
+    <div className="min-h-screen" style={{
       backgroundColor: themeConfigurationAvaliabilityChecker(
         themeConfiguration?.data.background as string, "BG"
       ),
