@@ -904,14 +904,7 @@ const SigningSuccess = (props: TPropsSigningSuccess) => {
             </a>
           </div>
         )}
-        <div className="mt-8 flex justify-center">
-          <Image
-            src={`${assetPrefix}/images/poweredByTilaka.svg`}
-            alt="powered-by-tilaka"
-            width="80px"
-            height="41.27px"
-          />
-        </div>
+        <Footer/>
       </div>
     </div>
   );
@@ -984,14 +977,7 @@ const SigningOnProgress = (props: TPropsSigningSuccess) => {
             </a>
           </div>
         )}
-        <div className="mt-8 flex justify-center">
-          <Image
-            src={`${assetPrefix}/images/poweredByTilaka.svg`}
-            alt="powered-by-tilaka"
-            width="80px"
-            height="41.27px"
-          />
-        </div>
+        <Footer/>
       </div>
     </div>
   );
