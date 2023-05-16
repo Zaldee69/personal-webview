@@ -59,29 +59,40 @@ const SettingSignature = ({}: Props) => {
 
   const themeConfiguration = useSelector((state: RootState) => state.theme);
 
-  useEffect(() => {
-    if (router.isReady) {
-      getUserName({})
-        .then((res) => {
-          const data = JSON.parse(res.data);
-          setData(data.name);
-        })
-        .catch((err) => {
-          switch (err.response.status) {
-            case 401:
-              // unauthorized
-              router.replace({
-                pathname: handleRoute("login"),
-                query: { ...router.query },
-              });
-              break;
+  const getTilakaName = () => {
+    getUserName({})
+    .then((res) => {
+      const data = JSON.parse(res.data);
+      setData(data.name);
+    })
+    .catch((err) => {
+      switch (err.response.status) {
+        case 401:
+          // unauthorized
+          router.replace({
+            pathname: handleRoute("login"),
+            query: { ...router.query, setting: "3" },
+          });
+          break;
 
-            default:
-              break;
-          }
-        });
+        default:
+          break;
+      }
+    });
+  }
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if(!router.isReady) return
+    if (!token) {
+      router.push({
+        pathname: handleRoute("login"),
+        query: { ...router.query, setting: "3" },
+      });
+    } else {
+      getTilakaName();
     }
-  }, [router, router.isReady]);
+  }, [router, router.isReady]); // eslint-disable-line react-hooks/exhaustive-deps
 
   //Convert HTML element to base64 png
   const convertToDataURL = async () => {
@@ -191,7 +202,7 @@ const SettingSignature = ({}: Props) => {
             });
             router.replace({
               pathname: handleRoute("login"),
-              query: { ...router.query },
+              query: { ...router.query, setting: "3" },
             });
           } else {
             toast.dismiss("info");
@@ -208,7 +219,7 @@ const SettingSignature = ({}: Props) => {
 
   return (
     <div
-      className="h-screen"
+      className="min-h-screen"
       style={{
         backgroundColor: themeConfigurationAvaliabilityChecker(
           themeConfiguration?.data.background as string,

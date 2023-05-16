@@ -194,6 +194,13 @@ const Login = ({}: Props) => {
                   ...queryWithDynamicRedirectURL,
                 },
               });
+            }else if(router.query.setting === "3"){
+              router.replace({
+                pathname: handleRoute("setting-signature"),
+                query: {
+                  ...queryWithDynamicRedirectURL,
+                },
+              });
             } else {
               router.replace({
                 pathname: handleRoute("signing"),
