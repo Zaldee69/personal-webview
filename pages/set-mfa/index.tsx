@@ -230,7 +230,7 @@ const SetMfa = () => {
             onClick={() => onClickHandler("confirmation")}
             disabled={defaultMfa === mfaMethod}
             size="lg"
-            className="py-2 mx-0"
+            // className="py-2 mx-0"
             style={{
               backgroundColor: themeConfigurationAvaliabilityChecker(
                 themeConfiguration?.data.buttonColor as string

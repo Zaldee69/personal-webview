@@ -6,11 +6,17 @@ import Footer from "@/components/Footer";
 import ModalLayout from "@/components/layout/ModalLayout";
 import { fileToBase64 } from "@/utils/fileToBase64";
 import { handleRoute } from "@/utils/handleRoute";
-import { onSubmitValidator } from "@/utils/onSubmitValidator";
+import { inputValidator } from "@/utils/inputValidator";
 import { assetPrefix } from "next.config";
 import { useRouter } from "next/router";
 import { toast } from "react-toastify";
-import React, { useEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import Image from "next/image";
 import i18n from "i18";
 import { RestPersonalPManualReg } from "infrastructure";
@@ -57,6 +63,7 @@ const Index = () => {
   const [errorMessage, setErrorMessage] = useState({
     nik: "",
     name: "",
+    email: "",
     photo_ktp: "",
     photo_selfie: "",
   });
@@ -70,6 +77,8 @@ const Index = () => {
     fileFotoSelfieRef: useRef<HTMLInputElement>(null),
   });
 
+  const [isTncChecked, setIsTncCheked] = useState<boolean>(false);
+
   const resolutionChecker = (file: File | undefined) => {
     return new Promise((resolve) => {
       const img: HTMLImageElement = document.createElement("img");
@@ -80,8 +89,8 @@ const Index = () => {
 
   const onChangeHandler = async (e: React.ChangeEvent<HTMLInputElement>) => {
     let isErrorImage: boolean = false;
-    const { value, name, files } = e.target;
     let isEligibleFileType: boolean = true;
+    const { value, name, files } = e.target;
     const file: File = files?.[0] as File;
     if (name === "photo_ktp" || name === "photo_selfie") {
       const fileType = ["jpg", "jpeg", "png"];
@@ -95,38 +104,56 @@ const Index = () => {
       }
     }
 
+    setForm({
+      ...form,
+      [name]:
+        name === "photo_ktp" || name === "photo_selfie"
+          ? await fileToBase64(file)
+          : name === "nik"
+          ? value.replace(/[^0-9]/g, "")
+          : name === "email"
+          ? value.replace(/\s/g, "")
+          : name === "name"
+          ? value.trimStart()
+          : name === "tnc"
+          ? setIsTncCheked(e.target.checked)
+          : "",
+    });
+
     const ref = {
       fileFotoKtpRef,
       fileFotoSelfieRef,
     };
 
-    if (isErrorImage || !isEligibleFileType) {
-      setErrorMessage((prev) => ({
-        ...prev,
-        [name]:
-          name === "photo_ktp"
-            ? t("manualForm.photoKtp.errorMessage2")
-            : t("manualForm.photoSelfie.errorMessage2"),
-      }));
-    } else {
-      setForm({
-        ...form,
-        [name]:
-          name === "photo_ktp" || name === "photo_selfie"
-            ? await fileToBase64(file)
-            : name === "nik"
-            ? value.replace(/[^0-9]/g, "")
-            : name === "email"
-            ? value.replace(/\s/g, "")
-            : value.trimStart(),
-      });
-      setErrorMessage({
-        nik: "",
-        name: "",
-        photo_ktp: "",
-        photo_selfie: "",
-      });
-    }
+    setErrorMessage((prev) => {
+      const stateObj = { ...prev, [name]: "" };
+      switch (name) {
+        case "photo_ktp":
+          if (isErrorImage) {
+            stateObj[name] = t("manualForm.photoKtp.errorMessage2");
+            setForm({
+              ...form,
+              ["photo_ktp"]: "",
+            });
+          }
+          break;
+        case "photo_selfie":
+          if (isErrorImage || !isEligibleFileType) {
+            stateObj[name] = t("manualForm.photoSelfie.errorMessage2");
+            setForm({
+              ...form,
+              ["photo_selfie"]: "",
+            });
+          }
+          break;
+        case "nik":
+          stateObj[name] = inputValidator.nikValidator(value);
+        default:
+          break;
+      }
+
+      return stateObj;
+    });
 
     setModal({
       ...modal,
@@ -150,24 +177,38 @@ const Index = () => {
     });
   };
 
-  // const isShouldRedirectToOnProcessPage =
-  //   errorMessage.fileFotoKtp.length < 1 &&
-  //   errorMessage.fileFotoSelfie.length < 1 &&
-  //   form.fileFotoKtp.length > 1 &&
-  //   form.fileFotoSelfie.length > 1;
-
   const onsubmitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setErrorMessage({
       ...errorMessage,
-      photo_ktp:
-        (form.photo_ktp.length < 1 && t("manualForm.photoKtp.errorMessage1")) ||
-        errorMessage.photo_ktp,
-      photo_selfie:
-        (form.photo_selfie.length < 1 &&
-          t("manualForm.photoSelfie.errorMessage1")) ||
-        errorMessage.photo_selfie,
+      photo_ktp: inputValidator.requiredInput(
+        form.photo_ktp,
+        t("manualForm.photoKtp.errorMessage1")
+      ),
+      photo_selfie: inputValidator.requiredInput(
+        form.photo_selfie,
+        t("manualForm.photoSelfie.errorMessage1")
+      ),
+      nik: inputValidator.requiredInput(
+        form.nik,
+        t("manualForm.nik.errorMessage1")
+      ),
+      name: inputValidator.requiredInput(
+        form.name,
+        t("manualForm.name.errorMessage1")
+      ),
+      email: inputValidator.requiredInput(
+        form.email,
+        t("manualForm.email.errorMessage1")
+      ),
     });
+
+    const isFormEmpty = Object.values(form).some((x) => x === "");
+    const isErrorMessageEmpty = Object.values(errorMessage).some(
+      (x) => x === ""
+    );
+
+    if (isFormEmpty || !isErrorMessageEmpty) return;
 
     try {
       const formReq: TPersonalPManualRegRequestData = {
@@ -222,82 +263,139 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen" style={{
-      backgroundColor: themeConfigurationAvaliabilityChecker(
-        themeConfiguration?.data.background as string, "BG"
-      ),
-    }} >
-    <div className="px-5 pt-8 max-w-md poppins-regular mx-auto">
-      <h1 className="text-lg font-bold">{t("manualForm.title")}</h1>
-      <form onSubmit={onsubmitHandler}>
-        <Label htmlFor="nik" title="NIK" isDisabled />
-        <TextInput
-          name="nik"
-          placeholder={t("manualForm.nik.placeholder")}
-          value={form.nik}
-          onChangeHandler={onChangeHandler}
-          isError={errorMessage.nik.length > 1}
+    <div
+      className="min-h-screen"
+      style={{
+        backgroundColor: themeConfigurationAvaliabilityChecker(
+          themeConfiguration?.data.background as string,
+          "BG"
+        ),
+      }}
+    >
+      <div className="px-5 pt-8 max-w-md poppins-regular mx-auto">
+        <h1 className="text-lg font-bold">{t("manualForm.title")}</h1>
+        <form onSubmit={onsubmitHandler}>
+          <Label htmlFor="nik" title="NIK" isDisabled />
+          <TextInput
+            name="nik"
+            placeholder={t("manualForm.nik.placeholder")}
+            value={form.nik}
+            onChangeHandler={onChangeHandler}
+            isError={errorMessage.nik.length > 1}
+          />
+          <ErrorMessage errorMessage={errorMessage.nik} />
+          <Label htmlFor="name" title={t("manualForm.name.label")} isDisabled />
+          <TextInput
+            name="name"
+            placeholder={t("manualForm.name.placeholder")}
+            value={form.name}
+            onChangeHandler={onChangeHandler}
+            isError={errorMessage.name.length > 1}
+          />
+          <ErrorMessage errorMessage={errorMessage.name} />
+          <Label
+            htmlFor="email"
+            title={t("manualForm.email.label")}
+            isDisabled
+          />
+          <TextInput
+            name="email"
+            placeholder={t("manualForm.email.placeholder")}
+            value={form.email}
+            onChangeHandler={onChangeHandler}
+            isError={errorMessage.email.length > 1}
+          />
+          <ErrorMessage errorMessage={errorMessage.email} />
+          <CustomFileInputField
+            name="photo_ktp"
+            label={t("manualForm.photoKtp.label")}
+            imageBase64={form.photo_ktp}
+            errorMessage={errorMessage.photo_ktp}
+            onDeleteImageHandler={onDeleteImageHandler}
+            onChangeHandler={onChangeHandler}
+            onLabelClicked={onLabelClicked}
+            inputRef={fileFotoKtpRef}
+            showMaxResolution={false}
+          />
+          <CustomFileInputField
+            label={t("manualForm.photoSelfie.label")}
+            name="photo_selfie"
+            errorMessage={errorMessage.photo_selfie}
+            imageBase64={form.photo_selfie}
+            onChangeHandler={onChangeHandler}
+            onDeleteImageHandler={onDeleteImageHandler}
+            onLabelClicked={onLabelClicked}
+            inputRef={fileFotoSelfieRef}
+            showMaxResolution
+          />
+          <div className="flex flex-row mt-5">
+            <input
+              id="tnc"
+              name="tnc"
+              type="checkbox"
+              className=" border-borderColor"
+              onChange={onChangeHandler}
+            />
+            <label className="ml-2 text-neutral font-poppins " htmlFor="tnc">
+              {t("agree")}{" "}
+              <span className="text-primary">
+                <a
+                  href="https://repository.tilaka.id/CP_CPS.pdf"
+                  target="blank"
+                >
+                  CP/CPS
+                </a>
+                ,{" "}
+                <a
+                  href="https://repository.tilaka.id/kebijakan-jaminan.pdf"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {t("warranty")}
+                </a>
+                ,{" "}
+                <a
+                  href="https://repository.tilaka.id/kebijakan-privasi.pdf"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {t("privacy")}
+                </a>
+                ,{" "}
+              </span>
+              {t("and")}
+              <a
+                target="blank"
+                href="https://repository.tilaka.id/perjanjian-pemilik-sertifikat.pdf"
+                className="text-primary"
+              >
+                {" "}
+                {t("certificate")}
+              </a>
+            </label>
+          </div>
+          <Button
+            type="submit"
+            disabled={!isTncChecked}
+            size="sm"
+            className="bg-primary btn font-semibold mt-7 h-9 hover:opacity-50"
+            style={{
+              backgroundColor: themeConfigurationAvaliabilityChecker(
+                themeConfiguration?.data.buttonColor as string
+              ),
+            }}
+          >
+            {t("send")}
+          </Button>
+        </form>
+        <PhotoKtpTermModal fileFotoKtpRef={fileFotoKtpRef} show={modal.show} />
+        <PhotoSelfieTermModal
+          fileFotoSelfieRef={fileFotoSelfieRef}
+          show={modal.show}
         />
-        <ErrorMessage errorMessage={errorMessage.nik} />
-        <Label htmlFor="name" title={t("manualForm.name.label")} isDisabled />
-        <TextInput
-          name="name"
-          placeholder={t("manualForm.name.placeholder")}
-          value={form.name}
-          onChangeHandler={onChangeHandler}
-          isError={errorMessage.name.length > 1}
-        />
-        <ErrorMessage errorMessage={errorMessage.name} />
-        <Label htmlFor="email" title={t("manualForm.email.label")} isDisabled />
-        <TextInput
-          name="email"
-          placeholder={t("manualForm.email.placeholder")}
-          value={form.email}
-          onChangeHandler={onChangeHandler}
-        />
-        <CustomFileInputField
-          name="photo_ktp"
-          label={t("manualForm.photoKtp.label")}
-          imageBase64={form.photo_ktp}
-          errorMessage={errorMessage.photo_ktp}
-          onDeleteImageHandler={onDeleteImageHandler}
-          onChangeHandler={onChangeHandler}
-          onLabelClicked={onLabelClicked}
-          inputRef={fileFotoKtpRef}
-          showMaxResolution={false}
-        />
-        <CustomFileInputField
-          label={t("manualForm.photoSelfie.label")}
-          name="photo_selfie"
-          errorMessage={errorMessage.photo_selfie}
-          imageBase64={form.photo_selfie}
-          onChangeHandler={onChangeHandler}
-          onDeleteImageHandler={onDeleteImageHandler}
-          onLabelClicked={onLabelClicked}
-          inputRef={fileFotoSelfieRef}
-          showMaxResolution
-        />
-        <Button
-          type="submit"
-          size="sm"
-          className="bg-primary btn font-semibold mt-7 h-9 hover:opacity-50"
-          style={{
-            backgroundColor: themeConfigurationAvaliabilityChecker(
-              themeConfiguration?.data.buttonColor as string
-            ),
-          }}
-        >
-          {t("send")}
-        </Button>
-      </form>
-      <PhotoKtpTermModal fileFotoKtpRef={fileFotoKtpRef} show={modal.show} />
-      <PhotoSelfieTermModal
-        fileFotoSelfieRef={fileFotoSelfieRef}
-        show={modal.show}
-      />
-      <Footer />
+        <Footer />
+      </div>
     </div>
-  </div>
   );
 };
 

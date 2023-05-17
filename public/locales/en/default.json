@@ -197,15 +197,21 @@
     "title": "Manual Verification",
     "nik": {
       "label": "nik",
-      "placeholder": "Input NIK"
+      "placeholder": "Input NIK",
+      "errorMessage1":"NIK is required",
+      "errorMessage2": "NIK format does not match",
+      "errorMessage3": "NIK must be 16 digits",
+      "errorMessage4": "NIK must be a number"
     },
     "name": {
       "label": "Full Name",
-      "placeholder": "Input full name "
+      "placeholder": "Input full name",
+      "errorMessage1":"Full Name is required"
     },
     "email": {
       "label": "Email",
-      "placeholder": "Input full email"
+      "placeholder": "Input email",
+      "errorMessage1":"Email is required"
     },
     "photoKtp": {
       "label": "e-KTP",

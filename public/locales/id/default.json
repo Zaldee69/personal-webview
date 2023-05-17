@@ -197,15 +197,21 @@
     "title": "Verifikasi Manual",
     "nik": {
       "label": "NIK",
-      "placeholder": "Masukkan nomor e-KTP"
+      "placeholder": "Masukkan nomor e-KTP",
+      "errorMessage1":"NIK wajib diisi",
+      "errorMessage2": "Format NIK tidak sesuai",
+      "errorMessage3": "NIK harus 16 digit",
+      "errorMessage4": "NIK harus berupa angka"
     },
     "name": {
       "label": "Nama Lengkap",
-      "placeholder": "Masukkan nama lengkap sesuai e-KTP"
+      "placeholder": "Masukkan nama lengkap sesuai e-KTP",
+      "errorMessage1":"Nama Lengkap wajib diisi"
     },
     "email": {
       "label": "Email",
-      "placeholder": "Masukkan email"
+      "placeholder": "Masukkan email",
+      "errorMessage1":"Email wajib diisi"
     },
     "photoKtp": {
       "label": "Foto e-KTP",
