@@ -55,7 +55,7 @@ const SettingSignatureSuccess = (props: Props) => {
           "BG"
         ),
       }}
-      className="px-10 pt-16 h-screen pb-9 text-center"
+      className="px-10 pt-16 min-h-screenn pb-9 text-center"
     >
       <p className="text-base poppins-semibold text-neutral800">
         {t("settingSignatureSuccessTitle")}
