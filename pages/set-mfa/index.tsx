@@ -42,7 +42,7 @@ const SetMfa = () => {
     useState<boolean>(false);
   const [mfaMethod, setMfaMethod] = useState<"fr" | "otp" | null>(null);
   const [defaultMfa, setDefaultMfa] = useState<"fr" | "otp">("fr");
-  const [isShowPage, setIsShowpage] = useState<boolean>(false)
+  const [isShowPage, setIsShowpage] = useState<boolean>(false);
 
   const themeConfiguration = useSelector((state: RootState) => state.theme);
 
@@ -129,130 +129,141 @@ const SetMfa = () => {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if(!router.isReady) return
+    if (!router.isReady) return;
     if (!token) {
       router.push({
         pathname: handleRoute("login"),
         query: { ...router.query, setting: "2" },
       });
     } else {
-      setIsShowpage(true)
+      setIsShowpage(true);
       geTypeMfa();
     }
   }, [router.isReady]);
 
-  return isShowPage && (
-    <div className="h-screen" style={{
-      backgroundColor: themeConfigurationAvaliabilityChecker(
-        themeConfiguration?.data.background as string, "BG"
-      ),
-    }} >
-      <Head>
-        <title>Setting MFA</title>
-        <meta name="viewport" content="initial-scale=1.0, width=device-width" />
-      </Head>
-      <div className="max-w-md mx-auto px-2 h-[calc(100vh-100px)] pt-8 sm:w-full md:w-4/5">
-        <div className="mt-1.5 rounded-md bg-blue50 py-2 px-4 flex items-start">
-          <div className="pt-1">
-            <InfoIcon />
+  return (
+    isShowPage && (
+      <div
+        className="h-screen"
+        style={{
+          backgroundColor: themeConfigurationAvaliabilityChecker(
+            themeConfiguration?.data.background as string,
+            "BG"
+          ),
+        }}
+      >
+        <Head>
+          <title>Setting MFA</title>
+          <meta
+            name="viewport"
+            content="initial-scale=1.0, width=device-width"
+          />
+        </Head>
+        <div className="max-w-md mx-auto px-2 h-[calc(100vh-100px)] pt-8 sm:w-full md:w-4/5">
+          <div className="mt-1.5 rounded-md bg-blue50 py-2 px-4 flex items-start">
+            <div className="pt-1">
+              <InfoIcon />
+            </div>
+            <p className="text-xs poppins-regular text-blue500 ml-4">
+              {i18n.language === "en" ? (
+                t("choosetAutheticantionModeInformation")
+              ) : (
+                <>
+                  Untuk meningkatkan keamanan, diperlukan{" "}
+                  <em>Multi Factor Authentication</em> yang harus Anda gunakan
+                  saat melakukan aktivitas tandatangan digital ataupun aktivitas
+                  lainnya di tilaka.id. Silakan pilih metode MFA yang sesuai
+                  dengan kenyamanan Anda.
+                </>
+              )}
+            </p>
           </div>
-          <p className="text-xs poppins-regular text-blue500 ml-4">
-            {i18n.language === "en" ? (
-              t("choosetAutheticantionModeInformation")
-            ) : (
-              <>
-                Untuk meningkatkan keamanan, diperlukan{" "}
-                <em>Multi Factor Authentication</em> yang harus Anda gunakan
-                saat melakukan aktivitas tandatangan digital ataupun aktivitas
-                lainnya di tilaka.id. Silakan pilih metode MFA yang sesuai
-                dengan kenyamanan Anda.
-              </>
-            )}
-          </p>
+          <div className="mt-6">
+            <label className="flex cursor-pointer items-center">
+              <input
+                name="mfa_method"
+                value="fr"
+                onChange={handleFormOnChange}
+                checked={mfaMethod === "fr"}
+                type="radio"
+                className="appearance-none bg-white w-4 h-4 ring-1 ring-neutral40 border-2 border-neutral40 rounded-full checked:bg-primary checked:ring-primary"
+              />
+              <p className="text-md ml-2.5 poppins-regular text-_030326">
+                Face Recognition
+              </p>
+            </label>
+            <label className="flex cursor-pointer items-center mt-3.5">
+              <input
+                name="mfa_method"
+                value="otp"
+                onChange={handleFormOnChange}
+                checked={mfaMethod === "otp"}
+                type="radio"
+                className="appearance-none bg-white w-4 h-4 ring-1 ring-neutral40 border-2 border-neutral40 rounded-full checked:bg-primary checked:ring-primary"
+              />
+              <p className="text-md ml-2.5 poppins-regular text-_030326">
+                OTP via Email
+              </p>
+            </label>
+            <label className="flex items-center mt-3.5">
+              <input
+                disabled
+                name="mfa_method"
+                value="mfa_method_otp_ponsel"
+                type="radio"
+                className="appearance-none w-4 h-4 ring-1 bg-neutral40 ring-neutral50 border-2 border-neutral40 rounded-full checked:bg-primary checked:ring-primary"
+              />
+              <p className="text-md ml-2.5 poppins-regular text-_030326">
+                {t("autheticantionMode3")}{" "}
+                <span className="text-sm text-white bg-neutral80 px-2 py-1 rounded">
+                  Belum Tersedia
+                </span>
+              </p>
+            </label>
+          </div>
+          <div className="justify-center flex-col-reverse md:flex-row flex gap-3 md:justify-end mt-10">
+            <Button
+              onClick={() => setMfaMethod(defaultMfa)}
+              className="mx-0"
+              size="none"
+              style={{
+                color: themeConfigurationAvaliabilityChecker(
+                  themeConfiguration?.data.actionFontColor as string
+                ),
+              }}
+            >
+              Batal
+            </Button>
+            <Button
+              onClick={() => onClickHandler("confirmation")}
+              disabled={defaultMfa === mfaMethod}
+              size="lg"
+              className="py-2 mx-0"
+              style={{
+                backgroundColor: themeConfigurationAvaliabilityChecker(
+                  themeConfiguration?.data.buttonColor as string
+                ),
+              }}
+            >
+              Ubah Metode Otentikasi
+            </Button>
+          </div>
+          <FRModal
+            isShowModalFr={isShowModalFr}
+            setShowModalFr={setShowModalFr}
+            geTypeMfa={geTypeMfa}
+          />
+          <OtpModalConfirmation
+            isShowOtpModalConfirmation={isShowOtpModalConfirmation}
+            setIsShowOtpModalConfirmation={setIsShowOtpModalConfirmation}
+            onClickHandler={onClickHandler}
+          />
+          <div className="mt-16">
+            <Footer />
+          </div>
         </div>
-        <div className="mt-6">
-          <label className="flex cursor-pointer items-center">
-            <input
-              name="mfa_method"
-              value="fr"
-              onChange={handleFormOnChange}
-              checked={mfaMethod === "fr"}
-              type="radio"
-              className="appearance-none bg-white w-4 h-4 ring-1 ring-neutral40 border-2 border-neutral40 rounded-full checked:bg-primary checked:ring-primary"
-            />
-            <p className="text-md ml-2.5 poppins-regular text-_030326">
-              Face Recognition
-            </p>
-          </label>
-          <label className="flex cursor-pointer items-center mt-3.5">
-            <input
-              name="mfa_method"
-              value="otp"
-              onChange={handleFormOnChange}
-              checked={mfaMethod === "otp"}
-              type="radio"
-              className="appearance-none bg-white w-4 h-4 ring-1 ring-neutral40 border-2 border-neutral40 rounded-full checked:bg-primary checked:ring-primary"
-            />
-            <p className="text-md ml-2.5 poppins-regular text-_030326">
-              OTP via Email
-            </p>
-          </label>
-          <label className="flex items-center mt-3.5">
-            <input
-              disabled
-              name="mfa_method"
-              value="mfa_method_otp_ponsel"
-              type="radio"
-              className="appearance-none w-4 h-4 ring-1 bg-neutral40 ring-neutral50 border-2 border-neutral40 rounded-full checked:bg-primary checked:ring-primary"
-            />
-            <p className="text-md ml-2.5 poppins-regular text-_030326">
-              {t("autheticantionMode3")}{" "}
-              <span className="text-sm text-white bg-neutral80 px-2 py-1 rounded">
-                Belum Tersedia
-              </span>
-            </p>
-          </label>
-        </div>
-        <div className="justify-center flex-col-reverse md:flex-row flex gap-3 md:justify-end mt-10">
-          <Button
-            onClick={() => setMfaMethod(defaultMfa)}
-            className="mx-0"
-            size="none"
-            style={{
-              color: themeConfigurationAvaliabilityChecker(
-                themeConfiguration?.data.actionFontColor as string
-              ),
-            }}
-          >
-            Batal
-          </Button>
-          <Button
-            onClick={() => onClickHandler("confirmation")}
-            disabled={defaultMfa === mfaMethod}
-            size="lg"
-            // className="py-2 mx-0"
-            style={{
-              backgroundColor: themeConfigurationAvaliabilityChecker(
-                themeConfiguration?.data.buttonColor as string
-              ),
-            }}
-          >
-            Ubah Metode Otentikasi
-          </Button>
-        </div>
-        <FRModal
-          isShowModalFr={isShowModalFr}
-          setShowModalFr={setShowModalFr}
-          geTypeMfa={geTypeMfa}
-        />
-        <OtpModalConfirmation
-          isShowOtpModalConfirmation={isShowOtpModalConfirmation}
-          setIsShowOtpModalConfirmation={setIsShowOtpModalConfirmation}
-          onClickHandler={onClickHandler}
-        />
-      <Footer />
       </div>
-    </div>
+    )
   );
 };
 
@@ -348,12 +359,12 @@ const FRModal = ({ isShowModalFr, setShowModalFr, geTypeMfa }: IModalFR) => {
             callbackCaptureProcessor={captureProcessor}
           />
           <Button
-              className="mt-5 mb-2"
-              style={{
-                backgroundColor: themeConfigurationAvaliabilityChecker(
-                  themeConfiguration?.data.buttonColor as string
-                ),
-              }}
+            className="mt-5 mb-2"
+            style={{
+              backgroundColor: themeConfigurationAvaliabilityChecker(
+                themeConfiguration?.data.buttonColor as string
+              ),
+            }}
             onClick={() => setShowModalFr(false)}
           >
             {t("cancel")}
@@ -383,7 +394,8 @@ const OtpModalConfirmation = ({
               Konfirmasi Perubahan Metode Otentikasi
             </p>
             <p className="mt-8 text-sm text-center">
-              Apa Anda yakin mengubah metode otentikasi menjadi Face Recognition?
+              Apa Anda yakin mengubah metode otentikasi menjadi Face
+              Recognition?
             </p>
           </div>
         </div>
