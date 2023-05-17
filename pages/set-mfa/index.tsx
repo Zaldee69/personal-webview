@@ -250,8 +250,8 @@ const SetMfa = () => {
           setIsShowOtpModalConfirmation={setIsShowOtpModalConfirmation}
           onClickHandler={onClickHandler}
         />
-      </div>
       <Footer />
+      </div>
     </div>
   );
 };
@@ -261,6 +261,8 @@ const FRModal = ({ isShowModalFr, setShowModalFr, geTypeMfa }: IModalFR) => {
   const dispatch: AppDispatch = useDispatch();
 
   const [isFRSuccess, setIsFRSuccess] = useState<boolean>(false);
+
+  const themeConfiguration = useSelector((state: RootState) => state.theme);
 
   const router = useRouter();
 
@@ -345,12 +347,17 @@ const FRModal = ({ isShowModalFr, setShowModalFr, geTypeMfa }: IModalFR) => {
             tokenIdentifier="token_v2"
             callbackCaptureProcessor={captureProcessor}
           />
-          <button
-            className="bg-primary btn text-white block mx-auto w-fit px-6 poppins-regular mb-5 mt-7 rounded-md h-10 font-medium hover:opacity-50"
+          <Button
+              className="mt-5 mb-2"
+              style={{
+                backgroundColor: themeConfigurationAvaliabilityChecker(
+                  themeConfiguration?.data.buttonColor as string
+                ),
+              }}
             onClick={() => setShowModalFr(false)}
           >
             {t("cancel")}
-          </button>
+          </Button>
         </>
       </div>
     </div>
@@ -363,6 +370,7 @@ const OtpModalConfirmation = ({
   onClickHandler,
 }: IOtpModalConfrimation) => {
   const { t }: any = i18n;
+  const themeConfiguration = useSelector((state: RootState) => state.theme);
   return isShowOtpModalConfirmation ? (
     <div
       style={{ backgroundColor: "rgba(0, 0, 0, .5)" }}
@@ -379,19 +387,30 @@ const OtpModalConfirmation = ({
             </p>
           </div>
         </div>
-        <div className="poppins-regular justify-center items-center flex-col-reverse  flex gap-3  mt-5">
-          <button
+        <div className="poppins-regular justify-center items-center flex-col-reverse flex gap-3  mt-5">
+          <Button
+            variant="ghost"
+            style={{
+              color: themeConfigurationAvaliabilityChecker(
+                themeConfiguration?.data.actionFontColor as string
+              ),
+            }}
             onClick={() => setIsShowOtpModalConfirmation(false)}
-            className="text-primary fit-content font-semibold"
           >
             Batal
-          </button>
-          <button
+          </Button>
+          <Button
+            size="none"
+            className="py-2.5"
+            style={{
+              backgroundColor: themeConfigurationAvaliabilityChecker(
+                themeConfiguration?.data.buttonColor as string
+              ),
+            }}
             onClick={() => onClickHandler("submit")}
-            className="bg-primary text-white w-fit mx-auto px-4 py-2 rounded"
           >
             Konfirmasi
-          </button>
+          </Button>
         </div>
       </div>
     </div>
