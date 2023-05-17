@@ -413,6 +413,8 @@ const AutoLogoutInfoModal: React.FC<IModal> = ({ modal, setModal }) => {
   } & IParameterFromRequestSign = router.query;
   const { showAutoLogoutInfo, ...restRouterQuery } = routerQuery;
 
+  const themeConfiguration = useSelector((state: RootState) => state.theme);
+
   const onClose = () => {
     setModal(false);
     router.replace({
@@ -447,12 +449,18 @@ const AutoLogoutInfoModal: React.FC<IModal> = ({ modal, setModal }) => {
             {t("relogin1")}
             <br /> {t("relogin2")}
           </p>
-          <button
+          <Button
+            variant="ghost"
+            style={{
+              color: themeConfigurationAvaliabilityChecker(
+                themeConfiguration?.data.actionFontColor as string
+              ),
+            }}
             onClick={onClose}
             className="text-primary font-poppins mt-4 hover:opacity-50 mx-auto rounded-sm font-semibold p-4 text-sm"
           >
             {t("close")}
-          </button>
+          </Button>
         </div>
       </div>
     </div>
