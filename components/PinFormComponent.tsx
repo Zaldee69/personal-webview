@@ -5,6 +5,10 @@ import DeleteIcon from "@/public/icons/DeleteIcon";
 import Image from "next/image";
 import { assetPrefix } from "next.config";
 import Footer from "./Footer";
+import { buttonVariants } from "./atoms/Button";
+import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/app/store";
 
 interface IPropsPinFormComponent {
   title: string;
@@ -43,10 +47,11 @@ const PinFormComponent = (props: IPropsPinFormComponent): JSX.Element => {
   const [values, setValues] = useState<Array<number>>([]);
   const [digitArr, setDigitArr] = useState<Array<boolean>>(
     Array.apply(null, Array(props.digitLength)).map((_) => false)
-  );
-  const [onDelete, setOnDelete] = useState<boolean>(false);
-  const [submitted, setSubmitted] = useState<boolean>(false);
-
+    );
+    const [onDelete, setOnDelete] = useState<boolean>(false);
+    const [submitted, setSubmitted] = useState<boolean>(false);
+    const themeConfiguration = useSelector((state: RootState) => state.theme);
+    
   const shouldShowErrorAfterSubmit: boolean =
     values.length === props.digitLength && props.isErrorAfterSubmit
       ? true
@@ -213,7 +218,16 @@ const PinFormComponent = (props: IPropsPinFormComponent): JSX.Element => {
         <div className="mt-7 text-center">
           <p
             onClick={props.cancelLink.onClickCancelCallback}
-            className="text-primary text-sm font-semibold font-poppins hover:opacity-80 hover:cursor-pointer"
+            style={{
+              color: themeConfigurationAvaliabilityChecker(
+                themeConfiguration?.data.actionFontColor as string
+              ),
+            }}
+            className={buttonVariants({
+              variant: "ghost",
+              size: "none",
+              className: "font-semibold text-sm",
+            })}
           >
             {props.cancelLink.title}
           </p>
