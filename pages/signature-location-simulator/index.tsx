@@ -185,7 +185,7 @@ const SignaturLocationSimulator = (props: TPropsSignaturLocationSimulator) => {
       <div className="simulator-header">
         <div className="simulator-header-text">{t("simulatorPDFTitle")}</div>
       </div>
-      <div className="pt-8 sm:pt-12 md:pt-20 pb-2 sm:pb-6 md:pb-9 px-11 sm:px-20 md:px-32">
+      <div className="pt-8 sm:pt-12 md:pt-20 pb-2 sm:pb-6 md:pb-9 px-11 sm:px-20 md:px-32  md:max-w-screen-2xl min-w-max mx-auto">
         <UploadBox show={!uploaded} fileOnChange={fileOnChange} />
         {shouldRenderPdfViewerBox && (
           <PdfViewerBox
