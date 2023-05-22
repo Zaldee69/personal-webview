@@ -190,7 +190,7 @@ const ModalSuccess: React.FC<{
   setModal: Dispatch<SetStateAction<boolean>>;
 }> = ({ modal, setModal }) => {
   const { t }: any = i18n;
-
+  const themeConfiguration = useSelector((state: RootState) => state.theme);
   return modal ? (
     <div
       style={{ backgroundColor: "rgba(0, 0, 0, .5)" }}
@@ -211,12 +211,17 @@ const ModalSuccess: React.FC<{
         <p className="text-neutral800 text-base font-normal mt-8 font-poppins text-center">
           {t("checkEmail")}
         </p>
-        <button
+        <Button
+           style={{
+            color: themeConfigurationAvaliabilityChecker(
+              themeConfiguration?.data.actionFontColor as string
+            ),
+          }}
           onClick={() => setModal(false)}
           className="text-neutral80 font-poppins font-medium w-full mt-14 mx-auto rounded-sm py-2"
         >
           {t("close")}
-        </button>
+        </Button>
       </div>
     </div>
   ) : null;
