@@ -12,6 +12,7 @@ import Button from "@/components/atoms/Button";
 import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
 import { RootState } from "@/redux/app/store";
 import { useSelector } from "react-redux";
+import Footer from "@/components/Footer";
 
 type Props = {};
 
@@ -174,15 +175,7 @@ const ForgotTilakaName = (props: Props) => {
             )}
           </div>
         </div>
-
-        <div className="mt-8 flex justify-center">
-          <Image
-            src={`${assetPrefix}/images/poweredByTilaka.svg`}
-            alt="powered-by-tilaka"
-            width="80px"
-            height="41.27px"
-          />
-        </div>
+      <Footer/>
       </div>
       <ModalSuccess modal={modalSuccess} setModal={modalSuccessSetter} />
     </div>
