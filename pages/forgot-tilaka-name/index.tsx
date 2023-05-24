@@ -108,7 +108,7 @@ const ForgotTilakaName = (props: Props) => {
         themeConfiguration?.data.background as string, "BG"
       ),
     }}
-    className="h-screen"
+    className="min-h-screen"
      >
       <Head>
         <title>{t("forgotTilakaName.title")}</title>

@@ -159,7 +159,7 @@ const SetMfa = () => {
             content="initial-scale=1.0, width=device-width"
           />
         </Head>
-        <div className="max-w-md mx-auto px-2 h-[calc(100vh-100px)] pt-8 sm:w-full md:w-4/5">
+        <div className="max-w-md mx-auto px-2 pt-8 sm:w-full md:w-4/5">
           <div className="mt-1.5 rounded-md bg-blue50 py-2 px-4 flex items-start">
             <div className="pt-1">
               <InfoIcon />
