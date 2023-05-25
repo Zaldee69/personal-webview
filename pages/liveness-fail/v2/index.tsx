@@ -86,7 +86,7 @@ const LivenessFail = () => {
     }
   };
   return (
-    <div className="h-screen" style={{
+    <div className="min-h-screen" style={{
       backgroundColor: themeConfigurationAvaliabilityChecker(
         themeConfiguration?.data.background as string, "BG"
       ),
