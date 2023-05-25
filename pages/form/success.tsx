@@ -31,7 +31,7 @@ const FormSuccess = (props: Props) => {
           "BG"
         ),
       }}
-      className="px-10 pt-16 pb-9 h-screen text-center"
+      className="px-10 pt-16 pb-9 min-h-screen text-center"
     >
       <p className="text-base poppins-semibold text-neutral800">
         {t("livenessSuccessTitle")}
