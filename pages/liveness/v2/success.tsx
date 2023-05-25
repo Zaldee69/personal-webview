@@ -38,7 +38,7 @@ const FormSuccess = (props: Props) => {
       backgroundColor: themeConfigurationAvaliabilityChecker(
         themeConfiguration?.data.background as string, "BG"
       ),
-    }} className="px-10 pt-16 pb-9 text-center h-screen">
+    }} className="px-10 pt-16 pb-9 text-center min-h-screen">
       <p className="text-base poppins-semibold text-neutral800">
         {t("livenessSuccess")}
       </p>
