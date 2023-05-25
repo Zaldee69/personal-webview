@@ -904,7 +904,7 @@ const SigningSuccess = (props: TPropsSigningSuccess) => {
             </a>
           </div>
         )}
-        <Footer/>
+        <Footer />
       </div>
     </div>
   );
@@ -977,7 +977,7 @@ const SigningOnProgress = (props: TPropsSigningSuccess) => {
             </a>
           </div>
         )}
-        <Footer/>
+        <Footer />
       </div>
     </div>
   );
@@ -1103,7 +1103,6 @@ const FRModal: React.FC<IModal> = ({
         } else {
           setIsFRSuccess(false);
           toast.dismiss("info");
-          setModal(false);
           toast.error(res.message || "Ada yang salah", { icon: <XIcon /> });
           const newCount =
             parseInt(localStorage.getItem("count_v2") as string) + 1;
@@ -1114,6 +1113,7 @@ const FRModal: React.FC<IModal> = ({
             res.message.toLowerCase() ===
               "penandatanganan dokumen gagal. gagal FR sudah 5 kali".toLocaleLowerCase()
           ) {
+            setModal(false);
             signingFailure(res.message || "Ada yang salah");
           }
         }
@@ -1121,7 +1121,6 @@ const FRModal: React.FC<IModal> = ({
       .catch((err) => {
         setIsFRSuccess(false);
         toast.dismiss("info");
-        setModal(false);
         if (err.response?.status === 401) {
           restLogout({ token: localStorage.getItem("refresh_token_v2") });
           removeStorageWithExpiresIn("token_v2");
@@ -1139,6 +1138,7 @@ const FRModal: React.FC<IModal> = ({
           localStorage.setItem("count_v2", newCount.toString());
           const count = parseInt(localStorage.getItem("count_v2") as string);
           if (count >= 5) {
+            setModal(false);
             signingFailure(err.response?.data?.message || "Ada yang salah");
           }
         }
@@ -1178,6 +1178,7 @@ const FRModal: React.FC<IModal> = ({
             tokenIdentifier="token_v2"
             countIdentifier="count_v2"
             callbackCaptureProcessor={captureProcessor}
+            countdownRepeatDelay={5}
           />
           <Button
             onClick={() => setModal(!modal)}
@@ -1256,7 +1257,6 @@ const OTPModal: React.FC<IModal> = ({
         } else {
           setSuccessSigning(false);
           toast.dismiss("loading");
-          setModal(false);
           setValues(["", "", "", "", "", ""]);
           toast.error(res.message || "Ada yang salah", { icon: <XIcon /> });
           const newCount =
@@ -1268,6 +1268,7 @@ const OTPModal: React.FC<IModal> = ({
             res.message.toLowerCase() ===
               "penandatanganan dokumen gagal. gagal FR sudah 5 kali".toLocaleLowerCase()
           ) {
+            setModal(false);
             signingFailure(res.message || "Ada yang salah");
             setEndTimeToZero();
           }
@@ -1276,7 +1277,6 @@ const OTPModal: React.FC<IModal> = ({
       .catch((err) => {
         setSuccessSigning(false);
         toast.dismiss("loading");
-        setModal(false);
         setValues(["", "", "", "", "", ""]);
         if (err.response?.status === 401) {
           restLogout({ token: localStorage.getItem("refresh_token_v2") });
@@ -1296,6 +1296,7 @@ const OTPModal: React.FC<IModal> = ({
           localStorage.setItem("count_v2", newCount.toString());
           const count = parseInt(localStorage.getItem("count_v2") as string);
           if (count >= 5) {
+            setModal(false);
             signingFailure(err.response?.data?.message || "Ada yang salah");
             setEndTimeToZero();
           }
