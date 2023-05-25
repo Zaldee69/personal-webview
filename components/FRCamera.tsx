@@ -24,6 +24,7 @@ interface Props {
   tokenIdentifier?: string;
   countIdentifier?: string;
   callbackCaptureProcessor?: (base64Img: string | null | undefined) => void;
+  countdownRepeatDelay?: number;
 }
 
 let dom: any;
@@ -35,6 +36,7 @@ const FRCamera = ({
   tokenIdentifier = "token",
   countIdentifier = "count",
   callbackCaptureProcessor,
+  countdownRepeatDelay = 15,
 }: Props) => {
   const constraint: Constraint = {
     width: 1280,
@@ -186,7 +188,10 @@ const FRCamera = ({
         <CountdownCircleTimer
           onComplete={() => {
             capture();
-            return { shouldRepeat: true, delay: 15 };
+            return {
+              shouldRepeat: true,
+              delay: countdownRepeatDelay,
+            };
           }}
           isPlaying={isPlaying}
           size={45}

@@ -100,13 +100,12 @@ const FRModal: React.FC<IModal> = ({
         } else {
           setIsFRSuccess(false);
           toast.dismiss("info");
-          setModal(false);
           toast.error(res.message || "Ada yang salah", { icon: <XIcon /> });
-
           if (
             res.message.toLowerCase() ===
             "authhashsign gagal. gagal FR sudah 5 kali".toLocaleLowerCase()
           ) {
+            setModal(false);
             signingFailure(res.message || "Ada yang salah");
           }
         }
@@ -114,7 +113,6 @@ const FRModal: React.FC<IModal> = ({
       .catch((err) => {
         setIsFRSuccess(false);
         toast.dismiss("info");
-        setModal(false);
         if (err.response?.status === 401) {
           restLogout({ token: localStorage.getItem("refresh_token_hashsign") });
           removeStorageWithExpiresIn("token_hashsign");
@@ -131,6 +129,7 @@ const FRModal: React.FC<IModal> = ({
             err.response?.data?.message?.toLowerCase() ===
             "authhashsign gagal. gagal FR sudah 5 kali".toLocaleLowerCase()
           ) {
+            setModal(false);
             signingFailure(err.response?.data?.message || "Ada yang salah");
           }
         }
@@ -169,6 +168,7 @@ const FRModal: React.FC<IModal> = ({
             signingFailedRedirectTo={AUTHHASH_PATHNAME}
             tokenIdentifier="token_hashsign"
             callbackCaptureProcessor={captureProcessor}
+            countdownRepeatDelay={5}
           />
           <Button
             onClick={() => setModal(!modal)}
@@ -243,7 +243,6 @@ const OTPModal: React.FC<IModal> = ({
         } else {
           setSuccessSigning(false);
           toast.dismiss("loading");
-          setModal(false);
           setValues(["", "", "", "", "", ""]);
           toast.error(res.message || "Ada yang salah", { icon: <XIcon /> });
 
@@ -251,6 +250,7 @@ const OTPModal: React.FC<IModal> = ({
             res.message.toLowerCase() ===
             "authhashsign gagal. salah OTP sudah 5 kali".toLocaleLowerCase()
           ) {
+            setModal(false);
             signingFailure(res.message || "Ada yang salah");
             setEndTimeToZero();
           }
@@ -259,7 +259,6 @@ const OTPModal: React.FC<IModal> = ({
       .catch((err) => {
         setSuccessSigning(false);
         toast.dismiss("loading");
-        setModal(false);
         setValues(["", "", "", "", "", ""]);
         if (err.response?.status === 401) {
           restLogout({ token: localStorage.getItem("refresh_token_hashsign") });
@@ -278,6 +277,7 @@ const OTPModal: React.FC<IModal> = ({
             err.response?.data?.message?.toLowerCase() ===
             "authhashsign gagal. salah OTP sudah 5 kali".toLocaleLowerCase()
           ) {
+            setModal(false);
             signingFailure(err.response?.data?.message || "Ada yang salah");
             setEndTimeToZero();
           }
@@ -862,10 +862,13 @@ const Login = ({}: IPropsLogin) => {
                   alt="lineVertical"
                 />
               </div>
-              <Link href={{
-                pathname: handleRoute("forgot-tilaka-name"),
-                query: router.query
-              }} passHref>
+              <Link
+                href={{
+                  pathname: handleRoute("forgot-tilaka-name"),
+                  query: router.query,
+                }}
+                passHref
+              >
                 <a
                   style={{
                     color: themeConfigurationAvaliabilityChecker(
