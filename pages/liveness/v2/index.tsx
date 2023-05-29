@@ -33,6 +33,7 @@ import { actionText } from "@/utils/actionText";
 import { assetPrefix } from "next.config";
 import { log } from "@/utils/logging";
 import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
+import Heading from "@/components/atoms/Heading";
 
 type TQueryParams = {
   request_id?: string;
@@ -311,9 +312,9 @@ const Liveness = () => {
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
       <div className="py-10 max-w-sm mx-auto px-2">
-        <h2 className="font-poppins text-xl font-semibold">
+        <Heading>
           {isGenerateAction ? <SkeletonLoading width="w-2/5" /> : "Liveness"}
-        </h2>
+        </Heading>
         {(!isStepDone && actionList.length > 1) || isMustReload ? (
           <ActionGuide2
             imageSrc={themeConfigurationAvaliabilityChecker(

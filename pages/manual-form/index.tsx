@@ -274,7 +274,7 @@ const Index = () => {
         ),
       }}
     >
-      <div className="px-5 pt-8 max-w-md poppins-regular mx-auto">
+      <div className="px-5 pt-8 max-w-md mx-auto">
         <Heading>{t("manualForm.title")}</Heading>
         <form onSubmit={onsubmitHandler}>
           <Label className="ml-3 mt-5" size="base" htmlFor="nik">

@@ -30,7 +30,7 @@ const TextInput = ({
       type={type && type}
       className={`w-full focus:outline-none ${
         isError ? "border-red300" : "border-borderColor"
-      } focus:ring border placeholder:text-placeholder read-only:bg-neutral20 read-only:text-placeholder read-only:cursor-not-allowed placeholder:font-light rounded-md py-3 px-3 ${customStyle}`}
+      } focus:ring border  read-only:bg-neutral20 read-only:text-placeholder read-only:cursor-not-allowed placeholder:font-light rounded-md py-3 px-3 ${customStyle}`}
       placeholder={placeholder}
       value={value}
       onChange={onChangeHandler}
