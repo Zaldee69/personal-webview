@@ -161,8 +161,8 @@ const SignaturLocationSimulator = (props: TPropsSignaturLocationSimulator) => {
       icon: (
         <Image
           src={`${assetPrefix}/images/check-circle-white-ic.svg`}
-          width="16px"
-          height="17px"
+          width="16"
+          height="17"
           alt="check-circle-white-ic"
         />
       ),
@@ -225,8 +225,8 @@ const SignaturLocationSimulator = (props: TPropsSignaturLocationSimulator) => {
           >
             <Image
               src={`${assetPrefix}/images/copy.svg`}
-              width="16px"
-              height="16px"
+              width="16"
+              height="16"
               alt="copy-ic"
             />
             <p className="ml-2.5">{t("copy")}</p>
@@ -237,8 +237,8 @@ const SignaturLocationSimulator = (props: TPropsSignaturLocationSimulator) => {
           <Image
             src={`${assetPrefix}/images/poweredByTilaka.svg`}
             alt="powered-by-tilaka"
-            width="116px"
-            height="66px"
+            width="116"
+            height="66"
             priority
           />
         </div>
@@ -610,8 +610,8 @@ const PdfViewerBox = ({
                 <Image
                   src={`${assetPrefix}/images/trash.svg`}
                   alt="trash"
-                  width="16px"
-                  height="16px"
+                  width="16"
+                  height="16"
                 />
               </button>
             </div>
@@ -700,15 +700,15 @@ const PdfViewerBox = ({
                 <div className="flex flex-col items-center gap-6 pt-2">
                   <Image
                     src={`${assetPrefix}/images/simulator-dot.svg`}
-                    width="8px"
-                    height="8px"
+                    width="8"
+                    height="8"
                     alt="simulator-dot"
                     layout="fixed"
                   />
                   <Image
                     src={`${assetPrefix}/images/simulator-v-line.svg`}
-                    width="2px"
-                    height="69px"
+                    width="2"
+                    height="69"
                     alt="simulator-v-line"
                     layout="fixed"
                   />
@@ -726,8 +726,8 @@ const PdfViewerBox = ({
                     >
                       <Image
                         src={`${assetPrefix}/images/simulator-remove-signer.svg`}
-                        width="16px"
-                        height="16px"
+                        width="16"
+                        height="16"
                         alt="simulator-remove-signer"
                       />
                     </button>
@@ -800,8 +800,8 @@ const PdfViewerBox = ({
               <div className="flex flex-col items-center gap-6 pt-5">
                 <Image
                   src={`${assetPrefix}/images/simulator-dot.svg`}
-                  width="8px"
-                  height="8px"
+                  width="8"
+                  height="8"
                   alt="simulator-dot"
                   layout="fixed"
                 />

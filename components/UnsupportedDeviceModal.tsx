@@ -47,8 +47,8 @@ const UnsupportedDeviceModal: React.FC<Props> = () => {
               <div className="px-3 border-r border-neutral50 self-stretch flex">
                 <Image
                   src={`${assetPrefix}/images/link.svg`}
-                  width="20px"
-                  height="10px"
+                  width="20"
+                  height="10"
                   alt="link-ill"
                 />
               </div>
