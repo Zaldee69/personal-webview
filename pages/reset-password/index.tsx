@@ -1,5 +1,5 @@
 import { useState } from "react";
-import Image from "next/image";
+import Image from "next/legacy/image";
 import EyeIcon from "./../../public/icons/EyeIcon";
 import EyeIconOff from "./../../public/icons/EyeIconOff";
 import { useRouter } from "next/router";
@@ -14,6 +14,9 @@ import Footer from "@/components/Footer";
 import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/app/store";
+import Paragraph from "@/components/atoms/Paraghraph";
+import Heading from "@/components/atoms/Heading";
+import Label from "@/components/atoms/Label";
 
 type Props = {};
 
@@ -151,26 +154,28 @@ const LinkAccount = (props: Props) => {
   };
 
   return (
-    <div className="min-h-screen" style={{
-      backgroundColor: themeConfigurationAvaliabilityChecker(
-        themeConfiguration?.data.background as string, "BG"
-      ),
-    }} >
+    <div
+      className="min-h-screen"
+      style={{
+        backgroundColor: themeConfigurationAvaliabilityChecker(
+          themeConfiguration?.data.background as string,
+          "BG"
+        ),
+      }}
+    >
       <Head>
         <title>Pengaturan Ulang Kata Sandi</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
       <div className="px-5 py-9 max-w-md mx-auto min-h-screen flex flex-col justify-between">
         <div>
-          <p className="font-poppins text-lg font-normal text-neutral800 text-center">
-            Pengaturan Ulang Kata Sandi
-          </p>
+          <Heading>Pengaturan Ulang Kata Sandi</Heading>
           <form onSubmit={handleFormOnSubmit}>
             <label className="block mt-11">
               <div className="flex justify-start items-center">
-                <p className="font-poppins text-sm text-neutral200 pl-2.5">
+                <Label size="base" htmlFor="password" className="pl-2.5">
                   Kata Sandi Baru
-                </p>
+                </Label>
               </div>
               <div className="mt-1 relative">
                 <input
@@ -197,9 +202,13 @@ const LinkAccount = (props: Props) => {
             </label>
             <label className="block mt-6">
               <div className="flex justify-start items-center">
-                <p className="font-poppins text-sm text-neutral200 pl-2.5">
+                <Label
+                  size="base"
+                  htmlFor="confirm_password"
+                  className="pl-2.5"
+                >
                   Konfirmasi Kata Sandi Baru
-                </p>
+                </Label>
               </div>
               <div className="mt-1 relative">
                 <input
@@ -239,7 +248,7 @@ const LinkAccount = (props: Props) => {
             </Button>
           </form>
         </div>
-        <Footer/>
+        <Footer />
       </div>
     </div>
   );

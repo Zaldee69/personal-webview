@@ -5,7 +5,7 @@ import { RestKycCheckStep } from "infrastructure";
 import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
 import { GetServerSideProps } from "next";
 import Head from "next/head";
-import Image from "next/image";
+import Image from "next/legacy/image";
 import { useRouter } from "next/router";
 import React, { useEffect } from "react";
 import Footer from "../../../components/Footer";
@@ -15,6 +15,8 @@ import { buttonVariants } from "@/components/atoms/Button";
 import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/app/store";
+import Heading from "@/components/atoms/Heading";
+import Paragraph from "@/components/atoms/Paraghraph";
 
 const LivenessFailure = () => {
   const { t }: any = i18n;
@@ -55,19 +57,23 @@ const LivenessFailure = () => {
       </Head>
       <div className="px-5 pt-8 sm:w-full md:w-4/5 mx-auto">
         <div className="flex flex-col gap-20 items-center justify-center">
-          <h1 className="text-center text-neutral800 poppins-semibold text-xl">
+          <Heading className="text-center">
             {t("livenessFailedTitle")}
-          </h1>
-          <Image
-            src={`${assetPrefix}/images/livenessFail.svg`}
-            width={200}
-            height={200}
-            alt="Liveness Fail"
-          />
+          </Heading>
+          <div
+            className="bg-contain w-52 h-52 bg-center bg-no-repeat"
+            style={{
+              backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
+                themeConfiguration.data.asset_liveness_v2_failed as string,
+                "ASSET",
+                `${assetPrefix}/images/livenessFail.svg`
+              )})`,
+            }}
+          ></div>
           <div className="flex flex-col items-center gap-10 ">
-            <p className="text-center poppins-regular text-neutral">
+            <Paragraph className="text-center">
               {t("livenessV2FailureTitle")}
-            </p>
+            </Paragraph>
             {routerQuery.redirect_url && (
               <a
                 href={concateRedirectUrlParams(

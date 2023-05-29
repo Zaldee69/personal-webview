@@ -1,4 +1,4 @@
-import Image from "next/image";
+import Image from "next/legacy/image";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
@@ -18,6 +18,9 @@ import Button from "@/components/atoms/Button";
 import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/app/store";
+import Heading from "@/components/atoms/Heading";
+import Paragraph from "@/components/atoms/Paraghraph";
+import Label from "@/components/atoms/Label";
 
 interface InputType {
   password: string | number;
@@ -219,29 +222,32 @@ const Form: React.FC = () => {
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
       <div className="px-5 pt-8 max-w-md mx-auto">
-        <h1 className="font-poppins font-semibold text-xl">
+        <Heading>
           {t("finalFormTitle")}
-        </h1>
-        <div className="flex justify-center mt-10">
-          <Image
-            width={200}
-            height={200}
-            src={`${assetPrefix}/images/form.svg`}
-            alt="imgform"
-          />
-        </div>
-        <span className="font-poppins text-left block mt-5">
+        </Heading>
+        <div
+          className="bg-contain w-52 mx-auto h-52 mt-5 bg-center bg-no-repeat"
+          style={{
+            backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
+              themeConfiguration.data.asset_manual_form_final_form as string,
+              "ASSET",
+              `${assetPrefix}/images/form.svg`
+            )})`,
+          }}
+        ></div>
+        <Paragraph className=" text-left block mt-5">
           {t("finalFormSubtitle")}
-        </span>
+        </Paragraph>
         <form autoComplete="off" className="mt-10" onSubmit={onSubmitHandler}>
           <div className="flex flex-col">
             <div className="flex flex-row">
-              <label
-                className="font-poppins px-2 text-label font-light"
+              <Label
+                size="base"
                 htmlFor="tilakaName"
+                className="px-2"
               >
                 Tilaka Name
-              </label>
+              </Label>
               <div className="relative flex flex-col items-center group">
                 <QuestionIcon />
                 <div className="absolute left-9 -top-10  w-48   flex-col items-center hidden mb-6 group-hover:flex">
@@ -270,12 +276,13 @@ const Form: React.FC = () => {
             </p>
           </div>
           <div className="flex flex-col  mt-5">
-            <label
-              className="font-poppins px-2 text-label font-light"
+            <Label
+              className="px-2"
               htmlFor="password"
+              size="base"
             >
               {t("passwordLabel")}
-            </label>
+            </Label>
             <div className="relative">
               <input
                 onChange={(e) => onChangeHandler(e)}
@@ -301,12 +308,13 @@ const Form: React.FC = () => {
             </div>
           </div>
           <div className="flex flex-col mt-5">
-            <label
-              className="font-poppins px-2 text-label font-light"
+            <Label
+              className="px-2"
+              size="base"
               htmlFor="retype-password"
             >
               {t("passwordConfirmationLabel")}
-            </label>
+            </Label>
             <div className="relative">
               <input
                 onChange={(e) => onChangeHandler(e)}
@@ -342,7 +350,7 @@ const Form: React.FC = () => {
               className=" border-borderColor"
               onChange={onChangeHandler}
             />
-            <label className="ml-2 text-neutral font-poppins " htmlFor="tnc">
+            <Label htmlFor="tnc">
               {t("agree")}{" "}
               <span className="text-primary">
                 <a
@@ -378,7 +386,7 @@ const Form: React.FC = () => {
                 {" "}
                 {t("certificate")}
               </a>
-            </label>
+            </Label>
           </div>
           <Button
             style={{

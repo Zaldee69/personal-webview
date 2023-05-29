@@ -126,7 +126,10 @@ const Liveness = () => {
           const payload = ["look_straight"].concat(res.data.actionList);
           dispatch(setActionList(payload));
         } else {
-          const message = res.response.data.data.errors[0] === "Request tidak ditemukan" ? res.response.data.data.errors[0] : "Request telah liveness"
+          const message =
+            res.response.data.data.errors[0] === "Request tidak ditemukan"
+              ? res.response.data.data.errors[0]
+              : "Request telah liveness";
           toast.dismiss("loading");
           setIsDisabled(true);
           setIsGenerateAction(true);
@@ -313,9 +316,19 @@ const Liveness = () => {
         </h2>
         {(!isStepDone && actionList.length > 1) || isMustReload ? (
           <ActionGuide2
-            currentIndex={currentIndex}
+            imageSrc={themeConfigurationAvaliabilityChecker(
+              currentIndex === "hadap-depan" || !isStepDone
+                ? (themeConfiguration.data
+                    .asset_liveness_v2_action_selfie as string)
+                : currentIndex === "buka-mulut"
+                ? (themeConfiguration.data
+                    .asset_liveness_v2_action_open_mouth as string)
+                : (themeConfiguration.data
+                    .asset_liveness_v2_action_blink as string),
+              "ASSET",
+              `${assetPrefix}/images/${currentIndex}.svg`
+            )}
             isGenerateAction={isGenerateAction}
-            isStepDone={isStepDone}
             isMustReload={isMustReload}
           />
         ) : (
@@ -331,7 +344,18 @@ const Liveness = () => {
             {!isLoading && (
               <ActionGuide1
                 actionList={actionList}
-                currentIndex={currentIndex}
+                imageSrc={themeConfigurationAvaliabilityChecker(
+                  currentIndex === "hadap-depan"
+                    ? (themeConfiguration.data
+                        .asset_liveness_v2_action_selfie as string)
+                    : currentIndex === "buka-mulut"
+                    ? (themeConfiguration.data
+                        .asset_liveness_v2_action_open_mouth as string)
+                    : (themeConfiguration.data
+                        .asset_liveness_v2_action_blink as string),
+                  "ASSET",
+                  `${assetPrefix}/images/${currentIndex}.svg`
+                )}
                 currentActionIndex={currentActionIndex}
                 failedMessage={failedMessage}
                 actionText={actionText}

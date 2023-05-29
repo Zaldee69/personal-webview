@@ -2,7 +2,6 @@ import { handleRoute } from "@/utils/handleRoute";
 import { serverSideRenderReturnConditions } from "@/utils/serverSideRenderReturnConditions";
 import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
 import { GetServerSideProps } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
@@ -20,6 +19,8 @@ import { RootState } from "@/redux/app/store";
 import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
 import { buttonVariants } from "@/components/atoms/Button";
 import Footer from "@/components/Footer";
+import Heading from "@/components/atoms/Heading";
+import Paragraph from "@/components/atoms/Paraghraph";
 
 type Props = {
   checkStepResultDataRoute: TKycCheckStepResponseData["data"]["route"];
@@ -135,33 +136,35 @@ const LinkAccountFailure = (props: Props) => {
       }}
     >
       <div className="px-10 max-w-md mx-auto pt-16 pb-9 text-center">
-        <p className="text-base poppins-semibold text-neutral800">
+        <Heading>
           {t("linkAccountFailedTitle")}
-        </p>
-        <div className="mt-20">
-          <Image
-            src={`${assetPrefix}/images/linkAccountFailure.svg`}
-            width="196px"
-            height="196px"
-            alt="liveness-failure-ill"
-          />
-        </div>
+        </Heading>
+        <div
+          className="bg-contain mt-10 w-52 mx-auto h-64 bg-center bg-no-repeat"
+          style={{
+            backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
+              themeConfiguration.data.asset_activation_failed as string,
+              "ASSET",
+              `${assetPrefix}/images/linkAccountFailure.svg`
+            )})`,
+          }}
+        ></div>
         {failedCount >= 5 && (
           <>
-            <h1 className="text-base mt-5 poppins-semibold text-neutral800">
+            <Heading className="text-base mt-5">
               {t("linkAccountFailed5x.title")}
-            </h1>
-            <p className="text-center mt-1 poppins-regular text-neutral800">
+            </Heading>
+            <Paragraph>
               {t("linkAccountFailed5x.subtitle")}
-            </p>
+            </Paragraph>
           </>
         )}
         {props.checkStepResultDataRoute === "penautan_consent" ? (
           routerQuery.reject_by_user === "1" ? (
             <div className="mt-14">
-              <p className="poppins-regular text-xs text-neutral200">
+              <Paragraph size="sm" >
                 {t("consentLinkAccountFailedSubtitleRejectByUser")}
-              </p>
+              </Paragraph>
             </div>
           ) : (
             <></>
@@ -243,6 +246,7 @@ const LinkAccountFailure = (props: Props) => {
         ) : (
           <div className="mt-20 text-primary text-base poppins-medium underline hover:cursor-pointer">
             <Link
+              legacyBehavior
               href={{
                 pathname: handleRoute("link-account"),
                 query: { ...router.query },

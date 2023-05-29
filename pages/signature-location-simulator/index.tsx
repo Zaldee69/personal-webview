@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import ChevronRight from "@/public/icons/ChevronRight";
-import Image from "next/image";
+import Image from "next/legacy/image";
 import { assetPrefix } from "next.config";
 import { copyToClipboard } from "@/utils/copyToClipboard";
 import { LightAsync as SyntaxHighlighter } from "react-syntax-highlighter";

@@ -1,5 +1,5 @@
 import { concateRedirectUrlParams } from "@/utils/concateRedirectUrlParams";
-import Image from "next/image";
+import Image from "next/legacy/image";
 import { useRouter } from "next/router";
 import React from "react";
 import { assetPrefix } from "../../next.config";
@@ -9,6 +9,8 @@ import { buttonVariants } from "@/components/atoms/Button";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/app/store";
 import Footer from "@/components/Footer";
+import Heading from "@/components/atoms/Heading";
+import Paragraph from "@/components/atoms/Paraghraph";
 
 type Props = {};
 
@@ -23,21 +25,21 @@ const FormSuccess = (props: Props) => {
         themeConfiguration?.data.background as string, "BG"
       ),
     }} className="px-10 min-h-screen pt-16 pb-9 text-center">
-      <p className="text-base poppins-semibold text-neutral800">
+      <Heading>
         {t("livenessSuccessTitle")}
-      </p>
+      </Heading>
       <div className="mt-20">
         <Image
           src={`${assetPrefix}/images/livenessSucc.svg`}
-          width="196px"
-          height="194px"
+          width="196"
+          height="194"
           alt="liveness-success-ill"
         />
       </div>
       <div className="mt-14">
-        <p className="poppins-regular text-xs text-neutral200">
+        <Paragraph size="sm" >
           {t("livenessSuccessSubtitle")}
-        </p>
+        </Paragraph>
       </div>
       <div className="mt-20 text-primary text-base poppins-medium underline hover:cursor-pointer">
         {routerQuery.redirect_url && (

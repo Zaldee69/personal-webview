@@ -17,7 +17,7 @@ import React, {
   useRef,
   useState,
 } from "react";
-import Image from "next/image";
+import Image from "next/legacy/image";
 import i18n from "i18";
 import { RestPersonalPManualReg } from "infrastructure";
 import { TPersonalPManualRegRequestData } from "infrastructure/rest/personal/types";
@@ -26,6 +26,8 @@ import Button from "@/components/atoms/Button";
 import { RootState } from "@/redux/app/store";
 import { useSelector } from "react-redux";
 import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
+import Heading from "@/components/atoms/Heading";
+import Paragraph from "@/components/atoms/Paraghraph";
 
 type TForm = {
   nik: string;
@@ -273,9 +275,11 @@ const Index = () => {
       }}
     >
       <div className="px-5 pt-8 max-w-md poppins-regular mx-auto">
-        <h1 className="text-lg font-bold">{t("manualForm.title")}</h1>
+        <Heading>{t("manualForm.title")}</Heading>
         <form onSubmit={onsubmitHandler}>
-          <Label htmlFor="nik" title="NIK" isDisabled />
+          <Label className="ml-3 mt-5" size="base" htmlFor="nik">
+            NIK
+          </Label>
           <TextInput
             name="nik"
             placeholder={t("manualForm.nik.placeholder")}
@@ -284,7 +288,9 @@ const Index = () => {
             isError={errorMessage.nik.length > 1}
           />
           <ErrorMessage errorMessage={errorMessage.nik} />
-          <Label htmlFor="name" title={t("manualForm.name.label")} isDisabled />
+          <Label className="ml-3 mt-3" size="base" htmlFor="name">
+            {t("manualForm.name.label")}
+          </Label>
           <TextInput
             name="name"
             placeholder={t("manualForm.name.placeholder")}
@@ -293,11 +299,9 @@ const Index = () => {
             isError={errorMessage.name.length > 1}
           />
           <ErrorMessage errorMessage={errorMessage.name} />
-          <Label
-            htmlFor="email"
-            title={t("manualForm.email.label")}
-            isDisabled
-          />
+          <Label className="ml-3 mt-3" size="base" htmlFor="email">
+            {t("manualForm.email.label")}
+          </Label>
           <TextInput
             name="email"
             placeholder={t("manualForm.email.placeholder")}
@@ -336,7 +340,7 @@ const Index = () => {
               className=" border-borderColor"
               onChange={onChangeHandler}
             />
-            <label className="ml-2 text-neutral font-poppins " htmlFor="tnc">
+            <Label className="ml-2 text-neutral" htmlFor="tnc">
               {t("agree")}{" "}
               <span className="text-primary">
                 <a
@@ -372,7 +376,7 @@ const Index = () => {
                 {" "}
                 {t("certificate")}
               </a>
-            </label>
+            </Label>
           </div>
           <Button
             type="submit"
@@ -414,21 +418,53 @@ const PhotoKtpTermModal = ({ show, fileFotoKtpRef }: TModal) => {
   return show.ktp ? (
     <ModalLayout>
       <div className="md:px-10 py-5">
-        <h1 className="text-lg font-bold">
+        <Heading className="text-lg font-bold">
           {t("manualForm.photoKtp.termTitle")}
-        </h1>
-        <div className="text-center mt-5 max-w-md">
-          <img
-            src={`${assetPrefix}/images/ktpGuide.png`}
-            width="100%"
-            height="40px"
-            alt="Photo e-KTP Term"
-          />
-        </div>
+        </Heading>
+        {!themeConfiguration.data.asset_manual_form_ektp_ok ||
+        !themeConfiguration.data.asset_manual_form_ektp_not_ok ? (
+          <div className="text-center mt-5 max-w-md">
+            <img
+              src={`${assetPrefix}/images/ktpGuide.png`}
+              width="100%"
+              height="40px"
+              alt="Photo e-KTP Term"
+            />
+          </div>
+        ) : (
+          <div className="flex">
+            <div
+              className="bg-contain w-44 mx-auto mt-5 h-44 bg-center bg-no-repeat"
+              style={{
+                backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
+                  themeConfiguration.data.asset_forget_password as string,
+                  "ASSET",
+                  `${assetPrefix}/images/forgotPassword.svg`
+                )})`,
+              }}
+            ></div>
+            <div
+              className="bg-contain w-44 mx-auto mt-6 h-44 bg-center bg-no-repeat"
+              style={{
+                backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
+                  themeConfiguration.data.asset_forget_password as string,
+                  "ASSET",
+                  `${assetPrefix}/images/forgotPassword.svg`
+                )})`,
+              }}
+            ></div>
+          </div>
+        )}
         <ul className="px-5 mt-10" style={{ listStyle: "initial" }}>
-          <li>{t("manualForm.photoKtp.term1")}</li>
-          <li className="mt-2">{t("manualForm.photoKtp.term2")}</li>
-          <li className="mt-2">{t("manualForm.photoKtp.term3")}</li>
+          <li>
+            <Paragraph>{t("manualForm.photoKtp.term1")}</Paragraph>
+          </li>
+          <li className="mt-2">
+            <Paragraph>{t("manualForm.photoKtp.term2")}</Paragraph>
+          </li>
+          <li className="mt-2">
+            <Paragraph>{t("manualForm.photoKtp.term3")}</Paragraph>
+          </li>
         </ul>
         <Button
           type="button"
@@ -467,25 +503,61 @@ const PhotoSelfieTermModal = ({ show, fileFotoSelfieRef }: TModal) => {
     >
       <div className="bg-white max-w-md pt-5 px-2 pb-3 rounded-md w-full ">
         <div className="md:px-10  py-3">
-          <h1 className="text-lg font-bold">
+          <Heading className="text-lg font-bold">
             {t("manualForm.photoSelfie.termTitle")}
-          </h1>
-          <div className="text-center mt-5 max-w-md">
-            <img
-              src={`${assetPrefix}/images/selfieGuide.png`}
-              width="100%"
-              height="40px"
-              alt="Photo e-KTP Term"
-            />
-          </div>
+          </Heading>
+          {!themeConfiguration.data.asset_manual_form_ektp_ok ||
+          !themeConfiguration.data.asset_manual_form_ektp_not_ok ? (
+            <div className="text-center mt-5 max-w-md">
+              <img
+                src={`${assetPrefix}/images/selfieGuide.png`}
+                width="100%"
+                height="40px"
+                alt="Photo e-KTP Term"
+              />
+            </div>
+          ) : (
+            <div className="flex">
+              <div
+                className="bg-contain w-44 mx-auto mt-5 h-44 bg-center bg-no-repeat"
+                style={{
+                  backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
+                    themeConfiguration.data
+                      .asset_manual_form_selfie_ok as string,
+                    "ASSET",
+                    `${assetPrefix}/images/forgotPassword.svg`
+                  )})`,
+                }}
+              ></div>
+              <div
+                className="bg-contain w-44 mx-auto mt-6 h-44 bg-center bg-no-repeat"
+                style={{
+                  backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
+                    themeConfiguration.data
+                      .asset_manual_form_selfie_not_ok as string,
+                    "ASSET",
+                    `${assetPrefix}/images/forgotPassword.svg`
+                  )})`,
+                }}
+              ></div>
+            </div>
+          )}
           <ul
             className="px-5 mt-10 text-sm md:text-base list-disc"
             style={{ listStyle: "initial !important" }}
           >
-            <li>{t("manualForm.photoSelfie.term1")}</li>
-            <li className="mt-2">{t("manualForm.photoSelfie.term2")}</li>
-            <li className="mt-2">{t("manualForm.photoSelfie.term3")}</li>
-            <li className="mt-2">{t("manualForm.photoSelfie.term4")}</li>
+            <li>
+              <Paragraph>{t("manualForm.photoSelfie.term1")}</Paragraph>
+            </li>
+            <li className="mt-2">
+              <Paragraph>{t("manualForm.photoSelfie.term2")}</Paragraph>
+            </li>
+            <li className="mt-2">
+              <Paragraph>{t("manualForm.photoSelfie.term3")}</Paragraph>
+            </li>
+            <li className="mt-2">
+              <Paragraph>{t("manualForm.photoSelfie.term4")}</Paragraph>
+            </li>
           </ul>
           <Button
             type="button"

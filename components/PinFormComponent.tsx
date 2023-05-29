@@ -2,13 +2,15 @@ import { shuffleArray } from "@/utils/shuffleArray";
 import React, { useEffect, useState } from "react";
 import ArrowLeftIcon from "@/public/icons/ArrowLeftIcon";
 import DeleteIcon from "@/public/icons/DeleteIcon";
-import Image from "next/image";
+import Image from "next/legacy/image";
 import { assetPrefix } from "next.config";
 import Footer from "./Footer";
 import { buttonVariants } from "./atoms/Button";
 import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/app/store";
+import Heading from "./atoms/Heading";
+import Paragraph from "./atoms/Paraghraph";
 
 interface IPropsPinFormComponent {
   title: string;
@@ -136,13 +138,13 @@ const PinFormComponent = (props: IPropsPinFormComponent): JSX.Element => {
           <ArrowLeftIcon />
         </button>
       )}
-      <p className="text-center text-neutral800 text-base font-semibold font-poppins">
+      <Heading className="text-center text-neutral800 text-base font-semibold">
         {props.title}
-      </p>
+      </Heading>
       {props.subTitle && (
-        <p className="text-center text-neutral200 text-xs font-normal font-poppins mt-2.5">
+        <Paragraph className="text-center text-neutral200 text-xs font-normal mt-2.5">
           {props.subTitle}
-        </p>
+        </Paragraph>
       )}
       <div className="mt-8">
         <div
@@ -153,8 +155,8 @@ const PinFormComponent = (props: IPropsPinFormComponent): JSX.Element => {
         >
           <Image
             src={`${assetPrefix}/images/loader.svg`}
-            width="30px"
-            height="30px"
+            width="30"
+            height="30"
             alt="loader"
           />
         </div>

@@ -2,7 +2,7 @@ import Footer from "../../components/Footer";
 import Head from "next/head";
 import { handleRoute } from "@/utils/handleRoute";
 import i18n from "i18";
-import Image from "next/image";
+import Image from "next/legacy/image";
 import { GetServerSideProps } from "next";
 
 const Guide = () => {

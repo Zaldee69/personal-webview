@@ -22,6 +22,9 @@ import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfiguratio
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/app/store";
 import Footer from "@/components/Footer";
+import { assetPrefix } from "next.config";
+import Heading from "@/components/atoms/Heading";
+import Paragraph from "@/components/atoms/Paraghraph";
 
 type Props = {};
 
@@ -228,16 +231,23 @@ function SettingSignatureAndMFA({}: Props) {
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
       <div className="p-4 max-w-md mx-auto">
-        <h1 className="text-xl poppins-semibold mt-2">
+        <Heading className="mt-2">
           {t("settingSignatureTitleAndMFA")}
-        </h1>
+        </Heading>
         <form onSubmit={handleFormOnSubmit}>
-          <div className="flex justify-center">
-            <img src="images/ttdSetting.svg" alt="ill" />
-          </div>
-          <p className="text-md poppins-regular text-neutral800">
+          <div
+          className="bg-contain w-64 mx-auto h-64 bg-center bg-no-repeat"
+          style={{
+            backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
+              themeConfiguration.data.asset_activation_setting_signature_and_mfa as string,
+              "ASSET",
+              `${assetPrefix}/images/ttdSetting.svg`
+            )})`,
+          }}
+        ></div>
+          <Paragraph>
             {t("chooseSignature")}
-          </p>
+          </Paragraph>
           <div className="mt-2 rounded-md bg-blue50 py-2 px-4 flex items-start">
             <div className="pt-1">
               <InfoIcon />
@@ -256,9 +266,9 @@ function SettingSignatureAndMFA({}: Props) {
                 type="radio"
                 className="appearance-none bg-white w-4 h-4 ring-1 ring-neutral40 border-2 border-neutral40 rounded-full checked:bg-primary checked:ring-primary"
               />
-              <p className="text-md poppins-regular ml-2.5 text-_030326">
+              <Paragraph className="ml-2.5">
                 {t("signatureOption1")}
-              </p>
+              </Paragraph>
             </label>
             <label className="flex items-center mt-3.5">
               <input
@@ -267,11 +277,11 @@ function SettingSignatureAndMFA({}: Props) {
                 onChange={handleFormOnChange}
                 checked={form.signature_type == 1}
                 type="radio"
-                className="appearance-none bg-white w-4 h-4 ring-1 ring-neutral40 border-2 border-white border-neutral40 rounded-full checked:bg-primary checked:ring-primary"
+                className="appearance-none bg-white w-4 h-4 ring-1 ring-neutral40 border-2 border-neutral40 rounded-full checked:bg-primary checked:ring-primary"
               />
-              <p className="text-md ml-2.5 poppins-regular text-_030326">
+              <Paragraph className="ml-2.5">
                 {t("signatureOption2")}
-              </p>
+              </Paragraph>
             </label>
           </div>
           <div className={form.signature_type == 0 ? undefined : "hidden"}>
@@ -367,9 +377,9 @@ function SettingSignatureAndMFA({}: Props) {
               </label>
             </div>
           </div>
-          <p className="text-md poppins-regular text-neutral800 mt-8">
+          <Paragraph className="mt-8">
             {t("choosetAutheticantionMode")}
-          </p>
+          </Paragraph>
           <div className="mt-1.5 rounded-md bg-blue50 py-2 px-4 flex items-start">
             <div className="pt-1">
               <InfoIcon />
@@ -387,31 +397,31 @@ function SettingSignatureAndMFA({}: Props) {
             </p>
           </div>
           <div className="mt-6">
-            <label className="flex items-center">
+            <label className="flex items-center hover:cursor-pointer">
               <input
                 name="mfa_method"
                 value="fr"
                 onChange={handleFormOnChange}
                 checked={form.mfa_method === "fr"}
                 type="radio"
-                className="appearance-none bg-white w-4 h-4 ring-1 ring-neutral40 border-2 border-white border-neutral40 rounded-full checked:bg-primary checked:ring-primary"
+                className="appearance-none hover:cursor-pointer bg-white w-4 h-4 ring-1 ring-neutral40 border-2 border-neutral40 rounded-full checked:bg-primary checked:ring-primary"
               />
-              <p className="text-md ml-2.5 poppins-regular text-_030326">
+              <Paragraph className="ml-2.5">
                 Face Recognition
-              </p>
+              </Paragraph>
             </label>
-            <label className="flex items-center mt-3.5">
+            <label className="flex items-center hover:cursor-pointer mt-3.5">
               <input
                 name="mfa_method"
                 value="otp"
                 onChange={handleFormOnChange}
                 checked={form.mfa_method === "otp"}
                 type="radio"
-                className="appearance-none bg-white w-4 h-4 ring-1 ring-neutral40 border-2 border-white border-neutral40 rounded-full checked:bg-primary checked:ring-primary"
+                className="appearance-none hover:cursor-pointer bg-white w-4 h-4 ring-1 ring-neutral40 border-2 border-neutral40 rounded-full checked:bg-primary checked:ring-primary"
               />
-              <p className="text-md ml-2.5 poppins-regular text-_030326">
+              <Paragraph className="ml-2.5">
                 OTP via Email
-              </p>
+              </Paragraph>
             </label>
             <label className="flex items-center mt-3.5">
               <input

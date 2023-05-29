@@ -19,7 +19,7 @@ import { toast } from "react-toastify";
 import XIcon from "@/public/icons/XIcon";
 import { useRouter } from "next/router";
 import { handleRoute } from "./../../../utils/handleRoute";
-import Image from "next/image";
+import Image from "next/legacy/image";
 import { assetPrefix } from "../../../next.config";
 import { NextParsedUrlQuery } from "next/dist/server/request-meta";
 import i18n from "i18";
@@ -35,6 +35,9 @@ import Link from "next/link";
 import { getEncodedCurrentUrl } from "@/utils/getEncodedCurrentUrl";
 import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
 import Button, { buttonVariants } from "@/components/atoms/Button";
+import Heading from "@/components/atoms/Heading";
+import Label from "@/components/atoms/Label";
+import Paragraph from "@/components/atoms/Paraghraph";
 
 interface IPropsLogin {}
 
@@ -269,18 +272,19 @@ const Login = ({}: IPropsLogin) => {
           <div className="h-14 w-14 font-semibold flex  text-xl items-center justify-center name text-white bg-[#64bac3] rounded-full">
             {tilakaName?.[0]?.toUpperCase()}
           </div>
-          <span className="font-bold text-xl text-[#172b4d] font-poppins">
+          <Heading>
             {t("hi")}, {user}
-          </span>
+          </Heading>
         </div>
         <form onSubmit={submitHandler}>
           <div className="flex flex-col  mt-20">
-            <label
-              className="font-poppins px-2 text-label font-light"
+            <Label
+              size="base"
+              className="px-2"
               htmlFor="password"
             >
               {t("passwordLabel")}
-            </label>
+            </Label>
             <div className="relative flex-1">
               <input
                 onChange={(e) => onChangeHandler(e)}
@@ -306,6 +310,7 @@ const Login = ({}: IPropsLogin) => {
                   query: router.query
                 }}
                 passHref
+                legacyBehavior
               >
                 <a style={{
                     color: themeConfigurationAvaliabilityChecker(
@@ -319,15 +324,15 @@ const Login = ({}: IPropsLogin) => {
               <div className="block mx-2.5">
                 <Image
                   src={`${assetPrefix}/images/lineVertical.svg`}
-                  width="8px"
-                  height="24px"
+                  width="8"
+                  height="24"
                   alt="lineVertical"
                 />
               </div>
               <Link href={{
                 pathname: handleRoute("forgot-tilaka-name"),
                 query: router.query
-              }} passHref>
+              }} legacyBehavior passHref>
                 <a style={{
                     color: themeConfigurationAvaliabilityChecker(
                       themeConfiguration?.data.actionFontColor as string
@@ -368,15 +373,15 @@ export default Login;
 
 const CertifModal = ({ certifModal, setCertifModal }: ModalProps) => {
   const { t }: any = i18n;
-  return certifModal ? (
+  return !certifModal ? (
     <div
       style={{ backgroundColor: "rgba(0, 0, 0, .5)" }}
       className="fixed z-50 flex items-start transition-all duration-1000 pb-3 justify-center w-full left-0 top-0 h-full "
     >
       <div className="bg-white max-w-md mt-20 pt-5 px-2 pb-3 rounded-xl w-full mx-5">
-        <p className="text-center font-poppins font-semibold">
+        <Heading className="text-center">
           {t("dontHaveCertifTitle")}
-        </p>
+        </Heading>
         <div className="flex flex-col justify-center">
           <Image
             src={`${assetPrefix}/images/certif.svg`}
@@ -384,9 +389,9 @@ const CertifModal = ({ certifModal, setCertifModal }: ModalProps) => {
             height={100}
             alt="cert"
           />
-          <p className="text-center font-poppins mt-5">
+          <Paragraph className="text-center mt-5">
             {t("dontHaveCertifSubtitle")}
-          </p>
+          </Paragraph>
         </div>
         <button className="bg-primary btn uppercase mt-8 disabled:opacity-50 text-white font-poppins w-full mx-auto rounded-sm h-9">
           {t("createNewCertif")}
@@ -431,24 +436,23 @@ const AutoLogoutInfoModal: React.FC<IModal> = ({ modal, setModal }) => {
     >
       <div className="bg-white max-w-sm mt-20 pt-6 px-3 pb-3 rounded-xl w-full mx-5">
         <div className="flex flex-col">
-          <p className="font-poppins text-center font-semibold text-base text-neutral800">
+          <Heading className="text-center">
             {t("youAreLoggedOut")}
-          </p>
+          </Heading>
           <div className="flex justify-center">
             <Image
               src={`${assetPrefix}/images/autoLogout.svg`}
-              width="95px"
-              height="95px"
+              width="95"
+              height="95"
               alt="auto-logout-ill"
             />
           </div>
-          <p
-            className="text-base font-normal text-neutral800 font-poppins text-center mt-2.5 mx-auto"
-            style={{ maxWidth: "330px" }}
+          <Paragraph
+            className="text-center px-3 mt-2.5 mx-auto"
           >
             {t("relogin1")}
             <br /> {t("relogin2")}
-          </p>
+          </Paragraph>
           <Button
             variant="ghost"
             style={{

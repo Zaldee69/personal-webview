@@ -18,7 +18,7 @@ import { toast } from "react-toastify";
 import XIcon from "@/public/icons/XIcon";
 import { useRouter } from "next/router";
 import { handleRoute } from "../../../utils/handleRoute";
-import Image from "next/image";
+import Image from "next/legacy/image";
 import { assetPrefix } from "../../../next.config";
 import { NextParsedUrlQuery } from "next/dist/server/request-meta";
 import i18n from "i18";
@@ -35,6 +35,9 @@ import FRCamera from "@/components/FRCamera";
 import { concateRedirectUrlParams } from "@/utils/concateRedirectUrlParams";
 import Button, { buttonVariants } from "@/components/atoms/Button";
 import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
+import Paragraph from "@/components/atoms/Paraghraph";
+import Heading from "@/components/atoms/Heading";
+import Label from "@/components/atoms/Label";
 
 interface IPropsLogin {}
 
@@ -366,19 +369,19 @@ const OTPModal: React.FC<IModal> = ({
     }
   }, [successSigning]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  return modal ? (
+  return !modal ? (
     <div
       style={{ backgroundColor: "rgba(0, 0, 0, .5)" }}
       className="fixed z-50 flex items-start transition-all duration-1000 pb-3 justify-center w-full left-0 top-0 h-full "
     >
       <div className="bg-white max-w-md mt-20 pt-5 px-2 pb-3 rounded-md w-full mx-5">
         <div className="flex flex-col">
-          <p className="font-poppins block text-center pb-5  whitespace-nowrap  font-semibold ">
+          <Heading className="block text-center pb-5  whitespace-nowrap">
             {t("frTitle")}
-          </p>
-          <span className="font-poppins block text-center pb-5  ">
+          </Heading>
+          <Paragraph className="block text-center pb-5">
             {t("frSubtitle2")}
-          </span>
+          </Paragraph>
           <PinInput
             containerStyle={{
               alignItems: "center",
@@ -392,8 +395,8 @@ const OTPModal: React.FC<IModal> = ({
             values={values}
             onChange={(value, index, values) => setValues(values)}
           />
-          <div className="flex font-poppins justify-center text-sm gap-1 mt-5">
-            <p className="text-neutral200">{t("dindtReceiveOtp")}</p>
+          <div className="flex justify-center text-sm gap-1 mt-5">
+            <Paragraph>{t("dindtReceiveOtp")}</Paragraph>
             <div
               style={{
                 color: themeConfigurationAvaliabilityChecker(
@@ -483,21 +486,21 @@ const SigningSuccess = () => {
       className="px-10 pt-16 pb-9 text-center flex flex-col justify-center min-h-screen"
     >
       <div>
-        <p className="font-poppins text-lg font-semibold text-neutral800">
-          {t("authenticationSuccessTitle")}
-        </p>
+        <Heading>{t("authenticationSuccessTitle")}</Heading>
+        <div
+          className="bg-contain mx-auto w-52 h-52 bg-center bg-no-repeat"
+          style={{
+            backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
+              themeConfiguration.data.asset_signing_success as string,
+              "ASSET",
+              `${assetPrefix}/images/signingSuccess.svg`
+            )})`,
+          }}
+        ></div>
         <div className="mt-3">
-          <Image
-            src={`${assetPrefix}/images/signingSuccess.svg`}
-            width="196px"
-            height="196px"
-            alt="signing-success-ill"
-          />
-        </div>
-        <div className="mt-3">
-          <p className="font-poppins text-sm whitespace-pre-line text-neutral800">
+          <Paragraph size="sm" className="whitespace-pre-line">
             {t("authenticationSuccessSubtitle")}
-          </p>
+          </Paragraph>
         </div>
       </div>
       <div className="mt-32">
@@ -556,21 +559,19 @@ const SigningFailure = () => {
       className="px-10 pt-16 pb-9 text-center flex flex-col justify-center min-h-screen"
     >
       <div>
-        <p className="font-poppins text-lg font-semibold text-neutral800">
-          {t("signFailed")}
-        </p>
+        <Heading>{t("signFailed")}</Heading>
+        <div
+          className="bg-contain mx-auto w-52 h-52 bg-center bg-no-repeat"
+          style={{
+            backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
+              themeConfiguration.data.asset_signing_failed as string,
+              "ASSET",
+              `${assetPrefix}/images/signingFailure.svg`
+            )})`,
+          }}
+        ></div>
         <div className="mt-3">
-          <Image
-            src={`${assetPrefix}/images/signingFailure.svg`}
-            width="196px"
-            height="196px"
-            alt="signing-failure-ill"
-          />
-        </div>
-        <div className="mt-3">
-          <p className="font-poppins text-sm text-neutral800">
-            {t("signFailedSubtitle")}{" "}
-          </p>
+          <Paragraph size="sm">{t("signFailedSubtitle")} </Paragraph>
         </div>
       </div>
       <div className="mt-32">
@@ -805,18 +806,15 @@ const Login = ({}: IPropsLogin) => {
           <div className="h-14 w-14 font-semibold flex  text-xl items-center justify-center name text-white bg-[#64bac3] rounded-full">
             {tilakaName?.[0]?.toUpperCase()}
           </div>
-          <span className="font-bold text-xl text-[#172b4d] font-poppins">
+          <Heading size="md">
             {t("hi")}, {user}
-          </span>
+          </Heading>
         </div>
         <form onSubmit={submitHandler}>
           <div className="flex flex-col  mt-20">
-            <label
-              className="font-poppins px-2 text-label font-light"
-              htmlFor="password"
-            >
+            <Label size="base" className="px-2" htmlFor="password">
               {t("passwordLabel")}
-            </label>
+            </Label>
             <div className="relative flex-1">
               <input
                 onChange={(e) => onChangeHandler(e)}
@@ -824,7 +822,7 @@ const Login = ({}: IPropsLogin) => {
                 name="password"
                 type={type.password}
                 placeholder={t("passwordPlaceholder")}
-                className={`font-poppins py-3 focus:outline-none border-borderColor focus:ring  placeholder:text-placeholder placeholder:font-light px-2 rounded-md border w-full`}
+                className={`py-3 focus:outline-none border-borderColor focus:ring   placeholder:font-light px-2 rounded-md border w-full`}
                 autoComplete="off"
               />
               <button
@@ -842,6 +840,7 @@ const Login = ({}: IPropsLogin) => {
                   query: router.query,
                 }}
                 passHref
+                legacyBehavior
               >
                 <a
                   style={{
@@ -857,8 +856,8 @@ const Login = ({}: IPropsLogin) => {
               <div className="block mx-2.5">
                 <Image
                   src={`${assetPrefix}/images/lineVertical.svg`}
-                  width="8px"
-                  height="24px"
+                  width="8"
+                  height="24"
                   alt="lineVertical"
                 />
               </div>
@@ -868,6 +867,7 @@ const Login = ({}: IPropsLogin) => {
                   query: router.query,
                 }}
                 passHref
+                legacyBehavior
               >
                 <a
                   style={{
@@ -882,18 +882,6 @@ const Login = ({}: IPropsLogin) => {
               </Link>
             </div>
           </div>
-          {/* <Button
-           style={{
-            backgroundColor: themeConfigurationAvaliabilityChecker(
-              themeConfiguration?.data.buttonColor as string
-            ),
-          }}
-          className="uppercase mt-24"
-            type="submit"
-            disabled={password.length < 1}
-          >
-            {t("loginCTA")}
-          </Button> */}
           <Button
             type="submit"
             style={{

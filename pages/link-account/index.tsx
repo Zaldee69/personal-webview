@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import Image from "next/image";
+import Image from "next/legacy/image";
 import EyeIcon from "./../../public/icons/EyeIcon";
 import EyeIconOff from "./../../public/icons/EyeIconOff";
 import { useRouter } from "next/router";
@@ -40,6 +40,8 @@ import { getEncodedCurrentUrl } from "@/utils/getEncodedCurrentUrl";
 import Footer from "@/components/Footer";
 import Button, { buttonVariants } from "@/components/atoms/Button";
 import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
+import Heading from "@/components/atoms/Heading";
+import Paragraph from "@/components/atoms/Paraghraph";
 
 type Props = {};
 
@@ -243,30 +245,32 @@ const LinkAccount = (props: Props) => {
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
       <div className="px-5 py-9 max-w-md mx-auto">
-        <p className="text-lg poppins-semibold text-neutral800">
+        <Heading className="text-lg poppins-semibold text-neutral800">
           {setting === "1" ? t("finalFormTitle") : t("linkAccountTitle")}
-        </p>
-        <div className="flex justify-center mt-6">
-          <Image
-            src={`${assetPrefix}/images/linkAccount.svg`}
-            width="150px"
-            height="150px"
-            alt="linkAccount-ill"
-          />
-        </div>
+        </Heading>
+        <div
+          className="bg-contain w-52 mx-auto h-64 bg-center bg-no-repeat"
+          style={{
+            backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
+              themeConfiguration.data.asset_activation_login as string,
+              "ASSET",
+              `${assetPrefix}/images/linkAccount.svg`
+            )})`,
+          }}
+        ></div>
         {nikRegistered && (
-          <p className="poppins-regular text-sm text-neutral800 mt-5">
+          <Paragraph className="poppins-regular text-sm text-neutral800 mt-5">
             {setting === "1"
               ? t("linkAccountSubtitle1")
               : t("linkAccountSubtitle")}
-          </p>
+          </Paragraph>
         )}
         <form onSubmit={handleFormOnSubmit}>
           <label className="block mt-4">
             <div className="flex justify-start items-center">
-              <p className="poppins-regular text-sm text-neutral200 pl-2.5">
+              <Paragraph size="sm" className="pl-2.5">
                 Tilaka Name
-              </p>
+              </Paragraph>
               <div className="tooltip poppins-regular">
                 <p className="text-white bg-neutral200 w-3 h-3 flex justify-center items-center text-xs rounded-full ml-1">
                   ?
@@ -289,9 +293,9 @@ const LinkAccount = (props: Props) => {
           </label>
           <label className="block mt-6">
             <div className="flex justify-start items-center">
-              <p className="poppins-regular text-sm text-neutral200 pl-2.5">
+              <Paragraph size="sm" className="pl-2.5">
                 {t("linkAccountPasswordInputlabel")}
-              </p>
+              </Paragraph>
             </div>
             <div className="mt-1 relative">
               <input
@@ -320,6 +324,7 @@ const LinkAccount = (props: Props) => {
                 query: router.query,
               }}
               passHref
+              legacyBehavior
             >
               <a
                 style={{
@@ -339,8 +344,8 @@ const LinkAccount = (props: Props) => {
             <div className="block mx-2.5">
               <Image
                 src={`${assetPrefix}/images/lineVertical.svg`}
-                width="8px"
-                height="24px"
+                width="8"
+                height="24"
                 alt="lineVertical"
               />
             </div>
@@ -350,6 +355,7 @@ const LinkAccount = (props: Props) => {
                 query: router.query,
               }}
               passHref
+              legacyBehavior
             >
               <a
                 style={{
@@ -475,12 +481,12 @@ const FRModal = ({ modal, setModal, tilakaName, formSetter }: IModal) => {
     >
       <div className="bg-white max-w-md mt-20 pt-5 px-2 pb-3 rounded-md w-full mx-5 ">
         <>
-          <p className="poppins-regular block text-center font-semibold ">
+          <Heading size="sm" className="block text-center">
             {t("linkingAccount")}
-          </p>
-          <span className="poppins-regular mt-2 block text-center text-sm font-normal">
+          </Heading>
+          <Paragraph size="sm" className="mt-2 block text-center">
             {t("frSubtitle3")}
-          </span>
+          </Paragraph>
           <FRCamera
             setModal={setModal}
             setIsFRSuccess={setIsFRSuccess}
@@ -902,21 +908,23 @@ const ModalConsent = ({
         <>
           <div className="rounded px-2 sm:px-6 pt-4 pb-6 bg-white">
             <div className="bg-neutral10 px-4 sm:px-10 md:px-16 pt-4 pb-6">
-              <p className="text-lg sm:text-xl md:text-2xl font-normal text-center text-neutral800">
+              <Heading size="md" className="sm:text-xl md:text-2xl font-normal text-center">
                 {t("page")}{" "}
-                <span className="italic">{t("customerConsentText")}</span>
-              </p>
-              <div className="mt-3 text-center">
-                <Image
-                  src={`${assetPrefix}/images/customerConsent.svg`}
-                  width="152px"
-                  height="151px"
-                  alt="customerConsent"
-                />
-              </div>
-              <p className="mt-3 text-center font-normal text-neutral800 text-sm">
+                <Heading size="md" className="italic font-normal inline">{t("customerConsentText")}</Heading>
+              </Heading>
+              <div
+                className="bg-contain w-48 mt-3 mx-auto h-48 bg-center bg-no-repeat"
+                style={{
+                  backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
+                    themeConfiguration.data.asset_action_popup_consent as string,
+                    "ASSET",
+                    `${assetPrefix}/images/customerConsent.svg`
+                  )})`,
+                }}
+              ></div>
+              <Paragraph size="sm" className="mt-3 text-center">
                 {t("linkAccountConsentText")}
-              </p>
+              </Paragraph>
             </div>
             <div className="flex justify-end items-center gap-3 mt-5">
               <Button

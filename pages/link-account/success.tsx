@@ -1,6 +1,6 @@
 import { assetPrefix } from "../../next.config";
 import { NextParsedUrlQuery } from "next/dist/server/request-meta";
-import Image from "next/image";
+import Image from "next/legacy/image";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { restLogout } from "infrastructure/rest/b2b";
@@ -16,6 +16,8 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/redux/app/store";
 import Footer from "@/components/Footer";
 import { buttonVariants } from "@/components/atoms/Button";
+import Heading from "@/components/atoms/Heading";
+import Paragraph from "@/components/atoms/Paraghraph";
 
 type Props = {};
 
@@ -129,25 +131,27 @@ const LinkAccountSuccess = (props: Props) => {
       }}
       className="px-10 min-h-screen pt-16 pb-9 text-center"
     >
-      <p className="text-base poppins-semibold text-neutral800">
+      <Heading >
         {routerQuery.setting === "1"
           ? t("linkAccountSuccessTitle1")
           : t("linkAccountSuccessTitle")}
-      </p>
-      <div className="mt-20">
-        <Image
-          src={`${assetPrefix}/images/linkAccountSuccess.svg`}
-          width="196px"
-          height="196px"
-          alt="liveness-success-ill"
-        />
-      </div>
+      </Heading>
+      <div
+          className="bg-contain w-52 mx-auto h-64 bg-center bg-no-repeat"
+          style={{
+            backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
+              themeConfiguration.data.asset_activation_success as string,
+              "ASSET",
+              `${assetPrefix}/images/linkAccountSuccess.svg`
+            )})`,
+          }}
+        ></div>
       <div className="mt-14">
-        <p className="poppins-regular text-xs text-neutral200">
+        <Paragraph size="sm">
           {routerQuery.setting === "1"
             ? t("linkAccountSuccessSubtitle1")
             : t("linkAccountSuccessSubtitle")}
-        </p>
+        </Paragraph>
       </div>
       {!isSigning && redirectUrl && (
         <a href={concateRedirectUrlParams(redirectUrl, "")}>

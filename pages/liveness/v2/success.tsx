@@ -3,7 +3,6 @@ import { serverSideRenderReturnConditions } from "@/utils/serverSideRenderReturn
 import { RestKycCheckStep } from "infrastructure";
 import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
 import { GetServerSideProps } from "next";
-import Image from "next/image";
 import { useRouter } from "next/router";
 import React from "react";
 import { assetPrefix } from "../../../next.config";
@@ -14,6 +13,7 @@ import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfiguratio
 import { RootState } from "@/redux/app/store";
 import { useSelector } from "react-redux";
 import Footer from "@/components/Footer";
+import Heading from "@/components/atoms/Heading";
 
 type Props = {};
 
@@ -24,53 +24,61 @@ const FormSuccess = (props: Props) => {
   const themeConfiguration = useSelector((state: RootState) => state.theme);
 
   useEffect(() => {
-    if(routerQuery.redirect_url) {
+    if (routerQuery.redirect_url) {
       setTimeout(() => {
         router.push({
           pathname: routerQuery.redirect_url as string,
-        })
-      }, 5000)
+        });
+      }, 5000);
     }
-  }, [router.isReady])
+  }, [router.isReady]);
 
   return (
-    <div style={{
-      backgroundColor: themeConfigurationAvaliabilityChecker(
-        themeConfiguration?.data.background as string, "BG"
-      ),
-    }} className="px-10 pt-16 pb-9 text-center min-h-screen">
-      <p className="text-base poppins-semibold text-neutral800">
+    <div
+      style={{
+        backgroundColor: themeConfigurationAvaliabilityChecker(
+          themeConfiguration?.data.background as string,
+          "BG"
+        ),
+      }}
+      className="px-10 pt-16 pb-9 text-center min-h-screen"
+    >
+      <Heading>
         {t("livenessSuccess")}
-      </p>
+      </Heading>
+      <div
+        className="bg-contain mx-auto mt-10 w-60 h-64 bg-center bg-no-repeat"
+        style={{
+          backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
+            themeConfiguration.data.asset_liveness_v2_success as string,
+            "ASSET",
+            `${assetPrefix}/images/livenessSucc.svg`
+          )})`,
+        }}
+      ></div>
+      {routerQuery.redirect_url && (
+        <a
+          style={{
+            color: themeConfigurationAvaliabilityChecker(
+              themeConfiguration?.data.actionFontColor as string
+            ),
+          }}
+          className={buttonVariants({
+            variant: "link",
+            size: "none",
+            className: "font-medium mt-20",
+          })}
+          href={concateRedirectUrlParams(
+            routerQuery.redirect_url as string,
+            ""
+          )}
+        >
+          {t("livenessSuccessButtonTitle")}
+        </a>
+      )}
       <div className="mt-20">
-        <Image
-          src={`${assetPrefix}/images/livenessSucc.svg`}
-          width="196px"
-          height="194px"
-          alt="liveness-success-ill"
-        />
+        <Footer />
       </div>
-        {routerQuery.redirect_url && (
-          <a
-            style={{
-              color: themeConfigurationAvaliabilityChecker(
-                themeConfiguration?.data.actionFontColor as string
-              ),
-            }}
-            className={buttonVariants({
-              variant: "link",
-              size: "none",
-              className: "font-medium mt-20",
-            })}
-            href={concateRedirectUrlParams(
-              routerQuery.redirect_url as string,
-              ""
-            )}
-          >
-            {t("livenessSuccessButtonTitle")}
-          </a>
-        )}
-      <Footer />
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import Image from "next/image";
+import Image from "next/legacy/image";
 import Head from "next/head";
 import { assetPrefix } from "../../next.config";
 import { useRouter } from "next/router";
@@ -8,6 +8,8 @@ import Footer from "@/components/Footer";
 import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/app/store";
+import Heading from "@/components/atoms/Heading";
+import Paragraph from "@/components/atoms/Paraghraph";
 
 type Props = {};
 
@@ -67,24 +69,24 @@ const LinkAccount = (props: Props) => {
       </Head>
       <div className="px-5 py-9 max-w-md mx-auto min-h-screen flex flex-col justify-center">
         <div className="text-center">
-          <p className="font-poppins text-lg font-normal text-neutral800 text-center">
+          <Heading className="text-center">
             Pengaturan Ulang Kata Sandi Berhasil
-          </p>
+          </Heading>
           <div className="mt-12">
             <Image
               src={`${assetPrefix}/images/linkAccountSuccess.svg`}
-              width="151px"
-              height="151px"
+              width="151"
+              height="151"
               alt="liveness-success-ill"
             />
-          </div>
-          <p className="mt-4 font-poppins text-sm font-normal text-neutral800 text-center">
+         </div>
+          <Paragraph size="sm" className="mt-4 text-center">
             Silahkan login kembali menggunakan Kata Sandi Anda yang terbaru
-          </p>
+          </Paragraph>
           {autoRedirect && redirect_url && (
-            <p className="mt-4 font-poppins text-sm font-normal text-neutral800 text-center">
+            <Paragraph size="sm" className="mt-4 text-center">
               Silahkan login ulang dalam {currentSecond} detik
-            </p>
+            </Paragraph>
           )}
         </div>
         <Footer/>
