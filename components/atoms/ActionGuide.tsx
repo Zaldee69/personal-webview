@@ -1,6 +1,7 @@
 import Image from "next/legacy/image";
 import React from "react";
 import i18n from "i18";
+import Paragraph from "./Paraghraph";
 
 type ActionGuide1Props = {
   actionList: any[];
@@ -27,17 +28,17 @@ export const ActionGuide1 = (props: ActionGuide1Props) => {
         )}
       </div>
       <div className="flex flex-col">
-        <span className="poppins-regular font-medium">
+        <Paragraph>
           {props.actionText(props.actionList[props.currentActionIndex])}
-        </span>
+        </Paragraph>
         {props.failedMessage ? (
           <span className="poppins-regular text-sm text-red300">
             {props.failedMessage}
           </span>
         ) : (
-          <span className="poppins-regular text-sm text-neutral">
+          <Paragraph size="sm">
             {props.actionList.length > 1 && t("dontMove")}
-          </span>
+          </Paragraph>
         )}
       </div>
     </div>

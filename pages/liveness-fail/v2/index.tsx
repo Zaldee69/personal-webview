@@ -74,7 +74,7 @@ const LivenessFail = () => {
           }}
         >
           <Button
-            size="sm"
+            size="md"
             style={{
               backgroundColor: themeConfigurationAvaliabilityChecker(
                 themeConfiguration?.data.buttonColor as string
