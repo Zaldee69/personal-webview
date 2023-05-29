@@ -15,6 +15,7 @@ export const buttonVariants = cva(
       size: {
         default: "px-6 py-2.5 md:mx-auto md:block md:w-1/4",
         sm: "px-4 h-9 md:mx-auto md:block md:w-1/4",
+        md: "px-4 h-9",
         lg: "px-8 py-4",
         none: "",
         full: "w-full"

@@ -1,10 +1,11 @@
 import i18n from "i18";
 import { assetPrefix } from "next.config";
-import Image from "next/image";
+import Image from "next/legacy/image";
 import React from "react";
 import ErrorMessage from "./ErrorMessage";
 import Label from "./Label";
 import PreviewImage from "./PreviewImage";
+import Paragraph from "./Paraghraph";
 
 type Props = {
   label: string;
@@ -29,12 +30,11 @@ const CustomFileInputField = ({
   onDeleteImageHandler,
   onLabelClicked,
 }: Props) => {
-
-  const {t}: any = i18n
+  const { t }: any = i18n;
 
   return (
     <>
-      <Label title={label} />
+      <Label className="ml-3 mt-3" size="base" htmlFor={name}>{label}</Label>
       {imageBase64 ? (
         <PreviewImage
           name={name}
@@ -67,12 +67,13 @@ const CustomFileInputField = ({
                 width={50}
                 alt="sitemap"
               />
-              <p className="text-label block font-semibold">
-              {t("upload")} {label}
-              </p>
-              <p className="text-placeholder text-center mb-0">
-                Max. 2MB (.jpg/.jpeg/.png) <br /> {showMaxResolution && t("manualForm.resolutionMinimum")}
-              </p>
+              <Paragraph className="text-label block font-semibold">
+                {t("upload")} {label}
+              </Paragraph>
+              <Paragraph className="text-placeholder text-center mb-0">
+                Max. 2MB (.jpg/.jpeg/.png) <br />{" "}
+                {showMaxResolution && t("manualForm.resolutionMinimum")}
+              </Paragraph>
             </div>
           </div>
           <ErrorMessage errorMessage={errorMessage} />

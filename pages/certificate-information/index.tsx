@@ -19,6 +19,8 @@ import { RestKycCheckStepv2 } from "infrastructure/rest/personal";
 import Button, { buttonVariants } from "@/components/atoms/Button";
 import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
 import Footer from "@/components/Footer";
+import { assetPrefix } from "next.config";
+import Paragraph from "@/components/atoms/Paraghraph";
 
 function CertificateInformation({}: Props) {
   const dispatch: AppDispatch = useDispatch();
@@ -119,66 +121,65 @@ function CertificateInformation({}: Props) {
       className="min-h-screen"
       style={{
         backgroundColor: themeConfigurationAvaliabilityChecker(
-          themeConfiguration?.data.background as string, "BG"
+          themeConfiguration?.data.background as string,
+          "BG"
         ),
       }}
     >
       <div className="p-4 poppins-regular max-w-md mx-auto">
-        <div className="flex justify-center">
-          <img src="images/certInfo.svg" alt="ill" />
-        </div>
-        <p className="text-sm text-neutral800">{t("certificateSubtitle")}</p>
+        <div
+          className="bg-contain w-64 mx-auto h-64 bg-center bg-no-repeat"
+          style={{
+            backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
+              themeConfiguration.data
+                .asset_activation_cert_confirmation as string,
+              "ASSET",
+              `${assetPrefix}/images/certInfo.svg`
+            )})`,
+          }}
+        ></div>
+        <Paragraph>{t("certificateSubtitle")}</Paragraph>
         <div className="mt-5">
           <div className="flex items-center">
-            <p className="text-sm text-neutral800 font-normal w-24 pr-2">
-              {t("country")}
-            </p>
-            <p className="text-sm text-neutral800 font-medium">
+            <Paragraph className="pr-2 w-24">{t("country")}</Paragraph>
+            <Paragraph className="font-semibold">
               {certificate.negara}
-            </p>
+            </Paragraph>
           </div>
           <div className="flex items-center">
-            <p className="text-sm text-neutral800 font-normal w-24 pr-2">
-              {t("name")}
-            </p>
-            <p className="text-sm text-neutral800 font-medium">
-              {certificate.nama}
-            </p>
+            <Paragraph className="w-24 pr-2">{t("name")}</Paragraph>
+            <Paragraph className="font-semibold">{certificate.nama}</Paragraph>
           </div>
           <div className="flex items-center">
-            <p className="text-sm text-neutral800 font-normal w-24 pr-2">
-              {t("organization")}
-            </p>
-            <p className="text-sm text-neutral800 font-medium">
+            <Paragraph className="w-24 pr-2">{t("organization")}</Paragraph>
+            <Paragraph className="font-semibold">
               {certificate.organisasi}
-            </p>
+            </Paragraph>
           </div>
           <div className="flex items-center">
-            <p className="text-sm text-neutral800 font-normal w-24 pr-2">
-              Email
-            </p>
-            <p className="text-sm text-neutral800 font-medium">
+            <Paragraph className="w-24 pr-2">Email</Paragraph>
+            <Paragraph className="font-semibold">
               {certificate.emailAddress}
-            </p>
+            </Paragraph>
           </div>
         </div>
         {i18n.language == "en" ? (
-          <p className="text-xs text-neutral800 mt-4 font-normal text-justify">
-            <span className="font-semibold">
+          <Paragraph size="sm" className="mt-4 font-normal text-justify">
+            <Paragraph size="sm" className="font-semibold inline">
               If there is no complaint filed within nine days,
-            </span>{" "}
+            </Paragraph>{" "}
             user is deemed to have accepted that all the information in the
             certificate is correct.
-          </p>
+          </Paragraph>
         ) : (
-          <p className="text-xs text-neutral800 mt-4 font-normal text-justify">
+          <Paragraph size="sm" className="mt-4 text-justify">
             Apabila dalam jangka waktu{" "}
-            <span className="font-semibold">
+            <Paragraph size="sm" className="font-semibold inline">
               sembilan hari kalender tidak ada keluhan,
-            </span>{" "}
+            </Paragraph>{" "}
             maka pelanggan dianggap telah menerima bahwa semua informasi yang
             terdapat dalam sertifikat adalah benar.
-          </p>
+          </Paragraph>
         )}
         <Button
           size="none"
@@ -208,7 +209,7 @@ function CertificateInformation({}: Props) {
               paddingRight: 0,
             }}
             className={buttonVariants({
-              size:"none",
+              size: "none",
               className:
                 "border mt-3 py-2.5 uppercase text-base font-medium block mx-auto w-48",
             })}

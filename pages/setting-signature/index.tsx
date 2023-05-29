@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 import html2canvas from "html2canvas";
 import { toast } from "react-toastify";
 import i18n from "i18";
-import Image from "next/image";
+import Image from "next/legacy/image";
 
 import { restSetDefaultSignature, getUserName } from "infrastructure/rest/b2b";
 import SignaturePad from "../../components/SignaturePad";
@@ -21,6 +21,8 @@ import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfiguratio
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/app/store";
 import Footer from "@/components/Footer";
+import Heading from "@/components/atoms/Heading";
+import Paragraph from "@/components/atoms/Paraghraph";
 
 type Props = {};
 
@@ -232,21 +234,23 @@ const SettingSignature = ({}: Props) => {
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
       <div className="p-4 max-w-md mx-auto">
-        <h1 className="text-xl poppins-semibold mt-2">
+        <Heading className="mt-2">
           {t("settingSignatureTitle")}
-        </h1>
+        </Heading>
         <form onSubmit={handleFormSubmit}>
-          <div className="flex justify-center">
-            <Image
-              src={`${assetPrefix}/images/ttdSetting.svg`}
-              alt="ttdImageSetting"
-              height={"196"}
-              width={"196"}
-            />
-          </div>
-          <p className="text-md poppins-regular text-neutral800">
+        <div
+          className="bg-contain w-52 mx-auto h-52 bg-center bg-no-repeat"
+          style={{
+            backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
+              themeConfiguration.data.asset_activation_setting_signature_and_mfa as string,
+              "ASSET",
+              `${assetPrefix}/images/ttdSetting.svg`
+            )})`,
+          }}
+        ></div>
+          <Paragraph>
             {t("chooseSignature")}
-          </p>
+          </Paragraph>
           <div className="mt-2 rounded-md bg-blue50 py-2 px-4 flex items-start">
             <div className="pt-1">
               <InfoIcon />
@@ -265,9 +269,9 @@ const SettingSignature = ({}: Props) => {
                 checked={form.signature_type == 0}
                 className="appearance-none bg-white w-4 h-4 ring-1 ring-neutral40 border-2 border-neutral40 rounded-full checked:bg-primary checked:ring-primary"
               />
-              <p className="text-md poppins-regular ml-2.5 text-_030326">
+              <Paragraph className="ml-2.5">
                 {t("handwritingSignature")}
-              </p>
+              </Paragraph>
             </label>
             <label className="flex items-center mt-3.5">
               <input
@@ -278,9 +282,9 @@ const SettingSignature = ({}: Props) => {
                 checked={form.signature_type == 1}
                 className="appearance-none bg-white w-4 h-4 ring-1 ring-neutral40 border-2 border-neutral40 rounded-full checked:bg-primary checked:ring-primary"
               />
-              <p className="text-md ml-2.5 poppins-regular text-_030326">
+              <Paragraph className="ml-2.5">
                 {t("fontSignature")}
-              </p>
+              </Paragraph>
             </label>
           </div>
           <div className={form.signature_type == 0 ? undefined : "hidden"}>

@@ -1,6 +1,6 @@
 import i18n from "i18";
 import { assetPrefix } from "next.config";
-import Image from "next/image";
+import Image from "next/legacy/image";
 import { Dispatch, SetStateAction } from "react";
 import { toast } from "react-toastify";
 

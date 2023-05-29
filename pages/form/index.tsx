@@ -1,4 +1,4 @@
-import Image from "next/image";
+import Image from "next/legacy/image";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
@@ -18,6 +18,10 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/redux/app/store";
 import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
 import Button from "@/components/atoms/Button";
+import Heading from "@/components/atoms/Heading";
+import Paragraph from "@/components/atoms/Paraghraph";
+import ErrorMessage from "@/components/atoms/ErrorMessage";
+import Label from "@/components/atoms/Label";
 interface InputType {
   password: string | number;
   confirmPassword: string | number;
@@ -339,33 +343,34 @@ const Form: React.FC = () => {
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
       <div className="px-5 pt-8 max-w-md mx-auto">
-        <h1 className="font-poppins font-semibold text-xl">
-          {t("finalFormTitle")}
-        </h1>
-        <div className="flex justify-center mt-10">
-          <Image
-            width={200}
-            height={200}
-            src={`${assetPrefix}/images/form.svg`}
-            alt="imgform"
-          />
-        </div>
-        <span className="font-poppins text-left block mt-5">
+        <Heading>{t("finalFormTitle")}</Heading>
+        <div
+          className="bg-contain w-52 mx-auto h-64 bg-center bg-no-repeat"
+          style={{
+            backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
+              themeConfiguration.data.asset_registration_final_form as string,
+              "ASSET",
+              `${assetPrefix}/images/form.svg`
+            )})`,
+          }}
+        ></div>
+        <Paragraph className=" text-left block mt-5">
           {t("finalFormSubtitle")}
-        </span>
+        </Paragraph>
         <form autoComplete="off" className="mt-10" onSubmit={onSubmitHandler}>
           <div className="flex flex-col">
             <div className="flex flex-row">
-              <label
-                className="font-poppins px-2 text-label font-light"
+              <Label
+                size="base"
+                className="px-2 text-label"
                 htmlFor="tilakaName"
               >
                 Tilaka Name
-              </label>
+              </Label>
               <div className="relative flex flex-col items-center group">
                 <QuestionIcon />
                 <div className="absolute left-9 -top-10  w-48   flex-col items-center hidden mb-6 group-hover:flex">
-                  <span className="relative z-10 p-2 text-xs rounded-md font-poppins w-full text-white whitespace-no-wrap bg-neutral shadow-lg">
+                  <span className="relative z-10 p-2 text-xs rounded-md  w-full text-white whitespace-no-wrap bg-neutral shadow-lg">
                     {t("finalFormTooltip")}
                   </span>
                   <div className="w-3 h-3 -mt-16 mr-48 rotate-45 bg-neutral"></div>
@@ -379,30 +384,25 @@ const Form: React.FC = () => {
               autoComplete="off"
               type="text"
               placeholder={t("tilakaNamePlaceHolder")}
-              className={`font-poppins py-3 focus:outline-none  placeholder:text-placeholder placeholder:font-light   px-2 rounded-md border border-borderColor ${
+              className={` py-3 focus:outline-none  placeholder:text-placeholder placeholder:font-light   px-2 rounded-md border border-borderColor ${
                 error.tilakaName
                   ? "border-error "
                   : "border-borderColor focus:ring"
               }`}
             />
-            <p className="text-error font-poppins pl-2 pt-2 block text-sm">
-              {error.tilakaName}
-            </p>
+            <ErrorMessage errorMessage={error.tilakaName} />
           </div>
           <div className="flex flex-col  mt-5">
-            <label
-              className="font-poppins px-2 text-label font-light"
-              htmlFor="password"
-            >
+            <Label size="base" className="px-2" htmlFor="password">
               {t("passwordLabel")}
-            </label>
+            </Label>
             <div className="relative">
               <input
                 onChange={(e) => onChangeHandler(e)}
                 name="password"
                 type={type.password}
                 placeholder={t("passwordPlaceholder")}
-                className={`font-poppins py-3 focus:outline-none  placeholder:text-placeholder placeholder:font-light  px-2 rounded-md border  w-full ${
+                className={` py-3 focus:outline-none  placeholder:text-placeholder placeholder:font-light  px-2 rounded-md border  w-full ${
                   error.password
                     ? "border-error "
                     : "border-borderColor focus:ring"
@@ -415,25 +415,24 @@ const Form: React.FC = () => {
               >
                 {type.password === "password" ? <EyeIcon /> : <EyeIconOff />}
               </button>
-              <p className="text-error font-poppins pl-2 pt-2 block text-sm">
-                {error.password}
-              </p>
+              <ErrorMessage errorMessage={error.password} />
             </div>
           </div>
           <div className="flex flex-col mt-5">
-            <label
-              className="font-poppins px-2 text-label font-light"
+            <Label
+              className="px-2"
+              size="base"
               htmlFor="retype-password"
             >
               {t("passwordConfirmationLabel")}
-            </label>
+            </Label>
             <div className="relative">
               <input
                 onChange={(e) => onChangeHandler(e)}
                 name="confirmPassword"
                 type={type.confirmPassword}
                 placeholder={t("passwordConfirmationPlaceholder")}
-                className={`font-poppins py-3 focus:outline-none  placeholder:text-placeholder placeholder:font-light  px-2 rounded-md border border-borderColor w-full ${
+                className={` py-3 focus:outline-none  placeholder:text-placeholder placeholder:font-light  px-2 rounded-md border border-borderColor w-full ${
                   error.confirmPassword
                     ? "border-error "
                     : "border-borderColor focus:ring"
@@ -449,9 +448,7 @@ const Form: React.FC = () => {
                   <EyeIconOff />
                 )}
               </button>
-              <p className="text-error font-poppins pl-2 pt-2 block text-sm">
-                {error.confirmPassword}
-              </p>
+              <ErrorMessage errorMessage={error.confirmPassword} />
             </div>
           </div>
           <div className="flex flex-row mt-5">
@@ -462,8 +459,8 @@ const Form: React.FC = () => {
               className=" border-borderColor"
               onChange={onChangeHandler}
             />
-            <label className="ml-2 text-neutral font-poppins " htmlFor="tnc">
-              {t("agree")}{" "}
+            <label className="ml-2 text-neutral " htmlFor="tnc">
+              <Paragraph className="inline">{t("agree")} </Paragraph>
               <span className="text-primary">
                 <a
                   href="https://repository.tilaka.id/CP_CPS.pdf"
@@ -489,7 +486,7 @@ const Form: React.FC = () => {
                 </a>
                 ,{" "}
               </span>
-              {t("and")}
+              <Paragraph className="inline">{t("and")}</Paragraph>
               <a
                 target="blank"
                 href="https://repository.tilaka.id/perjanjian-pemilik-sertifikat.pdf"

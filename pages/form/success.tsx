@@ -2,7 +2,7 @@ import { concateRedirectUrlParams } from "@/utils/concateRedirectUrlParams";
 import { serverSideRenderReturnConditions } from "@/utils/serverSideRenderReturnConditions";
 import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
 import { GetServerSideProps } from "next";
-import Image from "next/image";
+import Image from "next/legacy/image";
 import { useRouter } from "next/router";
 import React from "react";
 import { assetPrefix } from "../../next.config";
@@ -14,6 +14,8 @@ import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfiguratio
 import { buttonVariants } from "@/components/atoms/Button";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/app/store";
+import Paragraph from "@/components/atoms/Paraghraph";
+import Heading from "@/components/atoms/Heading";
 
 type Props = {};
 
@@ -31,44 +33,46 @@ const FormSuccess = (props: Props) => {
           "BG"
         ),
       }}
-      className="px-10 pt-16 pb-9 min-h-screen text-center"
+      className="px-10 flex flex-col justify-center items-center text-center gap-10 pt-16 min-h-screen"
     >
-      <p className="text-base poppins-semibold text-neutral800">
+      <Heading>
         {t("livenessSuccessTitle")}
-      </p>
-      <div className="mt-20">
-        <Image
-          src={`${assetPrefix}/images/livenessSucc.svg`}
-          width="196px"
-          height="194px"
-          alt="liveness-success-ill"
-        />
-      </div>
+      </Heading>
+      <div
+        className="bg-contain w-60 h-64 bg-center bg-no-repeat"
+        style={{
+          backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
+            themeConfiguration.data.asset_registration_status_success as string,
+            "ASSET",
+            `${assetPrefix}/images/livenessSucc.svg`
+          )})`,
+        }}
+      ></div>
       <div className="mt-14">
-        <p className="poppins-regular text-xs text-neutral200">
+        <Paragraph>
           {t("livenessSuccessSubtitle")}
-        </p>
+        </Paragraph>
       </div>
       <div className="mt-20 text-primary text-base poppins-medium underline hover:cursor-pointer">
         {routerQuery.redirect_url && (
-        <a
-          href={concateRedirectUrlParams(
-            routerQuery.redirect_url as string,
-            ""
-          )}
-          style={{
-            color: themeConfigurationAvaliabilityChecker(
-              themeConfiguration?.data.actionFontColor as string
-            ),
-          }}
-          className={buttonVariants({
-            variant: "link",
-            size: "none",
-            className: "font-medium",
-          })}
-        >
-          {t("livenessSuccessButtonTitle")}
-        </a>
+          <a
+            href={concateRedirectUrlParams(
+              routerQuery.redirect_url as string,
+              ""
+            )}
+            style={{
+              color: themeConfigurationAvaliabilityChecker(
+                themeConfiguration?.data.actionFontColor as string
+              ),
+            }}
+            className={buttonVariants({
+              variant: "link",
+              size: "none",
+              className: "font-medium",
+            })}
+          >
+            {t("livenessSuccessButtonTitle")}
+          </a>
         )}
       </div>
       <Footer />

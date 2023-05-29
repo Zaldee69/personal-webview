@@ -1,5 +1,5 @@
 import Head from "next/head";
-import Image from "next/image";
+import Image from "next/legacy/image";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import Footer from "../../components/Footer";
@@ -17,6 +17,8 @@ import { concateRedirectUrlParams } from "@/utils/concateRedirectUrlParams";
 import { RestKycCheckStepv2 } from "infrastructure/rest/personal";
 import Button from "@/components/atoms/Button";
 import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
+import Heading from "@/components/atoms/Heading";
+import Paragraph from "@/components/atoms/Paraghraph";
 
 const LivenessFail = () => {
   const router = useRouter();
@@ -78,7 +80,7 @@ const LivenessFail = () => {
           }}
         >
           <Button
-            size="sm"
+            size="md"
             style={{
               backgroundColor: themeConfigurationAvaliabilityChecker(
                 themeConfiguration?.data.buttonColor as string
@@ -107,25 +109,28 @@ const LivenessFail = () => {
       </Head>
       <div className="px-5 pt-8 sm:w-full md:w-4/5 mx-auto">
         <div className="flex flex-col gap-20 items-center justify-center">
-          <h1 className="text-center poppins-semibold text-xl">
-            {t("livenessFailedTitle")}
-          </h1>
-          <Image
-            src={`${assetPrefix}/images/livenessFail.svg`}
-            width={200}
-            height={200}
-            alt="liveness-fal"
-          />
+          <Heading className="text-center">{t("livenessFailedTitle")}</Heading>
+          <div
+            className="bg-contain w-60 h-64 bg-center bg-no-repeat"
+            style={{
+              backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
+                themeConfiguration.data
+                  .asset_registration_status_failed as string,
+                "ASSET",
+                `${assetPrefix}/images/livenessFail.svg`
+              )})`,
+            }}
+          ></div>
           <div className="flex flex-col gap-10 ">
-            <span className="text-center poppins-regular text-neutral ">
+            <Paragraph className="text-center">
               {gagalCounter > 2
                 ? t("livenessFailed3xSubtitle")
                 : t("livenessFailedSubtitle")}
-            </span>
+            </Paragraph>
           </div>
           <RedirectButton />
         </div>
-        <Footer  />
+        <Footer />
       </div>
     </div>
   );

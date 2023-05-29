@@ -13,7 +13,7 @@ import { toast } from "react-toastify";
 import XIcon from "@/public/icons/XIcon";
 import { useRouter } from "next/router";
 import { handleRoute } from "./../../utils/handleRoute";
-import Image from "next/image";
+import Image from "next/legacy/image";
 import { assetPrefix } from "../../next.config";
 import { GetServerSideProps } from "next";
 import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
@@ -32,6 +32,9 @@ import { getEncodedCurrentUrl } from "@/utils/getEncodedCurrentUrl";
 import Button, { buttonVariants } from "@/components/atoms/Button";
 import { TThemeResponse } from "infrastructure/rest/personal/types";
 import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
+import Paragraph from "@/components/atoms/Paraghraph";
+import Heading from "@/components/atoms/Heading";
+import Label from "@/components/atoms/Label";
 
 type Props = {};
 
@@ -194,7 +197,7 @@ const Login = ({}: Props) => {
                   ...queryWithDynamicRedirectURL,
                 },
               });
-            }else if(router.query.setting === "3"){
+            } else if (router.query.setting === "3") {
               router.replace({
                 pathname: handleRoute("setting-signature"),
                 query: {
@@ -291,18 +294,19 @@ const Login = ({}: Props) => {
           <div className="h-14 w-14 poppins-semibold flex text-xl items-center justify-center name text-white bg-[#64bac3] rounded-full">
             {tilakaName?.[0]?.toUpperCase()}
           </div>
-          <span className="font-bold text-xl text-[#172b4d] poppins-regular">
+          <Heading>
             {t("hi")}, {tilaka_name}
-          </span>
+          </Heading>
         </div>
         <form onSubmit={submitHandler}>
           <div className="flex flex-col  mt-20">
-            <label
-              className="poppins-regular px-2 text-label font-light"
+            <Label
+              size="base"
+              className="px-2"
               htmlFor="password"
             >
               {t("passwordLabel")}
-            </label>
+            </Label>
             <div className="relative flex-1">
               <input
                 onChange={(e) => onChangeHandler(e)}
@@ -331,12 +335,12 @@ const Login = ({}: Props) => {
                 checked={rememberMe}
                 onChange={() => setRememberMe(!rememberMe)}
               />
-              <label
-                className="poppins-regular text-label font-light"
+              <Label
+                size="base"
                 htmlFor="rememberMe"
               >
                 {t("rememberMe")}
-              </label>
+              </Label>
             </div>
             <div className="flex justify-center items-center mt-5">
               <Link
@@ -345,6 +349,7 @@ const Login = ({}: Props) => {
                   query: router.query,
                 }}
                 passHref
+                legacyBehavior
               >
                 <a
                   style={{
@@ -360,15 +365,19 @@ const Login = ({}: Props) => {
               <div className="block mx-2.5">
                 <Image
                   src={`${assetPrefix}/images/lineVertical.svg`}
-                  width="8px"
-                  height="24px"
+                  width="8"
+                  height="24"
                   alt="lineVertical"
                 />
               </div>
-              <Link href={{
-                pathname: handleRoute("forgot-tilaka-name"),
-                query: router.query
-              }} passHref>
+              <Link
+                href={{
+                  pathname: handleRoute("forgot-tilaka-name"),
+                  query: router.query,
+                }}
+                passHref
+                legacyBehavior
+              >
                 <a
                   style={{
                     color: themeConfigurationAvaliabilityChecker(
@@ -382,19 +391,19 @@ const Login = ({}: Props) => {
               </Link>
             </div>
           </div>
-          <div className="flex justify-center" >
-          <Button
-            type="submit"
-            style={{
-              backgroundColor: themeConfigurationAvaliabilityChecker(
-                theme?.data.buttonColor as string
-              ),
-            }}
-            className="uppercase mt-24"
-            disabled={password.length < 1}
-          >
-            {t("loginCTA")}
-          </Button>
+          <div className="flex justify-center">
+            <Button
+              type="submit"
+              style={{
+                backgroundColor: themeConfigurationAvaliabilityChecker(
+                  theme?.data.buttonColor as string
+                ),
+              }}
+              className="uppercase mt-24"
+              disabled={password.length < 1}
+            >
+              {t("loginCTA")}
+            </Button>
           </div>
         </form>
         <Footer />
@@ -454,19 +463,23 @@ const CertifModal = ({ certifModal, setCertifModal, theme }: ModalProps) => {
       className="fixed z-50 flex items-start transition-all duration-1000 pb-3 justify-center w-full left-0 top-0 h-full "
     >
       <div className="bg-white max-w-md mt-20 pt-5 px-2 pb-4 rounded-xl w-full mx-5">
-        <p className="text-center font-poppins font-semibold">
+        <Heading className="text-center">
           {t("dontHaveCertifTitle")}
-        </p>
+        </Heading>
         <div className="flex flex-col justify-center">
-          <Image
-            src={`${assetPrefix}/images/certif.svg`}
-            width={100}
-            height={100}
-            alt="cert"
-          />
-          <p className="text-center font-poppins mt-5">
+          <div
+            className="bg-contain w-32 mx-auto h-32 bg-center bg-no-repeat"
+            style={{
+              backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
+                theme?.data.asset_activation_cert_error as string,
+                "ASSET",
+                `${assetPrefix}/images/certif.svg`
+              )})`,
+            }}
+          ></div>
+          <Paragraph className="text-center mt-5">
             {t("dontHaveCertifSubtitle")}
-          </p>
+          </Paragraph>
         </div>
         <Button
           style={{

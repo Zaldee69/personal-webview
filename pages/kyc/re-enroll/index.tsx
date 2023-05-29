@@ -2,7 +2,7 @@ import Camera from "@/components/Camera";
 import Footer from "@/components/Footer";
 import ProgressStepBar from "@/components/ProgressStepBar";
 import Head from "next/head";
-import Image from "next/image";
+import Image from "next/legacy/image";
 import i18n from "i18";
 import { toast } from "react-toastify";
 import XIcon from "@/public/icons/XIcon";
@@ -382,9 +382,19 @@ const ReEnrollMekari = () => {
         </h2>
         {(!isStepDone && actionList.length > 1) || isMustReload ? (
           <ActionGuide2
-            currentIndex={currentIndex}
+            imageSrc={themeConfigurationAvaliabilityChecker(
+              currentIndex === "hadap-depan" || !isStepDone
+                ? (themeConfiguration.data
+                    .asset_liveness_action_selfie as string)
+                : currentIndex === "buka-mulut"
+                ? (themeConfiguration.data
+                    .asset_liveness_action_open_mouth as string)
+                : (themeConfiguration.data
+                    .asset_liveness_action_blink as string),
+              "ASSET",
+              `${assetPrefix}/images/${currentIndex}.svg`
+            )}
             isGenerateAction={isGenerateAction}
-            isStepDone={isStepDone}
             isMustReload={isMustReload}
           />
         ) : (
@@ -400,7 +410,18 @@ const ReEnrollMekari = () => {
             {!isLoading && (
               <ActionGuide1
                 actionList={actionList}
-                currentIndex={currentIndex}
+                imageSrc={themeConfigurationAvaliabilityChecker(
+                  currentIndex === "hadap-depan"
+                    ? (themeConfiguration.data
+                        .asset_liveness_action_selfie as string)
+                    : currentIndex === "buka-mulut"
+                    ? (themeConfiguration.data
+                        .asset_liveness_action_open_mouth as string)
+                    : (themeConfiguration.data
+                        .asset_liveness_action_blink as string),
+                  "ASSET",
+                  `${assetPrefix}/images/${currentIndex}.svg`
+                )}
                 currentActionIndex={currentActionIndex}
                 failedMessage={failedMessage}
                 actionText={actionText}

@@ -1,35 +1,29 @@
-import Image from "next/image";
+import Image from "next/legacy/image";
 import React from "react";
-import { assetPrefix } from "../../next.config";
 import i18n from "i18";
 
 type ActionGuide1Props = {
   actionList: any[];
-  currentIndex: string;
   failedMessage: string;
   actionText: (text: string) => any;
   currentActionIndex: number;
+  imageSrc: string;
 };
 
 type ActionGuide2Props = {
-  currentIndex: string;
   isGenerateAction: boolean;
-  isStepDone: boolean;
   isMustReload: boolean;
+  imageSrc: string;
 };
 
 export const ActionGuide1 = (props: ActionGuide1Props) => {
   const { t }: any = i18n;
+
   return (
     <div className="flex gap-5 mx-2 mt-5">
       <div className="mt-1">
         {props.actionList.length === 2 && (
-          <Image
-            src={`${assetPrefix}/images/${props.currentIndex}.svg`}
-            width={50}
-            height={50}
-            alt="2"
-          />
+          <Image src={props.imageSrc} width={50} height={50} alt="2" />
         )}
       </div>
       <div className="flex flex-col">
@@ -57,9 +51,7 @@ export const ActionGuide2 = (props: ActionGuide2Props) => {
       <div className="mt-1">
         {!props.isGenerateAction && (
           <Image
-            src={`${assetPrefix}/images/${
-              !props.isStepDone ? "hadap-depan" : props.currentIndex
-            }.svg`}
+            src={props.imageSrc}
             width={50}
             height={50}
             alt="1"

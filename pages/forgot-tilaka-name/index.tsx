@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction, useRef, useState } from "react";
-import Image from "next/image";
+import Image from "next/legacy/image";
 import { toast } from "react-toastify";
 import XIcon from "../../public/icons/XIcon";
 import Head from "next/head";
@@ -13,6 +13,8 @@ import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfiguratio
 import { RootState } from "@/redux/app/store";
 import { useSelector } from "react-redux";
 import Footer from "@/components/Footer";
+import Heading from "@/components/atoms/Heading";
+import Paragraph from "@/components/atoms/Paraghraph";
 
 type Props = {};
 
@@ -116,17 +118,19 @@ const ForgotTilakaName = (props: Props) => {
       </Head>
       <div className="py-9 max-w-md items-center mx-auto flex flex-col justify-between">
         <div className="w-full px-5">
-          <p className="font-poppins text-lg font-semibold text-neutral800">
+          <Heading>
             {t("forgotTilakaName.title")}
-          </p>
-          <div className="flex justify-center mt-6">
-            <Image
-              src={`${assetPrefix}/images/forgotTilakaName.svg`}
-              width="205px"
-              height="205px"
-              alt="forgot-ill"
-            />
-          </div>
+          </Heading>
+          <div
+            className="bg-contain w-52 mx-auto mt-6 h-52 bg-center bg-no-repeat"
+            style={{
+              backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
+                themeConfiguration.data.asset_forget_tilaka_name as string,
+                "ASSET",
+                `${assetPrefix}/images/forgotTilakaName.svg`
+              )})`,
+            }}
+          ></div>
 
           <div className="flex justify-center" style={{ minHeight: "180px" }}>
             {reCaptchaSuccess ? (
@@ -134,9 +138,9 @@ const ForgotTilakaName = (props: Props) => {
                 <form onSubmit={handleFormOnSubmit}>
                   <label className="block mt-4">
                     <div className="flex justify-start items-center">
-                      <p className="font-poppins text-sm text-neutral200 pl-2.5">
+                      <Paragraph size="sm" className="pl-2.5">
                         Email
-                      </p>
+                      </Paragraph>
                     </div>
                     <div className="mt-1 relative">
                       <input
@@ -202,8 +206,8 @@ const ModalSuccess: React.FC<{
         <div className="mt-5 text-center">
           <Image
             src={`${assetPrefix}/images/checkCircle.svg`}
-            width="53px"
-            height="53px"
+            width="53"
+            height="53"
             alt="check-ill"
           />
         </div>

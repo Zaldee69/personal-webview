@@ -12,7 +12,7 @@ import { toast } from "react-toastify";
 import XIcon from "@/public/icons/XIcon";
 import { restGetOtp } from "infrastructure/rest/b2b";
 import { Dispatch, SetStateAction, useEffect, useState, useRef } from "react";
-import Image from "next/image";
+import Image from "next/legacy/image";
 import Head from "next/head";
 import FRCamera from "@/components/FRCamera";
 import SignaturePad from "@/components/SignaturePad";
@@ -34,6 +34,8 @@ import {
 } from "@/utils/localStorageWithExpiresIn";
 import Button from "@/components/atoms/Button";
 import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
+import Heading from "@/components/atoms/Heading";
+import Paragraph from "@/components/atoms/Paraghraph";
 
 type TFontSig =
   | "Adine-Kirnberg"
@@ -150,10 +152,9 @@ const Signing = () => {
                 style={{
                   backgroundColor: themeConfigurationAvaliabilityChecker(
                     themeConfiguration?.data.buttonColor as string,
-                    "BG"
                   ),
                 }}
-                size="full"
+                size="md"
                 onClick={() =>
                   res.response.data.mfa.toLowerCase() == "fr"
                     ? setopenFRModal(true)
@@ -171,36 +172,36 @@ const Signing = () => {
   );
 };
 
-// export const getServerSideProps: GetServerSideProps = async (context) => {
-//   const cQuery = context.query;
-//   const uuid =
-//     cQuery.transaction_id || cQuery.request_id || cQuery.registration_id;
-//   const params = { ...cQuery, registration_id: uuid };
-//   const queryString = new URLSearchParams(params as any).toString();
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const cQuery = context.query;
+  const uuid =
+    cQuery.transaction_id || cQuery.request_id || cQuery.registration_id;
+  const params = { ...cQuery, registration_id: uuid };
+  const queryString = new URLSearchParams(params as any).toString();
 
-//   const checkStepResult: {
-//     res?: TKycCheckStepResponseData;
-//     err?: {
-//       response: {
-//         data: {
-//           success: boolean;
-//           message: string;
-//           data: { errors: string[] };
-//         };
-//       };
-//     };
-//   } = await RestKycCheckStepv2({
-//     registerId: uuid as string,
-//   })
-//     .then((res) => {
-//       return { res };
-//     })
-//     .catch((err) => {
-//       return { err };
-//     });
+  const checkStepResult: {
+    res?: TKycCheckStepResponseData;
+    err?: {
+      response: {
+        data: {
+          success: boolean;
+          message: string;
+          data: { errors: string[] };
+        };
+      };
+    };
+  } = await RestKycCheckStepv2({
+    registerId: uuid as string,
+  })
+    .then((res) => {
+      return { res };
+    })
+    .catch((err) => {
+      return { err };
+    });
 
-//   return serverSideRenderReturnConditions({ context, checkStepResult });
-// };
+  return serverSideRenderReturnConditions({ context, checkStepResult });
+};
 
 export default Signing;
 
@@ -224,10 +225,11 @@ const Configuration: React.FC<{
             width={25}
             height={25}
             src={`${assetPrefix}/images/goresan.svg`}
-          />
-          <p className="text-[#727272] text-base poppins-regular ">
+            alt="scratch"
+            />
+          <Heading className="text-[#727272] text-base">
             {t("signatureOption1")}
-          </p>
+          </Heading>
         </button>
       </div>
       <div className="flex flex-col">
@@ -236,8 +238,9 @@ const Configuration: React.FC<{
             width={25}
             height={25}
             src={`${assetPrefix}/images/font.svg`}
+            alt="font"
           />
-          <p className="text-[#727272] text-base poppins-regular ">Font</p>
+          <Heading className="text-[#727272] text-base">Font</Heading>
         </button>
       </div>
     </div>
@@ -267,14 +270,15 @@ export const FRModal: React.FC<Active | any> = ({ modal, setModal }) => {
       <div className="bg-white max-w-md mt-20 pt-5 px-2 pb-3 rounded-md w-full mx-5 ">
         {isFRSuccess ? (
           <div className="flex flex-col  items-center">
-            <p className="poppins-regular block text-center  whitespace-nowrap  font-semibold ">
+            <Heading className=" block text-center  whitespace-nowrap  font-semibold ">
               {t("signSuccess")}
-            </p>
+            </Heading>
             <div className="my-10">
               <Image
                 width={150}
                 height={150}
                 src={`${assetPrefix}/images/successFR.svg`}
+                alt="successFR"
               />
             </div>
 
@@ -304,12 +308,12 @@ export const FRModal: React.FC<Active | any> = ({ modal, setModal }) => {
           </div>
         ) : (
           <>
-            <p className="poppins-regular block text-center font-semibold ">
+            <Heading className=" block text-center font-semibold ">
               {t("frTitle")}
-            </p>
-            <span className="poppins-regular mt-2 block text-center text-sm font-normal">
+            </Heading>
+            <Paragraph className="mt-2 block text-center text-sm font-normal">
               {t("frSubtitle1")}
-            </span>
+            </Paragraph>
             <FRCamera setModal={setModal} setIsFRSuccess={setIsFRSuccess} />
             <Button
               onClick={() => setModal(!modal)}
@@ -356,9 +360,9 @@ const ChooseFontModal: React.FC<Active> = ({ modal, setModal, tilakaName }) => {
       className="fixed z-50 flex items-start transition-all duration-1000 justify-center w-full left-0 top-0 h-full "
     >
       <div className="bg-white max-w-md mt-20 pt-5 px-2 pb-3 rounded-md w-full mx-2">
-        <p className="poppins-regular block text-center  whitespace-nowrap  font-semibold ">
+        <Heading className="block text-center  whitespace-nowrap">
           {t("chooseFont")}
-        </p>
+        </Heading>
         <div className="mt-5 flex flex-col gap-5">
           <div
             className={`grid  ${
@@ -497,9 +501,9 @@ const ChooseScratchModal: React.FC<Active> = ({ modal, setModal }) => {
       className="fixed z-50 flex items-start transition-all duration-1000 justify-center w-full left-0 top-0 h-full "
     >
       <div className="bg-white max-w-md mt-20 pt-5 px-2 pb-3 rounded-md w-full mx-2">
-        <p className="poppins-regular block text-center  whitespace-nowrap  font-semibold ">
+        <Heading className="block text-center  whitespace-nowrap">
           {t("signatureOption1")}
-        </p>
+        </Heading>
         <SignaturePad sigPad={sigPad} />
         <Button
           onClick={(e) => {
@@ -678,9 +682,9 @@ export const OTPModal: React.FC<Active> = ({ modal, setModal }) => {
       <div className="bg-white max-w-md mt-20 pt-5 px-2 pb-3 rounded-md w-full mx-5">
         {successSigning ? (
           <div className="flex flex-col  items-center">
-            <p className="poppins-regular block text-center  whitespace-nowrap  font-semibold ">
+            <Heading className="block text-center  whitespace-nowrap">
               {t("signSuccess")}
-            </p>
+            </Heading>
             <div className="my-10">
               <Image
                 width={150}
@@ -702,19 +706,19 @@ export const OTPModal: React.FC<Active> = ({ modal, setModal }) => {
                   );
                 }
               }}
-              className="bg-primary btn uppercase text-white poppins-regular w-full mt-5 mx-auto rounded-sm h-9"
+              className="bg-primary btn uppercase text-white w-full mt-5 mx-auto rounded-sm h-9"
             >
               {t("close")}
             </button>
           </div>
         ) : (
           <>
-            <p className="poppins-regular block text-center pb-5  whitespace-nowrap  font-semibold ">
+            <Heading className=" block text-center pb-5  whitespace-nowrap  font-semibold ">
               {t("frTitle")}
-            </p>
-            <span className="poppins-regular block text-center pb-5  ">
+            </Heading>
+            <Paragraph className=" block text-center pb-5  ">
               {t("frSubtitle2")}
-            </span>
+            </Paragraph>
             <PinInput
               containerStyle={{
                 alignItems: "center",
@@ -728,7 +732,7 @@ export const OTPModal: React.FC<Active> = ({ modal, setModal }) => {
               values={values}
               onChange={(value, index, values) => setValues(values)}
             />
-            <div className="flex poppins-regular justify-center text-sm gap-1 mt-5">
+            <div className="flex justify-center text-sm gap-1 mt-5">
               <p className="text-neutral200">{t("dindtReceiveOtp")}</p>
               <div
                 style={{

@@ -1,11 +1,16 @@
 export const themeConfigurationAvaliabilityChecker = (
   str: string,
-  identifier?: "BG"
+  identifier?: "BG" | "ASSET" | undefined,
+  alt?: string,
 ): string => {
-  if (!str && identifier) {
+  if (identifier === "ASSET" && !str) {
+    return alt as string;
+  } else if (!str && identifier === "BG") {
     return "#fff";
   } else if (!str && !identifier) {
     return "#0052CC";
+  } else if (identifier === "ASSET" && str) {
+    return "data:image/png;base64,".concat(str);
   } else {
     return str;
   }

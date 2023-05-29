@@ -1,5 +1,5 @@
 import Head from "next/head";
-import Image from "next/image";
+import Image from "next/legacy/image";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import Footer from "../../../components/Footer";
@@ -17,6 +17,8 @@ import { serverSideRenderReturnConditions } from "@/utils/serverSideRenderReturn
 import { concateRedirectUrlParams } from "@/utils/concateRedirectUrlParams";
 import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
 import Button from "@/components/atoms/Button";
+import Heading from "@/components/atoms/Heading";
+import Paragraph from "@/components/atoms/Paraghraph";
 
 const LivenessFail = () => {
   const router = useRouter();
@@ -97,20 +99,25 @@ const LivenessFail = () => {
       </Head>
       <div className="px-5 pt-8 max-w-sm sm:w-full md:w-4/5 mx-auto">
         <div className="flex flex-col gap-10 items-center justify-center">
-          <h1 className="text-center poppins-semibold text-xl">
+          <Heading>
             {t("livenessFailedTitle")}
-          </h1>
-          <Image
-            src={`${assetPrefix}/images/livenessFail.svg`}
-            width={200}
-            height={200}
-          />
+          </Heading>
+          <div
+            className="bg-contain w-52 h-52 bg-center bg-no-repeat"
+            style={{
+              backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
+                themeConfiguration.data.asset_liveness_v2_failed as string,
+                "ASSET",
+                `${assetPrefix}/images/livenessFail.svg`
+              )})`,
+            }}
+          ></div>
           <div className="flex flex-col gap-10 ">
-            <span className="text-center poppins-regular text-neutral ">
+            <Paragraph className="text-center">
               {gagalCounter > 2
                 ? t("livenessFailed3xSubtitle")
                 : t("livenessFailedSubtitle")}
-            </span>
+            </Paragraph>
           </div>
           <RedirectButton />
         </div>
@@ -120,33 +127,33 @@ const LivenessFail = () => {
   );
 };
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  const cQuery = context.query;
-  const uuid =
-    cQuery.transaction_id || cQuery.request_id || cQuery.registration_id;
+// export const getServerSideProps: GetServerSideProps = async (context) => {
+//   const cQuery = context.query;
+//   const uuid =
+//     cQuery.transaction_id || cQuery.request_id || cQuery.registration_id;
 
-  const checkStepResult: {
-    res?: TKycCheckStepResponseData;
-    err?: {
-      response: {
-        data: {
-          success: boolean;
-          message: string;
-          data: { errors: string[] };
-        };
-      };
-    };
-  } = await RestKycCheckStep({
-    payload: { registerId: uuid as string },
-  })
-    .then((res) => {
-      return { res };
-    })
-    .catch((err) => {
-      return { err };
-    });
+//   const checkStepResult: {
+//     res?: TKycCheckStepResponseData;
+//     err?: {
+//       response: {
+//         data: {
+//           success: boolean;
+//           message: string;
+//           data: { errors: string[] };
+//         };
+//       };
+//     };
+//   } = await RestKycCheckStep({
+//     payload: { registerId: uuid as string },
+//   })
+//     .then((res) => {
+//       return { res };
+//     })
+//     .catch((err) => {
+//       return { err };
+//     });
 
-  return serverSideRenderReturnConditions({ context, checkStepResult });
-};
+//   return serverSideRenderReturnConditions({ context, checkStepResult });
+// };
 
 export default LivenessFail;

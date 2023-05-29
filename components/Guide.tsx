@@ -1,4 +1,4 @@
-import Image from "next/image";
+import Image from "next/legacy/image";
 import React from "react";
 import Head from "next/head";
 import i18n from "i18";
@@ -8,6 +8,8 @@ import Button from "./atoms/Button";
 import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
 import { RootState } from "@/redux/app/store";
 import { useSelector } from "react-redux";
+import Heading from "./atoms/Heading";
+import Paragraph from "./atoms/Paraghraph";
 
 interface Props {
   setIsClicked: React.Dispatch<React.SetStateAction<boolean>>;
@@ -34,37 +36,49 @@ const Guide = ({ setIsClicked, isDisabled }: Props) => {
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
       <div className=" py-10 max-w-sm mx-auto px-2 pt-8 sm:w-full md:w-4/5 ">
-        <h2 className="poppins-regular text-xl font-semibold">Liveness</h2>
-        <span className="poppins-regular text-sm block mt-4">
+        <Heading>Liveness</Heading>
+        <Paragraph size="sm" className="mt-4">
           {t("guideTitle")}
-        </span>
+        </Paragraph>
         <div className="flex flex-col gap-5 my-6">
-          <div className="grid poppins-regular text-sm grid-cols-2 items-center grid-flow-col">
+          <div className="grid poppins-regular gap-2 text-sm grid-cols-2 items-center grid-flow-col">
             <Image
               alt="guide-1"
-              src={`${assetPrefix}/images/1.svg`}
+              src={themeConfigurationAvaliabilityChecker(
+                themeConfiguration.data.asset_liveness_guide_1 as string,
+                "ASSET",
+                `${assetPrefix}/images/1.svg`
+              )}
               width={120}
               height={90}
             />
-            <p>{t("guideSubtitle1")}</p>
+            <Paragraph size="sm">{t("guideSubtitle1")}</Paragraph>
           </div>
-          <div className="grid poppins-regular text-sm grid-cols-2 items-center grid-flow-col">
+          <div className="grid poppins-regular gap-2 text-sm grid-cols-2 items-center grid-flow-col">
             <Image
               alt="guide-1"
-              src={`${assetPrefix}/images/2.svg`}
+              src={themeConfigurationAvaliabilityChecker(
+                themeConfiguration.data.asset_liveness_guide_2 as string,
+                "ASSET",
+                `${assetPrefix}/images/2.svg`
+              )}
               width={120}
               height={90}
             />
-            <p>{t("guideSubtitle2")}</p>
+            <Paragraph size="sm">{t("guideSubtitle2")}</Paragraph>
           </div>
-          <div className="grid poppins-regular text-sm grid-cols-2 items-center grid-flow-col">
+          <div className="grid poppins-regular gap-2 text-sm grid-cols-2 items-center grid-flow-col">
             <Image
               alt="guide-1"
-              src={`${assetPrefix}/images/3.svg`}
+              src={themeConfigurationAvaliabilityChecker(
+                themeConfiguration.data.asset_liveness_guide_3 as string,
+                "ASSET",
+                `${assetPrefix}/images/3.svg`
+              )}
               width={120}
               height={90}
             />
-            <p>{t("guideSubtitle3")}</p>
+            <Paragraph size="sm">{t("guideSubtitle3")}</Paragraph>
           </div>
         </div>
         <Button

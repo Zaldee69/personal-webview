@@ -11,7 +11,7 @@ import { getUserName, restGetOtp, restLogout } from "infrastructure/rest/b2b";
 import { ISignedPDF } from "infrastructure/rest/signing/types";
 import { assetPrefix } from "next.config";
 import { NextParsedUrlQuery } from "next/dist/server/request-meta";
-import Image from "next/image";
+import Image from "next/legacy/image";
 import { useRouter } from "next/router";
 import React, {
   ChangeEvent,
@@ -37,6 +37,9 @@ import { RootState } from "@/redux/app/store";
 import { useSelector } from "react-redux";
 import Button, { buttonVariants } from "@/components/atoms/Button";
 import Footer from "@/components/Footer";
+import Heading from "@/components/atoms/Heading";
+import Paragraph from "@/components/atoms/Paraghraph";
+import Label from "@/components/atoms/Label";
 
 interface IParameterFromRequestSign {
   user?: string;
@@ -316,7 +319,6 @@ const SigningWithRead = () => {
       return;
     }
   }, [documentsHasBeenRead, documentList]);
-
   if (!shouldRender) return null;
   if (isSuccess === "1") {
     return <SigningSuccess documentCount={documentList.length} />;
@@ -363,24 +365,24 @@ const SigningWithRead = () => {
         className="px-10 py-8 text-center flex flex-col justify-center min-h-screen"
       >
         <div>
-          <p
+          <Heading
             className="font-poppins text-lg font-semibold text-neutral800 text-left mx-auto"
-            style={{ maxWidth: "360px" }}
           >
             {t("signRequestTitle")}
-          </p>
-          <div className="mt-3">
-            <Image
-              src={`${assetPrefix}/images/signatureRequest.svg`}
-              width="120px"
-              height="120px"
-              alt="signing-request-ill"
-            />
-          </div>
+          </Heading>
+          <div
+            className="bg-contain mx-auto w-40 h-40 bg-center bg-no-repeat"
+            style={{
+              backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
+                themeConfiguration.data.asset_signing as string,
+                "ASSET",
+                `${assetPrefix}/images/signatureRequest.svg`
+              )})`,
+            }}
+          ></div>
           <div className="mt-3 flex justify-center">
-            <p
-              className="font-poppins text-sm text-neutral800 text-left"
-              style={{ maxWidth: "360px" }}
+            <Paragraph
+              className="text-sm text-left"
             >
               {t("signRequestSubtitle.subtitle1")}
               {routerQuery.mustread === "1" ? (
@@ -391,13 +393,13 @@ const SigningWithRead = () => {
               ) : (
                 t("signRequestSubtitle.subtitle2")
               )}
-            </p>
+            </Paragraph>
           </div>
         </div>
         <div className="mt-6 mx-auto w-full" style={{ maxWidth: "360px" }}>
-          <p className="font-poppins font-semibold text-sm text-neutral200 text-left">
+          <Paragraph size="sm" className="font-semibold text-left">
             {documentList.length} {t("document")}
-          </p>
+          </Paragraph>
           <div className="flex justify-center">
             <div
               className="mt-2 border border-neutral50 p-4 rounded-md w-full overflow-y-auto"
@@ -418,9 +420,9 @@ const SigningWithRead = () => {
                         <CheckEvalGrayIcon />
                       )}
                     </span>
-                    <p className="text-sm text-neutral800 truncate">
+                    <Paragraph size="sm" className="truncate">
                       {e.pdf_name}
-                    </p>
+                    </Paragraph>
                   </div>
                   <div className="flex items-center justify-end w-1/4">
                     <button
@@ -452,12 +454,12 @@ const SigningWithRead = () => {
                 checked={read}
                 disabled
               />
-              <label
-                className="ml-3 text-neutral800 font-poppins text-left text-sm cursor-pointer select-none"
+              <Label
+                className="ml-3 text-left cursor-pointer select-none"
                 htmlFor="read"
               >
                 {t("singingReadDocCheckbox")}
-              </label>
+              </Label>
             </div>
             <div
               className="flex items-center mt-4"
@@ -470,12 +472,12 @@ const SigningWithRead = () => {
                 className="form-checkbox cursor-pointer text-primary"
                 onChange={agreeOnChange}
               />
-              <label
-                className="ml-3 text-neutral800 font-poppins text-left text-sm cursor-pointer select-none"
+              <Label
+                className="ml-3 text-left cursor-pointer select-none"
                 htmlFor="agree"
               >
                 {t("singingAgreeDocCheckbox")}
-              </label>
+              </Label>
             </div>
           </div>
         </div>
@@ -736,24 +738,25 @@ const SigningWithoutRead = () => {
         className="px-10 py-8 text-center flex flex-col justify-center min-h-screen"
       >
         <div>
-          <p
-            className="font-poppins text-lg font-semibold text-neutral800 text-left mx-auto"
-            style={{ maxWidth: "360px" }}
+          <Heading
+            className="text-left mx-auto"
           >
             {t("signRequestTitle")}
-          </p>
-          <div className="mt-3">
-            <Image
-              src={`${assetPrefix}/images/signatureRequest.svg`}
-              width="120px"
-              height="120px"
-              alt="signing-request-ill"
-            />
-          </div>
+          </Heading>
+          <div
+            className="bg-contain mx-auto w-40 h-40 bg-center bg-no-repeat"
+            style={{
+              backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
+                themeConfiguration.data.asset_signing as string,
+                "ASSET",
+                `${assetPrefix}/images/signatureRequest.svg`
+              )})`,
+            }}
+          ></div>
           <div className="mt-3 flex justify-center">
-            <p
-              className="font-poppins text-sm text-neutral800 text-left"
-              style={{ maxWidth: "360px" }}
+            <Paragraph
+              size="sm"
+              className="text-left"
             >
               {t("signRequestSubtitle.subtitle1")}
               {routerQuery.mustread === "1" ? (
@@ -764,13 +767,13 @@ const SigningWithoutRead = () => {
               ) : (
                 t("signRequestSubtitle.subtitle2")
               )}
-            </p>
+            </Paragraph>
           </div>
         </div>
         <div className="mt-6 mx-auto w-full" style={{ maxWidth: "360px" }}>
-          <p className="font-poppins font-semibold text-sm text-neutral200 text-left">
+          <Paragraph size="sm" className=" font-semibold text-left">
             {documentList.length} {t("document")}
-          </p>
+          </Paragraph>
           <div className="flex justify-center">
             <div
               className="mt-2 border border-neutral50 p-4 rounded-md w-full overflow-y-auto"
@@ -783,9 +786,9 @@ const SigningWithoutRead = () => {
                     i !== 0 ? "mt-4" : ""
                   }`}
                 >
-                  <p className="text-sm text-neutral800 truncate">
+                  <Paragraph className="text-sm  truncate">
                     {e.pdf_name}
-                  </p>
+                  </Paragraph>
                   <button onClick={() => downloadOnClick(e.pdf, e.pdf_name)}>
                     <DownloadIcon />
                   </button>
@@ -806,12 +809,12 @@ const SigningWithoutRead = () => {
               className="form-checkbox cursor-pointer text-primary"
               onChange={agreeOnChange}
             />
-            <label
-              className="ml-3 text-neutral800 font-poppins text-left text-sm cursor-pointer select-none"
+            <Label
+              className="ml-3 text-left text-sm cursor-pointer select-none"
               htmlFor="agree"
             >
               {t("signCheckbox")}
-            </label>
+            </Label>
           </div>
         </div>
         <div className="mt-8">
@@ -864,21 +867,23 @@ const SigningSuccess = (props: TPropsSigningSuccess) => {
       className="px-10 pt-16 pb-9 text-center flex flex-col justify-center min-h-screen"
     >
       <div>
-        <p className="font-poppins text-lg font-semibold text-neutral800">
+        <Heading>
           {t("signSuccess")}
-        </p>
+        </Heading>
+        <div
+            className="bg-contain mx-auto w-52 h-52 bg-center bg-no-repeat"
+            style={{
+              backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
+                themeConfiguration.data.asset_signing_success as string,
+                "ASSET",
+                `${assetPrefix}/images/signingSuccess.svg`
+              )})`,
+            }}
+          ></div>
         <div className="mt-3">
-          <Image
-            src={`${assetPrefix}/images/signingSuccess.svg`}
-            width="196px"
-            height="196px"
-            alt="signing-success-ill"
-          />
-        </div>
-        <div className="mt-3">
-          <p className="font-poppins text-sm text-neutral800">
+          <Paragraph size="sm">
             {props.documentCount} {t("documentSuccess")}
-          </p>
+          </Paragraph>
         </div>
       </div>
       <div className="mt-32">
@@ -909,6 +914,7 @@ const SigningSuccess = (props: TPropsSigningSuccess) => {
     </div>
   );
 };
+
 const SigningOnProgress = (props: TPropsSigningSuccess) => {
   const router = useRouter();
   const routerQuery: NextParsedUrlQuery & {
@@ -937,26 +943,28 @@ const SigningOnProgress = (props: TPropsSigningSuccess) => {
       className="pt-16 px-1 pb-9 text-center flex flex-col justify-center min-h-screen"
     >
       <div>
-        <p className="font-poppins text-lg font-semibold text-neutral800">
+        <Heading className="mb-10">
           {t("authenticationSuccessTitle")}
-        </p>
-        <div className="mt-5">
-          <Image
-            src={`${assetPrefix}/images/progress.svg`}
-            width="196px"
-            height="196px"
-            alt="signing-success"
-          />
-        </div>
+        </Heading>
+        <div
+            className="bg-contain mx-auto w-52 h-52 bg-center bg-no-repeat"
+            style={{
+              backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
+                themeConfiguration.data.asset_signing_failed as string,
+                "ASSET",
+                `${assetPrefix}/images/progress.svg`
+              )})`,
+            }}
+          ></div>
         <div className="mt-3">
-          <p className="font-poppins text-sm whitespace-pre-line text-neutral800">
+          <Paragraph size="sm" className="whitespace-pre-line">
             {t("authenticationSuccessSubtitle")}
-          </p>
+          </Paragraph>
         </div>
       </div>
       <div className="mt-32">
         {routerQuery.redirect_url && (
-          <div className="text-primary text-base font-medium font-poppins underline hover:cursor-pointer">
+          <div className="text-primary text-base font-medium underline">
             <a
               style={{
                 color: themeConfigurationAvaliabilityChecker(
@@ -1010,21 +1018,23 @@ const SigningFailure = (props: TPropsSigningFailure) => {
       className="px-10 pt-16 pb-9 text-center flex flex-col justify-center min-h-screen"
     >
       <div>
-        <p className="font-poppins text-lg font-semibold text-neutral800">
+        <Heading>
           {t("signFailed")}
-        </p>
+        </Heading>
+           <div
+            className="bg-contain mx-auto w-52 h-52 bg-center bg-no-repeat"
+            style={{
+              backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
+                themeConfiguration.data.asset_signing_failed as string,
+                "ASSET",
+                `${assetPrefix}/images/signingFailure.svg`
+              )})`,
+            }}
+          ></div>
         <div className="mt-3">
-          <Image
-            src={`${assetPrefix}/images/signingFailure.svg`}
-            width="196px"
-            height="196px"
-            alt="signing-failure-ill"
-          />
-        </div>
-        <div className="mt-3">
-          <p className="font-poppins text-sm text-neutral800">
+          <Paragraph size="sm" >
             {t("signFailedSubtitle")}{" "}
-          </p>
+          </Paragraph>
         </div>
       </div>
       <div className="mt-32">
@@ -1165,12 +1175,12 @@ const FRModal: React.FC<IModal> = ({
     >
       <div className="bg-white max-w-md mt-20 pt-5 px-2 pb-3 rounded-md w-full mx-5 ">
         <>
-          <p className="font-poppins block text-center font-semibold ">
+          <Heading className="block text-center">
             {t("frTitle")}
-          </p>
-          <span className="font-poppins mt-2 block text-center text-sm font-normal">
+          </Heading>
+          <Paragraph size="sm" className="mt-2 block text-center">
             {t("frSubtitle1")}
-          </span>
+          </Paragraph>
           <FRCamera
             setModal={setModal}
             setIsFRSuccess={setIsFRSuccess}
@@ -1392,12 +1402,12 @@ const OTPModal: React.FC<IModal> = ({
     >
       <div className="bg-white max-w-md mt-20 pt-5 px-2 pb-3 rounded-md w-full mx-5">
         <div className="flex flex-col">
-          <p className="font-poppins block text-center pb-5  whitespace-nowrap  font-semibold ">
+          <Heading className="block text-center pb-5  whitespace-nowrap">
             {t("frTitle")}
-          </p>
-          <span className="font-poppins block text-center pb-5  ">
+          </Heading>
+          <Paragraph className="block text-center pb-5  ">
             {t("frSubtitle2")}
-          </span>
+          </Paragraph>
           <PinInput
             containerStyle={{
               alignItems: "center",
@@ -1411,8 +1421,8 @@ const OTPModal: React.FC<IModal> = ({
             values={values}
             onChange={(value, index, values) => setValues(values)}
           />
-          <div className="flex font-poppins justify-center text-sm gap-1 mt-5">
-            <p className="text-neutral200">{t("dindtReceiveOtp")}</p>
+          <div className="flex justify-center text-sm gap-1 mt-5">
+            <Paragraph>{t("dindtReceiveOtp")}</Paragraph>
             <div
               style={{
                 color: themeConfigurationAvaliabilityChecker(

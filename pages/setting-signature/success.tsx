@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useRouter } from "next/router";
 import { NextParsedUrlQuery } from "next/dist/server/request-meta";
-import Image from "next/image";
+import Image from "next/legacy/image";
 import { restLogout } from "infrastructure/rest/b2b";
 import { GetServerSideProps } from "next";
 import { serverSideRenderReturnConditions } from "@/utils/serverSideRenderReturnConditions";
@@ -17,6 +17,7 @@ import { RootState } from "@/redux/app/store";
 import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
 import Footer from "@/components/Footer";
 import { buttonVariants } from "@/components/atoms/Button";
+import Heading from "@/components/atoms/Heading";
 
 type Props = {};
 
@@ -57,17 +58,17 @@ const SettingSignatureSuccess = (props: Props) => {
       }}
       className="px-10 pt-16 min-h-screenn pb-9 text-center"
     >
-      <p className="text-base poppins-semibold text-neutral800">
-        {t("settingSignatureSuccessTitle")}
-      </p>
-      <div className="mt-20">
-        <Image
-          src={`${assetPrefix}/images/linkAccountSuccess.svg`}
-          width="196px"
-          height="196px"
-          alt="setting-signature-success-ill"
-        />
-      </div>
+      <Heading>{t("settingSignatureSuccessTitle")}</Heading>
+      <div
+        className="bg-contain w-52 mx-auto h-64 bg-center bg-no-repeat"
+        style={{
+          backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
+            themeConfiguration.data.asset_activation_success as string,
+            "ASSET",
+            `${assetPrefix}/images/linkAccountSuccess.svg`
+          )})`,
+        }}
+      ></div>
       {!isSigning && routerQuery.redirect_url && (
         <a
           style={{
