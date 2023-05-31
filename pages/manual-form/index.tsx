@@ -332,16 +332,16 @@ const Index = () => {
             inputRef={fileFotoSelfieRef}
             showMaxResolution
           />
-          <div className="flex flex-row mt-5">
+          <div className="flex items-start flex-row mt-5">
             <input
               id="tnc"
               name="tnc"
               type="checkbox"
-              className=" border-borderColor"
+              className=" border-borderColor block"
               onChange={onChangeHandler}
             />
-            <Label className="ml-2 text-neutral" htmlFor="tnc">
-              {t("agree")}{" "}
+            <Label size="base" className="ml-2 mt-[1px] text-neutral" htmlFor="tnc">
+              <Paragraph className="inline">{t("agree")} </Paragraph>
               <span className="text-primary">
                 <a
                   href="https://repository.tilaka.id/CP_CPS.pdf"
@@ -367,7 +367,7 @@ const Index = () => {
                 </a>
                 ,{" "}
               </span>
-              {t("and")}
+              <Paragraph className="inline">{t("and")}</Paragraph>
               <a
                 target="blank"
                 href="https://repository.tilaka.id/perjanjian-pemilik-sertifikat.pdf"
@@ -380,7 +380,7 @@ const Index = () => {
           </div>
           <Button
             type="submit"
-            disabled={!isTncChecked}
+            disabled={!isTncChecked || errorMessage.nik.length > 1}
             size="sm"
             className="bg-primary btn font-semibold mt-7 h-9 hover:opacity-50"
             style={{
@@ -579,3 +579,4 @@ const PhotoSelfieTermModal = ({ show, fileFotoSelfieRef }: TModal) => {
 };
 
 export default Index;
+
