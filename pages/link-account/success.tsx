@@ -137,7 +137,7 @@ const LinkAccountSuccess = (props: Props) => {
           : t("linkAccountSuccessTitle")}
       </Heading>
       <div
-          className="bg-contain w-52 mx-auto h-64 bg-center bg-no-repeat"
+          className="bg-contain mt-5 w-52 mx-auto h-64 bg-center bg-no-repeat"
           style={{
             backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
               themeConfiguration.data.asset_activation_success as string,
@@ -158,7 +158,7 @@ const LinkAccountSuccess = (props: Props) => {
           <a
             style={{
               color: themeConfigurationAvaliabilityChecker(
-                themeConfiguration?.data.actionFontColor as string
+                themeConfiguration?.data.action_font_color as string
               ),
             }}
             className={buttonVariants({

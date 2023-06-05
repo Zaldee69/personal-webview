@@ -179,7 +179,7 @@ const FRModal: React.FC<IModal> = ({
             className="mt-5 uppercase text-base mb-2 font-medium h-9"
             style={{
               backgroundColor: themeConfigurationAvaliabilityChecker(
-                themeConfiguration?.data.buttonColor as string
+                themeConfiguration?.data.button_color as string
               ),
             }}
           >
@@ -222,7 +222,7 @@ const OTPModal: React.FC<IModal> = ({
       isLoading: true,
       position: "top-center",
       style: {
-        backgroundColor: themeConfiguration?.data.toastColor as string,
+        backgroundColor: themeConfiguration?.data.toast_color as string,
       },
     });
     RestSigningAuthhashsign({
@@ -328,7 +328,7 @@ const OTPModal: React.FC<IModal> = ({
             isLoading: false,
             position: "top-center",
             style: {
-              backgroundColor: themeConfiguration?.data.toastColor as string,
+              backgroundColor: themeConfiguration?.data.toast_color as string,
             },
           });
         } else {
@@ -400,7 +400,7 @@ const OTPModal: React.FC<IModal> = ({
             <div
               style={{
                 color: themeConfigurationAvaliabilityChecker(
-                  themeConfiguration?.data.actionFontColor as string
+                  themeConfiguration?.data.action_font_color as string
                 ),
               }}
               className="font-semibold"
@@ -410,7 +410,7 @@ const OTPModal: React.FC<IModal> = ({
                   variant="ghost"
                   style={{
                     color: themeConfigurationAvaliabilityChecker(
-                      themeConfiguration?.data.actionFontColor as string
+                      themeConfiguration?.data.action_font_color as string
                     ),
                   }}
                   className="mx-0"
@@ -427,7 +427,7 @@ const OTPModal: React.FC<IModal> = ({
           <Button
             style={{
               backgroundColor: themeConfigurationAvaliabilityChecker(
-                themeConfiguration?.data.buttonColor as string
+                themeConfiguration?.data.button_color as string
               ),
             }}
             disabled={values.join("").length < 6}
@@ -446,7 +446,7 @@ const OTPModal: React.FC<IModal> = ({
             variant="ghost"
             style={{
               color: themeConfigurationAvaliabilityChecker(
-                themeConfiguration?.data.actionFontColor as string
+                themeConfiguration?.data.action_font_color as string
               ),
             }}
           >
@@ -514,7 +514,7 @@ const SigningSuccess = () => {
             <span
               style={{
                 color: themeConfigurationAvaliabilityChecker(
-                  themeConfiguration?.data.actionFontColor as string
+                  themeConfiguration?.data.action_font_color as string
                 ),
               }}
               className={buttonVariants({
@@ -586,7 +586,7 @@ const SigningFailure = () => {
               <span
                 style={{
                   color: themeConfigurationAvaliabilityChecker(
-                    themeConfiguration?.data.actionFontColor as string
+                    themeConfiguration?.data.action_font_color as string
                   ),
                 }}
                 className={buttonVariants({
@@ -652,7 +652,7 @@ const Login = ({}: IPropsLogin) => {
 
       doIn(data);
 
-      toastCaller(data, themeConfiguration?.data.toastColor as string);
+      toastCaller(data, themeConfiguration?.data.toast_color as string);
     } else if (data.status === "FULLFILLED" && !data.data.success) {
       toast(data.data.message || "Ada kesalahan", {
         type: "error",
@@ -845,7 +845,7 @@ const Login = ({}: IPropsLogin) => {
                 <a
                   style={{
                     color: themeConfigurationAvaliabilityChecker(
-                      themeConfiguration?.data.actionFontColor as string
+                      themeConfiguration?.data.action_font_color as string
                     ),
                   }}
                   className={buttonVariants({ variant: "ghost", size: "none" })}
@@ -872,7 +872,7 @@ const Login = ({}: IPropsLogin) => {
                 <a
                   style={{
                     color: themeConfigurationAvaliabilityChecker(
-                      themeConfiguration?.data.actionFontColor as string
+                      themeConfiguration?.data.action_font_color as string
                     ),
                   }}
                   className={buttonVariants({ variant: "ghost", size: "none" })}
@@ -886,7 +886,7 @@ const Login = ({}: IPropsLogin) => {
             type="submit"
             style={{
               backgroundColor: themeConfigurationAvaliabilityChecker(
-                themeConfiguration?.data.buttonColor as string
+                themeConfiguration?.data.button_color as string
               ),
             }}
             className="uppercase mt-24 text-white"

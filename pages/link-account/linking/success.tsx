@@ -151,7 +151,7 @@ const LinkAccountSuccess = (props: Props) => {
           <a
             style={{
               color: themeConfigurationAvaliabilityChecker(
-                themeConfiguration?.data.actionFontColor as string
+                themeConfiguration?.data.action_font_color as string
               ),
             }}
             className={buttonVariants({

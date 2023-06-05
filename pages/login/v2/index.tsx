@@ -115,7 +115,7 @@ const Login = ({}: IPropsLogin) => {
 
       doIn(data);
 
-      toastCaller(data, themeConfiguration?.data.toastColor as string);
+      toastCaller(data, themeConfiguration?.data.toast_color as string);
     } else if (data.status === "FULLFILLED" && !data.data.success) {
       toast(data.data.message || "Ada kesalahan", {
         type: "error",
@@ -314,7 +314,7 @@ const Login = ({}: IPropsLogin) => {
               >
                 <a style={{
                     color: themeConfigurationAvaliabilityChecker(
-                      themeConfiguration?.data.actionFontColor as string
+                      themeConfiguration?.data.action_font_color as string
                     ),
                   }}
                   className={buttonVariants({ variant: "ghost", size: "none" })}>
@@ -335,7 +335,7 @@ const Login = ({}: IPropsLogin) => {
               }} legacyBehavior passHref>
                 <a style={{
                     color: themeConfigurationAvaliabilityChecker(
-                      themeConfiguration?.data.actionFontColor as string
+                      themeConfiguration?.data.action_font_color as string
                     ),
                   }}
                   className={buttonVariants({ variant: "ghost", size: "none" })}>
@@ -349,7 +349,7 @@ const Login = ({}: IPropsLogin) => {
             type="submit"
             style={{
               backgroundColor: themeConfigurationAvaliabilityChecker(
-                themeConfiguration?.data.buttonColor as string
+                themeConfiguration?.data.button_color as string
               ),
             }}
             className="uppercase mt-24 text-white"
@@ -457,7 +457,7 @@ const AutoLogoutInfoModal: React.FC<IModal> = ({ modal, setModal }) => {
             variant="ghost"
             style={{
               color: themeConfigurationAvaliabilityChecker(
-                themeConfiguration?.data.actionFontColor as string
+                themeConfiguration?.data.action_font_color as string
               ),
             }}
             onClick={onClose}

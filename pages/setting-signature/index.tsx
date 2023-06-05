@@ -115,7 +115,7 @@ const SettingSignature = ({}: Props) => {
       isLoading: true,
       position: "top-center",
       style: {
-        backgroundColor: themeConfiguration?.data.toastColor as string,
+        backgroundColor: themeConfiguration?.data.toast_color as string,
       },
     });
     const signature_image = sigPad.current
@@ -386,7 +386,7 @@ const SettingSignature = ({}: Props) => {
             className="mt-8 px-6 py-2.5 text-base bg-primary block mx-auto"
             style={{
               backgroundColor: themeConfigurationAvaliabilityChecker(
-                themeConfiguration?.data.buttonColor as string
+                themeConfiguration?.data.button_color as string
               ),
             }}
           >

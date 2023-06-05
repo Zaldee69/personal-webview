@@ -122,7 +122,7 @@ const ForgotTilakaName = (props: Props) => {
             {t("forgotTilakaName.title")}
           </Heading>
           <div
-            className="bg-contain w-52 mx-auto mt-6 h-52 bg-center bg-no-repeat"
+            className="bg-contain w-52 mx-auto my-6 h-52 bg-center bg-no-repeat"
             style={{
               backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
                 themeConfiguration.data.asset_forget_tilaka_name as string,
@@ -160,7 +160,7 @@ const ForgotTilakaName = (props: Props) => {
                     className="mt-32  mb-5 h-10"
                     style={{
                       backgroundColor: themeConfigurationAvaliabilityChecker(
-                        themeConfiguration?.data.buttonColor as string, "BG"
+                        themeConfiguration?.data.button_color as string, "BG"
                       ),
                     }}
                   >
@@ -217,7 +217,7 @@ const ModalSuccess: React.FC<{
         <Button
            style={{
             color: themeConfigurationAvaliabilityChecker(
-              themeConfiguration?.data.actionFontColor as string
+              themeConfiguration?.data.action_font_color as string
             ),
           }}
           onClick={() => setModal(false)}

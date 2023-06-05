@@ -249,7 +249,7 @@ const LinkAccount = (props: Props) => {
           {setting === "1" ? t("finalFormTitle") : t("linkAccountTitle")}
         </Heading>
         <div
-          className="bg-contain w-52 mx-auto h-64 bg-center bg-no-repeat"
+          className="bg-contain my-3 w-52 mx-auto h-64 bg-center bg-no-repeat"
           style={{
             backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
               themeConfiguration.data.asset_activation_login as string,
@@ -329,7 +329,7 @@ const LinkAccount = (props: Props) => {
               <a
                 style={{
                   color: themeConfigurationAvaliabilityChecker(
-                    themeConfiguration?.data.actionFontColor as string
+                    themeConfiguration?.data.action_font_color as string
                   ),
                 }}
                 className={buttonVariants({
@@ -360,7 +360,7 @@ const LinkAccount = (props: Props) => {
               <a
                 style={{
                   color: themeConfigurationAvaliabilityChecker(
-                    themeConfiguration?.data.actionFontColor as string
+                    themeConfiguration?.data.action_font_color as string
                   ),
                 }}
                 className={buttonVariants({
@@ -380,7 +380,7 @@ const LinkAccount = (props: Props) => {
             className="mt-8 p-2.5 uppercase text-base font-medium block mx-auto"
             style={{
               backgroundColor: themeConfigurationAvaliabilityChecker(
-                themeConfiguration?.data.buttonColor as string
+                themeConfiguration?.data.button_color as string
               ),
             }}
           >
@@ -509,7 +509,7 @@ const FRModal = ({ modal, setModal, tilakaName, formSetter }: IModal) => {
             className="mt-5 uppercase text-base font-medium h-9"
             style={{
               backgroundColor: themeConfigurationAvaliabilityChecker(
-                themeConfiguration?.data.buttonColor as string
+                themeConfiguration?.data.button_color as string
               ),
             }}
           >
@@ -934,7 +934,7 @@ const ModalConsent = ({
                 className="text-base font-base h-2 hover:opacity-50"
                 style={{
                   color: themeConfigurationAvaliabilityChecker(
-                    themeConfiguration?.data.actionFontColor as string
+                    themeConfiguration?.data.action_font_color as string
                   ),
                 }}
               >
@@ -948,7 +948,7 @@ const ModalConsent = ({
                 })}
                 style={{
                   backgroundColor: themeConfigurationAvaliabilityChecker(
-                    themeConfiguration?.data.buttonColor as string
+                    themeConfiguration?.data.button_color as string
                   ),
                   margin: "0",
                 }}

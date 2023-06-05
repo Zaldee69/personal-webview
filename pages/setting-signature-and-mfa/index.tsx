@@ -97,7 +97,7 @@ function SettingSignatureAndMFA({}: Props) {
       isLoading: true,
       position: "top-center",
       style: {
-        backgroundColor: themeConfiguration?.data.toastColor as string,
+        backgroundColor: themeConfiguration?.data.toast_color as string,
       },
     });
     const signature_image = sigPad.current
@@ -236,7 +236,7 @@ function SettingSignatureAndMFA({}: Props) {
         </Heading>
         <form onSubmit={handleFormOnSubmit}>
           <div
-          className="bg-contain w-64 mx-auto h-64 bg-center bg-no-repeat"
+          className="bg-contain w-64 mx-auto my-5 h-64 bg-center bg-no-repeat"
           style={{
             backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
               themeConfiguration.data.asset_activation_setting_signature_and_mfa as string,
@@ -451,7 +451,7 @@ function SettingSignatureAndMFA({}: Props) {
             className="mt-8 px-6 py-2.5 text-base bg-primary block mx-auto"
             style={{
               backgroundColor: themeConfigurationAvaliabilityChecker(
-                themeConfiguration?.data.buttonColor as string
+                themeConfiguration?.data.button_color as string
               ),
             }}
           >

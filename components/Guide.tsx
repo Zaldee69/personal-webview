@@ -84,7 +84,7 @@ const Guide = ({ setIsClicked, isDisabled }: Props) => {
         <Button
           style={{
             backgroundColor: themeConfigurationAvaliabilityChecker(
-              themeConfiguration?.data.buttonColor as string
+              themeConfiguration?.data.button_color as string
             ),
           }}
           disabled={isDisabled}

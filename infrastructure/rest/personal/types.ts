@@ -126,9 +126,9 @@ export type TThemeResponse = {
   data: {
     logo: string;
     background: string;
-    buttonColor: string;
-    actionFontColor: string;
-    toastColor: string;
+    button_color: string;
+    action_font_color: string;
+    toast_color: string;
     font_family: string;
     font_color: string;
     asset_liveness_guide_1: string;

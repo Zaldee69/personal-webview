@@ -118,7 +118,7 @@ const Login = ({}: Props) => {
 
       doIn(data);
     }
-    toastCaller(data, themeConfiguration?.data.toastColor as string);
+    toastCaller(data, themeConfiguration?.data.toast_color as string);
   }, [data.status]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
@@ -354,7 +354,7 @@ const Login = ({}: Props) => {
                 <a
                   style={{
                     color: themeConfigurationAvaliabilityChecker(
-                      theme?.data.actionFontColor as string
+                      theme?.data.action_font_color as string
                     ),
                   }}
                   className={buttonVariants({ variant: "ghost", size: "none" })}
@@ -381,7 +381,7 @@ const Login = ({}: Props) => {
                 <a
                   style={{
                     color: themeConfigurationAvaliabilityChecker(
-                      theme?.data.actionFontColor as string
+                      theme?.data.action_font_color as string
                     ),
                   }}
                   className={buttonVariants({ variant: "ghost", size: "none" })}
@@ -396,7 +396,7 @@ const Login = ({}: Props) => {
               type="submit"
               style={{
                 backgroundColor: themeConfigurationAvaliabilityChecker(
-                  theme?.data.buttonColor as string
+                  theme?.data.button_color as string
                 ),
               }}
               className="uppercase mt-24"
@@ -468,7 +468,7 @@ const CertifModal = ({ certifModal, setCertifModal, theme }: ModalProps) => {
         </Heading>
         <div className="flex flex-col justify-center">
           <div
-            className="bg-contain w-32 mx-auto h-32 bg-center bg-no-repeat"
+            className="bg-contain w-32 mx-auto mt-3 h-32 bg-center bg-no-repeat"
             style={{
               backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
                 theme?.data.asset_activation_cert_error as string,
@@ -484,7 +484,7 @@ const CertifModal = ({ certifModal, setCertifModal, theme }: ModalProps) => {
         <Button
           style={{
             backgroundColor: themeConfigurationAvaliabilityChecker(
-              theme?.data.buttonColor as string
+              theme?.data.button_color as string
             ),
           }}
           size="full"
@@ -501,7 +501,7 @@ const CertifModal = ({ certifModal, setCertifModal, theme }: ModalProps) => {
           className="uppercase w-full mt-4 mx-auto rounded-sm h-9"
           style={{
             color: themeConfigurationAvaliabilityChecker(
-              theme?.data.actionFontColor as string
+              theme?.data.action_font_color as string
             ),
           }}
         >

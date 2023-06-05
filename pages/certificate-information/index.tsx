@@ -128,7 +128,7 @@ function CertificateInformation({}: Props) {
     >
       <div className="p-4 poppins-regular max-w-md mx-auto">
         <div
-          className="bg-contain w-64 mx-auto h-64 bg-center bg-no-repeat"
+          className="bg-contain w-64 mx-auto my-4 h-64 bg-center bg-no-repeat"
           style={{
             backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
               themeConfiguration.data
@@ -187,7 +187,7 @@ function CertificateInformation({}: Props) {
           className="mt-8 p-2.5 uppercase text-base font-medium block mx-auto w-48"
           style={{
             backgroundColor: themeConfigurationAvaliabilityChecker(
-              themeConfiguration?.data.buttonColor as string
+              themeConfiguration?.data.button_color as string
             ),
           }}
         >
@@ -200,10 +200,10 @@ function CertificateInformation({}: Props) {
             href="https://cantikatnt.atlassian.net/servicedesk/customer/portal/2/group/8/create/27"
             style={{
               color: themeConfigurationAvaliabilityChecker(
-                themeConfiguration?.data.buttonColor as string
+                themeConfiguration?.data.button_color as string
               ),
               borderColor: themeConfigurationAvaliabilityChecker(
-                themeConfiguration?.data.buttonColor as string
+                themeConfiguration?.data.button_color as string
               ),
               paddingLeft: 0,
               paddingRight: 0,

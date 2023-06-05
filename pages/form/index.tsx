@@ -345,7 +345,7 @@ const Form: React.FC = () => {
       <div className="px-5 pt-8 max-w-md mx-auto">
         <Heading>{t("finalFormTitle")}</Heading>
         <div
-          className="bg-contain w-52 mx-auto h-64 bg-center bg-no-repeat"
+          className="bg-contain w-52 mx-auto h-64 my-3 bg-center bg-no-repeat"
           style={{
             backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
               themeConfiguration.data.asset_registration_final_form as string,
@@ -502,7 +502,7 @@ const Form: React.FC = () => {
             type="submit"
             style={{
               backgroundColor: themeConfigurationAvaliabilityChecker(
-                themeConfiguration?.data.buttonColor as string
+                themeConfiguration?.data.button_color as string
               ),
             }}
             className="mt-24 p-2.5 block mx-auto"

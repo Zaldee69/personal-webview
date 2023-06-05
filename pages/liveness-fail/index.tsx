@@ -83,7 +83,7 @@ const LivenessFail = () => {
             size="md"
             style={{
               backgroundColor: themeConfigurationAvaliabilityChecker(
-                themeConfiguration?.data.buttonColor as string
+                themeConfiguration?.data.button_color as string
               ),
             }}
           >
@@ -115,7 +115,7 @@ const LivenessFail = () => {
             style={{
               backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
                 themeConfiguration.data
-                  .asset_registration_status_failed as string,
+                  .asset_liveness_failed as string,
                 "ASSET",
                 `${assetPrefix}/images/livenessFail.svg`
               )})`,
@@ -153,7 +153,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       };
     };
   } = await RestKycCheckStepv2({
-    registerId: uuid as string,
+    registerId: uuid as string, 
   })
     .then((res) => {
       return { res };

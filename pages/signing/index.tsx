@@ -151,7 +151,7 @@ const Signing = () => {
               <Button
                 style={{
                   backgroundColor: themeConfigurationAvaliabilityChecker(
-                    themeConfiguration?.data.buttonColor as string,
+                    themeConfiguration?.data.button_color as string,
                   ),
                 }}
                 size="md"
@@ -299,7 +299,7 @@ export const FRModal: React.FC<Active | any> = ({ modal, setModal }) => {
               className="uppercase mt-5 h-9"
               style={{
                 backgroundColor: themeConfigurationAvaliabilityChecker(
-                  themeConfiguration?.data.buttonColor as string
+                  themeConfiguration?.data.button_color as string
                 ),
               }}
             >
@@ -321,7 +321,7 @@ export const FRModal: React.FC<Active | any> = ({ modal, setModal }) => {
               className="uppercase mt-5 h-9"
               style={{
                 backgroundColor: themeConfigurationAvaliabilityChecker(
-                  themeConfiguration?.data.buttonColor as string,
+                  themeConfiguration?.data.button_color as string,
                   "BG"
                 ),
               }}
@@ -454,7 +454,7 @@ const ChooseFontModal: React.FC<Active> = ({ modal, setModal, tilakaName }) => {
         <Button
           style={{
             backgroundColor: themeConfigurationAvaliabilityChecker(
-              themeConfiguration?.data.buttonColor as string
+              themeConfiguration?.data.button_color as string
             ),
           }}
           size="full"
@@ -469,7 +469,7 @@ const ChooseFontModal: React.FC<Active> = ({ modal, setModal, tilakaName }) => {
         <Button
           style={{
             color: themeConfigurationAvaliabilityChecker(
-              themeConfiguration?.data.actionFontColor as string
+              themeConfiguration?.data.action_font_color as string
             ),
           }}
           className="uppercase"
@@ -512,7 +512,7 @@ const ChooseScratchModal: React.FC<Active> = ({ modal, setModal }) => {
           }}
           style={{
             backgroundColor: themeConfigurationAvaliabilityChecker(
-              themeConfiguration?.data.buttonColor as string
+              themeConfiguration?.data.button_color as string
             ),
           }}
           size="full"
@@ -524,7 +524,7 @@ const ChooseScratchModal: React.FC<Active> = ({ modal, setModal }) => {
           onClick={() => setModal(!modal)}
           style={{
             color: themeConfigurationAvaliabilityChecker(
-              themeConfiguration?.data.actionFontColor as string
+              themeConfiguration?.data.action_font_color as string
             ),
           }}
           className="uppercase"
@@ -580,7 +580,7 @@ export const OTPModal: React.FC<Active> = ({ modal, setModal }) => {
             isLoading: false,
             position: "top-center",
             style: {
-              backgroundColor: themeConfiguration?.data.toastColor as string,
+              backgroundColor: themeConfiguration?.data.toast_color as string,
             },
           });
           timerHandler();
@@ -615,7 +615,7 @@ export const OTPModal: React.FC<Active> = ({ modal, setModal }) => {
       isLoading: true,
       position: "top-center",
       style: {
-        backgroundColor: themeConfiguration?.data.toastColor as string,
+        backgroundColor: themeConfiguration?.data.toast_color as string,
       },
     });
     restSigning({
@@ -737,7 +737,7 @@ export const OTPModal: React.FC<Active> = ({ modal, setModal }) => {
               <div
                 style={{
                   color: themeConfigurationAvaliabilityChecker(
-                    themeConfiguration?.data.actionFontColor as string,
+                    themeConfiguration?.data.action_font_color as string,
                     "BG"
                   ),
                 }}
@@ -748,7 +748,7 @@ export const OTPModal: React.FC<Active> = ({ modal, setModal }) => {
                     variant="ghost"
                     style={{
                       color: themeConfigurationAvaliabilityChecker(
-                        themeConfiguration?.data.actionFontColor as string,
+                        themeConfiguration?.data.action_font_color as string,
                         "BG"
                       ),
                     }}
@@ -768,7 +768,7 @@ export const OTPModal: React.FC<Active> = ({ modal, setModal }) => {
               onClick={onClickHandler}
               style={{
                 backgroundColor: themeConfigurationAvaliabilityChecker(
-                  themeConfiguration?.data.buttonColor as string,
+                  themeConfiguration?.data.button_color as string,
                   "BG"
                 ),
               }}
@@ -786,7 +786,7 @@ export const OTPModal: React.FC<Active> = ({ modal, setModal }) => {
               variant="ghost"
               style={{
                 color: themeConfigurationAvaliabilityChecker(
-                  themeConfiguration?.data.actionFontColor as string,
+                  themeConfiguration?.data.action_font_color as string,
                   "BG"
                 ),
               }}

@@ -75,7 +75,7 @@ const LivenessFailure = () => {
             className="bg-contain w-60 h-64 bg-center bg-no-repeat"
             style={{
               backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
-                themeConfiguration.data.asset_liveness_failed as string,
+                themeConfiguration.data.asset_registration_status_failed as string,
                 "ASSET",
                 `${assetPrefix}/images/livenessFail.svg`
               )})`,
@@ -110,7 +110,7 @@ const LivenessFailure = () => {
                 <span
                   style={{
                     color: themeConfigurationAvaliabilityChecker(
-                      themeConfiguration?.data.actionFontColor as string
+                      themeConfiguration?.data.action_font_color as string
                     ),
                   }}
                   className={buttonVariants({

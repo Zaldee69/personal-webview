@@ -110,7 +110,7 @@ const Liveness = () => {
       isLoading: true,
       position: "top-center",
       style: {
-        backgroundColor: themeConfiguration?.data.toastColor as string,
+        backgroundColor: themeConfiguration?.data.toast_color as string,
       },
     });
     RestKycCheckStep({
@@ -597,7 +597,7 @@ const Liveness = () => {
         isLoading: true,
         position: "top-center",
         style: {
-          backgroundColor: themeConfiguration?.data.toastColor as string,
+          backgroundColor: themeConfiguration?.data.toast_color as string,
         },
       });
       setIsDisabled(true);
