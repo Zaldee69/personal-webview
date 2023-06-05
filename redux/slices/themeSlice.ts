@@ -7,9 +7,9 @@ export const initialState: TThemeResponse & Status = {
   data: {
     logo: "",
     background: "",
-    buttonColor: "",
-    actionFontColor: "",
-    toastColor: "",
+    button_color: "",
+    action_font_color: "",
+    toast_color: "",
     font_family: "",
     font_color: "",
     asset_liveness_guide_1: "",

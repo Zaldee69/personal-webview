@@ -391,7 +391,7 @@ const Form: React.FC = () => {
           <Button
             style={{
               backgroundColor: themeConfigurationAvaliabilityChecker(
-                themeConfiguration?.data.buttonColor as string
+                themeConfiguration?.data.button_color as string
               ),
             }}
             className={`mt-10 uppercase h-9 mx-auto block`}

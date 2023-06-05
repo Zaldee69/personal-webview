@@ -97,7 +97,7 @@ const SetMfa = () => {
           toastId: "info",
           position: "top-center",
           style: {
-            backgroundColor: themeConfiguration?.data.toastColor as string,
+            backgroundColor: themeConfiguration?.data.toast_color as string,
           },
         });
         setIsShowOtpModalConfirmation(false);
@@ -229,7 +229,7 @@ const SetMfa = () => {
                 size="none"
                 style={{
                   color: themeConfigurationAvaliabilityChecker(
-                    themeConfiguration?.data.actionFontColor as string
+                    themeConfiguration?.data.action_font_color as string
                   ),
                 }}
               >
@@ -242,7 +242,7 @@ const SetMfa = () => {
                 className="py-2 mx-0"
                 style={{
                   backgroundColor: themeConfigurationAvaliabilityChecker(
-                    themeConfiguration?.data.buttonColor as string
+                    themeConfiguration?.data.button_color as string
                   ),
                 }}
               >
@@ -363,7 +363,7 @@ const FRModal = ({ isShowModalFr, setShowModalFr, geTypeMfa }: IModalFR) => {
             className="mt-5 mb-2"
             style={{
               backgroundColor: themeConfigurationAvaliabilityChecker(
-                themeConfiguration?.data.buttonColor as string
+                themeConfiguration?.data.button_color as string
               ),
             }}
             onClick={() => setShowModalFr(false)}
@@ -405,7 +405,7 @@ const OtpModalConfirmation = ({
             variant="ghost"
             style={{
               color: themeConfigurationAvaliabilityChecker(
-                themeConfiguration?.data.actionFontColor as string
+                themeConfiguration?.data.action_font_color as string
               ),
             }}
             onClick={() => setIsShowOtpModalConfirmation(false)}
@@ -417,7 +417,7 @@ const OtpModalConfirmation = ({
             className="py-2.5"
             style={{
               backgroundColor: themeConfigurationAvaliabilityChecker(
-                themeConfiguration?.data.buttonColor as string
+                themeConfiguration?.data.button_color as string
               ),
             }}
             onClick={() => onClickHandler("submit")}

@@ -340,7 +340,11 @@ const Index = () => {
               className=" border-borderColor block"
               onChange={onChangeHandler}
             />
-            <Label size="base" className="ml-2 mt-[1px] text-neutral" htmlFor="tnc">
+            <Label
+              size="base"
+              className="ml-2 mt-[1px] text-neutral"
+              htmlFor="tnc"
+            >
               <Paragraph className="inline">{t("agree")} </Paragraph>
               <span className="text-primary">
                 <a
@@ -385,7 +389,7 @@ const Index = () => {
             className="bg-primary btn font-semibold mt-7 h-9 hover:opacity-50"
             style={{
               backgroundColor: themeConfigurationAvaliabilityChecker(
-                themeConfiguration?.data.buttonColor as string
+                themeConfiguration?.data.button_color as string
               ),
             }}
           >
@@ -421,40 +425,46 @@ const PhotoKtpTermModal = ({ show, fileFotoKtpRef }: TModal) => {
         <Heading className="text-lg font-bold">
           {t("manualForm.photoKtp.termTitle")}
         </Heading>
-        {!themeConfiguration.data.asset_manual_form_ektp_ok ||
-        !themeConfiguration.data.asset_manual_form_ektp_not_ok ? (
-          <div className="text-center mt-5 max-w-md">
-            <img
-              src={`${assetPrefix}/images/ktpGuide.png`}
-              width="100%"
-              height="40px"
-              alt="Photo e-KTP Term"
-            />
+        <div className="flex justify-center gap-12">
+            <div>
+              <div
+                className="bg-contain w-32 mx-auto mt-5 h-32 bg-center bg-no-repeat"
+                style={{
+                  backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
+                    themeConfiguration.data
+                      .asset_manual_form_ektp_ok as string,
+                    "ASSET",
+                    `${assetPrefix}/images/ktp.png`
+                  )})`,
+                }}
+              ></div>
+              <div
+                className="bg-contain w-10 mx-auto mt-5 h-10 bg-center bg-no-repeat"
+                style={{
+                  backgroundImage: `url(${assetPrefix}/images/Right.svg)`,
+                }}
+              ></div>
+            </div>
+            <div>
+              <div
+                className="bg-contain w-32 mx-auto mt-5 h-32 bg-center bg-no-repeat"
+                style={{
+                  backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
+                    themeConfiguration.data
+                      .asset_manual_form_ektp_not_ok as string,
+                    "ASSET",
+                    `${assetPrefix}/images/wrong-ktp.png`
+                  )})`,
+                }}
+              ></div>
+              <div
+                className="bg-contain w-10 mx-auto mt-5 h-10 bg-center bg-no-repeat"
+                style={{
+                  backgroundImage: `url(${assetPrefix}/images/Wrong.svg)`,
+                }}
+              ></div>
+              </div>
           </div>
-        ) : (
-          <div className="flex">
-            <div
-              className="bg-contain w-44 mx-auto mt-5 h-44 bg-center bg-no-repeat"
-              style={{
-                backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
-                  themeConfiguration.data.asset_forget_password as string,
-                  "ASSET",
-                  `${assetPrefix}/images/forgotPassword.svg`
-                )})`,
-              }}
-            ></div>
-            <div
-              className="bg-contain w-44 mx-auto mt-6 h-44 bg-center bg-no-repeat"
-              style={{
-                backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
-                  themeConfiguration.data.asset_forget_password as string,
-                  "ASSET",
-                  `${assetPrefix}/images/forgotPassword.svg`
-                )})`,
-              }}
-            ></div>
-          </div>
-        )}
         <ul className="px-5 mt-10" style={{ listStyle: "initial" }}>
           <li>
             <Paragraph>{t("manualForm.photoKtp.term1")}</Paragraph>
@@ -472,7 +482,7 @@ const PhotoKtpTermModal = ({ show, fileFotoKtpRef }: TModal) => {
           size="lg"
           style={{
             backgroundColor: themeConfigurationAvaliabilityChecker(
-              themeConfiguration?.data.buttonColor as string
+              themeConfiguration?.data.button_color as string
             ),
           }}
           onClick={() => fileFotoKtpRef?.current?.click()}
@@ -506,42 +516,46 @@ const PhotoSelfieTermModal = ({ show, fileFotoSelfieRef }: TModal) => {
           <Heading className="text-lg font-bold">
             {t("manualForm.photoSelfie.termTitle")}
           </Heading>
-          {!themeConfiguration.data.asset_manual_form_ektp_ok ||
-          !themeConfiguration.data.asset_manual_form_ektp_not_ok ? (
-            <div className="text-center mt-5 max-w-md">
-              <img
-                src={`${assetPrefix}/images/selfieGuide.png`}
-                width="100%"
-                height="40px"
-                alt="Photo e-KTP Term"
-              />
-            </div>
-          ) : (
-            <div className="flex">
+          <div className="flex justify-center gap-12">
+            <div>
               <div
-                className="bg-contain w-44 mx-auto mt-5 h-44 bg-center bg-no-repeat"
+                className="bg-contain w-32 mx-auto mt-5 h-32 bg-center bg-no-repeat"
                 style={{
                   backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
                     themeConfiguration.data
                       .asset_manual_form_selfie_ok as string,
                     "ASSET",
-                    `${assetPrefix}/images/forgotPassword.svg`
+                    `${assetPrefix}/images/selfie.png`
                   )})`,
                 }}
               ></div>
               <div
-                className="bg-contain w-44 mx-auto mt-6 h-44 bg-center bg-no-repeat"
+                className="bg-contain w-10 mx-auto mt-5 h-10 bg-center bg-no-repeat"
+                style={{
+                  backgroundImage: `url(${assetPrefix}/images/Right.svg)`,
+                }}
+              ></div>
+            </div>
+            <div>
+              <div
+                className="bg-contain w-32 mx-auto mt-5 h-32 bg-center bg-no-repeat"
                 style={{
                   backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
                     themeConfiguration.data
                       .asset_manual_form_selfie_not_ok as string,
                     "ASSET",
-                    `${assetPrefix}/images/forgotPassword.svg`
+                    `${assetPrefix}/images/wrong-selfie.png`
                   )})`,
                 }}
               ></div>
-            </div>
-          )}
+              <div
+                className="bg-contain w-10 mx-auto mt-5 h-10 bg-center bg-no-repeat"
+                style={{
+                  backgroundImage: `url(${assetPrefix}/images/Wrong.svg)`,
+                }}
+              ></div>
+              </div>
+          </div>
           <ul
             className="px-5 mt-10 text-sm md:text-base list-disc"
             style={{ listStyle: "initial !important" }}
@@ -565,7 +579,7 @@ const PhotoSelfieTermModal = ({ show, fileFotoSelfieRef }: TModal) => {
             size="lg"
             style={{
               backgroundColor: themeConfigurationAvaliabilityChecker(
-                themeConfiguration?.data.buttonColor as string
+                themeConfiguration?.data.button_color as string
               ),
             }}
             onClick={() => fileFotoSelfieRef?.current?.click()}
@@ -579,4 +593,3 @@ const PhotoSelfieTermModal = ({ show, fileFotoSelfieRef }: TModal) => {
 };
 
 export default Index;
-

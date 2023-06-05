@@ -240,7 +240,7 @@ const LinkAccount = (props: Props) => {
               className="mt-7 p-2.5 text-base"
               style={{
                 backgroundColor: themeConfigurationAvaliabilityChecker(
-                  themeConfiguration?.data.buttonColor as string
+                  themeConfiguration?.data.button_color as string
                 ),
               }}
             >

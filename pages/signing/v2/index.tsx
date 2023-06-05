@@ -488,7 +488,7 @@ const SigningWithRead = () => {
             className="px-6 py-2.5"
             style={{
               backgroundColor: themeConfigurationAvaliabilityChecker(
-                themeConfiguration?.data.buttonColor as string
+                themeConfiguration?.data.button_color as string
               ),
             }}
             onClick={() =>
@@ -821,7 +821,7 @@ const SigningWithoutRead = () => {
           <Button
             style={{
               backgroundColor: themeConfigurationAvaliabilityChecker(
-                themeConfiguration?.data.buttonColor as string
+                themeConfiguration?.data.button_color as string
               ),
             }}
             className="px-6 py-2.5"
@@ -892,7 +892,7 @@ const SigningSuccess = (props: TPropsSigningSuccess) => {
             <a
               style={{
                 color: themeConfigurationAvaliabilityChecker(
-                  themeConfiguration?.data.actionFontColor as string
+                  themeConfiguration?.data.action_font_color as string
                 ),
               }}
               className={buttonVariants({
@@ -968,7 +968,7 @@ const SigningOnProgress = (props: TPropsSigningSuccess) => {
             <a
               style={{
                 color: themeConfigurationAvaliabilityChecker(
-                  themeConfiguration?.data.actionFontColor as string
+                  themeConfiguration?.data.action_font_color as string
                 ),
               }}
               className={buttonVariants({
@@ -1043,7 +1043,7 @@ const SigningFailure = (props: TPropsSigningFailure) => {
             <a
               style={{
                 color: themeConfigurationAvaliabilityChecker(
-                  themeConfiguration?.data.actionFontColor as string
+                  themeConfiguration?.data.action_font_color as string
                 ),
               }}
               className={buttonVariants({
@@ -1196,7 +1196,7 @@ const FRModal: React.FC<IModal> = ({
             className="uppercase mt-5 mb-2 h-9"
             style={{
               backgroundColor: themeConfigurationAvaliabilityChecker(
-                themeConfiguration?.data.buttonColor as string
+                themeConfiguration?.data.button_color as string
               ),
             }}
           >
@@ -1243,7 +1243,7 @@ const OTPModal: React.FC<IModal> = ({
       isLoading: true,
       position: "top-center",
       style: {
-        backgroundColor: themeConfiguration?.data.toastColor as string,
+        backgroundColor: themeConfiguration?.data.toast_color as string,
       },
     });
     RestSigningAuthPIN({
@@ -1354,7 +1354,7 @@ const OTPModal: React.FC<IModal> = ({
             isLoading: false,
             position: "top-center",
             style: {
-              backgroundColor: themeConfiguration?.data.toastColor as string,
+              backgroundColor: themeConfiguration?.data.toast_color as string,
             },
           });
         } else {
@@ -1426,7 +1426,7 @@ const OTPModal: React.FC<IModal> = ({
             <div
               style={{
                 color: themeConfigurationAvaliabilityChecker(
-                  themeConfiguration?.data.actionFontColor as string,
+                  themeConfiguration?.data.action_font_color as string,
                   "BG"
                 ),
               }}
@@ -1437,7 +1437,7 @@ const OTPModal: React.FC<IModal> = ({
                   variant="ghost"
                   style={{
                     color: themeConfigurationAvaliabilityChecker(
-                      themeConfiguration?.data.actionFontColor as string,
+                      themeConfiguration?.data.action_font_color as string,
                       "BG"
                     ),
                   }}
@@ -1457,7 +1457,7 @@ const OTPModal: React.FC<IModal> = ({
             onClick={onClickHandler}
             style={{
               backgroundColor: themeConfigurationAvaliabilityChecker(
-                themeConfiguration?.data.buttonColor as string,
+                themeConfiguration?.data.button_color as string,
                 "BG"
               ),
             }}
@@ -1475,7 +1475,7 @@ const OTPModal: React.FC<IModal> = ({
             variant="ghost"
             style={{
               color: themeConfigurationAvaliabilityChecker(
-                themeConfiguration?.data.actionFontColor as string,
+                themeConfiguration?.data.action_font_color as string,
                 "BG"
               ),
             }}
@@ -1561,7 +1561,7 @@ const ViewerModal: React.FC<IModalViewer> = ({ modal, onClose, viewedDoc }) => {
             disabled={closeButtonShouldDisabled}
             style={{
               backgroundColor: themeConfigurationAvaliabilityChecker(
-                themeConfiguration?.data.buttonColor as string
+                themeConfiguration?.data.button_color as string
               ),
             }}
             onClick={() => {
