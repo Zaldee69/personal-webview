@@ -373,7 +373,7 @@ export default Login;
 
 const CertifModal = ({ certifModal, setCertifModal }: ModalProps) => {
   const { t }: any = i18n;
-  return !certifModal ? (
+  return certifModal ? (
     <div
       style={{ backgroundColor: "rgba(0, 0, 0, .5)" }}
       className="fixed z-50 flex items-start transition-all duration-1000 pb-3 justify-center w-full left-0 top-0 h-full "
