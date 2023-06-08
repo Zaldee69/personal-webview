@@ -1473,8 +1473,7 @@ const OTPModal: React.FC<IModal> = ({
             variant="ghost"
             style={{
               color: themeConfigurationAvaliabilityChecker(
-                themeConfiguration?.data.action_font_color as string,
-                "BG"
+                themeConfiguration?.data.action_font_color as string
               ),
             }}
           >
