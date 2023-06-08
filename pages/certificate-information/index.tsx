@@ -128,7 +128,7 @@ function CertificateInformation({}: Props) {
     >
       <div className="p-4 poppins-regular max-w-md mx-auto">
         <div
-          className="bg-contain w-64 mx-auto my-4 h-64 bg-center bg-no-repeat"
+          className="bg-contain w-48 mx-auto my-4 h-48 bg-center bg-no-repeat"
           style={{
             backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
               themeConfiguration.data
@@ -138,27 +138,27 @@ function CertificateInformation({}: Props) {
             )})`,
           }}
         ></div>
-        <Paragraph>{t("certificateSubtitle")}</Paragraph>
+        <Paragraph size="sm" >{t("certificateSubtitle")}</Paragraph>
         <div className="mt-5">
           <div className="flex items-center">
-            <Paragraph className="pr-2 w-24">{t("country")}</Paragraph>
-            <Paragraph className="font-semibold">
+            <Paragraph size="sm" className="pr-2 w-24">{t("country")}</Paragraph>
+            <Paragraph size="sm" className="font-semibold">
               {certificate.negara}
             </Paragraph>
           </div>
           <div className="flex items-center">
-            <Paragraph className="w-24 pr-2">{t("name")}</Paragraph>
-            <Paragraph className="font-semibold">{certificate.nama}</Paragraph>
+            <Paragraph size="sm" className="w-24 pr-2">{t("name")}</Paragraph>
+            <Paragraph size="sm" className="font-semibold">{certificate.nama}</Paragraph>
           </div>
           <div className="flex items-center">
-            <Paragraph className="w-24 pr-2">{t("organization")}</Paragraph>
-            <Paragraph className="font-semibold">
+            <Paragraph size="sm" className="w-24 pr-2">{t("organization")}</Paragraph>
+            <Paragraph size="sm" className="font-semibold">
               {certificate.organisasi}
             </Paragraph>
           </div>
           <div className="flex items-center">
-            <Paragraph className="w-24 pr-2">Email</Paragraph>
-            <Paragraph className="font-semibold">
+            <Paragraph size="sm" className="w-24 pr-2">Email</Paragraph>
+            <Paragraph size="sm" className="font-semibold">
               {certificate.emailAddress}
             </Paragraph>
           </div>
@@ -184,7 +184,7 @@ function CertificateInformation({}: Props) {
         <Button
           size="none"
           onClick={(e) => handleConfirm(e)}
-          className="mt-8 p-2.5 uppercase text-base font-medium block mx-auto w-48"
+          className="mt-8 p-2.5 uppercase text-sm font-medium block mx-auto w-40"
           style={{
             backgroundColor: themeConfigurationAvaliabilityChecker(
               themeConfiguration?.data.button_color as string
@@ -211,7 +211,7 @@ function CertificateInformation({}: Props) {
             className={buttonVariants({
               size: "none",
               className:
-                "border mt-3 py-2.5 uppercase text-base font-medium block mx-auto w-48",
+                "border px-3 mt-3 py-2.5 uppercase text-sm font-medium block mx-auto w-40",
             })}
           >
             {t("complain")}

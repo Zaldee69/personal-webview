@@ -33,13 +33,13 @@ const FormSuccess = (props: Props) => {
           "BG"
         ),
       }}
-      className="px-10 flex flex-col justify-center items-center text-center gap-10 pt-16 min-h-screen"
+      className="px-10 flex flex-col justify-center items-center text-center gap-8 min-h-screen"
     >
       <Heading>
         {t("livenessSuccessTitle")}
       </Heading>
       <div
-        className="bg-contain w-60 h-64 bg-center bg-no-repeat"
+        className="bg-contain w-48 h-48 bg-center bg-no-repeat"
         style={{
           backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
             themeConfiguration.data.asset_registration_status_success as string,
@@ -48,12 +48,12 @@ const FormSuccess = (props: Props) => {
           )})`,
         }}
       ></div>
-      <div className="mt-14">
-        <Paragraph>
+      <div className="mt-10">
+        <Paragraph size="sm" >
           {t("livenessSuccessSubtitle")}
         </Paragraph>
       </div>
-      <div className="mt-20 text-primary text-base poppins-medium underline hover:cursor-pointer">
+      <div className="mt-10 text-primary text-base poppins-medium underline hover:cursor-pointer">
         {routerQuery.redirect_url && (
           <a
             href={concateRedirectUrlParams(

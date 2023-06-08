@@ -67,12 +67,12 @@ const LivenessFailure = () => {
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
       <div className="px-5 pt-8 sm:w-full md:w-4/5 mx-auto">
-        <div className="flex flex-col gap-20 items-center justify-center">
+        <div className="flex flex-col gap-16 items-center justify-center">
           <Heading className="text-center">
-            {t("ekycFailed.title")}
+            {t("ekycFailed.title")} Banget gasiiii
           </Heading>
           <div
-            className="bg-contain w-60 h-64 bg-center bg-no-repeat"
+            className="bg-contain w-48 h-48 bg-center bg-no-repeat"
             style={{
               backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
                 themeConfiguration.data.asset_registration_status_failed as string,
@@ -82,12 +82,12 @@ const LivenessFailure = () => {
             }}
           ></div>
           <div className="flex flex-col items-center gap-10 ">
-            <Paragraph className="text-center">
+            <Paragraph size="sm" className="text-center">
               {message}
               {isRedirectToManualForm && (
                 <div>
                   <div className="hidden lg:block">
-                    <Paragraph className="text-center">
+                    <Paragraph  className="text-center">
                       {t("ekycFailed.subtitle1")} <br />
                       {t("ekycFailed.subtitle2")}
                     </Paragraph>
@@ -116,7 +116,6 @@ const LivenessFailure = () => {
                   className={buttonVariants({
                     variant: "link",
                     size: "none",
-                    className: "font-semibold",
                   })}
                 >
                   {t("livenessSuccessButtonTitle")}
