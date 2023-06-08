@@ -364,7 +364,7 @@ const SigningWithRead = () => {
         }}
         className="px-10 py-8 text-center flex flex-col justify-center min-h-screen"
       >
-        <div>
+        <div style={{maxWidth: "360px"}} className="mx-auto" >
           <Heading
             className="font-poppins text-lg font-semibold text-neutral800 text-left mx-auto"
           >
@@ -737,7 +737,7 @@ const SigningWithoutRead = () => {
         }}
         className="px-10 py-8 text-center flex flex-col justify-center min-h-screen"
       >
-        <div>
+        <div style={{maxWidth: "360px"}} className="mx-auto" >
           <Heading
             className="text-left mx-auto"
           >
@@ -1437,8 +1437,7 @@ const OTPModal: React.FC<IModal> = ({
                   variant="ghost"
                   style={{
                     color: themeConfigurationAvaliabilityChecker(
-                      themeConfiguration?.data.action_font_color as string,
-                      "BG"
+                      themeConfiguration?.data.action_font_color as string
                     ),
                   }}
                   className="mx-0"
@@ -1457,8 +1456,7 @@ const OTPModal: React.FC<IModal> = ({
             onClick={onClickHandler}
             style={{
               backgroundColor: themeConfigurationAvaliabilityChecker(
-                themeConfiguration?.data.button_color as string,
-                "BG"
+                themeConfiguration?.data.button_color as string
               ),
             }}
             className="mt-16 block mx-auto py-3"

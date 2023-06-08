@@ -103,7 +103,7 @@ const LivenessFail = () => {
             {t("livenessFailedTitle")}
           </Heading>
           <div
-            className="bg-contain w-52 h-52 bg-center bg-no-repeat"
+            className="bg-contain w-48 h-48 bg-center bg-no-repeat"
             style={{
               backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
                 themeConfiguration.data.asset_liveness_v2_failed as string,
@@ -113,7 +113,7 @@ const LivenessFail = () => {
             }}
           ></div>
           <div className="flex flex-col gap-10 ">
-            <Paragraph className="text-center">
+            <Paragraph size="sm" className="text-center">
               {gagalCounter > 2
                 ? t("livenessFailed3xSubtitle")
                 : t("livenessFailedSubtitle")}

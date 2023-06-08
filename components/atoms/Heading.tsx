@@ -5,11 +5,11 @@ import { RootState } from "@/redux/app/store";
 import { useSelector } from "react-redux";
 
 const headingVariants = cva(
-  "text-neutral800 font-poppins font-bold",
+  "text-neutral800 font-poppins font-semibold",
   {
     variants: {
       size: {
-        default: "text-lg",
+        default: "text-md",
         lg: "text-3xl",
         md: "text-xl",
         sm: "text-base"
