@@ -94,6 +94,14 @@ const FRModal: React.FC<IModal> = ({
     })
       .then((res) => {
         if (res.success) {
+          router.push(
+            {
+              pathname: router.pathname,
+              query: { ...routerQuery, hmac_nonce: res.data.hmac_nonce },
+            },
+            undefined,
+            { shallow: true }
+          );
           toast.dismiss("info");
           toast(`Pencocokan berhasil`, {
             type: "success",
@@ -240,6 +248,14 @@ const OTPModal: React.FC<IModal> = ({
     })
       .then((res) => {
         if (res.success) {
+          router.push(
+            {
+              pathname: router.pathname,
+              query: { ...routerQuery, hmac_nonce: res.data.hmac_nonce },
+            },
+            undefined,
+            { shallow: true }
+          );
           setSuccessSigning(true);
           toast.dismiss("loading");
           setEndTimeToZero();
@@ -369,7 +385,7 @@ const OTPModal: React.FC<IModal> = ({
     }
   }, [successSigning]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  return !modal ? (
+  return modal ? (
     <div
       style={{ backgroundColor: "rgba(0, 0, 0, .5)" }}
       className="fixed z-50 flex items-start transition-all duration-1000 pb-3 justify-center w-full left-0 top-0 h-full "
@@ -469,6 +485,7 @@ const SigningSuccess = () => {
   const params = {
     user_identifier: routerQuery.user,
     request_id: routerQuery.request_id,
+    hmac_nonce: routerQuery.hmac_nonce,
     status: "Sukses",
   };
   const queryString = new URLSearchParams(params as any).toString();
