@@ -97,7 +97,12 @@ const FRModal: React.FC<IModal> = ({
           router.push(
             {
               pathname: router.pathname,
-              query: { ...routerQuery, hmac_nonce: res.data.hmac_nonce },
+              query: {
+                ...routerQuery,
+                user_identifier: res.data.tilaka_name,
+                request_id: res.data.request_id,
+                hmac_nonce: res.data.hmac_nonce,
+              },
             },
             undefined,
             { shallow: true }
@@ -251,7 +256,12 @@ const OTPModal: React.FC<IModal> = ({
           router.push(
             {
               pathname: router.pathname,
-              query: { ...routerQuery, hmac_nonce: res.data.hmac_nonce },
+              query: {
+                ...routerQuery,
+                user_identifier: res.data.tilaka_name,
+                request_id: res.data.request_id,
+                hmac_nonce: res.data.hmac_nonce,
+              },
             },
             undefined,
             { shallow: true }

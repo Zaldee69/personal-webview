@@ -70,5 +70,9 @@ export interface ISigningAuthhashsignRequestData {
 export interface ISigningAuthhashsignResponseData {
   success: boolean;
   message: string;
-  data: any;
+  data: {
+    hmac_nonce: string;
+    request_id: string;
+    tilaka_name: string;
+  };
 }
