@@ -1,6 +1,5 @@
 import PinFormComponent from "@/components/PinFormComponent";
 import i18n from "i18";
-import { handleRoute } from "@/utils/handleRoute";
 import { RestSigningAuthhashsign } from "infrastructure";
 import { NextParsedUrlQuery } from "next/dist/server/request-meta";
 import { useRouter } from "next/router";
@@ -14,8 +13,8 @@ type Props = {};
 
 type TUrlQuery = {
   random?: "1";
-  user_identifier?: string;
-  registration_id?: string;
+  user?: string;
+  id?: string;
   redirect_url?: string;
   token?: string; // for setPassword after success manual form
 };
