@@ -484,7 +484,7 @@ const OTPModal: React.FC<IModal> = ({
   ) : null;
 };
 
-const SigningSuccess = () => {
+export const SigningSuccess = () => {
   const router = useRouter();
   const routerQuery: NextParsedUrlQuery & {
     redirect_url?: string;
@@ -560,7 +560,7 @@ const SigningSuccess = () => {
   );
 };
 
-const SigningFailure = () => {
+export const SigningFailure = () => {
   const router = useRouter();
   const routerQuery: NextParsedUrlQuery & {
     redirect_url?: string;
