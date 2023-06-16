@@ -65,6 +65,7 @@ export interface ISigningAuthhashsignRequestData {
   payload: {
     face_image?: string;
     otp_pin?: string;
+    pin?: string;
   };
 }
 export interface ISigningAuthhashsignResponseData {
