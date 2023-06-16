@@ -56,7 +56,7 @@ const SettingSignatureSuccess = (props: Props) => {
           "BG"
         ),
       }}
-      className="px-10 pt-16 min-h-screenn pb-9 text-center"
+      className="px-10 pt-16 min-h-screen pb-9 text-center"
     >
       <Heading>{t("settingSignatureSuccessTitle")}</Heading>
       <div
