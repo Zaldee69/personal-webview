@@ -32,11 +32,11 @@ const PinFormDedicatedChannel = (props: Props) => {
   }: NextParsedUrlQuery & TUrlQuery = router.query;
   const isRandom: boolean = random === "1";
   const [shouldRender, setShouldRender] = useState<boolean>(false);
-  const [pin, setPin] = useState<string>("");
-  const [pinError, setPinError] = useState<{
-    isError: boolean;
-    message: string;
-  }>({ isError: false, message: "" });
+  // const [pin, setPin] = useState<string>("");
+  // const [pinError, setPinError] = useState<{
+  //   isError: boolean;
+  //   message: string;
+  // }>({ isError: false, message: "" });
   const [pinConfirmError, setPinConfirmError] = useState<{
     isError: boolean;
     message: string;
@@ -45,7 +45,7 @@ const PinFormDedicatedChannel = (props: Props) => {
     isError: boolean;
     message: string;
   }>({ isError: false, message: "" });
-  const [isConfirmMode, setIsConfirmMode] = useState<boolean>(false);
+  // const [isConfirmMode, setIsConfirmMode] = useState<boolean>(false);
   const [isButtonNumberDisabled, setIsButtonNumberDisabled] =
     useState<boolean>(false);
   const [isProcessed, setIsProcessed] = useState<boolean>(false);
@@ -55,12 +55,12 @@ const PinFormDedicatedChannel = (props: Props) => {
 
   const themeConfiguration = useSelector((state: RootState) => state.theme);
 
-  const onClickNumberHandlerCallback = (value: number) => {};
-  const onClickDeleteHandlerCallback = () => {};
-  const submitFormCallback = (pin: string) => {
-    setPin(pin);
-    setIsConfirmMode(true);
-  };
+  // const onClickNumberHandlerCallback = (value: number) => {};
+  // const onClickDeleteHandlerCallback = () => {};
+  // const submitFormCallback = (pin: string) => {
+  //   setPin(pin);
+  //   setIsConfirmMode(true);
+  // };
   const onClickNumberHandlerConfirmCallback = (value: number) => {
     setPinConfirmError({ isError: false, message: "" });
   };
@@ -72,14 +72,14 @@ const PinFormDedicatedChannel = (props: Props) => {
     setIsButtonNumberDisabled(true);
     setIsProcessed(true);
 
-    if (pin !== pinConfirm) {
-      setPinConfirmErrorAfterSubmit({
-        isError: true,
-        message: t("confirmPinDoesntMatch"),
-      });
-      setIsProcessed(false);
-      return;
-    }
+    // if (pin !== pinConfirm) {
+    //   setPinConfirmErrorAfterSubmit({
+    //     isError: true,
+    //     message: t("confirmPinDoesntMatch"),
+    //   });
+    //   setIsProcessed(false);
+    //   return;
+    // }
 
     setPinConfirmErrorAfterSubmit({ isError: false, message: "" });
 
@@ -89,13 +89,13 @@ const PinFormDedicatedChannel = (props: Props) => {
         user: user as string,
       },
       payload: {
-        pin,
+        pin: pinConfirm,
         // token: "?"
       },
     })
       .then((res) => {
         if (res.success) {
-          setIsConfirmMode(false);
+          // setIsConfirmMode(false);
           setIsButtonNumberDisabled(false);
           setIsProcessed(false);
           router.push(
@@ -142,15 +142,15 @@ const PinFormDedicatedChannel = (props: Props) => {
       });
   };
 
-  const onClickBack = (_: React.SyntheticEvent) => {
-    setPin("");
-    setPinError({ isError: false, message: "" });
-    setPinConfirmError({ isError: false, message: "" });
-    setPinConfirmErrorAfterSubmit({ isError: false, message: "" });
-    setIsConfirmMode(false);
-    setIsButtonNumberDisabled(false);
-    setIsProcessed(false);
-  };
+  // const onClickBack = (_: React.SyntheticEvent) => {
+  //   setPin("");
+  //   setPinError({ isError: false, message: "" });
+  //   setPinConfirmError({ isError: false, message: "" });
+  //   setPinConfirmErrorAfterSubmit({ isError: false, message: "" });
+  //   setIsConfirmMode(false);
+  //   setIsButtonNumberDisabled(false);
+  //   setIsProcessed(false);
+  // };
 
   useEffect(() => {
     if (!router.isReady) return;
@@ -175,51 +175,26 @@ const PinFormDedicatedChannel = (props: Props) => {
       }}
       className="flex justify-center items-center min-h-screen px-3 pt-3 pb-5"
     >
-      {isConfirmMode ? (
-        <div className="max-w- w-full" style={{ maxWidth: "331px" }}>
-          <PinFormComponent
-            key="pinFormConfirmKey"
-            title={t("confirmPinTitle")}
-            subTitle={t("confirmPinSubtitle")}
-            digitLength={digitLength}
-            isRandom={isRandom}
-            onClickNumberHandlerCallback={onClickNumberHandlerConfirmCallback}
-            onClickDeleteHandlerCallback={onClickDeleteHandlerConfirmCallback}
-            submitFormCallback={submitFormConfirmCallback}
-            isResetAfterSubmit={false}
-            isErrorAfterSubmit={pinConfirmErrorAfterSubmit.isError}
-            isErrorAfterSubmitMessage={pinConfirmErrorAfterSubmit.message}
-            isError={pinConfirmError.isError}
-            isErrorMessage={pinConfirmError.message}
-            isButtonNumberDisabled={isButtonNumberDisabled}
-            isProcessed={isProcessed}
-            backButton={{
-              show: true,
-              onClickBackCallback: onClickBack,
-            }}
-            showPoweredByTilaka
-          />
-        </div>
-      ) : (
-        <div className="max-w- w-full" style={{ maxWidth: "331px" }}>
-          <PinFormComponent
-            key="pinFormKey"
-            title={t("createPinTitle")}
-            digitLength={digitLength}
-            isRandom={isRandom}
-            onClickNumberHandlerCallback={onClickNumberHandlerCallback}
-            onClickDeleteHandlerCallback={onClickDeleteHandlerCallback}
-            submitFormCallback={submitFormCallback}
-            isResetAfterSubmit
-            isError={pinError.isError}
-            isErrorMessage={pinError.message}
-            isButtonNumberDisabled={isButtonNumberDisabled}
-            isProcessed={isProcessed}
-            subTitle={t("createPinSubtitle")}
-            showPoweredByTilaka
-          />
-        </div>
-      )}
+      <div className="max-w- w-full" style={{ maxWidth: "331px" }}>
+        <PinFormComponent
+          key="pinFormConfirmKey"
+          title={t("inputPinTitle")}
+          subTitle={t("authPinSubtitle")}
+          digitLength={digitLength}
+          isRandom={isRandom}
+          onClickNumberHandlerCallback={onClickNumberHandlerConfirmCallback}
+          onClickDeleteHandlerCallback={onClickDeleteHandlerConfirmCallback}
+          submitFormCallback={submitFormConfirmCallback}
+          isResetAfterSubmit={false}
+          isErrorAfterSubmit={pinConfirmErrorAfterSubmit.isError}
+          isErrorAfterSubmitMessage={pinConfirmErrorAfterSubmit.message}
+          isError={pinConfirmError.isError}
+          isErrorMessage={pinConfirmError.message}
+          isButtonNumberDisabled={isButtonNumberDisabled}
+          isProcessed={isProcessed}
+          showPoweredByTilaka
+        />
+      </div>
     </div>
   );
 };
