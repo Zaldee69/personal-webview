@@ -40,44 +40,44 @@ const Guide = ({ setIsClicked, isDisabled }: Props) => {
         <Paragraph size="sm" className="mt-4">
           {t("guideTitle")}
         </Paragraph>
-        <div className="flex flex-col gap-5 my-6">
+        <div className="flex flex-col gap-2 my-6">
           <div className="grid poppins-regular gap-2 text-sm grid-cols-2 items-center grid-flow-col">
-            <Image
-              alt="guide-1"
-              src={themeConfigurationAvaliabilityChecker(
+            <div
+            className="bg-contain w-44 h-24 bg-center bg-no-repeat"
+            style={{
+              backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
                 themeConfiguration.data.asset_liveness_guide_1 as string,
                 "ASSET",
                 `${assetPrefix}/images/1.svg`
-              )}
-              width={120}
-              height={90}
-            />
+              )})`,
+            }}
+          ></div>
             <Paragraph size="sm">{t("guideSubtitle1")}</Paragraph>
           </div>
           <div className="grid poppins-regular gap-2 text-sm grid-cols-2 items-center grid-flow-col">
-            <Image
-              alt="guide-1"
-              src={themeConfigurationAvaliabilityChecker(
+            <div
+            className="bg-contain w-44 h-24 bg-center bg-no-repeat"
+            style={{
+              backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
                 themeConfiguration.data.asset_liveness_guide_2 as string,
                 "ASSET",
                 `${assetPrefix}/images/2.svg`
-              )}
-              width={120}
-              height={90}
-            />
+              )})`,
+            }}
+          ></div>
             <Paragraph size="sm">{t("guideSubtitle2")}</Paragraph>
           </div>
           <div className="grid poppins-regular gap-2 text-sm grid-cols-2 items-center grid-flow-col">
-            <Image
-              alt="guide-1"
-              src={themeConfigurationAvaliabilityChecker(
+             <div
+            className="bg-contain w-44 h-24 bg-center bg-no-repeat"
+            style={{
+              backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
                 themeConfiguration.data.asset_liveness_guide_3 as string,
                 "ASSET",
                 `${assetPrefix}/images/3.svg`
-              )}
-              width={120}
-              height={90}
-            />
+              )})`,
+            }}
+          ></div>
             <Paragraph size="sm">{t("guideSubtitle3")}</Paragraph>
           </div>
         </div>
