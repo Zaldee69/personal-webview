@@ -342,7 +342,7 @@ const Form: React.FC = () => {
               </p>
             </div>
           </div>
-          <div className="flex flex-row mt-5">
+          <div className="flex flex-row mt-5 gap-1">
             <input
               id="tnc"
               name="tnc"

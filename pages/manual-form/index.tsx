@@ -79,8 +79,6 @@ const Index = () => {
     fileFotoSelfieRef: useRef<HTMLInputElement>(null),
   });
 
-  const [isTncChecked, setIsTncCheked] = useState<boolean>(false);
-
   const resolutionChecker = (file: File | undefined) => {
     return new Promise((resolve) => {
       const img: HTMLImageElement = document.createElement("img");
@@ -117,8 +115,6 @@ const Index = () => {
           ? value.replace(/\s/g, "")
           : name === "name"
           ? value.trimStart()
-          : name === "tnc"
-          ? setIsTncCheked(e.target.checked)
           : "",
     });
 
@@ -332,59 +328,10 @@ const Index = () => {
             inputRef={fileFotoSelfieRef}
             showMaxResolution
           />
-          <div className="flex items-start flex-row mt-5">
-            <input
-              id="tnc"
-              name="tnc"
-              type="checkbox"
-              className=" border-borderColor block"
-              onChange={onChangeHandler}
-            />
-            <Label
-              size="base"
-              className="ml-2 mt-[1px] text-neutral"
-              htmlFor="tnc"
-            >
-              <Paragraph className="inline">{t("agree")} </Paragraph>
-              <span className="text-primary">
-                <a
-                  href="https://repository.tilaka.id/CP_CPS.pdf"
-                  target="blank"
-                >
-                  CP/CPS
-                </a>
-                ,{" "}
-                <a
-                  href="https://repository.tilaka.id/kebijakan-jaminan.pdf"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  {t("warranty")}
-                </a>
-                ,{" "}
-                <a
-                  href="https://repository.tilaka.id/kebijakan-privasi.pdf"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  {t("privacy")}
-                </a>
-                ,{" "}
-              </span>
-              <Paragraph className="inline">{t("and")}</Paragraph>
-              <a
-                target="blank"
-                href="https://repository.tilaka.id/perjanjian-pemilik-sertifikat.pdf"
-                className="text-primary"
-              >
-                {" "}
-                {t("certificate")}
-              </a>
-            </Label>
-          </div>
+         
           <Button
             type="submit"
-            disabled={!isTncChecked || errorMessage.nik.length > 1}
+            disabled={errorMessage.nik.length > 1}
             size="sm"
             className="bg-primary btn font-semibold mt-7 h-9 hover:opacity-50"
             style={{
