@@ -127,7 +127,7 @@ const Index = () => {
       const stateObj = { ...prev, [name]: "" };
       switch (name) {
         case "photo_ktp":
-          if (isErrorImage) {
+          if (!isEligibleFileType) {
             stateObj[name] = t("manualForm.photoKtp.errorMessage2");
             setForm({
               ...form,
