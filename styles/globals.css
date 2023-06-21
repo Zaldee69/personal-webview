@@ -66,42 +66,42 @@
 }
 
 .Adine-Kirnberg {
-  font-family: Adine-Kirnberg;
+  font-family: Adine-Kirnberg !important;
   font-size: 25px;
   display: flex;
   align-items: center;
 }
 
 .champignonaltswash {
-  font-family: champignonaltswash;
+  font-family: champignonaltswash !important;
   font-size: 25px;
   display: flex;
   align-items: center;
 }
 
 .FormalScript {
-  font-family: FormalScript;
+  font-family: FormalScript !important;
   font-size: 25px;
   display: flex;
   align-items: center;
 }
 
 .HerrVonMuellerhoff-Regular {
-  font-family: HerrVonMuellerhoff-Regular;
+  font-family: HerrVonMuellerhoff-Regular !important;
   font-size: 25px;
   display: flex;
   align-items: center;
 }
 
 .MrsSaintDelafield-Regular {
-  font-family: MrsSaintDelafield-Regular;
+  font-family: MrsSaintDelafield-Regular !important;
   font-size: 25px;
   display: flex;
   align-items: center;
 }
 
 .SCRIPTIN {
-  font-family: SCRIPTIN;
+  font-family: SCRIPTIN !important; 
   font-size: 18px;
   align-items: center;
 }
