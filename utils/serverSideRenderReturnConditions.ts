@@ -128,9 +128,7 @@ export const serverSideRenderReturnConditions = ({
               permanent: false,
               destination: concateRedirectUrlParams(
                 cQuery.redirect_url as string,
-                `status=${
-                  checkStepResult.res.data.status
-                }%26register_id=${uuid}${
+                `status=${checkStepResult.res.data.status}%uuid=${uuid}${
                   checkStepResult.res.data.reason_code
                     ? "%26reason_code=" + checkStepResult.res.data.reason_code
                     : ""
@@ -159,7 +157,7 @@ export const serverSideRenderReturnConditions = ({
         };
       } else if (checkStepResult.res.data.status === "S") {
         const params: any = {
-          register_id: uuid,
+          uuid,
           status: checkStepResult.res.data.status,
         };
 
@@ -205,7 +203,6 @@ export const serverSideRenderReturnConditions = ({
         return { props: {} };
       }
     } else {
-
       if (
         checkStepResult.res?.data?.errors?.[0] === "registrationId tidak valid"
       ) {
@@ -219,7 +216,8 @@ export const serverSideRenderReturnConditions = ({
             `${assetPrefix}/link-account/success` ||
           currentPathnameWithoutParams === "/link-account/success" ||
           currentPathnameWithoutParams === `${assetPrefix}/link-account` ||
-          currentPathnameWithoutParams === "/link-account" || isNotRedirect
+          currentPathnameWithoutParams === "/link-account" ||
+          isNotRedirect
         ) {
           return {
             props: {},
