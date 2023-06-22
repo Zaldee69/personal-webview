@@ -29,7 +29,7 @@ const LivenessFailure = () => {
     routerQuery.registration_id;
   const params = {
     status: "F",
-    register_id: uuid,
+    uuid,
   };
   const queryString = new URLSearchParams(params as any).toString();
   const reason_code = routerQuery.reason_code;
@@ -75,7 +75,8 @@ const LivenessFailure = () => {
             className="bg-contain w-48 h-48 bg-center bg-no-repeat"
             style={{
               backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
-                themeConfiguration.data.asset_registration_status_failed as string,
+                themeConfiguration.data
+                  .asset_registration_status_failed as string,
                 "ASSET",
                 `${assetPrefix}/images/livenessFail.svg`
               )})`,
@@ -87,7 +88,7 @@ const LivenessFailure = () => {
               {isRedirectToManualForm && (
                 <div>
                   <div className="hidden lg:block">
-                    <Paragraph  className="text-center">
+                    <Paragraph className="text-center">
                       {t("ekycFailed.subtitle1")} <br />
                       {t("ekycFailed.subtitle2")}
                     </Paragraph>

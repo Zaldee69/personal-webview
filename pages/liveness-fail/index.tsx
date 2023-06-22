@@ -29,12 +29,25 @@ const LivenessFail = () => {
 
   const { t }: any = i18n;
 
+  const uuid =
+    router.query.transaction_id ||
+    router.query.request_id ||
+    router.query.registration_id;
+  const params = {
+    status: "F",
+    uuid,
+  };
+  const queryString = new URLSearchParams(params as any).toString();
+
   const resetStorage = () => {
     setGagalCounter(0);
     sessionStorage.removeItem("tlk-counter");
     if (router.query.redirect_url) {
       window.location.replace(
-        concateRedirectUrlParams(router.query.redirect_url as string, "")
+        concateRedirectUrlParams(
+          router.query.redirect_url as string,
+          queryString
+        )
       );
     } else {
       router.replace({
@@ -114,8 +127,7 @@ const LivenessFail = () => {
             className="bg-contain w-48 h-48 bg-center bg-no-repeat"
             style={{
               backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
-                themeConfiguration.data
-                  .asset_liveness_failed as string,
+                themeConfiguration.data.asset_liveness_failed as string,
                 "ASSET",
                 `${assetPrefix}/images/livenessFail.svg`
               )})`,
@@ -153,7 +165,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       };
     };
   } = await RestKycCheckStepv2({
-    registerId: uuid as string, 
+    registerId: uuid as string,
   })
     .then((res) => {
       return { res };
