@@ -28,7 +28,8 @@ const LivenessFailure = () => {
     routerQuery.request_id ||
     routerQuery.registration_id;
   const params = {
-    register_id: uuid,
+    status: "F",
+    uuid,
   };
 
   const queryString = new URLSearchParams(params as any).toString();
@@ -46,20 +47,22 @@ const LivenessFailure = () => {
   }, [router.isReady]);
 
   return (
-    <div className="min-h-screen" style={{
-      backgroundColor: themeConfigurationAvaliabilityChecker(
-        themeConfiguration?.data.background as string, "BG"
-      ),
-    }}>
+    <div
+      className="min-h-screen"
+      style={{
+        backgroundColor: themeConfigurationAvaliabilityChecker(
+          themeConfiguration?.data.background as string,
+          "BG"
+        ),
+      }}
+    >
       <Head>
         <title>Liveness</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
       <div className="px-5 pt-8 sm:w-full md:w-4/5 mx-auto">
         <div className="flex flex-col gap-16 items-center justify-center">
-          <Heading className="text-center">
-            {t("livenessFailedTitle")}
-          </Heading>
+          <Heading className="text-center">{t("livenessFailedTitle")}</Heading>
           <div
             className="bg-contain w-48 h-48 bg-center bg-no-repeat"
             style={{

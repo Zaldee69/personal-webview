@@ -22,6 +22,15 @@ const FormSuccess = (props: Props) => {
   const routerQuery = router.query;
   const { t }: any = i18n;
   const themeConfiguration = useSelector((state: RootState) => state.theme);
+  const uuid =
+    router.query.transaction_id ||
+    router.query.request_id ||
+    router.query.registration_id;
+  const params = {
+    status: "S",
+    uuid,
+  };
+  const queryString = new URLSearchParams(params as any).toString();
 
   useEffect(() => {
     if (routerQuery.redirect_url) {
@@ -43,9 +52,7 @@ const FormSuccess = (props: Props) => {
       }}
       className="px-10 pt-16 pb-9 text-center min-h-screen"
     >
-      <Heading>
-        {t("livenessSuccess")}
-      </Heading>
+      <Heading>{t("livenessSuccess")}</Heading>
       <div
         className="bg-contain mx-auto mt-10 w-60 h-64 bg-center bg-no-repeat"
         style={{
@@ -70,7 +77,7 @@ const FormSuccess = (props: Props) => {
           })}
           href={concateRedirectUrlParams(
             routerQuery.redirect_url as string,
-            ""
+            queryString
           )}
         >
           {t("livenessSuccessButtonTitle")}

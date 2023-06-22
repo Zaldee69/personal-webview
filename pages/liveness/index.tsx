@@ -39,7 +39,7 @@ type TQueryParams = {
   request_id?: string;
   redirect_url?: string;
   reason_code?: string;
-  register_id?: string;
+  uuid?: string;
   status?: string;
 };
 
@@ -128,7 +128,7 @@ const Liveness = () => {
           if (res.data.status === "S") {
             toast.dismiss("generateAction");
             const params: TQueryParams = {
-              register_id: routerQuery.request_id as string,
+              uuid: routerQuery.request_id as string,
               status: res.data.status,
             };
 
@@ -234,7 +234,7 @@ const Liveness = () => {
             ) {
               const params: TQueryParams = {
                 status: res.data.status,
-                register_id: routerQuery.request_id as string,
+                uuid: routerQuery.request_id as string,
               };
 
               if (res.data.reason_code) {
@@ -490,7 +490,7 @@ const Liveness = () => {
                 } else if (result.data.pin_form && routerQuery.redirect_url) {
                   const params: any = {
                     status: status,
-                    register_id: routerQuery.request_id,
+                    uuid: routerQuery.request_id,
                   };
 
                   if (result?.data.reason_code) {

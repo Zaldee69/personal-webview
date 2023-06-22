@@ -29,12 +29,25 @@ const LivenessFail = () => {
 
   const themeConfiguration = useSelector((state: RootState) => state.theme);
 
+  const uuid =
+    router.query.transaction_id ||
+    router.query.request_id ||
+    router.query.registration_id;
+  const params = {
+    status: "F",
+    uuid,
+  };
+  const queryString = new URLSearchParams(params as any).toString();
+
   const resetStorage = () => {
     setGagalCounter(0);
     sessionStorage.removeItem("tlk-counter1");
     if (router.query.redirect_url) {
       window.location.replace(
-        concateRedirectUrlParams(router.query.redirect_url as string, "")
+        concateRedirectUrlParams(
+          router.query.redirect_url as string,
+          queryString
+        )
       );
     } else {
       router.replace({
@@ -88,20 +101,22 @@ const LivenessFail = () => {
     }
   };
   return (
-    <div className="min-h-screen" style={{
-      backgroundColor: themeConfigurationAvaliabilityChecker(
-        themeConfiguration?.data.background as string, "BG"
-      ),
-    }} >
+    <div
+      className="min-h-screen"
+      style={{
+        backgroundColor: themeConfigurationAvaliabilityChecker(
+          themeConfiguration?.data.background as string,
+          "BG"
+        ),
+      }}
+    >
       <Head>
         <title>Liveness</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
       <div className="px-5 pt-8 max-w-sm sm:w-full md:w-4/5 mx-auto">
         <div className="flex flex-col gap-10 items-center justify-center">
-          <Heading>
-            {t("livenessFailedTitle")}
-          </Heading>
+          <Heading>{t("livenessFailedTitle")}</Heading>
           <div
             className="bg-contain w-48 h-48 bg-center bg-no-repeat"
             style={{
