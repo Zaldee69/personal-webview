@@ -56,7 +56,6 @@ const PinFormDedicatedChannel = (props: Props) => {
 
   const themeConfiguration = useSelector((state: RootState) => state.theme);
 
-
   const onClickNumberHandlerCallback = (value: number) => {};
   const onClickDeleteHandlerCallback = () => {};
   const submitFormCallback = (pin: string) => {
@@ -100,7 +99,7 @@ const PinFormDedicatedChannel = (props: Props) => {
           if (res.success) {
             if (redirect_url) {
               const params = {
-                register_id: registration_id,
+                uuid: registration_id,
                 status: "S",
               };
               const queryString = new URLSearchParams(params as any).toString();
@@ -142,7 +141,7 @@ const PinFormDedicatedChannel = (props: Props) => {
           if (res.success) {
             if (redirect_url) {
               const params: any = {
-                register_id: registration_id,
+                uuid: registration_id,
                 status: res.data.status === "E" ? "S" : res.data.status,
               };
 
@@ -227,7 +226,7 @@ const PinFormDedicatedChannel = (props: Props) => {
             if (!res.data.pin_form) {
               if (redirect_url) {
                 const params: any = {
-                  register_id: registration_id,
+                  uuid: registration_id,
                   status: res.data.status,
                 };
 
@@ -265,7 +264,7 @@ const PinFormDedicatedChannel = (props: Props) => {
             }
           } else if (res.data.status === "S") {
             const params: any = {
-              register_id: registration_id,
+              uuid: registration_id,
               status: res.data.status,
             };
 
@@ -325,12 +324,15 @@ const PinFormDedicatedChannel = (props: Props) => {
   if (!shouldRender) return;
 
   return (
-    <div style={{
-      backgroundColor: themeConfigurationAvaliabilityChecker(
-        themeConfiguration?.data.background as string,
-        "BG"
-      ),
-    }} className="flex justify-center items-center min-h-screen px-3 pt-3 pb-5">
+    <div
+      style={{
+        backgroundColor: themeConfigurationAvaliabilityChecker(
+          themeConfiguration?.data.background as string,
+          "BG"
+        ),
+      }}
+      className="flex justify-center items-center min-h-screen px-3 pt-3 pb-5"
+    >
       {isConfirmMode ? (
         <div className="max-w- w-full" style={{ maxWidth: "331px" }}>
           <PinFormComponent

@@ -252,7 +252,7 @@ const Form: React.FC = () => {
             ) {
               window.top!.location.href = concateRedirectUrlParams(
                 restRouterQuery.redirect_url as string,
-                `request_id=${request_id}${
+                `uuid=${request_id}${
                   res.data.reason_code
                     ? "%26reason_code=" + res.data.reason_code
                     : ""
@@ -276,7 +276,7 @@ const Form: React.FC = () => {
           } else if (res.data.status === "S" || res.data.status === "E") {
             toast.dismiss("kycCheckStepRequestToast");
             const params: any = {
-              register_id: request_id,
+              uuid: request_id,
               status: res.data.status,
             };
 
@@ -419,11 +419,7 @@ const Form: React.FC = () => {
             </div>
           </div>
           <div className="flex flex-col mt-5">
-            <Label
-              className="px-2"
-              size="base"
-              htmlFor="retype-password"
-            >
+            <Label className="px-2" size="base" htmlFor="retype-password">
               {t("passwordConfirmationLabel")}
             </Label>
             <div className="relative">

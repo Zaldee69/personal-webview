@@ -24,6 +24,16 @@ const FormSuccess = (props: Props) => {
   const routerQuery = router.query;
   const { t }: any = i18n;
   const themeConfiguration = useSelector((state: RootState) => state.theme);
+  const uuid =
+    router.query.transaction_id ||
+    router.query.request_id ||
+    router.query.registration_id;
+  const params = {
+    ...routerQuery,
+    status: "F",
+    uuid,
+  };
+  const queryString = new URLSearchParams(params as any).toString();
 
   return (
     <div
@@ -35,9 +45,7 @@ const FormSuccess = (props: Props) => {
       }}
       className="px-10 flex flex-col justify-center items-center text-center gap-8 min-h-screen"
     >
-      <Heading>
-        {t("livenessSuccessTitle")}
-      </Heading>
+      <Heading>{t("livenessSuccessTitle")}</Heading>
       <div
         className="bg-contain w-48 h-48 bg-center bg-no-repeat"
         style={{
@@ -49,16 +57,14 @@ const FormSuccess = (props: Props) => {
         }}
       ></div>
       <div className="mt-10">
-        <Paragraph size="sm" >
-          {t("livenessSuccessSubtitle")}
-        </Paragraph>
+        <Paragraph size="sm">{t("livenessSuccessSubtitle")}</Paragraph>
       </div>
       <div className="mt-10 text-primary text-base poppins-medium underline hover:cursor-pointer">
         {routerQuery.redirect_url && (
           <a
             href={concateRedirectUrlParams(
               routerQuery.redirect_url as string,
-              ""
+              queryString
             )}
             style={{
               color: themeConfigurationAvaliabilityChecker(
