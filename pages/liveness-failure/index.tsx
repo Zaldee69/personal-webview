@@ -69,7 +69,7 @@ const LivenessFailure = () => {
       <div className="px-5 pt-8 sm:w-full md:w-4/5 mx-auto">
         <div className="flex flex-col gap-16 items-center justify-center">
           <Heading className="text-center">
-            {t("ekycFailed.title")} Banget gasiiii
+            {t("ekycFailed.title")}
           </Heading>
           <div
             className="bg-contain w-48 h-48 bg-center bg-no-repeat"
