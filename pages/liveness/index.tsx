@@ -575,9 +575,11 @@ const Liveness = () => {
       };
       import("@vladmandic/human").then((H) => {
         human = new H.default(humanConfig);
-        human.warmup().then(() => {
-          setHumanDone(true);
-        });
+        human.load().then(() => {
+          human.warmup().then(() => {
+            setHumanDone(true);
+          });
+        })
       });
     };
     initHuman();
