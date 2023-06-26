@@ -18,6 +18,12 @@ export const concateRedirectUrlParams = (
     return decodeURIComponent(decodedRedirectUrl + "&" + searchParams);
   } else {
     // redirect url with no 3rd Party params
-    return decodeURIComponent(redirectUrl.split("?")?.[0] + "?" + searchParams);
+    try {
+      return decodeURIComponent(
+        redirectUrl.split("?")?.[0] + "?" + searchParams
+      );
+    } catch (error) {
+      return decodeURIComponent(redirectUrl + "?" + searchParams);
+    }
   }
 };
