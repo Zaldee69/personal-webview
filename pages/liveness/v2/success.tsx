@@ -35,9 +35,10 @@ const FormSuccess = (props: Props) => {
   useEffect(() => {
     if (routerQuery.redirect_url) {
       setTimeout(() => {
-        router.push({
-          pathname: routerQuery.redirect_url as string,
-        });
+        window.top!.location.href = concateRedirectUrlParams(
+          routerQuery.redirect_url as string,
+          queryString
+        );
       }, 5000);
     }
   }, [router.isReady]);
