@@ -35,7 +35,7 @@ const LivenessFail = () => {
     router.query.registration_id;
   const params = {
     status: "F",
-    uuid,
+    request_id: uuid,
   };
   const queryString = new URLSearchParams(params as any).toString();
 

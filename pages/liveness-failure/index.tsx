@@ -29,7 +29,7 @@ const LivenessFailure = () => {
     routerQuery.registration_id;
   const params = {
     status: "F",
-    uuid,
+    request_id: uuid,
   };
   const queryString = new URLSearchParams(params as any).toString();
   const reason_code = routerQuery.reason_code;
@@ -68,9 +68,7 @@ const LivenessFailure = () => {
       </Head>
       <div className="px-5 pt-8 sm:w-full md:w-4/5 mx-auto">
         <div className="flex flex-col gap-16 items-center justify-center">
-          <Heading className="text-center">
-            {t("ekycFailed.title")}
-          </Heading>
+          <Heading className="text-center">{t("ekycFailed.title")}</Heading>
           <div
             className="bg-contain w-48 h-48 bg-center bg-no-repeat"
             style={{
