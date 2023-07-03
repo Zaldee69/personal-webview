@@ -157,12 +157,20 @@ export const serverSideRenderReturnConditions = ({
         };
       } else if (checkStepResult.res.data.status === "S") {
         const params: any = {
-          uuid,
           status: checkStepResult.res.data.status,
         };
 
         if (checkStepResult.res.data.reason_code) {
           params.reason_code = checkStepResult.res.data.reason_code;
+        }
+
+        if (
+          currentPathnameWithoutParams === `${assetPrefix}/form/success` ||
+          currentPathnameWithoutParams === "/form/success"
+        ) {
+          params.request_id = uuid;
+        } else {
+          params.uuid = uuid;
         }
 
         const queryString = new URLSearchParams(params as any).toString();
