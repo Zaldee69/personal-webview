@@ -272,7 +272,7 @@ const Login = ({}: IPropsLogin) => {
           <div className="h-14 w-14 font-semibold flex  text-xl items-center justify-center name text-white bg-[#64bac3] rounded-full">
             {tilakaName?.[0]?.toUpperCase()}
           </div>
-          <Heading>
+          <Heading size="md">
             {t("hi")}, {user}
           </Heading>
         </div>
