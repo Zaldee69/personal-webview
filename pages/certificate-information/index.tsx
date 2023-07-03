@@ -163,9 +163,11 @@ function CertificateInformation({}: Props) {
             </Paragraph>
           </div> */}
           <div className="flex items-center">
-            <Paragraph size="sm" className="w-24 pr-2">Unique ID</Paragraph>
-            <Paragraph size="sm" className="font-semibold">
-              {certificate.dnQualifier}
+            <Paragraph size="sm" className="w-24 pr-2">
+              Unique ID
+            </Paragraph>
+            <Paragraph size="sm" className="font-semibold w-72">
+              {certificate.dnQualifier}{" "}
             </Paragraph>
           </div>
         </div>
