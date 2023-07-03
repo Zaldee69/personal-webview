@@ -44,6 +44,10 @@ export const initialState: TThemeResponse & Status = {
     asset_liveness_v2_action_blink: "",
     asset_liveness_v2_failed: "",
     asset_liveness_v2_success: "",
+    asset_forget_password_email_sent: "",
+    asset_forget_password_success: "",
+    asset_forget_tilaka_name_email_sent: "",
+    asset_signing_authenticated_success: ""
   },
   status: "IDDLE",
 };
