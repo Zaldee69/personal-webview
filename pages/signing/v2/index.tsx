@@ -950,7 +950,7 @@ const SigningOnProgress = (props: TPropsSigningSuccess) => {
             className="bg-contain mx-auto w-52 h-52 bg-center bg-no-repeat"
             style={{
               backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
-                themeConfiguration.data.asset_signing_success as string,
+                themeConfiguration.data.asset_signing_authenticated_success as string,
                 "ASSET",
                 `${assetPrefix}/images/progress.svg`
               )})`,
