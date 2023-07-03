@@ -163,5 +163,9 @@ export type TThemeResponse = {
     asset_liveness_v2_action_blink: string;
     asset_liveness_v2_failed: string;
     asset_liveness_v2_success: string;
+    asset_forget_password_email_sent: string
+    asset_forget_tilaka_name_email_sent: string;
+    asset_signing_authenticated_success: string
+    asset_forget_password_success: string
   };
 };

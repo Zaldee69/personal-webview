@@ -58,28 +58,35 @@ const LinkAccount = (props: Props) => {
   }, [router.isReady, currentSecond]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <div className="min-h-screen" style={{
-      backgroundColor: themeConfigurationAvaliabilityChecker(
-        themeConfiguration?.data.background as string, "BG"
-      ),
-    }}>
+    <div
+      className="min-h-screen"
+      style={{
+        backgroundColor: themeConfigurationAvaliabilityChecker(
+          themeConfiguration?.data.background as string,
+          "BG"
+        ),
+      }}
+    >
       <Head>
         <title>Pengaturan Ulang Kata Sandi Berhasil</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
       <div className="px-5 py-9 max-w-md mx-auto min-h-screen flex flex-col justify-center">
         <div className="text-center">
-          <Heading className="text-center">
+          <Heading className="text-center mb-3">
             Pengaturan Ulang Kata Sandi Berhasil
           </Heading>
-          <div className="mt-12">
-            <Image
-              src={`${assetPrefix}/images/linkAccountSuccess.svg`}
-              width="151"
-              height="151"
-              alt="liveness-success-ill"
-            />
-         </div>
+          <div
+            className="bg-contain mx-auto w-40 h-40 bg-center bg-no-repeat"
+            style={{
+              backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
+                themeConfiguration.data
+                  .asset_forget_password_success as string,
+                "ASSET",
+                `${assetPrefix}/images/linkAccountSuccess.svg`
+              )})`,
+            }}
+          ></div>
           <Paragraph size="sm" className="mt-4 text-center">
             Silahkan login kembali menggunakan Kata Sandi Anda yang terbaru
           </Paragraph>
@@ -89,7 +96,7 @@ const LinkAccount = (props: Props) => {
             </Paragraph>
           )}
         </div>
-        <Footer/>
+        <Footer />
       </div>
     </div>
   );

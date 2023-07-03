@@ -203,14 +203,16 @@ const ModalSuccess: React.FC<{
         <p className="font-poppins block text-center pb-5  whitespace-nowrap  font-semibold ">
           {t("emailWasSend")}
         </p>
-        <div className="mt-5 text-center">
-          <Image
-            src={`${assetPrefix}/images/checkCircle.svg`}
-            width="53"
-            height="53"
-            alt="check-ill"
-          />
-        </div>
+        <div
+          className="bg-contain w-12 h-12 bg-center mx-auto bg-no-repeat"
+          style={{
+            backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
+              themeConfiguration.data.asset_forget_tilaka_name_email_sent as string,
+              "ASSET",
+              `${assetPrefix}/images/checkCircle.svg`
+            )})`,
+          }}
+        ></div>
         <p className="text-neutral800 text-base font-normal mt-8 font-poppins text-center">
           {t("checkEmail2")}
         </p>
