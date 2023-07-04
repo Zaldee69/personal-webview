@@ -166,7 +166,9 @@ export const serverSideRenderReturnConditions = ({
 
         if (
           currentPathnameWithoutParams === `${assetPrefix}/form/success` ||
-          currentPathnameWithoutParams === "/form/success"
+          currentPathnameWithoutParams === "/form/success" ||
+          currentPathnameWithoutParams === `${assetPrefix}/kyc/pinform` ||
+          currentPathnameWithoutParams === "/kyc/pinform"
         ) {
           params.request_id = uuid;
         } else {

@@ -99,7 +99,7 @@ const PinFormDedicatedChannel = (props: Props) => {
           if (res.success) {
             if (redirect_url) {
               const params = {
-                uuid: registration_id,
+                request_id: registration_id,
                 status: "S",
               };
               const queryString = new URLSearchParams(params as any).toString();
@@ -141,7 +141,7 @@ const PinFormDedicatedChannel = (props: Props) => {
           if (res.success) {
             if (redirect_url) {
               const params: any = {
-                uuid: registration_id,
+                request_id: registration_id,
                 status: res.data.status === "E" ? "S" : res.data.status,
               };
 
@@ -226,7 +226,7 @@ const PinFormDedicatedChannel = (props: Props) => {
             if (!res.data.pin_form) {
               if (redirect_url) {
                 const params: any = {
-                  uuid: registration_id,
+                  request_id: registration_id,
                   status: res.data.status,
                 };
 
@@ -264,7 +264,7 @@ const PinFormDedicatedChannel = (props: Props) => {
             }
           } else if (res.data.status === "S") {
             const params: any = {
-              uuid: registration_id,
+              request_id: registration_id,
               status: res.data.status,
             };
 
