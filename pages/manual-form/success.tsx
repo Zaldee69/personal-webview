@@ -19,15 +19,22 @@ const FormSuccess = (props: Props) => {
   const routerQuery = router.query;
   const { t }: any = i18n;
   const themeConfiguration = useSelector((state: RootState) => state.theme);
+  const params = {
+    request_id: routerQuery.request_id,
+    reason_code: routerQuery.reason_code,
+  };
+  const queryString = new URLSearchParams(params as any).toString();
   return (
-    <div  style={{
-      backgroundColor: themeConfigurationAvaliabilityChecker(
-        themeConfiguration?.data.background as string, "BG"
-      ),
-    }} className="px-10 min-h-screen pt-16 pb-9 text-center">
-      <Heading>
-        {t("livenessSuccessTitle")}
-      </Heading>
+    <div
+      style={{
+        backgroundColor: themeConfigurationAvaliabilityChecker(
+          themeConfiguration?.data.background as string,
+          "BG"
+        ),
+      }}
+      className="px-10 min-h-screen pt-16 pb-9 text-center"
+    >
+      <Heading>{t("livenessSuccessTitle")}</Heading>
       <div className="mt-20">
         <Image
           src={`${assetPrefix}/images/livenessSucc.svg`}
@@ -37,9 +44,7 @@ const FormSuccess = (props: Props) => {
         />
       </div>
       <div className="mt-14">
-        <Paragraph size="sm" >
-          {t("livenessSuccessSubtitle")}
-        </Paragraph>
+        <Paragraph size="sm">{t("livenessSuccessSubtitle")}</Paragraph>
       </div>
       <div className="mt-20 text-primary text-base poppins-medium underline hover:cursor-pointer">
         {routerQuery.redirect_url && (
@@ -56,7 +61,7 @@ const FormSuccess = (props: Props) => {
             })}
             href={concateRedirectUrlParams(
               routerQuery.redirect_url as string,
-              ""
+              queryString
             )}
           >
             {t("livenessSuccessButtonTitle")}
