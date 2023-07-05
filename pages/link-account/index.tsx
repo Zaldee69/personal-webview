@@ -160,6 +160,9 @@ const LinkAccount = (props: Props) => {
                 });
               }
             });
+          } else if(certif[0].status == "Enroll"){
+            toast.dismiss();
+            toast.warning("Penerbitan sertifikat dalam proses, cek email Anda untuk informasi sertifikat");
           } else {
             router.replace({
               pathname: handleRoute("certificate-information"),
