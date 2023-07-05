@@ -485,7 +485,7 @@ const SigningWithRead = () => {
           <Button
             disabled={shouldDisableSubmit || !read || !agree}
             size="none"
-            className="px-6 py-2.5"
+            className="px-4 fit-content py-2.5"
             style={{
               backgroundColor: themeConfigurationAvaliabilityChecker(
                 themeConfiguration?.data.button_color as string
@@ -824,7 +824,8 @@ const SigningWithoutRead = () => {
                 themeConfiguration?.data.button_color as string
               ),
             }}
-            className="px-6 py-2.5"
+            size="none"
+            className="px-4 fit-content py-2.5"
             disabled={shouldDisableSubmit || !agree}
             onClick={() =>
               typeMFA === "FR" ? setopenFRModal(true) : setOtpModal(true)
@@ -1192,8 +1193,8 @@ const FRModal: React.FC<IModal> = ({
           />
           <Button
             onClick={() => setModal(!modal)}
-            size="full"
-            className="uppercase mt-5 mb-2 h-9"
+            size="none"
+            className="mt-5 mb-2 uppercase text-base font-medium h-9"
             style={{
               backgroundColor: themeConfigurationAvaliabilityChecker(
                 themeConfiguration?.data.button_color as string

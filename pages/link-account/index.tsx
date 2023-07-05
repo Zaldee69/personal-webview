@@ -508,8 +508,8 @@ const FRModal = ({ modal, setModal, tilakaName, formSetter }: IModal) => {
                 password: "",
               });
             }}
-            size="full"
-            className="mt-5 uppercase text-base font-medium h-9"
+            size="none"
+            className="mt-5 mb-2 uppercase text-base font-medium h-9"
             style={{
               backgroundColor: themeConfigurationAvaliabilityChecker(
                 themeConfiguration?.data.button_color as string

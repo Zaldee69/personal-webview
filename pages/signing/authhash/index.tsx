@@ -188,8 +188,8 @@ const FRModal: React.FC<IModal> = ({
           />
           <Button
             onClick={() => setModal(!modal)}
-            size="full"
-            className="mt-5 uppercase text-base mb-2 font-medium h-9"
+            size="none"
+            className="mt-5 mb-2 uppercase text-base font-medium h-9"
             style={{
               backgroundColor: themeConfigurationAvaliabilityChecker(
                 themeConfiguration?.data.button_color as string
