@@ -130,7 +130,7 @@ export const serverSideRenderReturnConditions = ({
                 cQuery.redirect_url as string,
                 `status=${
                   checkStepResult.res.data.status
-                }%26request_id=${uuid}${
+                }%26register_id=${uuid}${
                   checkStepResult.res.data.reason_code
                     ? "%26reason_code=" + checkStepResult.res.data.reason_code
                     : ""
@@ -168,13 +168,17 @@ export const serverSideRenderReturnConditions = ({
 
         if (
           currentPathnameWithoutParams === `${assetPrefix}/form/success` ||
-          currentPathnameWithoutParams === "/form/success" ||
-          currentPathnameWithoutParams === `${assetPrefix}/kyc/pinform` ||
-          currentPathnameWithoutParams === "/kyc/pinform"
+          currentPathnameWithoutParams === "/form/success"
         ) {
           params.request_id = uuid;
+        } else if (
+          currentPathnameWithoutParams === `${assetPrefix}/kyc/pinform` ||
+          currentPathnameWithoutParams === "/kyc/pinform" ||
+          checkStepResult.res.data.pin_form
+        ) {
+          params.register_id = uuid;
         } else {
-          params.uuid = uuid;
+          params.request_id = uuid;
         }
 
         const queryString = new URLSearchParams(params as any).toString();
