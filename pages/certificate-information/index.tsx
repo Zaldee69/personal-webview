@@ -162,7 +162,7 @@ function CertificateInformation({}: Props) {
               {certificate.emailAddress}
             </Paragraph>
           </div> */}
-          <div className="flex items-center">
+          <div className="flex items-start">
             <Paragraph size="sm" className="w-24 pr-2">
               Unique ID
             </Paragraph>
