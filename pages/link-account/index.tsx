@@ -509,10 +509,10 @@ const FRModal = ({ modal, setModal, tilakaName, formSetter }: IModal) => {
               });
             }}
             size="none"
-            className="mt-5 mb-2 uppercase text-base font-medium h-9"
+            className="mt-5 mb-2 uppercase text-base font-bold h-9"
             style={{
-              backgroundColor: themeConfigurationAvaliabilityChecker(
-                themeConfiguration?.data.button_color as string
+              color: themeConfigurationAvaliabilityChecker(
+                themeConfiguration?.data.action_font_color as string
               ),
             }}
           >
