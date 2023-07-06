@@ -490,6 +490,7 @@ const SigningWithRead = () => {
               backgroundColor: themeConfigurationAvaliabilityChecker(
                 themeConfiguration?.data.button_color as string
               ),
+              borderRadius: "12px"
             }}
             onClick={() =>
               typeMFA === "FR" ? setopenFRModal(true) : setOtpModal(true)
@@ -822,8 +823,9 @@ const SigningWithoutRead = () => {
             style={{
               backgroundColor: themeConfigurationAvaliabilityChecker(
                 themeConfiguration?.data.button_color as string
-              ),
-            }}
+                ),
+                borderRadius: "6px"
+              }}
             size="none"
             className="px-4 fit-content py-2.5"
             disabled={shouldDisableSubmit || !agree}
@@ -1169,7 +1171,7 @@ const FRModal: React.FC<IModal> = ({
 
   const { t }: any = i18n;
 
-  return modal ? (
+  return !modal ? (
     <div
       style={{ backgroundColor: "rgba(0, 0, 0, .5)" }}
       className="fixed z-50 flex items-start transition-all duration-1000 justify-center w-full left-0 top-0 h-full "
@@ -1194,10 +1196,10 @@ const FRModal: React.FC<IModal> = ({
           <Button
             onClick={() => setModal(!modal)}
             size="none"
-            className="mt-5 mb-2 uppercase text-base font-medium h-9"
+            className="mt-3 mb-1 uppercase font-bold text-base h-9"
             style={{
-              backgroundColor: themeConfigurationAvaliabilityChecker(
-                themeConfiguration?.data.button_color as string
+              color: themeConfigurationAvaliabilityChecker(
+                themeConfiguration?.data.action_font_color as string
               ),
             }}
           >

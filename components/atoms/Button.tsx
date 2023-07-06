@@ -8,7 +8,7 @@ export const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "rounded-md px-6 text-white disabled:bg-primary70 mx-auto disabled:opacity-75 rounded-sm",
+          "px-6 text-white disabled:bg-primary70 mx-auto disabled:opacity-75 rounded-sm",
         ghost: "bg-transparent data-[state=open]:bg-transparent ",
         link: "underline bg-transparent data-[state=open]:bg-transparent ",
       },
