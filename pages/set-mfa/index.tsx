@@ -360,10 +360,10 @@ const FRModal = ({ isShowModalFr, setShowModalFr, geTypeMfa }: IModalFR) => {
             callbackCaptureProcessor={captureProcessor}
           />
           <Button
-            className="mt-5 mb-2"
+            className="mt-3 text-base uppercase font-bold"
             style={{
-              backgroundColor: themeConfigurationAvaliabilityChecker(
-                themeConfiguration?.data.button_color as string
+              color: themeConfigurationAvaliabilityChecker(
+                themeConfiguration?.data.action_font_color as string
               ),
             }}
             onClick={() => setShowModalFr(false)}
