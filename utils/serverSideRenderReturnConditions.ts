@@ -166,15 +166,16 @@ export const serverSideRenderReturnConditions = ({
           params.reason_code = checkStepResult.res.data.reason_code;
         }
 
-        if (
+        if (checkStepResult.res.data.pin_form) {
+          params.register_id = uuid;
+        } else if (
           currentPathnameWithoutParams === `${assetPrefix}/form/success` ||
           currentPathnameWithoutParams === "/form/success"
         ) {
           params.request_id = uuid;
         } else if (
           currentPathnameWithoutParams === `${assetPrefix}/kyc/pinform` ||
-          currentPathnameWithoutParams === "/kyc/pinform" ||
-          checkStepResult.res.data.pin_form
+          currentPathnameWithoutParams === "/kyc/pinform"
         ) {
           params.register_id = uuid;
         } else {

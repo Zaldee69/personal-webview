@@ -127,13 +127,18 @@ const Liveness = () => {
           setIsDisabled(false);
           if (res.data.status === "S") {
             toast.dismiss("generateAction");
-            const params: TQueryParams = {
-              request_id: routerQuery.request_id as string,
+            const params: TQueryParams & { register_id?: string } = {
               status: res.data.status,
             };
 
             if (res.data.reason_code) {
               params.reason_code = res.data.reason_code;
+            }
+
+            if (res.data.pin_form) {
+              params.register_id = routerQuery.request_id as string;
+            } else {
+              params.request_id = routerQuery.request_id as string;
             }
 
             const queryString = new URLSearchParams(params as any).toString();
@@ -232,9 +237,9 @@ const Liveness = () => {
               res.data.pin_form &&
               routerQuery.redirect_url
             ) {
-              const params: TQueryParams = {
+              const params: TQueryParams & { register_id?: string } = {
                 status: res.data.status,
-                request_id: routerQuery.request_id as string,
+                register_id: routerQuery.request_id as string,
               };
 
               if (res.data.reason_code) {
