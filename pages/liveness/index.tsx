@@ -124,7 +124,6 @@ const Liveness = () => {
           res.data.status !== "E"
         ) {
           // this scope for status A B C S
-          setIsDisabled(false);
           if (res.data.status === "S") {
             toast.dismiss("generateAction");
             const params: TQueryParams & { register_id?: string } = {
@@ -149,10 +148,20 @@ const Liveness = () => {
               toast.success(res?.message || "pengecekan step berhasil", {
                 icon: <CheckOvalIcon />,
               });
+              setTimeout(() => {
+                toast.dismiss();
+                router.replace({
+                  pathname: handleRoute("form/success"),
+                  query: {
+                    ...routerQuery,
+                  },
+                });
+              }, 2000)
             }
           } else {
             RestKycGenerateAction(body)
               .then((result) => {
+                setIsDisabled(false);
                 if (result?.data) {
                   const payload = ["look_straight"].concat(
                     result.data.actionList
