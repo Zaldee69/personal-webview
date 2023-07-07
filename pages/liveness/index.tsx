@@ -135,11 +135,9 @@ const Liveness = () => {
               params.reason_code = res.data.reason_code;
             }
 
-            if (res.data.pin_form) {
-              params.register_id = routerQuery.request_id as string;
-            } else {
-              params.request_id = routerQuery.request_id as string;
-            }
+            // we return `register_id`, even if the channel is reguler,
+            // because if status S we don't know what channel of the uuid
+            params.register_id = routerQuery.request_id as string;
 
             const queryString = new URLSearchParams(params as any).toString();
             if (routerQuery.redirect_url) {
