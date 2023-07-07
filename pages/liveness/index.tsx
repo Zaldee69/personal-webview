@@ -126,25 +126,16 @@ const Liveness = () => {
           // this scope for status A B C S
           if (res.data.status === "S") {
             toast.dismiss("generateAction");
-            const params: TQueryParams & { register_id?: string } = {
-              status: res.data.status,
-            };
+            const params: TQueryParams & { register_id?: string } = {};
 
-            if (res.data.reason_code) {
-              params.reason_code = res.data.reason_code;
+            if(routerQuery.redirect_url){
+              params.status = res.data.status
             }
 
             // we return `register_id`, even if the channel is reguler,
             // because if status S we don't know what channel of the uuid
             params.register_id = routerQuery.request_id as string;
 
-            const queryString = new URLSearchParams(params as any).toString();
-            if (routerQuery.redirect_url) {
-              window.top!.location.href = concateRedirectUrlParams(
-                routerQuery.redirect_url as string,
-                queryString
-              );
-            } else {
               toast.success(res?.message || "pengecekan step berhasil", {
                 icon: <CheckOvalIcon />,
               });
@@ -154,10 +145,12 @@ const Liveness = () => {
                   pathname: handleRoute("form/success"),
                   query: {
                     ...routerQuery,
+                    ...params,
+                    // set 0 as reason_code default value
+                    reason_code: res.data.reason_code || 0
                   },
                 });
               }, 2000)
-            }
           } else {
             RestKycGenerateAction(body)
               .then((result) => {
