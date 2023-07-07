@@ -139,34 +139,36 @@ function CertificateInformation({}: Props) {
           }}
         ></div>
         <Paragraph size="sm" >{t("certificateSubtitle")}</Paragraph>
-        <div className="mt-5">
-          <div className="flex items-center">
-            <Paragraph size="sm" className="pr-2 w-24">{t("country")}</Paragraph>
-            <Paragraph size="sm" className="font-semibold">
+        <div className="mt-5 flex flex-col">
+          <div className="grid grid-cols-12 h-fit">
+            <Paragraph size="sm" className="col-span-4 md:col-span-3 pr-2">{t("country")}</Paragraph>
+            <Paragraph size="sm" className="font-semibold col-span-8 md:col-span-9"  >
               {certificate.negara}
             </Paragraph>
           </div>
-          <div className="flex items-center">
-            <Paragraph size="sm" className="w-24 pr-2">{t("name")}</Paragraph>
-            <Paragraph size="sm" className="font-semibold">{certificate.nama}</Paragraph>
+          <div className="grid grid-cols-12">
+            <Paragraph size="sm" className="col-span-4 md:col-span-3 pr-2">{t("name")}</Paragraph>
+            <Paragraph size="sm" className="font-semibold col-span-8 md:col-span-9">
+              {certificate.nama}
+            </Paragraph>
           </div>
-          <div className="flex items-center">
-            <Paragraph size="sm" className="w-24 pr-2">{t("organization")}</Paragraph>
-            <Paragraph size="sm" className="font-semibold">
+          <div className="grid grid-cols-12">
+            <Paragraph size="sm" className="col-span-4 md:col-span-3 pr-2">{t("organization")}</Paragraph>
+            <Paragraph size="sm" className="font-semibold col-span-8 md:col-span-9">
               {certificate.organisasi}
             </Paragraph>
           </div>
-          {/* <div className="flex items-center">
-            <Paragraph size="sm" className="w-24 pr-2">Email</Paragraph>
+          {/* <div className="grid grid-cols-12">
+            <Paragraph size="sm" className=" pr-2">Email</Paragraph>
             <Paragraph size="sm" className="font-semibold">
               {certificate.emailAddress}
             </Paragraph>
           </div> */}
-          <div className="flex items-start">
-            <Paragraph size="sm" className="w-24 pr-2">
+          <div className="grid grid-cols-12">
+            <Paragraph size="sm" className="col-span-4 md:col-span-3 pr-2">
               Unique ID
             </Paragraph>
-            <Paragraph size="sm" className="font-semibold w-52 md:w-80">
+            <Paragraph size="sm" className=" font-semibold col-span-8 md:col-span-9">
               {certificate.dnQualifier}{" "}
             </Paragraph>
           </div>
