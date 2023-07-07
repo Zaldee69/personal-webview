@@ -92,6 +92,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     cQuery.transaction_id || cQuery.request_id || cQuery.registration_id;
   const params = { ...cQuery, registration_id: uuid };
   const queryString = new URLSearchParams(params as any).toString();
+  const isNotRedirect = true
 
   const checkStepResult: {
     res?: TKycCheckStepResponseData;
@@ -114,7 +115,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       return { err };
     });
 
-  return serverSideRenderReturnConditions({ context, checkStepResult });
+  return serverSideRenderReturnConditions({ context, checkStepResult,isNotRedirect });
 };
 
 export default FormSuccess;
