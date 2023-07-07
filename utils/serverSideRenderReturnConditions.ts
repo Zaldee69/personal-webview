@@ -166,9 +166,8 @@ export const serverSideRenderReturnConditions = ({
           params.reason_code = checkStepResult.res.data.reason_code;
         }
 
-        if (checkStepResult.res.data.pin_form) {
-          params.register_id = uuid;
-        } else if (
+        // status S doesn't has `pin_form`
+        if (
           currentPathnameWithoutParams === `${assetPrefix}/form/success` ||
           currentPathnameWithoutParams === "/form/success"
         ) {
@@ -179,7 +178,9 @@ export const serverSideRenderReturnConditions = ({
         ) {
           params.register_id = uuid;
         } else {
-          params.request_id = uuid;
+          // if condition above not fulfulled, we return `register_id`,
+          // even if the channel is reguler, because if status S we don't know what channel of the uuid
+          params.register_id = uuid;
         }
 
         const queryString = new URLSearchParams(params as any).toString();
