@@ -99,28 +99,6 @@ const LivenessFailure = () => {
                 </div>
               )}
             </Paragraph>
-            {routerQuery.redirect_url && (
-              <a
-                href={concateRedirectUrlParams(
-                  routerQuery.redirect_url as string,
-                  queryString
-                )}
-              >
-                <span
-                  style={{
-                    color: themeConfigurationAvaliabilityChecker(
-                      themeConfiguration?.data.action_font_color as string
-                    ),
-                  }}
-                  className={buttonVariants({
-                    variant: "link",
-                    size: "none",
-                  })}
-                >
-                  {t("livenessSuccessButtonTitle")}
-                </span>
-              </a>
-            )}
           </div>
         </div>
         <Footer />
