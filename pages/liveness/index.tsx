@@ -267,6 +267,22 @@ const Liveness = () => {
                   queryString
                 );
               }
+              // for dedicated channel
+            } else if (res.data.reason_code === "1" && res.data.pin_form && routerQuery.redirect_url) {
+
+              const params: TQueryParams & { register_id?: string } = {
+                status: res.data.status as string,
+                register_id: routerQuery.request_id as string,
+                reason_code: res.data.reason_code as string,
+              };
+
+              const queryString = new URLSearchParams(params as any).toString();
+
+                window.top!.location.href = concateRedirectUrlParams(
+                  routerQuery.redirect_url as string,
+                  queryString
+                )
+              // for regular channel
             } else {
               const query: TQueryParams = {
                 ...routerQuery,
