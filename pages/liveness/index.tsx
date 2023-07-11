@@ -130,11 +130,14 @@ const Liveness = () => {
 
             if(routerQuery.redirect_url){
               params.status = res.data.status
+              params.redirect_url = routerQuery.redirect_url as string
             }
 
-            // we return `register_id`, even if the channel is reguler,
-            // because if status S we don't know what channel of the uuid
-            params.register_id = routerQuery.request_id as string;
+            if(res.data.pin_form){
+              params.register_id = routerQuery.request_id as string;
+            }else {
+              params.request_id = routerQuery.request_id as string;
+            }
 
               toast.success(res?.message || "pengecekan step berhasil", {
                 icon: <CheckOvalIcon />,
@@ -144,7 +147,6 @@ const Liveness = () => {
                 router.replace({
                   pathname: handleRoute("form/success"),
                   query: {
-                    ...routerQuery,
                     ...params,
                     // set 0 as reason_code default value
                     reason_code: res.data.reason_code || 0
