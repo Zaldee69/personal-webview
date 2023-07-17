@@ -130,7 +130,7 @@ const LinkAccount = (props: Props) => {
         data.data.data[0] as string,
         getExpFromToken(data.data.data[0]) as number
       );
-
+      
       // penautan and penautan_consent will redirected to /linking/* result page
       if (signing === "1" || setting === "1") {
         getCertificateList({ params: "" as string }).then((res) => {
@@ -218,6 +218,9 @@ const LinkAccount = (props: Props) => {
           account_locked: "1",
         },
       });
+    } else if(data.data.message === "Penerbitan sertifikat dalam proses, cek email Anda untuk informasi sertifikat" && data.status === "FULLFILLED" && !data.data.success){
+      toast.dismiss();
+      toast.warning(data.data.message);
     } else if (
       data.status === "REJECTED" ||
       (data.status === "FULLFILLED" && !data.data.success)
