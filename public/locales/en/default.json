@@ -265,5 +265,13 @@
   "linkAccountFailed5x": {
     "title": "Identity Authentication Failed",
     "subtitle": "Please continue linking account verification process manually by using the link received in your email"
+  },
+  "setMFA": {
+    "submitBtn": "Change Authentication Method",
+    "notAvaliableFiture": "Coming Soon",
+    "modal": {
+      "title": "Change Authentication Method",
+      "FRSubtitle": "Are you sure to set authentication method to Face Recognition?"
+    } 
   }
 }
