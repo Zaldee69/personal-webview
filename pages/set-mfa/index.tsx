@@ -217,7 +217,7 @@ const SetMfa = () => {
                 <Paragraph className="ml-2.5 poppins-regular">
                   {t("autheticantionMode3")}{" "}
                   <span className="text-sm text-white bg-neutral80 px-2 py-1 rounded">
-                    Belum Tersedia
+                  {t("setMFA.notAvaliableFiture")}
                   </span>
                 </Paragraph>
               </label>
@@ -233,20 +233,20 @@ const SetMfa = () => {
                   ),
                 }}
               >
-                Batal
+                {t("cancel")}
               </Button>
               <Button
                 onClick={() => onClickHandler("confirmation")}
                 disabled={defaultMfa === mfaMethod}
                 size="lg"
-                className="py-2 mx-0"
+                className="py-2 mx-0 whitespace-nowrap"
                 style={{
                   backgroundColor: themeConfigurationAvaliabilityChecker(
                     themeConfiguration?.data.button_color as string
                   ),
                 }}
               >
-                Ubah Metode Otentikasi
+                {t("setMFA.submitBtn")}
               </Button>
             </div>
             <FRModal
@@ -350,7 +350,7 @@ const FRModal = ({ isShowModalFr, setShowModalFr, geTypeMfa }: IModalFR) => {
       <div className="bg-white mt-20 max-w-sm pt-5 px-2 pb-3 rounded-xl w-full mx-5 ">
         <>
           <p className="poppins-regular block text-center font-semibold ">
-            Konfirmasi Perubahan Metode Otentikasi
+          {t("setMFA.modal.title")}
           </p>
           <FRCamera
             setModal={setShowModalFr}
@@ -392,11 +392,10 @@ const OtpModalConfirmation = ({
         <div className="px-5 py-5 flex justify-start gap-5 items-start">
           <div>
             <p className="poppins-regular block text-center font-semibold ">
-              Konfirmasi Perubahan Metode Otentikasi
+            {t("setMFA.modal.title")}
             </p>
             <p className="mt-8 text-sm text-center">
-              Apa Anda yakin mengubah metode otentikasi menjadi Face
-              Recognition?
+            {t("setMFA.modal.FRSubtitle")}
             </p>
           </div>
         </div>
@@ -410,7 +409,7 @@ const OtpModalConfirmation = ({
             }}
             onClick={() => setIsShowOtpModalConfirmation(false)}
           >
-            Batal
+            {t("cancel")}
           </Button>
           <Button
             size="none"
@@ -422,7 +421,7 @@ const OtpModalConfirmation = ({
             }}
             onClick={() => onClickHandler("submit")}
           >
-            Konfirmasi
+            {t("confirm")}
           </Button>
         </div>
       </div>
