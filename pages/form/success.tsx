@@ -29,9 +29,8 @@ const FormSuccess = (props: Props) => {
     router.query.request_id ||
     router.query.registration_id;
   const params = {
-    ...routerQuery,
-    status: "F",
-    uuid,
+    reason_code: routerQuery.reason_code,
+    request_id: uuid,
   };
   const queryString = new URLSearchParams(params as any).toString();
 
@@ -92,7 +91,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     cQuery.transaction_id || cQuery.request_id || cQuery.registration_id;
   const params = { ...cQuery, registration_id: uuid };
   const queryString = new URLSearchParams(params as any).toString();
-  const isNotRedirect = true
+  const isNotRedirect = true;
 
   const checkStepResult: {
     res?: TKycCheckStepResponseData;
@@ -115,7 +114,11 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       return { err };
     });
 
-  return serverSideRenderReturnConditions({ context, checkStepResult,isNotRedirect });
+  return serverSideRenderReturnConditions({
+    context,
+    checkStepResult,
+    isNotRedirect,
+  });
 };
 
 export default FormSuccess;

@@ -128,17 +128,25 @@ const Liveness = () => {
             toast.dismiss("generateAction");
             const params: TQueryParams & { register_id?: string } = {};
 
-            if(routerQuery.redirect_url){
-              params.status = res.data.status
-              params.redirect_url = routerQuery.redirect_url as string
+            if (routerQuery.redirect_url) {
+              params.status = res.data.status;
             }
 
-            if(res.data.pin_form){
+            //block for dedicated channel
+            if (res.data.pin_form) {
               params.register_id = routerQuery.request_id as string;
-            }else {
+              params.reason_code = res.data.reason_code as string;
+              const queryString = new URLSearchParams(params as any).toString();
+              if (routerQuery.redirect_url) {
+                window.top!.location.href = concateRedirectUrlParams(
+                  routerQuery.redirect_url as string,
+                  queryString
+                );
+              }
+              //block for regular channel
+            } else {
+              params.redirect_url = routerQuery.redirect_url as string;
               params.request_id = routerQuery.request_id as string;
-            }
-
               toast.success(res?.message || "pengecekan step berhasil", {
                 icon: <CheckOvalIcon />,
               });
@@ -148,11 +156,11 @@ const Liveness = () => {
                   pathname: handleRoute("form/success"),
                   query: {
                     ...params,
-                    // set 0 as reason_code default value
-                    reason_code: res.data.reason_code || 0
+                    reason_code: res.data.reason_code,
                   },
                 });
-              }, 2000)
+              }, 2000);
+            }
           } else {
             RestKycGenerateAction(body)
               .then((result) => {
@@ -270,8 +278,11 @@ const Liveness = () => {
                 );
               }
               // for dedicated channel
-            } else if (res.data.reason_code === "1" && res.data.pin_form && routerQuery.redirect_url) {
-
+            } else if (
+              res.data.reason_code === "1" &&
+              res.data.pin_form &&
+              routerQuery.redirect_url
+            ) {
               const params: TQueryParams & { register_id?: string } = {
                 status: res.data.status as string,
                 register_id: routerQuery.request_id as string,
@@ -280,10 +291,10 @@ const Liveness = () => {
 
               const queryString = new URLSearchParams(params as any).toString();
 
-                window.top!.location.href = concateRedirectUrlParams(
-                  routerQuery.redirect_url as string,
-                  queryString
-                )
+              window.top!.location.href = concateRedirectUrlParams(
+                routerQuery.redirect_url as string,
+                queryString
+              );
               // for regular channel
             } else {
               const query: TQueryParams = {
