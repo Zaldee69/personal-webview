@@ -130,7 +130,7 @@ const LinkAccount = (props: Props) => {
         data.data.data[0] as string,
         getExpFromToken(data.data.data[0]) as number
       );
-      
+
       // penautan and penautan_consent will redirected to /linking/* result page
       if (signing === "1" || setting === "1") {
         getCertificateList({ params: "" as string }).then((res) => {
@@ -160,9 +160,11 @@ const LinkAccount = (props: Props) => {
                 });
               }
             });
-          } else if(certif[0].status == "Enroll"){
+          } else if (certif[0].status == "Enroll") {
             toast.dismiss();
-            toast.warning("Penerbitan sertifikat dalam proses, cek email Anda untuk informasi sertifikat");
+            toast.warning(
+              "Penerbitan sertifikat dalam proses, cek email Anda untuk informasi sertifikat"
+            );
           } else {
             router.replace({
               pathname: handleRoute("certificate-information"),
@@ -188,39 +190,42 @@ const LinkAccount = (props: Props) => {
           });
         }
       }
-    } else if (
-      data.status === "FULLFILLED" &&
-      !data.data.success &&
-      (data.data.message ===
-        `Invalid Username / Password for Tilaka Name ${form?.tilaka_name}` ||
+    } else if (data.status === "FULLFILLED" && !data.data.success) {
+      if (
+        data.data.message ===
+          `Invalid Username / Password for Tilaka Name ${form?.tilaka_name}` ||
         data.data.message === "User Not Found" ||
         data.data.message === "NIK Not Equals ON Tilaka System" ||
-        data.data.message === "Error, tilaka Name not valid")
-    ) {
-      toast.dismiss();
-      toast.error(t("invalidUsernamePassword"));
-    } else if (
-      data.data.message === "Sudah melakukan penautan" &&
-      data.status === "FULLFILLED" &&
-      !data.data.success
-    ) {
-      toast.error(data.data.message, { icon: <XIcon /> });
-    } else if (
-      data.data.message ===
-        "Saat ini akun Anda terkunci. Silahkan coba login beberapa saat lagi." &&
-      data.status === "FULLFILLED" &&
-      !data.data.success
-    ) {
-      router.replace({
-        pathname: handleRoute("link-account/failure"),
-        query: {
-          ...router.query,
-          account_locked: "1",
-        },
-      });
-    } else if(data.data.message === "Penerbitan sertifikat dalam proses, cek email Anda untuk informasi sertifikat" && data.status === "FULLFILLED" && !data.data.success){
-      toast.dismiss();
-      toast.warning(data.data.message);
+        data.data.message === "Error, tilaka Name not valid"
+      ) {
+        toast.dismiss();
+        toast.error(t("invalidUsernamePassword"));
+      } else if (data.data.message === "Sudah melakukan penautan") {
+        dispatch(
+          login({
+            password: form.password,
+            tilaka_name: form.tilaka_name,
+            ...restRouterQuery,
+          } as TLoginProps)
+        );
+      } else if (
+        data.data.message ===
+        "Saat ini akun Anda terkunci. Silahkan coba login beberapa saat lagi."
+      ) {
+        router.replace({
+          pathname: handleRoute("link-account/failure"),
+          query: {
+            ...router.query,
+            account_locked: "1",
+          },
+        });
+      } else if (
+        data.data.message ===
+        "Penerbitan sertifikat dalam proses, cek email Anda untuk informasi sertifikat"
+      ) {
+        toast.dismiss();
+        toast.warning(data.data.message);
+      }
     } else if (
       data.status === "REJECTED" ||
       (data.status === "FULLFILLED" && !data.data.success)
@@ -313,6 +318,7 @@ const LinkAccount = (props: Props) => {
                 className="px-2.5 py-3 w-full focus:outline-none text-sm text-neutral800 poppins-regular border border-neutral40 rounded-md"
               />
               <button
+                type="button"
                 onClick={(e) => {
                   e.preventDefault();
                   showPasswordSetter(!showPassword);
@@ -914,15 +920,21 @@ const ModalConsent = ({
         <>
           <div className="rounded px-2 sm:px-6 pt-4 pb-6 bg-white">
             <div className="bg-neutral10 px-4 sm:px-10 md:px-16 pt-4 pb-6">
-              <Heading size="md" className="sm:text-xl md:text-2xl font-normal text-center">
+              <Heading
+                size="md"
+                className="sm:text-xl md:text-2xl font-normal text-center"
+              >
                 {t("page")}{" "}
-                <Heading size="md" className="italic font-normal inline">{t("customerConsentText")}</Heading>
+                <Heading size="md" className="italic font-normal inline">
+                  {t("customerConsentText")}
+                </Heading>
               </Heading>
               <div
                 className="bg-contain w-48 mt-3 mx-auto h-48 bg-center bg-no-repeat"
                 style={{
                   backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
-                    themeConfiguration.data.asset_action_popup_consent as string,
+                    themeConfiguration.data
+                      .asset_action_popup_consent as string,
                     "ASSET",
                     `${assetPrefix}/images/customerConsent.svg`
                   )})`,
