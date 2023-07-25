@@ -524,7 +524,7 @@ const Liveness = () => {
                 } else if (result.data.pin_form && routerQuery.redirect_url) {
                   const params: any = {
                     status: status,
-                    request_id: routerQuery.request_id,
+                    register_id: routerQuery.request_id,
                   };
 
                   if (result?.data.reason_code) {
