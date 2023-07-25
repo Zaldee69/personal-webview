@@ -63,6 +63,7 @@ const Form: React.FC = () => {
   const themeConfiguration = useSelector((state: RootState) => state.theme);
 
   const [isChecked, setIsCheked] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false)
   const disabled =
     !input.password ||
     !input.confirmPassword ||
@@ -70,14 +71,13 @@ const Form: React.FC = () => {
     error.tilakaName ||
     error.confirmPassword ||
     error.password ||
-    !isChecked;
+    !isChecked || isLoading;
 
   const onChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
 
     if (name === "tnc") {
       setIsCheked(e.target.checked);
-      console.log(e.target.checked);
     } else {
       setInput((prev) => ({
         ...prev,
@@ -168,6 +168,16 @@ const Form: React.FC = () => {
     const password = target.password.value;
 
     try {
+      setIsLoading(true)
+      toast(`Loading...`, {
+        type: "info",
+        toastId: "load",
+        isLoading: true,
+        position: "top-center",
+        style: {
+          backgroundColor: themeConfiguration?.data.toast_color as string,
+        },
+      });
       const res = await RestPersonalSetPassword({
         payload: {
           tilaka_name,
@@ -177,6 +187,7 @@ const Form: React.FC = () => {
         },
       });
       if (res.success) {
+        toast.dismiss()
         toast.success(res?.message || "berhasil", {
           icon: <CheckOvalIcon />,
         });
@@ -191,15 +202,20 @@ const Form: React.FC = () => {
           query,
         });
       } else {
+        setIsLoading(false)
+        toast.dismiss()
         toast.error(res?.message || "gagal", { icon: <XIcon /> });
       }
     } catch (err: any) {
+      setIsLoading(false)
       if (err.response?.data?.data?.errors?.[0]) {
+        toast.dismiss()
         toast.error(
           `${err.response?.data?.message}, ${err.response?.data?.data?.errors?.[0]}`,
           { icon: <XIcon /> }
         );
       } else {
+        toast.dismiss()
         toast.error(err.response?.data?.message || "gagal", {
           icon: <XIcon />,
         });
@@ -261,6 +277,7 @@ const Form: React.FC = () => {
 
             <input
               onChange={(e) => onChangeHandler(e)}
+              tabIndex={1}
               name="tilakaName"
               autoComplete="off"
               type="text"
@@ -270,7 +287,7 @@ const Form: React.FC = () => {
                   ? "border-error "
                   : "border-borderColor focus:ring"
               }`}
-            />
+              />
             <p className="text-error font-poppins pl-2 pt-2 block text-sm">
               {error.tilakaName}
             </p>
@@ -285,13 +302,14 @@ const Form: React.FC = () => {
             </Label>
             <div className="relative">
               <input
+                tabIndex={2}
                 onChange={(e) => onChangeHandler(e)}
                 name="password"
                 type={type.password}
                 placeholder={t("passwordPlaceholder")}
                 className={`font-poppins py-3 focus:outline-none  placeholder:text-placeholder placeholder:font-light  px-2 rounded-md border  w-full ${
                   error.password
-                    ? "border-error "
+                  ? "border-error "
                     : "border-borderColor focus:ring"
                 }`}
                 autoComplete="off"
@@ -299,7 +317,7 @@ const Form: React.FC = () => {
               <button
                 onClick={(e) => handleShowPwd("password", e)}
                 className="absolute right-3 top-3"
-              >
+                >
                 {type.password === "password" ? <EyeIcon /> : <EyeIconOff />}
               </button>
               <p className="text-error font-poppins pl-2 pt-2 block text-sm">
@@ -317,6 +335,7 @@ const Form: React.FC = () => {
             </Label>
             <div className="relative">
               <input
+                tabIndex={3}
                 onChange={(e) => onChangeHandler(e)}
                 name="confirmPassword"
                 type={type.confirmPassword}
@@ -344,6 +363,7 @@ const Form: React.FC = () => {
           </div>
           <div className="flex flex-row mt-5 gap-1">
             <input
+              tabIndex={4}
               id="tnc"
               name="tnc"
               type="checkbox"

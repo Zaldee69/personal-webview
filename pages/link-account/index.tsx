@@ -79,6 +79,7 @@ const LinkAccount = (props: Props) => {
   const [nikRegistered, nikRegisteredSetter] = useState<boolean>(true);
   const [form, formSetter] = useState<Tform>({ tilaka_name: "", password: "" });
   const [modal, setModal] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false)
   const [modalConsent, setModalConsent] = useState<{
     show: boolean;
     data: { queryWithDynamicRedirectURL: any } | null;
@@ -95,6 +96,16 @@ const LinkAccount = (props: Props) => {
 
   const handleFormOnSubmit = (e: React.SyntheticEvent): void => {
     e.preventDefault();
+    setIsLoading(true)
+    toast(`Loading...`, {
+      type: "info",
+      toastId: "load",
+      isLoading: true,
+      position: "top-center",
+      style: {
+        backgroundColor: themeConfiguration?.data.toast_color as string,
+      },
+    });
 
     const target = e.target as typeof e.target & {
       tilaka_name: { value: Tform["tilaka_name"] };
@@ -112,7 +123,7 @@ const LinkAccount = (props: Props) => {
         request_id,
         ...restRouterQuery,
       } as TLoginProps)
-    );
+    ).then((res) => console.log(res.payload));
   };
 
   useEffect(() => {
@@ -129,10 +140,12 @@ const LinkAccount = (props: Props) => {
         "token",
         data.data.data[0] as string,
         getExpFromToken(data.data.data[0]) as number
-      );
-
-      // penautan and penautan_consent will redirected to /linking/* result page
-      if (signing === "1" || setting === "1") {
+        );
+        
+        // penautan and penautan_consent will redirected to /linking/* result page
+        if (signing === "1" || setting === "1") {
+        toast.dismiss("load")
+        setIsLoading(false)
         getCertificateList({ params: "" as string }).then((res) => {
           const certif = JSON.parse(res.data);
           if (certif[0].status == "Aktif") {
@@ -176,6 +189,8 @@ const LinkAccount = (props: Props) => {
           }
         });
       } else {
+        toast.dismiss("load")
+        setIsLoading(false)
         if (data.data.data[2] === "penautan") {
           setModal(true);
         } else if (data.data.data[2] === "penautan_consent") {
@@ -191,6 +206,7 @@ const LinkAccount = (props: Props) => {
         }
       }
     } else if (data.status === "FULLFILLED" && !data.data.success) {
+      setIsLoading(false)
       if (
         data.data.message ===
           `Invalid Username / Password for Tilaka Name ${form?.tilaka_name}` ||
@@ -230,6 +246,7 @@ const LinkAccount = (props: Props) => {
       data.status === "REJECTED" ||
       (data.status === "FULLFILLED" && !data.data.success)
     ) {
+      toast.dismiss()
       router.replace({
         pathname: handleRoute("link-account/failure"),
         query: {
@@ -387,7 +404,7 @@ const LinkAccount = (props: Props) => {
           </div>
           <Button
             type="submit"
-            disabled={!form.tilaka_name || !form.password}
+            disabled={!form.tilaka_name || !form.password || isLoading}
             size="none"
             className="mt-8 p-2.5 uppercase text-base font-medium block mx-auto"
             style={{
