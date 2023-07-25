@@ -79,6 +79,8 @@ const Index = () => {
     fileFotoSelfieRef: useRef<HTMLInputElement>(null),
   });
 
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
   const resolutionChecker = (file: File | undefined) => {
     return new Promise((resolve) => {
       const img: HTMLImageElement = document.createElement("img");
@@ -177,6 +179,7 @@ const Index = () => {
 
   const onsubmitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
     setErrorMessage({
       ...errorMessage,
       photo_ktp: inputValidator.requiredInput(
@@ -208,13 +211,27 @@ const Index = () => {
 
     if (isFormEmpty || !isErrorMessageEmpty) return;
 
+    toast(`Loading...`, {
+      type: "info",
+      toastId: "load",
+      isLoading: true,
+      position: "top-center",
+      style: {
+        backgroundColor: themeConfiguration?.data.toast_color as string,
+      },
+    });
+
     try {
+
+      setIsLoading(true);
       const formReq: TPersonalPManualRegRequestData = {
         ...form,
         register_id: request_id as string,
       };
       const res = await RestPersonalPManualReg(formReq);
       if (!res.success) {
+        setIsLoading(false);
+        toast.dismiss();
         return toast.error(res.message || "gagal", { icon: <XIcon /> });
       }
 
@@ -225,17 +242,21 @@ const Index = () => {
       };
 
       if (res.channel_type === "REGULAR") {
+        toast.dismiss();
         router.push({
           pathname: handleRoute("manual-form/final"),
           query,
         });
       } else {
+        toast.dismiss();
         router.push({
           pathname: handleRoute("manual-form/on-process"),
           query: { ...router.query },
         });
       }
     } catch (err: any) {
+      setIsLoading(false);
+      toast.dismiss();
       if (err.response?.data?.data?.errors?.[0]) {
         toast.error(
           `${err.response?.data?.message}, ${err.response?.data?.data?.errors?.[0]}`,
@@ -328,10 +349,10 @@ const Index = () => {
             inputRef={fileFotoSelfieRef}
             showMaxResolution
           />
-         
+
           <Button
             type="submit"
-            disabled={errorMessage.nik.length > 1}
+            disabled={errorMessage.nik.length > 1 || isLoading}
             size="sm"
             className="bg-primary btn font-semibold mt-7 h-9 hover:opacity-50"
             style={{
@@ -373,45 +394,44 @@ const PhotoKtpTermModal = ({ show, fileFotoKtpRef }: TModal) => {
           {t("manualForm.photoKtp.termTitle")}
         </Heading>
         <div className="flex justify-center gap-12">
-            <div>
-              <div
-                className="bg-contain w-32 mx-auto mt-5 h-32 bg-center bg-no-repeat"
-                style={{
-                  backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
-                    themeConfiguration.data
-                      .asset_manual_form_ektp_ok as string,
-                    "ASSET",
-                    `${assetPrefix}/images/ktp.png`
-                  )})`,
-                }}
-              ></div>
-              <div
-                className="bg-contain w-10 mx-auto mt-5 h-10 bg-center bg-no-repeat"
-                style={{
-                  backgroundImage: `url(${assetPrefix}/images/Right.svg)`,
-                }}
-              ></div>
-            </div>
-            <div>
-              <div
-                className="bg-contain w-32 mx-auto mt-5 h-32 bg-center bg-no-repeat"
-                style={{
-                  backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
-                    themeConfiguration.data
-                      .asset_manual_form_ektp_not_ok as string,
-                    "ASSET",
-                    `${assetPrefix}/images/wrong-ktp.png`
-                  )})`,
-                }}
-              ></div>
-              <div
-                className="bg-contain w-10 mx-auto mt-5 h-10 bg-center bg-no-repeat"
-                style={{
-                  backgroundImage: `url(${assetPrefix}/images/Wrong.svg)`,
-                }}
-              ></div>
-              </div>
+          <div>
+            <div
+              className="bg-contain w-32 mx-auto mt-5 h-32 bg-center bg-no-repeat"
+              style={{
+                backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
+                  themeConfiguration.data.asset_manual_form_ektp_ok as string,
+                  "ASSET",
+                  `${assetPrefix}/images/ktp.png`
+                )})`,
+              }}
+            ></div>
+            <div
+              className="bg-contain w-10 mx-auto mt-5 h-10 bg-center bg-no-repeat"
+              style={{
+                backgroundImage: `url(${assetPrefix}/images/Right.svg)`,
+              }}
+            ></div>
           </div>
+          <div>
+            <div
+              className="bg-contain w-32 mx-auto mt-5 h-32 bg-center bg-no-repeat"
+              style={{
+                backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
+                  themeConfiguration.data
+                    .asset_manual_form_ektp_not_ok as string,
+                  "ASSET",
+                  `${assetPrefix}/images/wrong-ktp.png`
+                )})`,
+              }}
+            ></div>
+            <div
+              className="bg-contain w-10 mx-auto mt-5 h-10 bg-center bg-no-repeat"
+              style={{
+                backgroundImage: `url(${assetPrefix}/images/Wrong.svg)`,
+              }}
+            ></div>
+          </div>
+        </div>
         <ul className="px-5 mt-10" style={{ listStyle: "initial" }}>
           <li>
             <Paragraph>{t("manualForm.photoKtp.term1")}</Paragraph>
@@ -501,7 +521,7 @@ const PhotoSelfieTermModal = ({ show, fileFotoSelfieRef }: TModal) => {
                   backgroundImage: `url(${assetPrefix}/images/Wrong.svg)`,
                 }}
               ></div>
-              </div>
+            </div>
           </div>
           <ul
             className="px-5 mt-10 text-sm md:text-base list-disc"

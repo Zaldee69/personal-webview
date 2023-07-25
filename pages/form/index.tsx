@@ -48,6 +48,8 @@ const Form: React.FC = () => {
     tilakaName: "",
   });
 
+  const[isLoading, setIsLoading] = useState<boolean>(false)
+
   const [error, setError] = useState<ErrorType>({
     password: "",
     confirmPassword: "",
@@ -71,7 +73,7 @@ const Form: React.FC = () => {
     error.tilakaName ||
     error.confirmPassword ||
     error.password ||
-    !isChecked;
+    !isChecked || isLoading;
 
   const onChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -160,7 +162,16 @@ const Form: React.FC = () => {
   };
   const onSubmitHandler = (e: React.SyntheticEvent) => {
     e.preventDefault();
-
+    setIsLoading(true)
+    toast(`Loading...`, {
+      type: "info",
+      toastId: "load",
+      isLoading: true,
+      position: "top-center",
+      style: {
+        backgroundColor: themeConfiguration?.data.toast_color as string,
+      },
+    });
     const target = e.target as typeof e.target & {
       tilakaName: { value: string };
       password: { value: string };
@@ -172,8 +183,9 @@ const Form: React.FC = () => {
       payload: { tilakaName, password, registerId: request_id as string },
     })
       .then((res) => {
+        setIsLoading(false)
         if (res.success) {
-          toast.dismiss("kycCheckStepRequestToast");
+          toast.dismiss();
           toast.success(res?.message || "berhasil", {
             icon: <CheckOvalIcon />,
           });
@@ -199,12 +211,13 @@ const Form: React.FC = () => {
             query,
           });
         } else {
-          toast.dismiss("kycCheckStepRequestToast");
+          toast.dismiss();
           toast.error(res?.message || "gagal", { icon: <XIcon /> });
         }
       })
       .catch((err) => {
-        toast.dismiss("kycCheckStepRequestToast");
+        toast.dismiss();
+        setIsLoading(false)
         if (err.response?.data?.data?.errors?.[0]) {
           toast.error(
             `${err.response?.data?.message}, ${err.response?.data?.data?.errors?.[0]}`,
@@ -225,7 +238,7 @@ const Form: React.FC = () => {
       .then((res) => {
         if (res.success) {
           if (res.data.status === "D") {
-            toast.dismiss("kycCheckStepRequestToast");
+            toast.dismiss();
             toast.success(res?.message || "pengecekan step berhasil", {
               icon: <CheckOvalIcon />,
             });
@@ -237,7 +250,7 @@ const Form: React.FC = () => {
               });
             }
           } else if (res.data.status === "F") {
-            toast.dismiss("kycCheckStepRequestToast");
+            toast.dismiss();
             toast.error(
               res?.message ||
                 "pengecekan step berhasil, tetapi proses ekyc bermasalah",
@@ -274,7 +287,7 @@ const Form: React.FC = () => {
               });
             }
           } else if (res.data.status === "S" || res.data.status === "E") {
-            toast.dismiss("kycCheckStepRequestToast");
+            toast.dismiss();
             const params: any = {
               uuid: request_id,
               status: res.data.status,
@@ -296,26 +309,26 @@ const Form: React.FC = () => {
               });
             }
           } else if (res.data.status === "B") {
-            toast.dismiss("kycCheckStepRequestToast");
+            toast.dismiss();
             router.push({
               pathname: handleRoute("guide"),
               query: { ...restRouterQuery, request_id },
             });
           } else {
-            toast.dismiss("kycCheckStepRequestToast");
+            toast.dismiss();
             toast.success(res?.message || "pengecekan step berhasil", {
               icon: <CheckOvalIcon />,
             });
           }
         } else {
-          toast.dismiss("kycCheckStepRequestToast");
+          toast.dismiss();
           toast.error(res?.message || "pengecekan step tidak sukses", {
             icon: <XIcon />,
           });
         }
       })
       .catch((err) => {
-        toast.dismiss("kycCheckStepRequestToast");
+        toast.dismiss();
         if (err.response?.data?.data?.errors?.[0]) {
           toast.error(err.response?.data?.data?.errors?.[0], {
             icon: <XIcon />,
@@ -379,6 +392,7 @@ const Form: React.FC = () => {
             </div>
 
             <input
+              tabIndex={1}
               onChange={(e) => onChangeHandler(e)}
               name="tilakaName"
               autoComplete="off"
@@ -398,6 +412,7 @@ const Form: React.FC = () => {
             </Label>
             <div className="relative">
               <input
+                tabIndex={3}
                 onChange={(e) => onChangeHandler(e)}
                 name="password"
                 type={type.password}
@@ -412,6 +427,7 @@ const Form: React.FC = () => {
               <button
                 onClick={(e) => handleShowPwd("password", e)}
                 className="absolute right-3 top-3"
+                type="button"
               >
                 {type.password === "password" ? <EyeIcon /> : <EyeIconOff />}
               </button>
@@ -424,6 +440,7 @@ const Form: React.FC = () => {
             </Label>
             <div className="relative">
               <input
+                tabIndex={3}
                 onChange={(e) => onChangeHandler(e)}
                 name="confirmPassword"
                 type={type.confirmPassword}
@@ -437,6 +454,7 @@ const Form: React.FC = () => {
               <button
                 onClick={(e) => handleShowPwd("confirmPassword", e)}
                 className="absolute right-3 top-3"
+                type="button"
               >
                 {type.confirmPassword === "password" ? (
                   <EyeIcon />
@@ -449,6 +467,7 @@ const Form: React.FC = () => {
           </div>
           <div className="flex flex-row mt-5">
             <input
+              tabIndex={4}
               id="tnc"
               name="tnc"
               type="checkbox"
