@@ -144,7 +144,6 @@ const LinkAccount = (props: Props) => {
         // penautan and penautan_consent will redirected to /linking/* result page
         if (signing === "1" || setting === "1") {
         toast.dismiss("load")
-        setIsLoading(false)
         getCertificateList({ params: "" as string }).then((res) => {
           const certif = JSON.parse(res.data);
           if (certif[0].status == "Aktif") {
@@ -173,6 +172,7 @@ const LinkAccount = (props: Props) => {
               }
             });
           } else if (certif[0].status == "Enroll") {
+            setIsLoading(false)
             toast.dismiss();
             toast.warning(
               "Penerbitan sertifikat dalam proses, cek email Anda untuk informasi sertifikat"
@@ -189,7 +189,6 @@ const LinkAccount = (props: Props) => {
         });
       } else {
         toast.dismiss("load")
-        setIsLoading(false)
         if (data.data.data[2] === "penautan") {
           setModal(true);
         } else if (data.data.data[2] === "penautan_consent") {
@@ -208,11 +207,12 @@ const LinkAccount = (props: Props) => {
       setIsLoading(false)
       if (
         data.data.message ===
-          `Invalid Username / Password for Tilaka Name ${form?.tilaka_name}` ||
+        `Invalid Username / Password for Tilaka Name ${form?.tilaka_name}` ||
         data.data.message === "User Not Found" ||
         data.data.message === "NIK Not Equals ON Tilaka System" ||
         data.data.message === "Error, tilaka Name not valid"
-      ) {
+        ) {
+        setIsLoading(false)
         toast.dismiss();
         toast.error(t("invalidUsernamePassword"));
       } else if (data.data.message === "Sudah melakukan penautan") {
@@ -238,6 +238,7 @@ const LinkAccount = (props: Props) => {
         data.data.message ===
         "Penerbitan sertifikat dalam proses, cek email Anda untuk informasi sertifikat"
       ) {
+        setIsLoading(false)
         toast.dismiss();
         toast.warning(data.data.message);
       }
