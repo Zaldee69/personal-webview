@@ -183,7 +183,6 @@ const Form: React.FC = () => {
       payload: { tilakaName, password, registerId: request_id as string },
     })
       .then((res) => {
-        setIsLoading(false)
         if (res.success) {
           toast.dismiss();
           toast.success(res?.message || "berhasil", {
