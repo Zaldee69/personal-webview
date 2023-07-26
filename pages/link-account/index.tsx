@@ -122,8 +122,7 @@ const LinkAccount = (props: Props) => {
         tilaka_name,
         request_id,
         ...restRouterQuery,
-      } as TLoginProps)
-    ).then((res) => console.log(res.payload));
+      } as TLoginProps));
   };
 
   useEffect(() => {
@@ -132,7 +131,7 @@ const LinkAccount = (props: Props) => {
       let queryWithDynamicRedirectURL = {
         ...router.query,
       };
-      if (data.data.message.length > 0) {
+      if (data.data.message.length > 0 && setting === "1") {
         queryWithDynamicRedirectURL["redirect_url"] = data.data.message;
       }
       localStorage.setItem("refresh_token", data.data.data[1] as string);

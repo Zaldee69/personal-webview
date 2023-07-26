@@ -169,9 +169,6 @@ const Login = ({}: IPropsLogin) => {
     if (data) {
       setDoInAuto(false);
 
-      if (data.data.message.length > 0) {
-        queryWithDynamicRedirectURL["redirect_url"] = data.data.message;
-      }
     }
 
     getCertificateList({
