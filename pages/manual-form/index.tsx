@@ -222,7 +222,6 @@ const Index = () => {
     });
 
     try {
-
       setIsLoading(true);
       const formReq: TPersonalPManualRegRequestData = {
         ...form,

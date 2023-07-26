@@ -205,13 +205,14 @@ const Form: React.FC = () => {
               });
             }
           }
-
+          
           router.replace({
             pathname: handleRoute("form/success"),
             query,
           });
         } else {
           toast.dismiss();
+          setIsLoading(false)
           toast.error(res?.message || "gagal", { icon: <XIcon /> });
         }
       })
