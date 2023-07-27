@@ -54,6 +54,7 @@ type IModal = {
   modal: boolean;
   setModal: React.Dispatch<React.SetStateAction<boolean>>;
   formSetter: React.Dispatch<React.SetStateAction<Tform>>;
+  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
   tilakaName: string;
 };
 
@@ -62,6 +63,7 @@ type IModalConsent = {
     show: boolean;
     data: { queryWithDynamicRedirectURL: any } | null;
   };
+  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
   setModalConsent: React.Dispatch<
     React.SetStateAction<{
       show: boolean;
@@ -79,7 +81,7 @@ const LinkAccount = (props: Props) => {
   const [nikRegistered, nikRegisteredSetter] = useState<boolean>(true);
   const [form, formSetter] = useState<Tform>({ tilaka_name: "", password: "" });
   const [modal, setModal] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [modalConsent, setModalConsent] = useState<{
     show: boolean;
     data: { queryWithDynamicRedirectURL: any } | null;
@@ -139,10 +141,10 @@ const LinkAccount = (props: Props) => {
         "token",
         data.data.data[0] as string,
         getExpFromToken(data.data.data[0]) as number
-        );
-        
-        // penautan and penautan_consent will redirected to /linking/* result page
-        if (signing === "1" || setting === "1") {
+      );
+
+      // penautan and penautan_consent will redirected to /linking/* result page
+      if (signing === "1" || setting === "1") {
         toast.dismiss("load")
         getCertificateList({ params: "" as string }).then((res) => {
           const certif = JSON.parse(res.data);
@@ -207,11 +209,11 @@ const LinkAccount = (props: Props) => {
       setIsLoading(false)
       if (
         data.data.message ===
-        `Invalid Username / Password for Tilaka Name ${form?.tilaka_name}` ||
+          `Invalid Username / Password for Tilaka Name ${form?.tilaka_name}` ||
         data.data.message === "User Not Found" ||
         data.data.message === "NIK Not Equals ON Tilaka System" ||
         data.data.message === "Error, tilaka Name not valid"
-        ) {
+      ) {
         setIsLoading(false)
         toast.dismiss();
         toast.error(t("invalidUsernamePassword"));
@@ -423,18 +425,26 @@ const LinkAccount = (props: Props) => {
         tilakaName={form.tilaka_name}
         modal={modal}
         setModal={setModal}
+        setIsLoading={setIsLoading}
       />
       <ModalConsent
         formSetter={formSetter}
         tilakaName={form.tilaka_name}
         modalConsent={modalConsent}
         setModalConsent={setModalConsent}
+        setIsLoading={setIsLoading}
       />
     </div>
   );
 };
 
-const FRModal = ({ modal, setModal, tilakaName, formSetter }: IModal) => {
+const FRModal = ({
+  modal,
+  setModal,
+  tilakaName,
+  formSetter,
+  setIsLoading,
+}: IModal) => {
   const [isFRSuccess, setIsFRSuccess] = useState<boolean>(false);
   const controller = new AbortController();
 
@@ -526,6 +536,7 @@ const FRModal = ({ modal, setModal, tilakaName, formSetter }: IModal) => {
           <Button
             onClick={() => {
               controller.abort();
+              setIsLoading(false)
               toast.dismiss("info");
               restLogout({});
               setModal(!modal);
@@ -555,6 +566,7 @@ const ModalConsent = ({
   setModalConsent,
   tilakaName,
   formSetter,
+  setIsLoading,
 }: IModalConsent) => {
   const controller = new AbortController();
   const router = useRouter();
@@ -832,6 +844,7 @@ const ModalConsent = ({
     // call api
     // redirect with status=F&reason=reject by user pada redirect url
     // not call api, logout enough
+    setIsLoading(false);
     controller.abort();
     toast.dismiss("info");
     restLogout({});
