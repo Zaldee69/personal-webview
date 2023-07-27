@@ -284,7 +284,7 @@ const Liveness = () => {
               routerQuery.redirect_url
             ) {
               const params: TQueryParams & { register_id?: string } = {
-                status: res.data.status as string,
+                status: "S",
                 register_id: routerQuery.request_id as string,
                 reason_code: res.data.reason_code as string,
               };
