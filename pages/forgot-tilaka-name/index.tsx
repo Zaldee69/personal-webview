@@ -133,7 +133,7 @@ const ForgotTilakaName = (props: Props) => {
           ></div>
 
           <div className="flex justify-center" style={{ minHeight: "180px" }}>
-            {reCaptchaSuccess ? (
+            {!reCaptchaSuccess ? (
               <div className="w-full">
                 <form onSubmit={handleFormOnSubmit}>
                   <label className="block mt-4">
@@ -160,7 +160,7 @@ const ForgotTilakaName = (props: Props) => {
                     className="mt-32  mb-5 h-10"
                     style={{
                       backgroundColor: themeConfigurationAvaliabilityChecker(
-                        themeConfiguration?.data.button_color as string, "BG"
+                        themeConfiguration?.data.button_color as string
                       ),
                     }}
                   >
