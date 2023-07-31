@@ -123,12 +123,13 @@ export const serverSideRenderReturnConditions = ({
           checkStepResult.res.data.pin_form &&
           cQuery.redirect_url
         ) {
+          const status = checkStepResult.res.data.reason_code === "1" ? "S" : "F"
           return {
             redirect: {
               permanent: false,
               destination: concateRedirectUrlParams(
                 cQuery.redirect_url as string,
-                `status=S%26register_id=${uuid}${
+                `status=${status}%26register_id=${uuid}${
                   checkStepResult.res.data.reason_code
                     ? "%26reason_code=" + checkStepResult.res.data.reason_code
                     : ""
