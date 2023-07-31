@@ -133,7 +133,7 @@ const ForgotTilakaName = (props: Props) => {
           ></div>
 
           <div className="flex justify-center" style={{ minHeight: "180px" }}>
-            {!reCaptchaSuccess ? (
+            {reCaptchaSuccess ? (
               <div className="w-full">
                 <form onSubmit={handleFormOnSubmit}>
                   <label className="block mt-4">
