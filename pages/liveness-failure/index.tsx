@@ -18,6 +18,12 @@ import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfiguratio
 import Heading from "@/components/atoms/Heading";
 import Paragraph from "@/components/atoms/Paraghraph";
 
+interface TQueryParams {
+  status?: string;
+  request_id: string;
+  reason_code?: string;
+}
+
 const LivenessFailure = () => {
   const { t }: any = i18n;
   const router = useRouter();
@@ -27,12 +33,18 @@ const LivenessFailure = () => {
     routerQuery.transaction_id ||
     routerQuery.request_id ||
     routerQuery.registration_id;
-  const params = {
-    status: "F",
-    request_id: uuid,
+  const params: TQueryParams = {
+    request_id: uuid as string,
   };
-  const queryString = new URLSearchParams(params as any).toString();
   const reason_code = routerQuery.reason_code;
+
+  if (reason_code === "3") {
+    params.reason_code = "3";
+  } else {
+    params.status = "F";
+  }
+
+  const queryString = new URLSearchParams(params as any).toString();
   const message =
     reason_code === "1"
       ? t("ekycFailed.errorCode1")
@@ -120,7 +132,7 @@ const LivenessFailure = () => {
                   {t("livenessSuccessButtonTitle")}
                 </span>
               </a>
-            ): null}
+            ) : null}
           </div>
         </div>
         <Footer />
