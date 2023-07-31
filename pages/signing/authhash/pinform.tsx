@@ -178,7 +178,7 @@ const PinFormDedicatedChannel = (props: Props) => {
       <div className="max-w- w-full" style={{ maxWidth: "331px" }}>
         <PinFormComponent
           key="pinFormConfirmKey"
-          title={t("inputPinTitle")}
+          title="PIN"
           subTitle={t("authPinSubtitle")}
           digitLength={digitLength}
           isRandom={isRandom}
