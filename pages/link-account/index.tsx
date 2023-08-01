@@ -227,15 +227,18 @@ const LinkAccount = (props: Props) => {
         );
       } else if (
         data.data.message ===
-        "Saat ini akun Anda terkunci. Silahkan coba login beberapa saat lagi."
+        "Saat ini akun Anda terkunci. Silahkan coba login beberapa menit lagi."
       ) {
-        router.replace({
-          pathname: handleRoute("link-account/failure"),
-          query: {
-            ...router.query,
-            account_locked: "1",
-          },
-        });
+        setIsLoading(true)
+        setTimeout(() => {
+          router.replace({
+            pathname: handleRoute("link-account/failure"),
+            query: {
+              ...router.query,
+              account_locked: "1",
+            },
+          });
+        }, 2500);
       } else if (
         data.data.message ===
         "Penerbitan sertifikat dalam proses, cek email Anda untuk informasi sertifikat"
