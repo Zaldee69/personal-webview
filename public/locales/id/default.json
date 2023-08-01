@@ -194,7 +194,7 @@
   "consentDisagree": "Tidak Setuju",
   "consentLinkAccountFailedSubtitleRejectByUser": "Anda tidak setuju untuk melakukan penautan akun.",
   "manualForm": {
-    "title": "Verifikasi Manual",
+    "title": "Registrasi Manual",
     "nik": {
       "label": "NIK",
       "placeholder": "Masukkan nomor e-KTP",
