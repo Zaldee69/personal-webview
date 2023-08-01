@@ -14,7 +14,7 @@ import Footer from "@/components/Footer";
 import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/app/store";
-import Paragraph from "@/components/atoms/Paraghraph";
+import i18n from "i18";
 import Heading from "@/components/atoms/Heading";
 import Label from "@/components/atoms/Label";
 
@@ -43,6 +43,8 @@ const LinkAccount = (props: Props) => {
     password: "",
     confirm_password: "",
   });
+
+  const { t }: any = i18n;
 
   const themeConfiguration = useSelector((state: RootState) => state.theme);
 
@@ -164,24 +166,25 @@ const LinkAccount = (props: Props) => {
       }}
     >
       <Head>
-        <title>Pengaturan Ulang Kata Sandi</title>
+        <title>{t("resetPassword.title")}</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
       <div className="px-5 py-9 max-w-md mx-auto min-h-screen flex flex-col justify-between">
         <div>
-          <Heading>Pengaturan Ulang Kata Sandi</Heading>
+          <Heading>{t("resetPassword.title")}</Heading>
           <form onSubmit={handleFormOnSubmit}>
             <label className="block mt-11">
               <div className="flex justify-start items-center">
                 <Label size="base" htmlFor="password" className="pl-2.5">
-                  Kata Sandi Baru
+                  {t("resetPassword.newPasswordLabel")}
                 </Label>
               </div>
               <div className="mt-1 relative">
                 <input
                   type={showPassword ? "text" : "password"}
+                  tabIndex={1}
                   name="password"
-                  placeholder="Masukkan Kata Sandi Baru"
+                  placeholder={t("resetPassword.newPasswordPlaceholder")}
                   value={form.password}
                   onChange={handleFormOnChange}
                   className="px-2.5 py-3 w-full focus:outline-none text-sm text-neutral800 font-poppins border border-neutral40 rounded-md"
@@ -207,14 +210,15 @@ const LinkAccount = (props: Props) => {
                   htmlFor="confirm_password"
                   className="pl-2.5"
                 >
-                  Konfirmasi Kata Sandi Baru
+                  {t("resetPassword.confirmNewPasswordLabel")}
                 </Label>
               </div>
               <div className="mt-1 relative">
                 <input
                   type={showConfirmPassword ? "text" : "password"}
+                  tabIndex={2}
                   name="confirm_password"
-                  placeholder="Masukkan Konfirmasi Kata Sandi Baru"
+                  placeholder={t("resetPassword.confirmNewPasswordPlaceholder")}
                   value={form.confirm_password}
                   onChange={handleFormOnChange}
                   className="px-2.5 py-3 w-full focus:outline-none text-sm text-neutral800 font-poppins border border-neutral40 rounded-md"
@@ -237,14 +241,14 @@ const LinkAccount = (props: Props) => {
               type="submit"
               size="none"
               disabled={submitShouldDisabled}
-              className="mt-7 py-2.5 px-5 text-base fit-content"
+              className="mt-7 py-2.5 px-5 text-base fit-content uppercase"
               style={{
                 backgroundColor: themeConfigurationAvaliabilityChecker(
                   themeConfiguration?.data.button_color as string
                 ),
               }}
             >
-              BUAT KATA SANDI BARU
+              {t("resetPassword.submitButton")}
             </Button>
           </form>
         </div>

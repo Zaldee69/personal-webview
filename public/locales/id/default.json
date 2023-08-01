@@ -272,5 +272,13 @@
       "title": "Konfirmasi Perubahan Metode Otentikasi",
       "FRSubtitle": "Apa Anda yakin mengubah metode otentikasi menjadi Face Recognition"
     } 
+  },
+  "resetPassword": {
+    "title": "Pengaturan Ulang Kata Sandi",
+    "newPasswordLabel": "Kata Sandi Baru",
+    "newPasswordPlaceholder": "Masukkan Kata Sandi Baru",
+    "confirmNewPasswordLabel": "Konfirmasi Kata Sandi Baru",
+    "confirmNewPasswordPlaceholder": "Masukkan Konfirmasi Kata Sandi Baru",
+    "submitButton": "Buat Kata Sandi Baru"
   }
 }
