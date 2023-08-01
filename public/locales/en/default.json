@@ -194,7 +194,7 @@
   "consentDisagree": "Disagree",
   "consentLinkAccountFailedSubtitleRejectByUser": "You do not agree to link accounts",
   "manualForm": {
-    "title": "Manual Verification",
+    "title": "Manual Registration",
     "nik": {
       "label": "nik",
       "placeholder": "Input NIK",
