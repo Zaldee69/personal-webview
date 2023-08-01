@@ -227,9 +227,11 @@ const LinkAccount = (props: Props) => {
         );
       } else if (
         data.data.message ===
-        "Saat ini akun Anda terkunci. Silahkan coba login beberapa menit lagi."
+        "Saat ini akun Anda terkunci. Silahkan coba login beberapa saat lagi."
       ) {
         setIsLoading(true)
+        toast.dismiss();
+        toast.error("Saat ini akun Anda terkunci. Silahkan coba login beberapa menit lagi.");
         setTimeout(() => {
           router.replace({
             pathname: handleRoute("link-account/failure"),
