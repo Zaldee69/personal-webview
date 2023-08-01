@@ -273,5 +273,13 @@
       "title": "Change Authentication Method",
       "FRSubtitle": "Are you sure to set authentication method to Face Recognition?"
     } 
+  },
+  "resetPassword": {
+    "title": "Reset Password",
+    "newPasswordLabel": "New Password",
+    "newPasswordPlaceholder": "New Password",
+    "confirmNewPasswordLabel": "Confirm New Password",
+    "confirmNewPasswordPlaceholder": "Confirm New Password",
+    "submitButton": "Submit"
   }
 }
