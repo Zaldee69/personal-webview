@@ -30,6 +30,12 @@ const SettingMFASuccess = (props: Props) => {
   } = router.query;
   const isSigning: boolean = routerQuery.signing === "1";
 
+  const params = {
+    tilaka_name: router.query.tilaka_name
+  }
+
+  const queryString = new URLSearchParams(params as any).toString();
+
   const themeConfiguration = useSelector((state: RootState) => state.theme);
 
   const { t }: any = i18n;
@@ -81,7 +87,7 @@ const SettingMFASuccess = (props: Props) => {
             size: "none",
             className: "font-medium mt-20",
           })}
-          href={concateRedirectUrlParams(routerQuery.redirect_url, `tilaka_name=${routerQuery.tilaka_name as string}`)}
+          href={concateRedirectUrlParams(routerQuery.redirect_url, queryString)}
         >
           <p>{t("settingSignatureSuccessButton")}</p>
         </a>
