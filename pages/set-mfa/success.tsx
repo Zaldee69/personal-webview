@@ -97,38 +97,4 @@ const SettingMFASuccess = (props: Props) => {
   );
 };
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  const cQuery = context.query;
-  const isNotRedirect: boolean = true;
-  const uuid =
-    cQuery.transaction_id || cQuery.request_id || cQuery.registration_id;
-
-  const checkStepResult: {
-    res?: TKycCheckStepResponseData;
-    err?: {
-      response: {
-        data: {
-          success: boolean;
-          message: string;
-          data: { errors: string[] };
-        };
-      };
-    };
-  } = await RestKycCheckStep({
-    payload: { registerId: uuid as string },
-  })
-    .then((res) => {
-      return { res };
-    })
-    .catch((err) => {
-      return { err };
-    });
-
-  return serverSideRenderReturnConditions({
-    context,
-    checkStepResult,
-    isNotRedirect,
-  });
-};
-
 export default SettingMFASuccess;

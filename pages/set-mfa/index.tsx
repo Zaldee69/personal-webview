@@ -78,7 +78,7 @@ const SetMfa = () => {
             });
             setTimeout(() => {
               router.replace({
-                pathname: handleRoute("link-account/success"),
+                pathname: handleRoute("set-mfa/success"),
                 query: { ...router.query },
               });
             }, 2500);
@@ -317,7 +317,7 @@ const FRModal = ({ isShowModalFr, setShowModalFr, geTypeMfa,setIsDisabled }: IMo
             geTypeMfa();
             setTimeout(() => {
               router.replace({
-                pathname: handleRoute("link-account/success"),
+                pathname: handleRoute("set-mfa/success"),
                 query: { ...router.query },
               });
             }, 2500);
