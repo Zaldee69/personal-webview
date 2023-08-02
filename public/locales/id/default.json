@@ -275,11 +275,11 @@
     } 
   },
   "resetPassword": {
-    "title": "Pengaturan Ulang Kata Sandi",
+    "title": "Ganti kata Sandi",
     "newPasswordLabel": "Kata Sandi Baru",
-    "newPasswordPlaceholder": "Masukkan Kata Sandi Baru",
+    "newPasswordPlaceholder": "Kata Sandi Baru",
     "confirmNewPasswordLabel": "Konfirmasi Kata Sandi Baru",
-    "confirmNewPasswordPlaceholder": "Masukkan Konfirmasi Kata Sandi Baru",
-    "submitButton": "Buat Kata Sandi Baru"
+    "confirmNewPasswordPlaceholder": "Konfirmasi Kata Sandi Baru",
+    "submitButton": "Kirim"
   }
 }

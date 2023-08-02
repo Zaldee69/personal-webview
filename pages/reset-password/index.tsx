@@ -241,7 +241,7 @@ const LinkAccount = (props: Props) => {
               type="submit"
               size="none"
               disabled={submitShouldDisabled}
-              className="mt-7 py-2.5 px-5 text-base fit-content uppercase"
+              className="mt-7 py-2.5 px-5 text-base fit-content"
               style={{
                 backgroundColor: themeConfigurationAvaliabilityChecker(
                   themeConfiguration?.data.button_color as string
