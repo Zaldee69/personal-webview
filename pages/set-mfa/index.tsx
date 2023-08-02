@@ -308,6 +308,12 @@ const FRModal = ({ isShowModalFr, setShowModalFr, geTypeMfa }: IModalFR) => {
               toastId: "success",
             });
             geTypeMfa();
+            setTimeout(() => {
+              router.replace({
+                pathname: handleRoute("link-account/success"),
+                query: { ...router.query },
+              });
+            }, 2500);
           });
         } else {
           setIsFRSuccess(false);
