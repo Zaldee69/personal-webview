@@ -24,6 +24,7 @@ import { toast } from "react-toastify";
 type IModalFR = {
   isShowModalFr: boolean;
   setShowModalFr: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsDisabled: React.Dispatch<React.SetStateAction<boolean>>;
   geTypeMfa: () => void;
 };
 
@@ -31,6 +32,7 @@ type IOtpModalConfrimation = {
   isShowOtpModalConfirmation: boolean;
   setIsShowOtpModalConfirmation: React.Dispatch<React.SetStateAction<boolean>>;
   onClickHandler: (clickEventType: "submit" | "confirmation") => void;
+  setIsDisabled: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const SetMfa = () => {
@@ -44,6 +46,7 @@ const SetMfa = () => {
   const [mfaMethod, setMfaMethod] = useState<"fr" | "otp" | null>(null);
   const [defaultMfa, setDefaultMfa] = useState<"fr" | "otp">("fr");
   const [isShowPage, setIsShowpage] = useState<boolean>(false);
+  const [isDisabled, setIsDisabled] = useState<boolean>(false)
 
   const themeConfiguration = useSelector((state: RootState) => state.theme);
 
@@ -67,6 +70,7 @@ const SetMfa = () => {
         })
           .then((res) => {
             setIsShowOtpModalConfirmation(false);
+            setIsDisabled(true)
             geTypeMfa();
             toast("Penggantian MFA berhasil", {
               type: "success",
@@ -239,7 +243,7 @@ const SetMfa = () => {
             </Button>
             <Button
               onClick={() => onClickHandler("confirmation")}
-              disabled={defaultMfa === mfaMethod}
+              disabled={defaultMfa === mfaMethod || isDisabled}
               size="lg"
               className="py-2 mx-0 whitespace-nowrap"
               style={{
@@ -255,11 +259,13 @@ const SetMfa = () => {
             isShowModalFr={isShowModalFr}
             setShowModalFr={setShowModalFr}
             geTypeMfa={geTypeMfa}
+            setIsDisabled={setIsDisabled}
           />
           <OtpModalConfirmation
             isShowOtpModalConfirmation={isShowOtpModalConfirmation}
             setIsShowOtpModalConfirmation={setIsShowOtpModalConfirmation}
             onClickHandler={onClickHandler}
+            setIsDisabled={setIsDisabled}
           />
           <div className="mt-16">
             <Footer />
@@ -270,7 +276,7 @@ const SetMfa = () => {
   );
 };
 
-const FRModal = ({ isShowModalFr, setShowModalFr, geTypeMfa }: IModalFR) => {
+const FRModal = ({ isShowModalFr, setShowModalFr, geTypeMfa,setIsDisabled }: IModalFR) => {
   const { t }: any = i18n;
   const dispatch: AppDispatch = useDispatch();
 
@@ -295,14 +301,15 @@ const FRModal = ({ isShowModalFr, setShowModalFr, geTypeMfa }: IModalFR) => {
     RestPersonalFaceRecognitionV2({ payload })
       .then((res) => {
         if (res.success) {
-          toast.dismiss("info");
-          setIsFRSuccess(true);
-          setShowModalFr(false);
           restSetDefaultMFA({
             payload: {
               mfa_type: "otp",
             },
           }).then((res) => {
+            toast.dismiss("info");
+            setIsFRSuccess(true);
+            setShowModalFr(false);
+            setIsDisabled(true)
             toast("Penggantian MFA berhasil", {
               type: "success",
               toastId: "success",
