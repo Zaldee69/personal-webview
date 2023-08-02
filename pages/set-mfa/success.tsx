@@ -21,7 +21,7 @@ import Heading from "@/components/atoms/Heading";
 
 type Props = {};
 
-const SettingSignatureSuccess = (props: Props) => {
+const SettingMFASuccess = (props: Props) => {
   const router = useRouter();
   const routerIsReady: boolean = router.isReady;
   const routerQuery: NextParsedUrlQuery & {
@@ -58,7 +58,7 @@ const SettingSignatureSuccess = (props: Props) => {
       }}
       className="px-10 pt-16 min-h-screen pb-9 text-center"
     >
-      <Heading>{t("settingSignatureSuccessTitle")}</Heading>
+      <Heading>{t("settingMFASuccessTitle")}</Heading>
       <div
         className="bg-contain w-52 mx-auto h-64 bg-center bg-no-repeat"
         style={{
@@ -125,4 +125,4 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   });
 };
 
-export default SettingSignatureSuccess;
+export default SettingMFASuccess;

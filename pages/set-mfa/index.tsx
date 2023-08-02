@@ -72,6 +72,12 @@ const SetMfa = () => {
               type: "success",
               toastId: "success",
             });
+            setTimeout(() => {
+              router.replace({
+                pathname: handleRoute("link-account/success"),
+                query: { ...router.query },
+              });
+            }, 2500);
           })
           .catch((err) => {
             setIsShowOtpModalConfirmation(false);
@@ -175,95 +181,91 @@ const SetMfa = () => {
                   saat melakukan aktivitas tandatangan digital ataupun aktivitas
                   lainnya di tilaka.id. Silakan pilih metode MFA yang sesuai
                   dengan kenyamanan Anda.
-                  </>
-                )}
-              </p>
-            </div>
-            <div className="mt-6">
-              <label className="flex cursor-pointer items-center">
-                <input
-                  name="mfa_method"
-                  value="fr"
-                  onChange={handleFormOnChange}
-                  checked={mfaMethod === "fr"}
-                  type="radio"
-                  className="appearance-none bg-white w-4 h-4 ring-1 ring-neutral40 border-2 border-neutral40 rounded-full checked:bg-primary checked:ring-primary"
-                />
-                <Paragraph className="ml-2.5">
-                  Face Recognition
-                </Paragraph>
-              </label>
-              <label className="flex cursor-pointer items-center mt-3.5">
-                <input
-                  name="mfa_method"
-                  value="otp"
-                  onChange={handleFormOnChange}
-                  checked={mfaMethod === "otp"}
-                  type="radio"
-                  className="appearance-none bg-white w-4 h-4 ring-1 ring-neutral40 border-2 border-neutral40 rounded-full checked:bg-primary checked:ring-primary"
-                />
-                <Paragraph className="ml-2.5">
-                  OTP via Email
-                </Paragraph>
-              </label>
-              <label className="flex items-center mt-3.5">
-                <input
-                  disabled
-                  name="mfa_method"
-                  value="mfa_method_otp_ponsel"
-                  type="radio"
-                  className="appearance-none w-4 h-4 ring-1 bg-neutral40 ring-neutral50 border-2 border-neutral40 rounded-full checked:bg-primary checked:ring-primary"
-                />
-                <Paragraph className="ml-2.5 poppins-regular">
-                  {t("autheticantionMode3")}{" "}
-                  <span className="text-sm text-white bg-neutral80 px-2 py-1 rounded">
-                  {t("setMFA.notAvaliableFiture")}
-                  </span>
-                </Paragraph>
-              </label>
-            </div>
-            <div className="justify-center flex-col-reverse md:flex-row flex gap-3 md:justify-end mt-10">
-              <Button
-                onClick={() => setMfaMethod(defaultMfa)}
-                className="mx-0"
-                size="none"
-                style={{
-                  color: themeConfigurationAvaliabilityChecker(
-                    themeConfiguration?.data.action_font_color as string
-                  ),
-                }}
-              >
-                {t("cancel")}
-              </Button>
-              <Button
-                onClick={() => onClickHandler("confirmation")}
-                disabled={defaultMfa === mfaMethod}
-                size="lg"
-                className="py-2 mx-0 whitespace-nowrap"
-                style={{
-                  backgroundColor: themeConfigurationAvaliabilityChecker(
-                    themeConfiguration?.data.button_color as string
-                  ),
-                }}
-              >
-                {t("setMFA.submitBtn")}
-              </Button>
-            </div>
-            <FRModal
-              isShowModalFr={isShowModalFr}
-              setShowModalFr={setShowModalFr}
-              geTypeMfa={geTypeMfa}
-            />
-            <OtpModalConfirmation
-              isShowOtpModalConfirmation={isShowOtpModalConfirmation}
-              setIsShowOtpModalConfirmation={setIsShowOtpModalConfirmation}
-              onClickHandler={onClickHandler}
-            />
-          <div className="mt-16">
-              <Footer />
+                </>
+              )}
+            </p>
           </div>
+          <div className="mt-6">
+            <label className="flex cursor-pointer items-center">
+              <input
+                name="mfa_method"
+                value="fr"
+                onChange={handleFormOnChange}
+                checked={mfaMethod === "fr"}
+                type="radio"
+                className="appearance-none bg-white w-4 h-4 ring-1 ring-neutral40 border-2 border-neutral40 rounded-full checked:bg-primary checked:ring-primary"
+              />
+              <Paragraph className="ml-2.5">Face Recognition</Paragraph>
+            </label>
+            <label className="flex cursor-pointer items-center mt-3.5">
+              <input
+                name="mfa_method"
+                value="otp"
+                onChange={handleFormOnChange}
+                checked={mfaMethod === "otp"}
+                type="radio"
+                className="appearance-none bg-white w-4 h-4 ring-1 ring-neutral40 border-2 border-neutral40 rounded-full checked:bg-primary checked:ring-primary"
+              />
+              <Paragraph className="ml-2.5">OTP via Email</Paragraph>
+            </label>
+            <label className="flex items-center mt-3.5">
+              <input
+                disabled
+                name="mfa_method"
+                value="mfa_method_otp_ponsel"
+                type="radio"
+                className="appearance-none w-4 h-4 ring-1 bg-neutral40 ring-neutral50 border-2 border-neutral40 rounded-full checked:bg-primary checked:ring-primary"
+              />
+              <Paragraph className="ml-2.5 poppins-regular">
+                {t("autheticantionMode3")}{" "}
+                <span className="text-sm text-white bg-neutral80 px-2 py-1 rounded">
+                  {t("setMFA.notAvaliableFiture")}
+                </span>
+              </Paragraph>
+            </label>
+          </div>
+          <div className="justify-center flex-col-reverse md:flex-row flex gap-3 md:justify-end mt-10">
+            <Button
+              onClick={() => setMfaMethod(defaultMfa)}
+              className="mx-0"
+              size="none"
+              style={{
+                color: themeConfigurationAvaliabilityChecker(
+                  themeConfiguration?.data.action_font_color as string
+                ),
+              }}
+            >
+              {t("cancel")}
+            </Button>
+            <Button
+              onClick={() => onClickHandler("confirmation")}
+              disabled={defaultMfa === mfaMethod}
+              size="lg"
+              className="py-2 mx-0 whitespace-nowrap"
+              style={{
+                backgroundColor: themeConfigurationAvaliabilityChecker(
+                  themeConfiguration?.data.button_color as string
+                ),
+              }}
+            >
+              {t("setMFA.submitBtn")}
+            </Button>
+          </div>
+          <FRModal
+            isShowModalFr={isShowModalFr}
+            setShowModalFr={setShowModalFr}
+            geTypeMfa={geTypeMfa}
+          />
+          <OtpModalConfirmation
+            isShowOtpModalConfirmation={isShowOtpModalConfirmation}
+            setIsShowOtpModalConfirmation={setIsShowOtpModalConfirmation}
+            onClickHandler={onClickHandler}
+          />
+          <div className="mt-16">
+            <Footer />
           </div>
         </div>
+      </div>
     )
   );
 };
@@ -350,7 +352,7 @@ const FRModal = ({ isShowModalFr, setShowModalFr, geTypeMfa }: IModalFR) => {
       <div className="bg-white mt-20 max-w-sm pt-5 px-2 pb-3 rounded-xl w-full mx-5 ">
         <>
           <p className="poppins-regular block text-center font-semibold ">
-          {t("setMFA.modal.title")}
+            {t("setMFA.modal.title")}
           </p>
           <FRCamera
             setModal={setShowModalFr}
@@ -392,10 +394,10 @@ const OtpModalConfirmation = ({
         <div className="px-5 py-5 flex justify-start gap-5 items-start">
           <div>
             <p className="poppins-regular block text-center font-semibold ">
-            {t("setMFA.modal.title")}
+              {t("setMFA.modal.title")}
             </p>
             <p className="mt-8 text-sm text-center">
-            {t("setMFA.modal.FRSubtitle")}
+              {t("setMFA.modal.FRSubtitle")}
             </p>
           </div>
         </div>
