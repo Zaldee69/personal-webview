@@ -8,6 +8,7 @@ import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfiguratio
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/app/store";
 import { SigningFailure, SigningSuccess } from ".";
+import { concateRedirectUrlParams } from "@/utils/concateRedirectUrlParams";
 
 type Props = {};
 
@@ -98,20 +99,20 @@ const PinFormDedicatedChannel = (props: Props) => {
           // setIsConfirmMode(false);
           setIsButtonNumberDisabled(false);
           setIsProcessed(false);
-          router.push(
-            {
-              pathname: router.pathname,
-              query: {
-                ...router.query,
-                user_identifier: res.data.tilaka_name,
-                request_id: res.data.request_id,
-                hmac_nonce: res.data.hmac_nonce,
-              },
-            },
-            undefined,
-            { shallow: true }
+
+          const params = {
+            ...router.query,
+            user_identifier: res.data.tilaka_name,
+            request_id: res.data.request_id,
+            hmac_nonce: res.data.hmac_nonce,
+          };
+
+          const queryString = new URLSearchParams(params as any).toString();
+
+          window.top!.location.href = concateRedirectUrlParams(
+            router.query.redirect_url as string,
+            queryString 
           );
-          setIsSuccess("1");
         } else {
           setPinConfirmError({
             isError: true,
@@ -119,6 +120,17 @@ const PinFormDedicatedChannel = (props: Props) => {
           });
           setIsButtonNumberDisabled(true);
           setIsProcessed(false);
+
+          const params = {
+            ...router.query,
+          };
+
+          const queryString = new URLSearchParams(params as any).toString();
+
+          window.top!.location.href = concateRedirectUrlParams(
+            router.query.redirect_url as string,
+            queryString 
+          );
 
           // setIsSuccess("0");
         }
