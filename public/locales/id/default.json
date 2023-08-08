@@ -267,6 +267,7 @@
     "subtitle": "Mohon lakukan proses verifikasi penautan akun secara manual melalui link yang diterima di email Anda"
   },
   "setMFA": {
+    "title": "Pengaturan MFA",
     "submitBtn": "Ubah Metode Otentikasi",
     "notAvaliableFiture": "Belum Tersedia",
     "modal": {

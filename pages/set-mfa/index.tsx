@@ -1,4 +1,5 @@
 import Button from "@/components/atoms/Button";
+import Heading from "@/components/atoms/Heading";
 import Paragraph from "@/components/atoms/Paraghraph";
 import Footer from "@/components/Footer";
 import FRCamera from "@/components/FRCamera";
@@ -164,13 +165,14 @@ const SetMfa = () => {
         }}
       >
         <Head>
-          <title>Setting MFA</title>
+          <title>{t("setMFA.title")}</title>
           <meta
             name="viewport"
             content="initial-scale=1.0, width=device-width"
           />
         </Head>
         <div className="max-w-md mx-auto px-2 pt-8 sm:w-full md:w-4/5">
+          <Heading className="pb-6" >{t("setMFA.title")}</Heading>
           <div className="mt-1.5 rounded-md bg-blue50 py-2 px-4 flex items-start">
             <div className="pt-1">
               <InfoIcon />
