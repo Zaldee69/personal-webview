@@ -101,18 +101,36 @@ const PinFormDedicatedChannel = (props: Props) => {
           setIsProcessed(false);
 
           const params = {
-            ...router.query,
             user_identifier: res.data.tilaka_name,
             request_id: res.data.request_id,
             hmac_nonce: res.data.hmac_nonce,
+            status: "Sukses",
           };
 
           const queryString = new URLSearchParams(params as any).toString();
 
-          window.top!.location.href = concateRedirectUrlParams(
-            router.query.redirect_url as string,
-            queryString 
-          );
+          const { redirect_url, pathname } = router.query;
+
+          if (redirect_url) {
+            window.top!.location.href = concateRedirectUrlParams(
+              redirect_url as string,
+              queryString
+            );
+          } else {
+            router.push(
+              {
+                pathname: pathname as string,
+                query: {
+                  ...router.query,
+                  user_identifier: res.data.tilaka_name,
+                  request_id: res.data.request_id,
+                  hmac_nonce: res.data.hmac_nonce,
+                },
+              },
+              undefined,
+              { shallow: true }
+            );
+          }
         } else {
           setPinConfirmError({
             isError: true,
@@ -122,17 +140,22 @@ const PinFormDedicatedChannel = (props: Props) => {
           setIsProcessed(false);
 
           const params = {
-            ...router.query,
+            user_identifier: router.query.user,
+            request_id: res.data.request_id,
+            status: "Gagal",
           };
 
-          const queryString = new URLSearchParams(params as any).toString();
+          if (
+            res.message ===
+            "penandatanganan dokumen gagal pin sudah salah 3 kali"
+          ) {
+            const queryString = new URLSearchParams(params as any).toString();
 
-          window.top!.location.href = concateRedirectUrlParams(
-            router.query.redirect_url as string,
-            queryString 
-          );
-
-          // setIsSuccess("0");
+            window.top!.location.href = concateRedirectUrlParams(
+              router.query.redirect_url as string,
+              queryString
+            );
+          }
         }
       })
       .catch((err) => {
