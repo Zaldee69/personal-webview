@@ -96,6 +96,7 @@ const PinFormDedicatedChannel = (props: Props) => {
       },
     })
       .then((res) => {
+        console.log(res)
         if (res.success) {
           // setIsConfirmMode(false);
           setIsButtonNumberDisabled(false);
