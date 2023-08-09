@@ -34,6 +34,7 @@ type IOtpModalConfrimation = {
   setIsShowOtpModalConfirmation: React.Dispatch<React.SetStateAction<boolean>>;
   onClickHandler: (clickEventType: "submit" | "confirmation") => void;
   setIsDisabled: React.Dispatch<React.SetStateAction<boolean>>;
+  isDisabled: boolean
 };
 
 const SetMfa = () => {
@@ -64,12 +65,22 @@ const SetMfa = () => {
       }
     } else {
       if (mfaMethod === "fr" && mfaMethod !== defaultMfa) {
+        toast(`Loading...`, {
+          type: "info",
+          toastId: "info",
+          isLoading: true,
+          position: "top-center",
+          style: {
+            backgroundColor: themeConfiguration?.data.toast_color as string,
+          },
+        });
         restSetDefaultMFA({
           payload: {
             mfa_type: mfaMethod,
           },
         })
           .then((res) => {
+            toast.dismiss("info")
             setIsShowOtpModalConfirmation(false);
             setIsDisabled(true)
             geTypeMfa();
@@ -92,10 +103,13 @@ const SetMfa = () => {
                 icon: <XIcon />,
               });
               dispatch(resetInitalState());
-              router.replace({
-                pathname: handleRoute("login"),
-                query: { ...router.query, setting: "2" },
-              });
+              setIsDisabled(true)
+              setTimeout(() => {
+                router.replace({
+                  pathname: handleRoute("login"),
+                  query: { ...router.query, setting: "2" },
+                });
+              }, 2500);
             } else {
               toast.error(err.response?.data?.message || "Terjadi kesalahan", {
                 icon: <XIcon />,
@@ -151,7 +165,7 @@ const SetMfa = () => {
       setIsShowpage(true);
       geTypeMfa();
     }
-  }, [router.isReady]);
+  }, [router.isReady]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     isShowPage && (
@@ -268,6 +282,7 @@ const SetMfa = () => {
             setIsShowOtpModalConfirmation={setIsShowOtpModalConfirmation}
             onClickHandler={onClickHandler}
             setIsDisabled={setIsDisabled}
+            isDisabled={isDisabled}
           />
           <div className="mt-16">
             <Footer />
@@ -397,6 +412,8 @@ const OtpModalConfirmation = ({
   setIsShowOtpModalConfirmation,
   isShowOtpModalConfirmation,
   onClickHandler,
+  isDisabled,
+  setIsDisabled
 }: IOtpModalConfrimation) => {
   const { t }: any = i18n;
   const themeConfiguration = useSelector((state: RootState) => state.theme);
@@ -424,13 +441,17 @@ const OtpModalConfirmation = ({
                 themeConfiguration?.data.action_font_color as string
               ),
             }}
-            onClick={() => setIsShowOtpModalConfirmation(false)}
+            onClick={() => {
+              setIsDisabled(false)
+              setIsShowOtpModalConfirmation(false)
+            }}
           >
             {t("cancel")}
           </Button>
           <Button
             size="none"
             className="py-2.5"
+            disabled={isDisabled}
             style={{
               backgroundColor: themeConfigurationAvaliabilityChecker(
                 themeConfiguration?.data.button_color as string

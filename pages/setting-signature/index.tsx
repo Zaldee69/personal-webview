@@ -45,6 +45,7 @@ const SettingSignature = ({}: Props) => {
   });
   const [imageURL, setImageURL] = useState<string>();
   const [data, setData] = useState<string>();
+  const [isLoading, setIsLoading] = useState<boolean>(false)
   let ref: any = null;
   const sigPad = useRef<any>();
   const router = useRouter();
@@ -109,6 +110,7 @@ const SettingSignature = ({}: Props) => {
 
   const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setIsLoading(true)
     toast(`Loading...`, {
       type: "info",
       toastId: "info",
@@ -141,6 +143,7 @@ const SettingSignature = ({}: Props) => {
       (signature_type == 1 && !imageURL)
     ) {
       toast.dismiss("info");
+      setIsLoading(false)
       toast(
         `${
           signature_type === 0 ? t("handwritingRequired") : t("FontRequired")
@@ -184,6 +187,7 @@ const SettingSignature = ({}: Props) => {
               }, 3000);
             }
           } else {
+            setIsLoading(false)
             toast.dismiss("info");
             toast(res.message, {
               type: "error",
@@ -195,6 +199,7 @@ const SettingSignature = ({}: Props) => {
         })
         .catch((err) => {
           if (err.response?.status === 401) {
+            setIsLoading(false)
             toast.dismiss("info");
             toast("Anda harus login terlebih dahulu", {
               type: "error",
@@ -381,6 +386,7 @@ const SettingSignature = ({}: Props) => {
             </div>
           </div>
           <Button
+            disabled={isLoading}
             size="none"
             type="submit"
             className="mt-8 px-6 py-2.5 text-base bg-primary block mx-auto"

@@ -108,6 +108,15 @@ const LinkAccount = (props: Props) => {
 
   const handleFormOnSubmit = (e: React.SyntheticEvent): void => {
     e.preventDefault();
+    toast(`Loading...`, {
+      type: "info",
+      toastId: "loading",
+      isLoading: true,
+      position: "top-center",
+      style: {
+        backgroundColor: themeConfiguration?.data.toast_color as string,
+      },
+    });
 
     const target = e.target as typeof e.target & {
       password: { value: Tform["password"] };
@@ -118,6 +127,11 @@ const LinkAccount = (props: Props) => {
 
     RestPersonalResetPassword({ payload: { password, token: key as string } })
       .then((res) => {
+        toast.dismiss("loading");
+        formSetter({
+          password: "",
+          confirm_password: "",
+        })
         if (res.success) {
           toast.success("Berhasil mengganti kata sandi!", {
             icon: <CheckOvalIcon />,
@@ -133,6 +147,7 @@ const LinkAccount = (props: Props) => {
         }
       })
       .catch((err) => {
+        toast.dismiss("loading");
         if (
           err.response?.data?.message &&
           err.response?.data?.data?.errors?.[0]
