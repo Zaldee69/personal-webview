@@ -9,6 +9,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/redux/app/store";
 import { SigningFailure, SigningSuccess } from ".";
 import { concateRedirectUrlParams } from "@/utils/concateRedirectUrlParams";
+import { handleRoute } from "@/utils/handleRoute";
 
 type Props = {};
 
@@ -119,7 +120,7 @@ const PinFormDedicatedChannel = (props: Props) => {
           } else {
             router.push(
               {
-                pathname: pathname as string,
+                pathname: handleRoute(pathname as string),
                 query: {
                   ...router.query,
                   user_identifier: res.data.tilaka_name,
@@ -130,6 +131,7 @@ const PinFormDedicatedChannel = (props: Props) => {
               undefined,
               { shallow: true }
             );
+            setIsSuccess("1");
           }
         } else {
           setPinConfirmError({
@@ -147,7 +149,7 @@ const PinFormDedicatedChannel = (props: Props) => {
 
           if (
             res.message ===
-            "penandatanganan dokumen gagal pin sudah salah 3 kali"
+            "penandatanganan dokumen gagal. pin sudah salah 3 kali"
           ) {
             const queryString = new URLSearchParams(params as any).toString();
 

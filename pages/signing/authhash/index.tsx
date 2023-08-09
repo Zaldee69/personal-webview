@@ -571,6 +571,7 @@ export const SigningFailure = () => {
   const params = {
     user_identifier: routerQuery.user,
     id: routerQuery.id,
+    status: "Gagal"
   };
   const queryString = new URLSearchParams(params as any).toString();
   const { t }: any = i18n;
