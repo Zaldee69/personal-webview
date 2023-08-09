@@ -676,18 +676,9 @@ const Login = ({}: IPropsLogin) => {
         "refresh_token_hashsign",
         data.data.data[1] as string
       );
-
       doIn(data);
-
-      toastCaller(data, themeConfiguration?.data.toast_color as string);
-    } else if (data.status === "FULLFILLED" && !data.data.success) {
-      toast(data.data.message || "Ada kesalahan", {
-        type: "error",
-        toastId: "error",
-        position: "top-center",
-        icon: XIcon,
-      });
     }
+    toastCaller(data, themeConfiguration?.data.toast_color as string);
   }, [data.status]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const doIn = (data?: TLoginInitialState): void => {

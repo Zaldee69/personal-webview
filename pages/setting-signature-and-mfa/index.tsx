@@ -41,8 +41,6 @@ type Tform = {
   mfa_method: "fr" | "otp" | "otp_ponsel";
 };
 
-const { t }: any = i18n;
-
 function SettingSignatureAndMFA({}: Props) {
   const [form, formSetter] = useState<Tform>({
     signature_type: 1,
@@ -58,6 +56,7 @@ function SettingSignatureAndMFA({}: Props) {
   const [showModalOtpPonsel, showModalOtpPonselSetter] =
     useState<boolean>(false);
   const [agreeOtpPonsel, agreeOtpPonselSetter] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false)
   const handleFormOnChange = (e: React.FormEvent<HTMLInputElement>): void => {
     formSetter({ ...form, [e.currentTarget.name]: e.currentTarget.value });
     ref = e.currentTarget;
@@ -100,6 +99,7 @@ function SettingSignatureAndMFA({}: Props) {
         backgroundColor: themeConfiguration?.data.toast_color as string,
       },
     });
+    setIsLoading(true)
     const signature_image = sigPad.current
       .getTrimmedCanvas()
       .toDataURL("image/png");
@@ -125,6 +125,7 @@ function SettingSignatureAndMFA({}: Props) {
       (signature_type == 1 && !imageURL)
     ) {
       toast.dismiss("info");
+      setIsLoading(false)
       toast(
         `${
           signature_type === 0 ? t("handwritingRequired") : t("FontRequired")
@@ -169,6 +170,7 @@ function SettingSignatureAndMFA({}: Props) {
             }
           } else {
             toast.dismiss("info");
+            setIsLoading(false)
             toast(res.message, {
               type: "error",
               toastId: "error",
@@ -178,6 +180,7 @@ function SettingSignatureAndMFA({}: Props) {
           }
         })
         .catch((err) => {
+          setIsLoading(false)
           if (err.response?.status === 401) {
             toast.dismiss("info");
             toast("Anda harus login terlebih dahulu", {
@@ -293,46 +296,46 @@ function SettingSignatureAndMFA({}: Props) {
                 (data?.length as number) > 15 ? "grid-cols gap-5" : "grid-col-2"
               } gap-3 mt-5`}
             >
-              <label className="relative flex items-center justify-center">
+              <label className="relative flex items-center justify-center cursor-pointer">
                 <input
                   type="radio"
                   name="signature_font_type"
                   value="Adine-Kirnberg"
                   onChange={handleFormOnChange}
                   checked={form.signature_font_type === "Adine-Kirnberg"}
-                  className="appearance-none border border-_B6B6B6 checked:border-_1A73E8 rounded-md w-full h-12"
+                  className="appearance-none border border-_B6B6B6 checked:border-_1A73E8 rounded-md w-full h-12 cursor-pointer"
                 />
                 <p className="text-2xl Adine-Kirnberg text-_030326 absolute w-fit text-center">
                   {data}
                 </p>
               </label>
-              <label className="relative flex items-center justify-center">
+              <label className="relative flex items-center justify-center cursor-pointer">
                 <input
                   type="radio"
                   name="signature_font_type"
                   value="champignonaltswash"
                   onChange={handleFormOnChange}
                   checked={form.signature_font_type === "champignonaltswash"}
-                  className="appearance-none border border-_B6B6B6 checked:border-_1A73E8 rounded-md w-full h-12"
+                  className="appearance-none border border-_B6B6B6 checked:border-_1A73E8 rounded-md w-full h-12 cursor-pointer"
                 />
                 <p className="h-full champignonaltswash text-_030326 absolute w-fit text-center">
                   {data}
                 </p>
               </label>
-              <label className="relative flex items-center justify-center">
+              <label className="relative flex items-center justify-center cursor-pointer">
                 <input
                   type="radio"
                   name="signature_font_type"
                   value="FormalScript"
                   onChange={handleFormOnChange}
                   checked={form.signature_font_type === "FormalScript"}
-                  className="appearance-none border border-_B6B6B6 checked:border-_1A73E8 rounded-md w-full h-12"
+                  className="appearance-none border border-_B6B6B6 checked:border-_1A73E8 rounded-md w-full h-12 cursor-pointer"
                 />
                 <p className="text-lg FormalScript text-_030326 absolute w-fit text-center">
                   {data}
                 </p>
               </label>
-              <label className="relative flex items-center justify-center">
+              <label className="relative flex items-center justify-center cursor-pointer">
                 <input
                   type="radio"
                   name="signature_font_type"
@@ -341,13 +344,13 @@ function SettingSignatureAndMFA({}: Props) {
                   checked={
                     form.signature_font_type === "HerrVonMuellerhoff-Regular"
                   }
-                  className="appearance-none border border-_B6B6B6 checked:border-_1A73E8 rounded-md w-full h-12"
+                  className="appearance-none border border-_B6B6B6 checked:border-_1A73E8 rounded-md w-full h-12 cursor-pointer"
                 />
                 <p className="h-full HerrVonMuellerhoff-Regular text-_030326 absolute w-fit text-center">
                   {data}
                 </p>
               </label>
-              <label className="relative flex items-center justify-center">
+              <label className="relative flex items-center justify-center cursor-pointer">
                 <input
                   type="radio"
                   name="signature_font_type"
@@ -356,20 +359,20 @@ function SettingSignatureAndMFA({}: Props) {
                   checked={
                     form.signature_font_type === "MrsSaintDelafield-Regular"
                   }
-                  className="appearance-none border border-_B6B6B6 checked:border-_1A73E8 rounded-md w-full h-12"
+                  className="appearance-none border border-_B6B6B6 checked:border-_1A73E8 rounded-md w-full h-12 cursor-pointer"
                 />
                 <p className="h-full MrsSaintDelafield-Regular text-_030326 absolute w-fit text-center">
                   {data}
                 </p>
               </label>
-              <label className="relative flex items-center justify-center">
+              <label className="relative flex items-center justify-center cursor-pointer">
                 <input
                   type="radio"
                   name="signature_font_type"
                   value="SCRIPTIN"
                   onChange={handleFormOnChange}
                   checked={form.signature_font_type === "SCRIPTIN"}
-                  className="appearance-none border border-_B6B6B6 checked:border-_1A73E8 rounded-md w-full h-12"
+                  className="appearance-none border border-_B6B6B6 checked:border-_1A73E8 rounded-md w-full h-12 cursor-pointer"
                 />
                 <p className="h-full SCRIPTIN text-_030326 absolute w-fit text-center">
                   {data}
@@ -438,7 +441,7 @@ function SettingSignatureAndMFA({}: Props) {
                 }
                 checked={form.mfa_method === "otp_ponsel"}
                 type="radio"
-                className="appearance-none disabled:opacity-50 bg-white w-4 h-4 ring-1 ring-neutral40 border-2 border-white border-neutral40 rounded-full checked:bg-primary checked:ring-primary"
+                className="appearance-none disabled:opacity-50 bg-white w-4 h-4 ring-1 ring-neutral40 border-2 border-neutral40 rounded-full checked:bg-primary checked:ring-primary"
               />
               <p className="text-md ml-2.5 poppins-regular opacity-50 text-_030326">
                 {t("autheticantionMode3")}
@@ -449,6 +452,7 @@ function SettingSignatureAndMFA({}: Props) {
             size="none"
             type="submit"
             className="mt-8 px-6 py-2.5 text-base bg-primary block mx-auto"
+            disabled={isLoading}
             style={{
               backgroundColor: themeConfigurationAvaliabilityChecker(
                 themeConfiguration?.data.button_color as string

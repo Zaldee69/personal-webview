@@ -1,5 +1,4 @@
 import { Dispatch, SetStateAction, useRef, useState } from "react";
-import Image from "next/legacy/image";
 import { toast } from "react-toastify";
 import XIcon from "../../public/icons/XIcon";
 import Head from "next/head";
@@ -29,6 +28,7 @@ const ForgotPassword = (props: Props) => {
   const [form, formSetter] = useState<Tform>({});
   const [modalSuccess, modalSuccessSetter] = useState<boolean>(false);
   const [reCaptchaSuccess, reCaptchaSuccessSetter] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false)
 
   const { t }: any = i18n;
 
@@ -43,6 +43,16 @@ const ForgotPassword = (props: Props) => {
 
   const handleFormOnSubmit = (e: React.SyntheticEvent): void => {
     e.preventDefault();
+    setIsLoading(true)
+    toast(`Loading...`, {
+      type: "info",
+      toastId: "loading",
+      isLoading: true,
+      position: "top-center",
+      style: {
+        backgroundColor: themeConfiguration?.data.toast_color as string,
+      },
+    });
 
     const target = e.target as typeof e.target & {
       email: { value: Tform["email"] };
@@ -57,9 +67,11 @@ const ForgotPassword = (props: Props) => {
 
     RestPersonalRequestResetPassword({ payload: data })
       .then((res) => {
+        toast.dismiss("loading");
         if (res.success) {
           modalSuccessSetter(true);
         } else {
+          setIsLoading(false)
           toast.error(res.message || "Gagal request reset password", {
             icon: <XIcon />,
           });
@@ -68,6 +80,8 @@ const ForgotPassword = (props: Props) => {
         resetCaptcha();
       })
       .catch((err) => {
+        toast.dismiss("loading");
+        setIsLoading(false)
         if (
           err.response?.data?.message &&
           err.response?.data?.data?.errors?.[0]
@@ -156,7 +170,7 @@ const ForgotPassword = (props: Props) => {
                   <Button
                     type="submit"
                     size="sm"
-                    disabled={!form.email}
+                    disabled={!form.email || isLoading}
                     className="mt-32  mb-5 h-10"
                     style={{
                       backgroundColor: themeConfigurationAvaliabilityChecker(

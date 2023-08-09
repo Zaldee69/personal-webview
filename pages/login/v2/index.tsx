@@ -115,15 +115,8 @@ const Login = ({}: IPropsLogin) => {
 
       doIn(data);
 
-      toastCaller(data, themeConfiguration?.data.toast_color as string);
-    } else if (data.status === "FULLFILLED" && !data.data.success) {
-      toast(data.data.message || "Ada kesalahan", {
-        type: "error",
-        toastId: "error",
-        position: "top-center",
-        icon: XIcon,
-      });
-    }
+    } 
+    toastCaller(data, themeConfiguration?.data.toast_color as string);
   }, [data.status]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {

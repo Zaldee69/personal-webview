@@ -1,6 +1,6 @@
 type Props = {};
 import { setCertificate } from "@/redux/slices/certificateSlice";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { AppDispatch, RootState } from "@/redux/app/store";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/router";
@@ -30,6 +30,8 @@ function CertificateInformation({}: Props) {
   const { t }: any = i18n;
 
   const themeConfiguration = useSelector((state: RootState) => state.theme);
+
+  const [isLoading, setIsLoading] = useState<boolean>(false)
 
   const getRegisteredCertificate = () => {
     const body = {
@@ -66,16 +68,27 @@ function CertificateInformation({}: Props) {
   useEffect(() => {
     if (!router.isReady) return;
     getRegisteredCertificate();
-  }, [router.isReady]);
+  }, [router.isReady]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleConfirm = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
+    toast(`Loading...`, {
+      type: "info",
+      toastId: "info",
+      isLoading: true,
+      position: "top-center",
+      style: {
+        backgroundColor: themeConfiguration?.data.toast_color as string,
+      },
+    });
+    setIsLoading(true)
     const body: TConfirmCertificateRequestData = {
       company_id: company_id as string,
       serial_number: certificate.serialNumber,
     };
     RestConfirmCertificate(body)
       .then((res) => {
+        toast.dismiss("info")
         if (res.success) {
           toast(`Sukses mengaktifkan sertifikat`, {
             type: "success",
@@ -89,6 +102,7 @@ function CertificateInformation({}: Props) {
             });
           }, 1000);
         } else {
+          setIsLoading(false)
           toast(`${res.message}`, {
             type: "error",
             toastId: "error",
@@ -97,6 +111,8 @@ function CertificateInformation({}: Props) {
         }
       })
       .catch((err) => {
+        toast.dismiss("info")
+        setIsLoading(false)
         switch (err.response.status) {
           case 401:
             // unauthorized
@@ -192,6 +208,7 @@ function CertificateInformation({}: Props) {
           </Paragraph>
         )}
         <Button
+          disabled={isLoading}
           size="none"
           onClick={(e) => handleConfirm(e)}
           className="mt-8 p-2.5 uppercase text-sm font-medium block mx-auto w-40"
