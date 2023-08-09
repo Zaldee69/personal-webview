@@ -147,9 +147,11 @@ const PinFormDedicatedChannel = (props: Props) => {
             status: "Gagal",
           };
 
+          console.log(res)
+
           if (
-            res.message ===
-            "penandatanganan dokumen gagal. pin sudah salah 3 kali"
+            res.message.toLocaleLowerCase() ===
+            "penandatanganan dokumen gagal. pin sudah salah 3 kali".toLocaleLowerCase()
           ) {
             const queryString = new URLSearchParams(params as any).toString();
 
