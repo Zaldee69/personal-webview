@@ -30,39 +30,32 @@ const PinFormDedicatedChannel = (props: Props) => {
     id,
     redirect_url,
     token,
+    pathname,
     ...restRouterQuery
   }: NextParsedUrlQuery & TUrlQuery = router.query;
   const isRandom: boolean = random === "1";
   const [shouldRender, setShouldRender] = useState<boolean>(false);
-  // const [pin, setPin] = useState<string>("");
-  // const [pinError, setPinError] = useState<{
-  //   isError: boolean;
-  //   message: string;
-  // }>({ isError: false, message: "" });
   const [pinConfirmError, setPinConfirmError] = useState<{
     isError: boolean;
     message: string;
   }>({ isError: false, message: "" });
+
   const [pinConfirmErrorAfterSubmit, setPinConfirmErrorAfterSubmit] = useState<{
     isError: boolean;
     message: string;
   }>({ isError: false, message: "" });
-  // const [isConfirmMode, setIsConfirmMode] = useState<boolean>(false);
+
   const [isButtonNumberDisabled, setIsButtonNumberDisabled] =
     useState<boolean>(false);
+
   const [isProcessed, setIsProcessed] = useState<boolean>(false);
+
   const [isSuccess, setIsSuccess] = useState<"-1" | "0" | "1">("-1");
 
   const digitLength: number = 6;
 
   const themeConfiguration = useSelector((state: RootState) => state.theme);
 
-  // const onClickNumberHandlerCallback = (value: number) => {};
-  // const onClickDeleteHandlerCallback = () => {};
-  // const submitFormCallback = (pin: string) => {
-  //   setPin(pin);
-  //   setIsConfirmMode(true);
-  // };
   const onClickNumberHandlerConfirmCallback = (value: number) => {
     setPinConfirmError({ isError: false, message: "" });
   };
@@ -74,15 +67,6 @@ const PinFormDedicatedChannel = (props: Props) => {
     setIsButtonNumberDisabled(true);
     setIsProcessed(true);
 
-    // if (pin !== pinConfirm) {
-    //   setPinConfirmErrorAfterSubmit({
-    //     isError: true,
-    //     message: t("confirmPinDoesntMatch"),
-    //   });
-    //   setIsProcessed(false);
-    //   return;
-    // }
-
     setPinConfirmErrorAfterSubmit({ isError: false, message: "" });
 
     RestSigningAuthhashsign({
@@ -92,13 +76,11 @@ const PinFormDedicatedChannel = (props: Props) => {
       },
       payload: {
         pin: pinConfirm,
-        // token: "?"
       },
     })
       .then((res) => {
         console.log(res)
         if (res.success) {
-          // setIsConfirmMode(false);
           setIsButtonNumberDisabled(false);
           setIsProcessed(false);
 
@@ -111,11 +93,9 @@ const PinFormDedicatedChannel = (props: Props) => {
 
           const queryString = new URLSearchParams(params as any).toString();
 
-          const { redirect_url, pathname } = router.query;
-
           if (redirect_url) {
             window.top!.location.href = concateRedirectUrlParams(
-              redirect_url as string,
+              redirect_url,
               queryString
             );
           } else {
@@ -142,22 +122,18 @@ const PinFormDedicatedChannel = (props: Props) => {
           setIsButtonNumberDisabled(true);
           setIsProcessed(false);
 
-          const params = {
-            user_identifier: router.query.user,
-            request_id: res.data.request_id,
-            status: "Gagal",
-          };
-
-          console.log(res)
-
           if (
-            res.message.toLocaleLowerCase() ===
-            "penandatanganan dokumen gagal. pin sudah salah 3 kali".toLocaleLowerCase()
+            res.message ===
+              "penandatanganan dokumen gagal. pin sudah salah 3 kali" &&
+            redirect_url
           ) {
-            const queryString = new URLSearchParams(params as any).toString();
+            const queryString = new URLSearchParams({
+              user_identifier: user,
+              status: "Blocked",
+            } as any).toString();
 
             window.top!.location.href = concateRedirectUrlParams(
-              router.query.redirect_url as string,
+              redirect_url as string,
               queryString
             );
           }
@@ -177,20 +153,8 @@ const PinFormDedicatedChannel = (props: Props) => {
         }
         setIsButtonNumberDisabled(true);
         setIsProcessed(false);
-
-        // setIsSuccess("0");
       });
   };
-
-  // const onClickBack = (_: React.SyntheticEvent) => {
-  //   setPin("");
-  //   setPinError({ isError: false, message: "" });
-  //   setPinConfirmError({ isError: false, message: "" });
-  //   setPinConfirmErrorAfterSubmit({ isError: false, message: "" });
-  //   setIsConfirmMode(false);
-  //   setIsButtonNumberDisabled(false);
-  //   setIsProcessed(false);
-  // };
 
   useEffect(() => {
     if (!router.isReady) return;
