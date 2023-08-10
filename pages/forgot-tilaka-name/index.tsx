@@ -171,7 +171,7 @@ const ForgotTilakaName = (props: Props) => {
                   <Button
                     type="submit"
                     size="sm"
-                    disabled={!form.email}
+                    disabled={!form.email || isLoading}
                     className="mt-32  mb-5 h-10"
                     style={{
                       backgroundColor: themeConfigurationAvaliabilityChecker(

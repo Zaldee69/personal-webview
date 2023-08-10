@@ -65,6 +65,7 @@ const SetMfa = () => {
       }
     } else {
       if (mfaMethod === "fr" && mfaMethod !== defaultMfa) {
+        setIsDisabled(true)
         toast(`Loading...`, {
           type: "info",
           toastId: "info",
@@ -82,7 +83,6 @@ const SetMfa = () => {
           .then((res) => {
             toast.dismiss("info")
             setIsShowOtpModalConfirmation(false);
-            setIsDisabled(true)
             geTypeMfa();
             toast("Penggantian MFA berhasil", {
               type: "success",

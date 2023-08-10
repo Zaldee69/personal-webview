@@ -44,6 +44,8 @@ const LinkAccount = (props: Props) => {
     confirm_password: "",
   });
 
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+
   const { t }: any = i18n;
 
   const themeConfiguration = useSelector((state: RootState) => state.theme);
@@ -55,7 +57,7 @@ const LinkAccount = (props: Props) => {
     !form.password ||
     !form.confirm_password ||
     !!formErrors.password ||
-    !!formErrors.confirm_password;
+    !!formErrors.confirm_password
 
   const handleFormOnChange = (e: React.FormEvent<HTMLInputElement>): void => {
     const { name, value } = e.currentTarget;
@@ -107,6 +109,7 @@ const LinkAccount = (props: Props) => {
   };
 
   const handleFormOnSubmit = (e: React.SyntheticEvent): void => {
+    setIsLoading(true)
     e.preventDefault();
     toast(`Loading...`, {
       type: "info",
@@ -141,6 +144,7 @@ const LinkAccount = (props: Props) => {
             query: { kunciRahasia: key, ...routerQuery },
           });
         } else {
+          setIsLoading(false)
           toast.error(res.message || "Gagal request reset password", {
             icon: <XIcon />,
           });
@@ -148,6 +152,7 @@ const LinkAccount = (props: Props) => {
       })
       .catch((err) => {
         toast.dismiss("loading");
+        setIsLoading(false)
         if (
           err.response?.data?.message &&
           err.response?.data?.data?.errors?.[0]
@@ -255,7 +260,7 @@ const LinkAccount = (props: Props) => {
             <Button
               type="submit"
               size="none"
-              disabled={submitShouldDisabled}
+              disabled={submitShouldDisabled || isLoading}
               className="mt-7 py-2.5 px-5 text-base fit-content"
               style={{
                 backgroundColor: themeConfigurationAvaliabilityChecker(
