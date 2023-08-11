@@ -66,12 +66,13 @@ const ForgotPassword = (props: Props) => {
     };
 
     RestPersonalRequestResetPassword({ payload: data })
-      .then((res) => {
+    .then((res) => {
+        setIsLoading(false)
         toast.dismiss("loading");
         if (res.success) {
           modalSuccessSetter(true);
+          formSetter({})
         } else {
-          setIsLoading(false)
           toast.error(res.message || "Gagal request reset password", {
             icon: <XIcon />,
           });
