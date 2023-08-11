@@ -68,11 +68,12 @@ const ForgotTilakaName = (props: Props) => {
 
     RestPersonalRequestTilakaName({ payload: data })
     .then((res) => {
+        setIsLoading(false)
         toast.dismiss("loading");
         if (res.success) {
           modalSuccessSetter(true);
+          formSetter({})
         } else {
-          setIsLoading(false)
           toast.error(res.message || "Gagal request tilaka name", {
             icon: <XIcon />,
           });
