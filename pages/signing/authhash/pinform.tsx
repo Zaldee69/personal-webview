@@ -79,9 +79,7 @@ const PinFormDedicatedChannel = (props: Props) => {
       },
     })
       .then((res) => {
-        console.log(res)
         if (res.success) {
-          setIsButtonNumberDisabled(false);
           setIsProcessed(false);
 
           const params = {
@@ -129,7 +127,8 @@ const PinFormDedicatedChannel = (props: Props) => {
           ) {
             const queryString = new URLSearchParams({
               user_identifier: user,
-              status: "Blocked",
+              id,
+              status: "Blocked"
             } as any).toString();
 
             window.top!.location.href = concateRedirectUrlParams(
