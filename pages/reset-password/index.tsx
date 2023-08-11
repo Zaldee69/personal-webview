@@ -17,6 +17,7 @@ import { RootState } from "@/redux/app/store";
 import i18n from "i18";
 import Heading from "@/components/atoms/Heading";
 import Label from "@/components/atoms/Label";
+import { handleRoute } from "@/utils/handleRoute";
 
 type Props = {};
 
@@ -140,7 +141,7 @@ const LinkAccount = (props: Props) => {
             icon: <CheckOvalIcon />,
           });
           router.replace({
-            pathname: router.pathname + "/success",
+            pathname: handleRoute("reset-password/success"),
             query: { kunciRahasia: key, ...routerQuery },
           });
         } else {
