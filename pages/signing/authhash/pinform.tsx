@@ -80,8 +80,6 @@ const PinFormDedicatedChannel = (props: Props) => {
     })
       .then((res) => {
         if (res.success) {
-          setIsProcessed(false);
-
           const params = {
             user_identifier: res.data.tilaka_name,
             request_id: res.data.request_id,
