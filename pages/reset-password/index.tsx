@@ -146,9 +146,13 @@ const LinkAccount = (props: Props) => {
           });
         } else {
           setIsLoading(false)
-          toast.error(res.message || "Gagal request reset password", {
-            icon: <XIcon />,
-          });
+          if (res.message === "token tidak valid atau sudah kadaluwarsa"){
+            toast.warning("Link sudah kadaluwarsa")
+          }else {
+             toast.error(res.message || "Gagal request reset password", {
+               icon: <XIcon />,
+             });
+          }
         }
       })
       .catch((err) => {
