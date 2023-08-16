@@ -147,7 +147,9 @@ const LinkAccount = (props: Props) => {
         } else {
           setIsLoading(false)
           if (res.message === "token tidak valid atau sudah kadaluwarsa"){
-            toast.warning("Link sudah kadaluwarsa")
+            toast.error("Link sudah kadaluwarsa", {
+              icon: <XIcon />,
+            });
           }else {
              toast.error(res.message || "Gagal request reset password", {
                icon: <XIcon />,
