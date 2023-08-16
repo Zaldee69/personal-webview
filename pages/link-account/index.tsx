@@ -1018,6 +1018,7 @@ const ModalConsent = ({
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const cQuery = context.query;
+  const isNotRedirect= true
   const uuid =
     cQuery.transaction_id || cQuery.request_id || cQuery.registration_id;
   const checkStepResult: {
@@ -1041,7 +1042,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       return { err };
     });
 
-  return serverSideRenderReturnConditions({ context, checkStepResult });
+  return serverSideRenderReturnConditions({ context, checkStepResult, isNotRedirect });
 };
 
 export default LinkAccount;
