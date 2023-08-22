@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import React, { useState } from "react";
 import i18n from "i18";
 import { assetPrefix } from "next.config";
