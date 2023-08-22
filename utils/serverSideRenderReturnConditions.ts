@@ -140,9 +140,10 @@ export const serverSideRenderReturnConditions = ({
           };
         }
 
+
         if (
           currentPathnameWithoutParams === `${assetPrefix}/liveness-failure` ||
-          currentPathnameWithoutParams === "/liveness-failure"
+          currentPathnameWithoutParams === "/liveness-failure" || isNotRedirect
         ) {
           return { props: {} };
         }

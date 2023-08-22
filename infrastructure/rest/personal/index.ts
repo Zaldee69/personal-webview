@@ -1,4 +1,3 @@
-import { setPersonalChangePasswordTokenToLocalStorage } from "@/utils/setPersonalChangePasswordTokenToLocalStorage";
 import axios from "axios";
 import {
   TPersonalChangePasswordRequestData,
@@ -25,6 +24,7 @@ import {
 import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
 import { getStorageWithExpiresIn } from "@/utils/localStorageWithExpiresIn";
 import { initialState } from "@/redux/slices/themeSlice";
+import { setTokenToLocalStorage } from "@/utils/token";
 
 const BASE_URL =
   process.env.NEXT_PUBLIC_PERSONAL_API_URL || "https://dev-api.tilaka.id";
@@ -56,7 +56,10 @@ export const RestPersonalRequestChangePassword = ({
       payload
     )
     .then((res) => {
-      setPersonalChangePasswordTokenToLocalStorage(res.data.data?.[0] || null);
+      setTokenToLocalStorage(
+        res.data.data?.[0] || null,
+        "personal_change_password_token"
+      );
       return res.data;
     })
     .catch((err) => {

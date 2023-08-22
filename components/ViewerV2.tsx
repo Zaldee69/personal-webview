@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import React, { Dispatch, SetStateAction, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/app/store";

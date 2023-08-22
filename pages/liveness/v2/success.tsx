@@ -41,7 +41,7 @@ const FormSuccess = (props: Props) => {
         );
       }, 5000);
     }
-  }, [router.isReady]);
+  }, [router.isReady]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div

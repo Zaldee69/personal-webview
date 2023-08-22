@@ -1,4 +1,3 @@
-import { setKycCheckstepTokenToLocalStorage } from "@/utils/setKycCheckstepTokenToLocalStorage";
 import { setTokenToLocalStorage } from "@/utils/token";
 import axios from "axios";
 import {
@@ -39,7 +38,10 @@ export const RestKycCheckStep = ({
       headers: {},
     })
     .then((res) => {
-      setKycCheckstepTokenToLocalStorage(res.data.data?.token || null);
+      setTokenToLocalStorage(
+        res.data.data?.token || null,
+        "kyc_checkstep_token"
+      );
       return res.data;
     })
     .catch((err) => {

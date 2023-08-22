@@ -216,17 +216,15 @@ const Liveness = () => {
           // this scope for status D F E
           setIsGenerateAction(false);
           toast.dismiss("generateAction");
-          toast(`${res.message || "Tidak merespon!"}`, {
-            type: "error",
-            autoClose: 5000,
-            position: "top-center",
-            toastId: "errToast1",
-          });
           if (
             res.message === "Anda berada di tahap pengisian formulir" ||
             res.data.status === "D"
           ) {
-            toast.dismiss("errToast1");
+             toast(res.message, {
+               type: "success",
+               autoClose: 5000,
+               position: "top-center",
+             });
             if (res.data.pin_form) {
               router.replace({
                 pathname: handleRoute("kyc/pinform"),

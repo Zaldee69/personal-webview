@@ -35,6 +35,7 @@ const SignaturePad = ({ sigPad }: Props) => {
         </button>
         {(showInitialSig && res.response.data.tandaTangan) || showInitialSig &&
         data?.data.scratch ? (
+          // eslint-disable-next-line @next/next/no-img-element
           <img
             onClick={() => setShowInitialSig(false)}
             style={{ touchAction: "none", width: "200px", height: "200px" }}
