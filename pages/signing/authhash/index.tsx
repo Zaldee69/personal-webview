@@ -101,7 +101,6 @@ const FRModal: React.FC<IModal> = ({
                 ...routerQuery,
                 user_identifier: res.data.tilaka_name,
                 request_id: res.data.request_id,
-                hmac_nonce: res.data.hmac_nonce,
               },
             },
             undefined,
@@ -260,7 +259,6 @@ const OTPModal: React.FC<IModal> = ({
                 ...routerQuery,
                 user_identifier: res.data.tilaka_name,
                 request_id: res.data.request_id,
-                hmac_nonce: res.data.hmac_nonce,
               },
             },
             undefined,
@@ -495,7 +493,6 @@ export const SigningSuccess = () => {
   const params = {
     user_identifier: routerQuery.user,
     request_id: routerQuery.request_id,
-    hmac_nonce: routerQuery.hmac_nonce,
     status: "Sukses",
   };
   const queryString = new URLSearchParams(params as any).toString();
