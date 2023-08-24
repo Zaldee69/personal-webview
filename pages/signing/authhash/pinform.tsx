@@ -83,7 +83,6 @@ const PinFormDedicatedChannel = (props: Props) => {
           const params = {
             user_identifier: res.data.tilaka_name,
             request_id: res.data.request_id,
-            hmac_nonce: res.data.hmac_nonce,
             status: "Sukses",
           };
 
@@ -102,7 +101,6 @@ const PinFormDedicatedChannel = (props: Props) => {
                   ...router.query,
                   user_identifier: res.data.tilaka_name,
                   request_id: res.data.request_id,
-                  hmac_nonce: res.data.hmac_nonce,
                 },
               },
               undefined,
