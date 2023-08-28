@@ -21,6 +21,8 @@ import { buttonVariants } from "@/components/atoms/Button";
 import Footer from "@/components/Footer";
 import Heading from "@/components/atoms/Heading";
 import Paragraph from "@/components/atoms/Paraghraph";
+import { useCountdown } from "@/hooks/useCountdown";
+import { Trans } from "react-i18next";
 
 type Props = {
   checkStepResultDataRoute: TKycCheckStepResponseData["data"]["route"];
@@ -40,6 +42,12 @@ const LinkAccountFailure = (props: Props) => {
   const [redirectUrl, setRedirectUrl] = useState<string>(
     routerQuery.redirect_url as string
   );
+  
+  const second = 5;
+
+  console.log(props)
+
+  const { timeLeft } = useCountdown(second);
 
   const themeConfiguration = useSelector((state: RootState) => state.theme);
 
@@ -48,81 +56,93 @@ const LinkAccountFailure = (props: Props) => {
   useEffect(() => {
     if (!routerIsReady) return;
 
-    let queryWithDynamicRedirectURL = {
-      ...routerQuery,
-    };
-    let params: any = {};
+    if (router.query.isRedirectToManualForm === "1") {
+      setTimeout(() => {
+        router.push({
+          pathname: handleRoute("manual-form"),
+          query: {
+            ...routerQuery,
+          },
+        });
+        resetFRFailedCount("count");
+      }, 5000);
+    } else {
+      let queryWithDynamicRedirectURL = {
+        ...routerQuery,
+      };
+      let params: any = {};
 
-    if (queryWithDynamicRedirectURL.request_id) {
-      params["request-id"] = queryWithDynamicRedirectURL.request_id;
-    }
-    if (queryWithDynamicRedirectURL.tilaka_name) {
-      params["tilaka-name"] = queryWithDynamicRedirectURL.tilaka_name;
-    }
-    if (queryWithDynamicRedirectURL.status) {
-      params["status"] = queryWithDynamicRedirectURL.status;
-    }
-    if (queryWithDynamicRedirectURL.reason) {
-      params["reason"] = queryWithDynamicRedirectURL.reason;
-    }
-
-    let queryString = new URLSearchParams(params as any).toString();
-
-    if (queryWithDynamicRedirectURL.redirect_url?.length) {
-      const currentRedirectUrl =
-        queryWithDynamicRedirectURL.redirect_url as string;
-      const currentRedirectUrlArr = currentRedirectUrl.split("?");
-
-      if (currentRedirectUrlArr.length > 1) {
-        if (
-          currentRedirectUrlArr[1].includes("request-id") &&
-          currentRedirectUrlArr[1].includes("tilaka-name")
-        ) {
-          queryWithDynamicRedirectURL.redirect_url =
-            currentRedirectUrlArr[0] + "?" + currentRedirectUrlArr[1] + "&";
-        } else if (currentRedirectUrlArr[1].includes("request-id")) {
-          const additionParams = {
-            ...params,
-            "tilaka-name": queryWithDynamicRedirectURL.tilaka_name,
-          };
-          queryString = new URLSearchParams(additionParams as any).toString();
-
-          queryWithDynamicRedirectURL.redirect_url =
-            currentRedirectUrlArr[0] +
-            "?" +
-            currentRedirectUrlArr[1] +
-            "&" +
-            queryString;
-        } else if (currentRedirectUrlArr[1].includes("tilaka-name")) {
-          const additionParams = {
-            ...params,
-            "request-id": queryWithDynamicRedirectURL.request_id,
-          };
-          queryString = new URLSearchParams(additionParams as any).toString();
-
-          queryWithDynamicRedirectURL.redirect_url =
-            currentRedirectUrlArr[0] +
-            "?" +
-            currentRedirectUrlArr[1] +
-            "&" +
-            queryString;
-        } else {
-          // manualy input redirect_url on url
-          queryWithDynamicRedirectURL.redirect_url =
-            currentRedirectUrlArr[0] +
-            "?" +
-            currentRedirectUrlArr[1] +
-            "&" +
-            queryString;
-        }
-      } else {
-        // current redirect_url no has param
-        queryWithDynamicRedirectURL.redirect_url =
-          currentRedirectUrlArr[0] + "?" + queryString;
+      if (queryWithDynamicRedirectURL.request_id) {
+        params["request-id"] = queryWithDynamicRedirectURL.request_id;
       }
-    }
+      if (queryWithDynamicRedirectURL.tilaka_name) {
+        params["tilaka-name"] = queryWithDynamicRedirectURL.tilaka_name;
+      }
+      if (queryWithDynamicRedirectURL.status) {
+        params["status"] = queryWithDynamicRedirectURL.status;
+      }
+      if (queryWithDynamicRedirectURL.reason) {
+        params["reason"] = queryWithDynamicRedirectURL.reason;
+      }
 
-    setRedirectUrl(queryWithDynamicRedirectURL.redirect_url as string);
+      let queryString = new URLSearchParams(params as any).toString();
+
+      if (queryWithDynamicRedirectURL.redirect_url?.length) {
+        const currentRedirectUrl =
+          queryWithDynamicRedirectURL.redirect_url as string;
+        const currentRedirectUrlArr = currentRedirectUrl.split("?");
+
+        if (currentRedirectUrlArr.length > 1) {
+          if (
+            currentRedirectUrlArr[1].includes("request-id") &&
+            currentRedirectUrlArr[1].includes("tilaka-name")
+          ) {
+            queryWithDynamicRedirectURL.redirect_url =
+              currentRedirectUrlArr[0] + "?" + currentRedirectUrlArr[1] + "&";
+          } else if (currentRedirectUrlArr[1].includes("request-id")) {
+            const additionParams = {
+              ...params,
+              "tilaka-name": queryWithDynamicRedirectURL.tilaka_name,
+            };
+            queryString = new URLSearchParams(additionParams as any).toString();
+
+            queryWithDynamicRedirectURL.redirect_url =
+              currentRedirectUrlArr[0] +
+              "?" +
+              currentRedirectUrlArr[1] +
+              "&" +
+              queryString;
+          } else if (currentRedirectUrlArr[1].includes("tilaka-name")) {
+            const additionParams = {
+              ...params,
+              "request-id": queryWithDynamicRedirectURL.request_id,
+            };
+            queryString = new URLSearchParams(additionParams as any).toString();
+
+            queryWithDynamicRedirectURL.redirect_url =
+              currentRedirectUrlArr[0] +
+              "?" +
+              currentRedirectUrlArr[1] +
+              "&" +
+              queryString;
+          } else {
+            // manualy input redirect_url on url
+            queryWithDynamicRedirectURL.redirect_url =
+              currentRedirectUrlArr[0] +
+              "?" +
+              currentRedirectUrlArr[1] +
+              "&" +
+              queryString;
+          }
+        } else {
+          // current redirect_url no has param
+          queryWithDynamicRedirectURL.redirect_url =
+            currentRedirectUrlArr[0] + "?" + queryString;
+        }
+      }
+
+      setRedirectUrl(queryWithDynamicRedirectURL.redirect_url as string);
+    }
   }, [routerIsReady, routerQuery]);
 
   return (
@@ -136,9 +156,7 @@ const LinkAccountFailure = (props: Props) => {
       }}
     >
       <div className="px-10 max-w-md mx-auto pt-16 pb-9 text-center">
-        <Heading>
-          {t("linkAccountFailedTitle")}
-        </Heading>
+        <Heading>{t("linkAccountFailedTitle")}</Heading>
         <div
           className="bg-contain mt-10 w-52 mx-auto h-64 bg-center bg-no-repeat"
           style={{
@@ -151,18 +169,23 @@ const LinkAccountFailure = (props: Props) => {
         ></div>
         {failedCount >= 5 && (
           <>
-            <Heading className="text-base mt-5">
+            <Heading className="text-base my-5">
               {t("linkAccountFailed5x.title")}
             </Heading>
             <Paragraph>
-              {t("linkAccountFailed5x.subtitle")}
+              <Trans
+                values={{
+                  timeLeft: timeLeft <= 0 ? 0 : timeLeft,
+                }}
+                i18nKey="ekycFailed.subtitle"
+              ></Trans>
             </Paragraph>
           </>
         )}
         {props.checkStepResultDataRoute === "penautan_consent" ? (
           routerQuery.reject_by_user === "1" ? (
             <div className="mt-14">
-              <Paragraph size="sm" >
+              <Paragraph size="sm">
                 {t("consentLinkAccountFailedSubtitleRejectByUser")}
               </Paragraph>
             </div>
@@ -218,57 +241,7 @@ const LinkAccountFailure = (props: Props) => {
               </div>
             )
           )
-        ) : (failedCount >= 5 && props.checkStepResultDataRoute !== null) ||
-          props.checkStepResultResponseData?.[0] ===
-            "registrationId tidak valid" ? (
-          redirectUrl ? (
-            <div className="mt-20 text-primary text-base poppins-medium underline hover:cursor-pointer">
-              <a
-                style={{
-                  color: themeConfigurationAvaliabilityChecker(
-                    themeConfiguration?.data.action_font_color as string
-                  ),
-                }}
-                className={buttonVariants({
-                  variant: "link",
-                  size: "none",
-                  className: "font-medium",
-                })}
-                onClick={() => resetFRFailedCount("count")}
-                href={concateRedirectUrlParams(redirectUrl, "")}
-              >
-                {t("livenessSuccessButtonTitle")}
-              </a>
-            </div>
-          ) : (
-            <></>
-          )
-        ) : (
-          <div className="mt-20 text-primary text-base poppins-medium underline hover:cursor-pointer">
-            <Link
-              legacyBehavior
-              href={{
-                pathname: handleRoute("link-account"),
-                query: { ...router.query },
-              }}
-            >
-              <a
-                style={{
-                  color: themeConfigurationAvaliabilityChecker(
-                    themeConfiguration?.data.action_font_color as string
-                  ),
-                }}
-                className={buttonVariants({
-                  variant: "link",
-                  size: "none",
-                  className: "font-medium",
-                })}
-              >
-                {t("linkAccountTilaka")}
-              </a>
-            </Link>
-          </div>
-        )}
+        ) : null}
         <Footer />
       </div>
     </div>

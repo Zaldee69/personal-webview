@@ -140,7 +140,6 @@ export const serverSideRenderReturnConditions = ({
           };
         }
 
-
         if (
           currentPathnameWithoutParams === `${assetPrefix}/liveness-failure` ||
           currentPathnameWithoutParams === "/liveness-failure" || isNotRedirect
@@ -208,7 +207,10 @@ export const serverSideRenderReturnConditions = ({
         const params: any = { ...cQuery, request_id: uuid };
         const queryString = new URLSearchParams(params as any).toString();
 
-        if (!currentPathnameWithoutParams.includes("/link-account")) {
+        if (
+          !currentPathnameWithoutParams.includes("/link-account") &&
+          isNotRedirect
+        ) {
           return {
             redirect: {
               permanent: false,

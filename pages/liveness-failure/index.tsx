@@ -17,6 +17,8 @@ import { useSelector } from "react-redux";
 import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
 import Heading from "@/components/atoms/Heading";
 import Paragraph from "@/components/atoms/Paraghraph";
+import { Trans } from "react-i18next";
+import { useCountdown } from "@/hooks/useCountdown";
 
 interface TQueryParams {
   status?: string;
@@ -43,6 +45,10 @@ const LivenessFailure = () => {
   } else {
     params.status = "F";
   }
+
+  const second = 5;
+
+  const { timeLeft } = useCountdown(second);
 
   const queryString = new URLSearchParams(params as any).toString();
   const message =
@@ -105,7 +111,14 @@ const LivenessFailure = () => {
                   </div>
                   <div className="block lg:hidden">
                     <Paragraph className="text-center text-red-100">
-                      {t("ekycFailed.subtitle")}
+                      <Paragraph>
+                        <Trans
+                          values={{
+                            timeLeft: timeLeft <= 0 ? 0 : timeLeft,
+                          }}
+                          i18nKey="ekycFailed.subtitle"
+                        ></Trans>
+                      </Paragraph>
                     </Paragraph>
                   </div>
                 </div>

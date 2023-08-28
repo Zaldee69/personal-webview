@@ -42,8 +42,14 @@ import Button, { buttonVariants } from "@/components/atoms/Button";
 import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
 import Heading from "@/components/atoms/Heading";
 import Paragraph from "@/components/atoms/Paraghraph";
+import ModalLayout from "@/components/layout/ModalLayout";
+import CloseIcon from "@/public/icons/CloseIcon";
+import TextInput from "@/components/atoms/TextInput";
 
-type Props = {};
+type Props = {
+  checkStepResultDataRoute: TKycCheckStepResponseData["data"]["route"];
+  tilakaName: TKycCheckStepResponseData["data"]["user_identifier"]
+};
 
 type Tform = {
   tilaka_name: string;
@@ -74,6 +80,13 @@ type IModalConsent = {
   tilakaName: string;
 };
 
+type TLinkingModal = {
+  fillTilakaName: () => void;
+  isShowLinkingModal: boolean;
+  setIsShowLinkingModal: React.Dispatch<React.SetStateAction<boolean>>;
+  tilakaName: string;
+};
+
 const LinkAccount = (props: Props) => {
   const router = useRouter();
   const { t }: any = i18n;
@@ -82,12 +95,21 @@ const LinkAccount = (props: Props) => {
   const [form, formSetter] = useState<Tform>({ tilaka_name: "", password: "" });
   const [modal, setModal] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isTilakaNameFieldDisabled, setIsTilakaNameFieldDisabled] =
+    useState<boolean>(false);
+  const [isShowLinkingModal, setIsShowLinkingModal] = useState<boolean>(false);
   const [modalConsent, setModalConsent] = useState<{
     show: boolean;
     data: { queryWithDynamicRedirectURL: any } | null;
   }>({ show: false, data: null });
-  const { nik, request_id, signing, setting, is_penautan, ...restRouterQuery } =
-    router.query;
+  const {
+    nik,
+    request_id,
+    signing,
+    setting,
+    is_penautan,
+    ...restRouterQuery
+  } = router.query;
   const dispatch: AppDispatch = useDispatch();
   const data = useSelector((state: RootState) => state.login);
   const themeConfiguration = useSelector((state: RootState) => state.theme);
@@ -96,9 +118,15 @@ const LinkAccount = (props: Props) => {
     formSetter({ ...form, [e.currentTarget.name]: e.currentTarget.value });
   };
 
+  const fillTilakaName = () => {
+    setIsTilakaNameFieldDisabled(true);
+    setIsShowLinkingModal(false);
+    formSetter({ ...form, tilaka_name: props.tilakaName });
+  };
+
   const handleFormOnSubmit = (e: React.SyntheticEvent): void => {
     e.preventDefault();
-    setIsLoading(true)
+    setIsLoading(true);
     toast(`Loading...`, {
       type: "info",
       toastId: "load",
@@ -124,8 +152,17 @@ const LinkAccount = (props: Props) => {
         tilaka_name,
         request_id,
         ...restRouterQuery,
-      } as TLoginProps));
+      } as TLoginProps)
+    );
   };
+
+  console.log(props);
+
+  useEffect(() => {
+    if (props.tilakaName) {
+      setIsShowLinkingModal(true);
+    }
+  }, [router.isReady]);
 
   useEffect(() => {
     // res -- data.data.is_penautan: boolean;
@@ -145,7 +182,7 @@ const LinkAccount = (props: Props) => {
 
       // penautan and penautan_consent will redirected to /linking/* result page
       if (signing === "1" || setting === "1") {
-        toast.dismiss("load")
+        toast.dismiss("load");
         getCertificateList({ params: "" as string }).then((res) => {
           const certif = JSON.parse(res.data);
           if (certif[0].status == "Aktif") {
@@ -174,7 +211,7 @@ const LinkAccount = (props: Props) => {
               }
             });
           } else if (certif[0].status == "Enroll") {
-            setIsLoading(false)
+            setIsLoading(false);
             toast.dismiss();
             toast.warning(
               "Penerbitan sertifikat dalam proses, cek email Anda untuk informasi sertifikat"
@@ -190,7 +227,7 @@ const LinkAccount = (props: Props) => {
           }
         });
       } else {
-        toast.dismiss("load")
+        toast.dismiss("load");
         if (data.data.data[2] === "penautan") {
           setModal(true);
         } else if (data.data.data[2] === "penautan_consent") {
@@ -206,7 +243,7 @@ const LinkAccount = (props: Props) => {
         }
       }
     } else if (data.status === "FULLFILLED" && !data.data.success) {
-      setIsLoading(false)
+      setIsLoading(false);
       if (
         data.data.message ===
           `Invalid Username / Password for Tilaka Name ${form?.tilaka_name}` ||
@@ -214,7 +251,7 @@ const LinkAccount = (props: Props) => {
         data.data.message === "NIK Not Equals ON Tilaka System" ||
         data.data.message === "Error, tilaka Name not valid"
       ) {
-        setIsLoading(false)
+        setIsLoading(false);
         toast.dismiss();
         toast.error(t("invalidUsernamePassword"));
       } else if (data.data.message === "Sudah melakukan penautan") {
@@ -229,9 +266,11 @@ const LinkAccount = (props: Props) => {
         data.data.message ===
         "Saat ini akun Anda terkunci. Silahkan coba login beberapa saat lagi."
       ) {
-        setIsLoading(true)
+        setIsLoading(true);
         toast.dismiss();
-        toast.error("Saat ini akun Anda terkunci. Silahkan coba login beberapa menit lagi.");
+        toast.error(
+          "Saat ini akun Anda terkunci. Silahkan coba login beberapa menit lagi."
+        );
         setTimeout(() => {
           router.replace({
             pathname: handleRoute("link-account/failure"),
@@ -245,7 +284,7 @@ const LinkAccount = (props: Props) => {
         data.data.message ===
         "Penerbitan sertifikat dalam proses, cek email Anda untuk informasi sertifikat"
       ) {
-        setIsLoading(false)
+        setIsLoading(false);
         toast.dismiss();
         toast.warning(data.data.message);
       }
@@ -253,13 +292,14 @@ const LinkAccount = (props: Props) => {
       data.status === "REJECTED" ||
       (data.status === "FULLFILLED" && !data.data.success)
     ) {
-      toast.dismiss()
+      toast.dismiss();
       router.replace({
         pathname: handleRoute("link-account/failure"),
         query: {
           ...router.query,
         },
       });
+      setIsLoading(false);
     }
   }, [data.status]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -316,13 +356,14 @@ const LinkAccount = (props: Props) => {
               </div>
             </div>
             <div className="mt-1 relative">
-              <input
+              <TextInput
                 type="text"
                 name="tilaka_name"
                 placeholder={t("linkAccountPlaceholder")}
                 value={form.tilaka_name}
-                onChange={handleFormOnChange}
-                className="px-2.5 py-3 w-full focus:outline-none text-sm text-neutral800 poppins-regular border border-neutral40 rounded-md"
+                onChangeHandler={handleFormOnChange}
+                customStyle="text-sm"
+                isDisabled={isTilakaNameFieldDisabled}
               />
             </div>
           </label>
@@ -333,13 +374,13 @@ const LinkAccount = (props: Props) => {
               </Paragraph>
             </div>
             <div className="mt-1 relative">
-              <input
+              <TextInput
                 type={showPassword ? "text" : "password"}
                 name="password"
                 placeholder={t("passwordPlaceholder")}
                 value={form.password}
-                onChange={handleFormOnChange}
-                className="px-2.5 py-3 w-full focus:outline-none text-sm text-neutral800 poppins-regular border border-neutral40 rounded-md"
+                onChangeHandler={handleFormOnChange}
+                customStyle="text-sm"
               />
               <button
                 type="button"
@@ -439,6 +480,12 @@ const LinkAccount = (props: Props) => {
         setModalConsent={setModalConsent}
         setIsLoading={setIsLoading}
       />
+      <ModalLinking
+        fillTilakaName={fillTilakaName}
+        isShowLinkingModal={isShowLinkingModal}
+        setIsShowLinkingModal={setIsShowLinkingModal}
+        tilakaName={props.tilakaName}
+      />
     </div>
   );
 };
@@ -468,7 +515,9 @@ const FRModal = ({
     const doRedirect = (path: string) => {
       router.push({
         pathname: handleRoute(path),
-        query: { ...router.query },
+        query: {
+          ...router.query,
+        },
       });
     };
 
@@ -541,7 +590,7 @@ const FRModal = ({
           <Button
             onClick={() => {
               controller.abort();
-              setIsLoading(false)
+              setIsLoading(false);
               toast.dismiss("info");
               restLogout({});
               setModal(!modal);
@@ -1016,9 +1065,55 @@ const ModalConsent = ({
   ) : null;
 };
 
+const ModalLinking = ({
+  isShowLinkingModal,
+  fillTilakaName,
+  setIsShowLinkingModal,
+  tilakaName,
+}: TLinkingModal) => {
+  const themeConfiguration = useSelector((state: RootState) => state.theme);
+
+  return isShowLinkingModal ? (
+    <ModalLayout>
+      <div className="flex justify-end">
+        <button
+          onClick={() => setIsShowLinkingModal(false)}
+          className="hover:opacity-50"
+        >
+          <CloseIcon />
+        </button>
+      </div>
+      <div className="flex flex-col gap-10 pt-5 pb-10 align-items-center text-center">
+        <Heading className="font-normal text-2xl">
+          NIK Anda Telah Terdaftar
+        </Heading>
+        <Paragraph>
+          Lanjutkan proses penautan aku dengan memasukkan Tilaka Name dan Kata
+          sandi Anda.
+        </Paragraph>
+        <Paragraph className="font-semibold rounded-md py-2 bg-[#DDEBFE]">
+          Tilaka Name : {tilakaName}
+        </Paragraph>
+        <Button
+          size="none"
+          className="mt-5 mb-2 uppercase text-base font-bold h-9"
+          style={{
+            backgroundColor: themeConfigurationAvaliabilityChecker(
+              themeConfiguration?.data.button_color as string
+            ),
+          }}
+          onClick={fillTilakaName}
+        >
+          Tautkan Akun
+        </Button>
+      </div>
+    </ModalLayout>
+  ) : null;
+};
+
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const cQuery = context.query;
-  const isNotRedirect= true
+  const isNotRedirect = true;
   const uuid =
     cQuery.transaction_id || cQuery.request_id || cQuery.registration_id;
   const checkStepResult: {
@@ -1042,41 +1137,20 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       return { err };
     });
 
-  return serverSideRenderReturnConditions({ context, checkStepResult, isNotRedirect });
+  const serverSideRenderReturnConditionsResult =
+    serverSideRenderReturnConditions({
+      context,
+      checkStepResult,
+      isNotRedirect,
+    });
+
+  serverSideRenderReturnConditionsResult["props"] = {
+    ...serverSideRenderReturnConditionsResult["props"],
+    checkStepResultDataRoute: checkStepResult.res?.data?.route || null,
+    tilakaName: checkStepResult.res?.data?.user_identifier || null
+  };
+
+  return serverSideRenderReturnConditionsResult;
 };
 
 export default LinkAccount;
-
-// const LinkAccountProcess = (props: Props) => {
-//   return (
-//     <div className="px-10 pt-16 pb-9 text-center">
-//       <p className="poppins-regular text-base font-semibold text-neutral800">
-//         Penautan Akun Berhasil!
-//       </p>
-//       <div className="mt-20">
-//         <Image
-//           src="/images/linkAccountSuccess.svg"
-//           width="196px"
-//           height="196px"
-//         />
-//       </div>
-//       <div className="mt-24">
-//         <Image
-//           src="/images/loader.svg"
-//           width="46.22px"
-//           height="48px"
-//           className="animate-spin"
-//         />
-//         <p className="poppins-regular text-sm text-neutral50">Mohon menunggu...</p>
-//       </div>
-//       <div className="mt-11 flex justify-center">
-//         <Image
-//           src="/images/poweredByTilaka.svg"
-//           alt="powered-by-tilaka"
-//           width="80px"
-//           height="41.27px"
-//         />
-//       </div>
-//     </div>
-//   );
-// };
