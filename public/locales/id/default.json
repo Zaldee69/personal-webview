@@ -255,7 +255,7 @@
   "checkEmail2": "Silahkan periksa email Anda untuk melihat informasi Tilaka Name.",
   "ekycFailed": {
     "title": "e-KYC Gagal",
-    "subtitle": "Untuk melanjutkan proses registrasi, Anda akan diarahkan ke halaman Verifikasi Manual dalam 5 detik",
+    "subtitle": "Untuk melanjutkan proses registrasi, Anda akan diarahkan ke halaman Verifikasi Manual dalam {{timeLeft}} detik",
     "subtitle1": "Untuk melanjutkan proses registrasi, Anda akan diarahkan ",
     "subtitle2": "ke halaman Verifikasi Manual dalam 5 detik",
     "errorCode1": "Gagal pemeriksaan Dukcapil",

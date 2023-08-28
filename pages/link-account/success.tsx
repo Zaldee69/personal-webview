@@ -65,6 +65,7 @@ const LinkAccountSuccess = (props: Props) => {
             currentRedirectUrlArr[1].includes("request-id") &&
             currentRedirectUrlArr[1].includes("tilaka-name")
           ) {
+            console.log(currentRedirectUrlArr);
             queryWithDynamicRedirectURL.redirect_url =
               currentRedirectUrlArr[0] + "?" + currentRedirectUrlArr[1] + "&";
           } else if (currentRedirectUrlArr[1].includes("request-id")) {

@@ -19,7 +19,7 @@ import React, {
 } from "react";
 import Image from "next/legacy/image";
 import i18n from "i18";
-import { RestPersonalPManualReg } from "infrastructure";
+import { RestKycCheckStepv2, RestPersonalPManualReg } from "infrastructure";
 import { TPersonalPManualRegRequestData } from "infrastructure/rest/personal/types";
 import XIcon from "@/public/icons/XIcon";
 import Button from "@/components/atoms/Button";
@@ -28,6 +28,9 @@ import { useSelector } from "react-redux";
 import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
 import Heading from "@/components/atoms/Heading";
 import Paragraph from "@/components/atoms/Paraghraph";
+import { GetServerSideProps } from "next";
+import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
+import { serverSideRenderReturnConditions } from "@/utils/serverSideRenderReturnConditions";
 
 type TForm = {
   nik: string;
@@ -46,7 +49,11 @@ type TModal = {
   fileFotoSelfieRef?: React.MutableRefObject<HTMLInputElement | null>;
 };
 
-const Index = () => {
+type Props = {
+  checkStepResultDataRoute: TKycCheckStepResponseData["data"]["route"];
+};
+
+const Index = (props: Props) => {
   const router = useRouter();
   const { request_id, ...restRouterQuery } = router.query;
   const { t }: any = i18n;
@@ -177,7 +184,9 @@ const Index = () => {
     });
   };
 
-  const onsubmitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
+  console.log(props)
+
+  const onSubmitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     setErrorMessage({
@@ -240,7 +249,7 @@ const Index = () => {
         token: res.token,
       };
 
-      if (res.channel_type === "REGULAR") {
+      if (res.channel_type === "REGULAR" && props.checkStepResultDataRoute !== "penautan") {
         toast.dismiss();
         router.push({
           pathname: handleRoute("manual-form/final"),
@@ -292,7 +301,7 @@ const Index = () => {
     >
       <div className="px-5 pt-8 max-w-md mx-auto">
         <Heading>{t("manualForm.title")}</Heading>
-        <form onSubmit={onsubmitHandler}>
+        <form onSubmit={onSubmitHandler}>
           <Label className="ml-3 mt-5" size="base" htmlFor="nik">
             NIK
           </Label>
@@ -557,5 +566,44 @@ const PhotoSelfieTermModal = ({ show, fileFotoSelfieRef }: TModal) => {
     </div>
   ) : null;
 };
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const cQuery = context.query;
+  const isNotRedirect = false;
+  const uuid =
+    cQuery.transaction_id || cQuery.request_id || cQuery.registration_id;
+
+  const checkStepResult: {
+    res?: TKycCheckStepResponseData;
+    err?: {
+      response: {
+        data: {
+          success: boolean;
+          message: string;
+          data: { errors: string[] };
+        };
+      };
+    };
+  } = await RestKycCheckStepv2({
+    registerId: uuid as string,
+  })
+    .then((res) => {
+      return { res };
+    })
+    .catch((err) => {
+      return { err };
+    });
+
+  const serverSideRenderReturnConditionsResult =
+    serverSideRenderReturnConditions({ context, checkStepResult, isNotRedirect });
+
+  serverSideRenderReturnConditionsResult["props"] = {
+    ...serverSideRenderReturnConditionsResult["props"],
+    checkStepResultDataRoute: checkStepResult.res?.data?.route || null,
+  };
+
+  return serverSideRenderReturnConditionsResult;
+};
+
 
 export default Index;
