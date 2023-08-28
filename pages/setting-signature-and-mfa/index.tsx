@@ -56,7 +56,7 @@ function SettingSignatureAndMFA({}: Props) {
   const [showModalOtpPonsel, showModalOtpPonselSetter] =
     useState<boolean>(false);
   const [agreeOtpPonsel, agreeOtpPonselSetter] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const handleFormOnChange = (e: React.FormEvent<HTMLInputElement>): void => {
     formSetter({ ...form, [e.currentTarget.name]: e.currentTarget.value });
     ref = e.currentTarget;
@@ -68,14 +68,40 @@ function SettingSignatureAndMFA({}: Props) {
 
   const themeConfiguration = useSelector((state: RootState) => state.theme);
 
-  useEffect(() => {
-    if (router.isReady) {
-      getUserName({}).then((res) => {
+  const getTilakaName = () => {
+    getUserName({})
+      .then((res) => {
         const data = JSON.parse(res.data);
         setData(data.name);
+      })
+      .catch((err) => {
+        switch (err.response.status) {
+          case 401:
+            // unauthorized
+            router.replace({
+              pathname: handleRoute("login"),
+              query: { ...router.query },
+            });
+            break;
+
+          default:
+            break;
+        }
       });
+  };
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!router.isReady) return;
+    if (!token) {
+      router.push({
+        pathname: handleRoute("login"),
+        query: { ...router.query },
+      });
+    } else {
+      getTilakaName();
     }
-  }, [router.isReady]);
+  }, [router, router.isReady]); // eslint-disable-line react-hooks/exhaustive-deps
 
   //Convert HTML element to base64 png
   const convertToDataURL = async () => {
@@ -99,7 +125,7 @@ function SettingSignatureAndMFA({}: Props) {
         backgroundColor: themeConfiguration?.data.toast_color as string,
       },
     });
-    setIsLoading(true)
+    setIsLoading(true);
     const signature_image = sigPad.current
       .getTrimmedCanvas()
       .toDataURL("image/png");
@@ -125,7 +151,7 @@ function SettingSignatureAndMFA({}: Props) {
       (signature_type == 1 && !imageURL)
     ) {
       toast.dismiss("info");
-      setIsLoading(false)
+      setIsLoading(false);
       toast(
         `${
           signature_type === 0 ? t("handwritingRequired") : t("FontRequired")
@@ -170,7 +196,7 @@ function SettingSignatureAndMFA({}: Props) {
             }
           } else {
             toast.dismiss("info");
-            setIsLoading(false)
+            setIsLoading(false);
             toast(res.message, {
               type: "error",
               toastId: "error",
@@ -180,7 +206,7 @@ function SettingSignatureAndMFA({}: Props) {
           }
         })
         .catch((err) => {
-          setIsLoading(false)
+          setIsLoading(false);
           if (err.response?.status === 401) {
             toast.dismiss("info");
             toast("Anda harus login terlebih dahulu", {
@@ -220,7 +246,7 @@ function SettingSignatureAndMFA({}: Props) {
   };
 
   return (
-    <div 
+    <div
       className="min-h-screen"
       style={{
         backgroundColor: themeConfigurationAvaliabilityChecker(
@@ -234,23 +260,20 @@ function SettingSignatureAndMFA({}: Props) {
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
       <div className="p-4 max-w-md mx-auto">
-        <Heading className="mt-2">
-          {t("settingSignatureTitleAndMFA")}
-        </Heading>
+        <Heading className="mt-2">{t("settingSignatureTitleAndMFA")}</Heading>
         <form onSubmit={handleFormOnSubmit}>
           <div
-          className="bg-contain w-64 mx-auto my-5 h-64 bg-center bg-no-repeat"
-          style={{
-            backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
-              themeConfiguration.data.asset_activation_setting_signature_and_mfa as string,
-              "ASSET",
-              `${assetPrefix}/images/ttdSetting.svg`
-            )})`,
-          }}
-        ></div>
-          <Paragraph>
-            {t("chooseSignature")}
-          </Paragraph>
+            className="bg-contain w-64 mx-auto my-5 h-64 bg-center bg-no-repeat"
+            style={{
+              backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
+                themeConfiguration.data
+                  .asset_activation_setting_signature_and_mfa as string,
+                "ASSET",
+                `${assetPrefix}/images/ttdSetting.svg`
+              )})`,
+            }}
+          ></div>
+          <Paragraph>{t("chooseSignature")}</Paragraph>
           <div className="mt-2 rounded-md bg-blue50 py-2 px-4 flex items-start">
             <div className="pt-1">
               <InfoIcon />
@@ -269,9 +292,7 @@ function SettingSignatureAndMFA({}: Props) {
                 type="radio"
                 className="appearance-none bg-white w-4 h-4 ring-1 ring-neutral40 border-2 border-neutral40 rounded-full checked:bg-primary checked:ring-primary"
               />
-              <Paragraph className="ml-2.5">
-                {t("signatureOption1")}
-              </Paragraph>
+              <Paragraph className="ml-2.5">{t("signatureOption1")}</Paragraph>
             </label>
             <label className="flex items-center mt-3.5">
               <input
@@ -282,9 +303,7 @@ function SettingSignatureAndMFA({}: Props) {
                 type="radio"
                 className="appearance-none bg-white w-4 h-4 ring-1 ring-neutral40 border-2 border-neutral40 rounded-full checked:bg-primary checked:ring-primary"
               />
-              <Paragraph className="ml-2.5">
-                {t("signatureOption2")}
-              </Paragraph>
+              <Paragraph className="ml-2.5">{t("signatureOption2")}</Paragraph>
             </label>
           </div>
           <div className={form.signature_type == 0 ? undefined : "hidden"}>
@@ -409,9 +428,7 @@ function SettingSignatureAndMFA({}: Props) {
                 type="radio"
                 className="appearance-none hover:cursor-pointer bg-white w-4 h-4 ring-1 ring-neutral40 border-2 border-neutral40 rounded-full checked:bg-primary checked:ring-primary"
               />
-              <Paragraph className="ml-2.5">
-                Face Recognition
-              </Paragraph>
+              <Paragraph className="ml-2.5">Face Recognition</Paragraph>
             </label>
             <label className="flex items-center hover:cursor-pointer mt-3.5">
               <input
@@ -422,9 +439,7 @@ function SettingSignatureAndMFA({}: Props) {
                 type="radio"
                 className="appearance-none hover:cursor-pointer bg-white w-4 h-4 ring-1 ring-neutral40 border-2 border-neutral40 rounded-full checked:bg-primary checked:ring-primary"
               />
-              <Paragraph className="ml-2.5">
-                OTP via Email
-              </Paragraph>
+              <Paragraph className="ml-2.5">OTP via Email</Paragraph>
             </label>
             <label className="flex items-center mt-3.5">
               <input
