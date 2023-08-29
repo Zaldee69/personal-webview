@@ -517,6 +517,7 @@ const FRModal = ({
         pathname: handleRoute(path),
         query: {
           ...router.query,
+          next_path: "manual_form",
         },
       });
     };
