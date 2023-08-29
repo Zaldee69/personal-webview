@@ -56,7 +56,7 @@ const LinkAccountFailure = (props: Props) => {
   useEffect(() => {
     if (!routerIsReady) return;
 
-    if (router.query.isRedirectToManualForm === "1") {
+    if (router.query.next_path === "manual_form") {
       setTimeout(() => {
         router.push({
           pathname: handleRoute("manual-form"),
