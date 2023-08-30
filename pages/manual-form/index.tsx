@@ -184,7 +184,6 @@ const Index = (props: Props) => {
     });
   };
 
-  console.log(props)
 
   const onSubmitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -569,7 +568,7 @@ const PhotoSelfieTermModal = ({ show, fileFotoSelfieRef }: TModal) => {
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const cQuery = context.query;
-  const isNotRedirect = false;
+  const isNotRedirect = true;
   const uuid =
     cQuery.transaction_id || cQuery.request_id || cQuery.registration_id;
 
@@ -604,6 +603,5 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   return serverSideRenderReturnConditionsResult;
 };
-
 
 export default Index;
