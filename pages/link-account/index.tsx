@@ -48,7 +48,7 @@ import TextInput from "@/components/atoms/TextInput";
 
 type Props = {
   checkStepResultDataRoute: TKycCheckStepResponseData["data"]["route"];
-  tilakaName: TKycCheckStepResponseData["data"]["user_identifier"]
+  tilakaName: TKycCheckStepResponseData["data"]["user_identifier"];
 };
 
 type Tform = {
@@ -102,14 +102,8 @@ const LinkAccount = (props: Props) => {
     show: boolean;
     data: { queryWithDynamicRedirectURL: any } | null;
   }>({ show: false, data: null });
-  const {
-    nik,
-    request_id,
-    signing,
-    setting,
-    is_penautan,
-    ...restRouterQuery
-  } = router.query;
+  const { nik, request_id, signing, setting, is_penautan, ...restRouterQuery } =
+    router.query;
   const dispatch: AppDispatch = useDispatch();
   const data = useSelector((state: RootState) => state.login);
   const themeConfiguration = useSelector((state: RootState) => state.theme);
@@ -155,8 +149,6 @@ const LinkAccount = (props: Props) => {
       } as TLoginProps)
     );
   };
-
-  console.log(props);
 
   useEffect(() => {
     if (props.tilakaName) {
@@ -595,10 +587,6 @@ const FRModal = ({
               toast.dismiss("info");
               restLogout({});
               setModal(!modal);
-              formSetter({
-                tilaka_name: "",
-                password: "",
-              });
             }}
             size="none"
             className="mt-5 mb-2 uppercase text-base font-bold h-9"
@@ -1074,6 +1062,8 @@ const ModalLinking = ({
 }: TLinkingModal) => {
   const themeConfiguration = useSelector((state: RootState) => state.theme);
 
+  const { t }: any = i18n;
+
   return isShowLinkingModal ? (
     <ModalLayout>
       <div className="flex justify-end">
@@ -1084,13 +1074,12 @@ const ModalLinking = ({
           <CloseIcon />
         </button>
       </div>
-      <div className="flex flex-col gap-10 pt-5 pb-10 align-items-center text-center">
-        <Heading className="font-normal text-2xl">
-          NIK Anda Telah Terdaftar
+      <div className="flex flex-col gap-10 pt-5 pb-5 align-items-center text-center">
+        <Heading className="font-[500] text-2xl">
+          {t("tilakaNameHasRegisteredModal.title")}
         </Heading>
-        <Paragraph>
-          Lanjutkan proses penautan aku dengan memasukkan Tilaka Name dan Kata
-          sandi Anda.
+        <Paragraph className="px-5">
+          {t("tilakaNameHasRegisteredModal.subtitle")}
         </Paragraph>
         <Paragraph className="font-semibold rounded-md py-2 bg-[#DDEBFE]">
           Tilaka Name : {tilakaName}
@@ -1105,8 +1094,14 @@ const ModalLinking = ({
           }}
           onClick={fillTilakaName}
         >
-          Tautkan Akun
+          {t("linkAccountCTA")}
         </Button>
+        <Paragraph size="sm">
+          {t("neverRegisteredBefore")}{" "}
+          <a className="text-[#4b68af]" target="_blank" href="https://tilaka.id/contact/">
+          {t("contactUs")}
+          </a>
+        </Paragraph>
       </div>
     </ModalLayout>
   ) : null;
@@ -1148,7 +1143,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   serverSideRenderReturnConditionsResult["props"] = {
     ...serverSideRenderReturnConditionsResult["props"],
     checkStepResultDataRoute: checkStepResult.res?.data?.route || null,
-    tilakaName: checkStepResult.res?.data?.user_identifier || null
+    tilakaName: checkStepResult.res?.data?.user_identifier || null,
   };
 
   return serverSideRenderReturnConditionsResult;
