@@ -568,7 +568,7 @@ const PhotoSelfieTermModal = ({ show, fileFotoSelfieRef }: TModal) => {
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const cQuery = context.query;
-  const isNotRedirect = true;
+  const isNotRedirect = false;
   const uuid =
     cQuery.transaction_id || cQuery.request_id || cQuery.registration_id;
 

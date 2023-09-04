@@ -86,6 +86,10 @@
   "linkAccountFailedSubtitle": "Please ensure the data matches with the Tilaka account to be linked.",
   "linkAccountTilaka": "Link Tilaka Account",
   "linkAccountTilaka1": "Activate Tilaka Account",
+  "tilakaNameHasRegisteredModal": {
+    "title": "Your NIK has been registered ",
+    "subtitle": "Continue linking account process using your Tilaka Name and Password"
+  },
   "hi": "hi",
   "loginCheckBox": "Stay signed in for 30 days",
   "loginCTA": "Login",
@@ -283,5 +287,7 @@
     "confirmNewPasswordLabel": "Confirm New Password",
     "confirmNewPasswordPlaceholder": "Confirm New Password",
     "submitButton": "Submit"
-  }
+  },
+  "neverRegisteredBefore": "Never registered before?",
+  "contactUs": "Contact Us"
 }

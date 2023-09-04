@@ -86,6 +86,10 @@
   "linkAccountFailedSubtitle": "Pastikan data sesuai dengan akun Tilaka yang akan ditautkan.",
   "linkAccountTilaka": "Tautkan Akun Tilaka",
   "linkAccountTilaka1": "Aktivasi Akun Tilaka",
+  "tilakaNameHasRegisteredModal": {
+    "title": "NIK Anda Telah Terdaftar",
+    "subtitle": "Lanjutkan proses Penautan Akun dengan masukkan Tilaka Name dan Kata Sandi Anda"
+  },
   "hi": "hai",
   "loginCheckBox": "Tetap masuk selama 30 hari",
   "loginCTA": "Masuk",
@@ -282,5 +286,7 @@
     "confirmNewPasswordLabel": "Konfirmasi Kata Sandi Baru",
     "confirmNewPasswordPlaceholder": "Konfirmasi Kata Sandi Baru",
     "submitButton": "Kirim"
-  }
+  },
+  "neverRegisteredBefore": "Tidak pernah mendaftar sebelumnya?",
+  "contactUs": "Hubungi Kami"
 }
