@@ -209,7 +209,7 @@ export const serverSideRenderReturnConditions = ({
 
         if (
           !currentPathnameWithoutParams.includes("/link-account") &&
-          isNotRedirect
+          !isNotRedirect
         ) {
           return {
             redirect: {
