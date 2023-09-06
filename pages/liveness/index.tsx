@@ -759,7 +759,7 @@ const Liveness = () => {
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const cQuery = context.query;
-  const isNotRedirect: boolean = true;
+  const isNotRedirect: boolean = false;
   const uuid =
     cQuery.transaction_id || cQuery.request_id || cQuery.registration_id;
 
