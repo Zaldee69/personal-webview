@@ -1066,15 +1066,7 @@ const ModalLinking = ({
 
   return isShowLinkingModal ? (
     <ModalLayout>
-      <div className="flex justify-end">
-        <button
-          onClick={() => setIsShowLinkingModal(false)}
-          className="hover:opacity-50"
-        >
-          <CloseIcon />
-        </button>
-      </div>
-      <div className="flex flex-col gap-10 pt-5 pb-5 align-items-center text-center">
+      <div className="flex flex-col gap-10 pt-8 pb-5 align-items-center text-center">
         <Heading className="font-[500] text-2xl">
           {t("tilakaNameHasRegisteredModal.title")}
         </Heading>
@@ -1098,8 +1090,12 @@ const ModalLinking = ({
         </Button>
         <Paragraph size="sm">
           {t("neverRegisteredBefore")}{" "}
-          <a className="text-[#4b68af]" target="_blank" href="https://tilaka.id/contact/">
-          {t("contactUs")}
+          <a
+            className="text-[#4b68af]"
+            target="_blank"
+            href="https://tilaka.id/contact/"
+          >
+            {t("contactUs")}
           </a>
         </Paragraph>
       </div>
