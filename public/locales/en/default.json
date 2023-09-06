@@ -88,7 +88,7 @@
   "linkAccountTilaka1": "Activate Tilaka Account",
   "tilakaNameHasRegisteredModal": {
     "title": "Your NIK has been registered ",
-    "subtitle": "Continue linking account process using your Tilaka Name and Password"
+    "subtitle": "Continue linking account process using your Password"
   },
   "hi": "hi",
   "loginCheckBox": "Stay signed in for 30 days",
