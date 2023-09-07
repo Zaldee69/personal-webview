@@ -123,7 +123,8 @@ export const serverSideRenderReturnConditions = ({
           checkStepResult.res.data.pin_form &&
           cQuery.redirect_url
         ) {
-          const status = checkStepResult.res.data.reason_code === "1" ? "S" : "F"
+          const status =
+            checkStepResult.res.data.reason_code === "1" ? "S" : "F";
           return {
             redirect: {
               permanent: false,
@@ -142,7 +143,8 @@ export const serverSideRenderReturnConditions = ({
 
         if (
           currentPathnameWithoutParams === `${assetPrefix}/liveness-failure` ||
-          currentPathnameWithoutParams === "/liveness-failure" || isNotRedirect
+          currentPathnameWithoutParams === "/liveness-failure" ||
+          isNotRedirect
         ) {
           return { props: {} };
         }
@@ -251,6 +253,19 @@ export const serverSideRenderReturnConditions = ({
           },
           props: {},
         };
+      } else if (checkStepResult?.res?.data.route === "manual_form") {
+        const params: any = { ...cQuery, request_id: uuid };
+        const queryString = new URLSearchParams(params as any).toString();
+
+        if (!currentPathnameWithoutParams.includes("/manual-form")) {
+          return {
+            redirect: {
+              permanent: false,
+              destination: handleRoute("manual-form?" + queryString),
+            },
+            props: {},
+          };
+        }
       } else {
         return { props: {} };
       }
