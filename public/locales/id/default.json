@@ -268,7 +268,8 @@
   },
   "linkAccountFailed5x": {
     "title": "Otentikasi Identitas Gagal",
-    "subtitle": "Mohon lakukan proses verifikasi penautan akun secara manual melalui link yang diterima di email Anda"
+    "subtitle": "Mohon lakukan proses verifikasi penautan akun secara manual melalui link yang diterima di email Anda",
+    "subtitle1": "Untuk melanjutkan proses Penautan, Anda akan diarahkan ke halaman Registrasi Manual dalam {{timeLeft}} detik"
   },
   "setMFA": {
     "title": "Pengaturan MFA",

@@ -175,8 +175,8 @@ const LinkAccount = (props: Props) => {
       const params = {
         tilaka_name: form.tilaka_name,
         request_id,
-        redirect_url: data.data.message
-      }
+        redirect_url: data.data.message,
+      };
 
       // penautan and penautan_consent will redirected to /linking/* result page
       if (signing === "1" || setting === "1") {
@@ -198,7 +198,7 @@ const LinkAccount = (props: Props) => {
                 } else {
                   router.replace({
                     pathname: handleRoute("link-account/success"),
-                    query: {...params},
+                    query: { ...params },
                   });
                 }
               } else {
@@ -241,7 +241,9 @@ const LinkAccount = (props: Props) => {
     } else if (data.status === "FULLFILLED" && !data.data.success) {
       setIsLoading(false);
       if (
-        data.data.message.includes('Invalid Username / Password for Tilaka Name') ||
+        data.data.message.includes(
+          "Invalid Username / Password for Tilaka Name"
+        ) ||
         data.data.message === "User Not Found" ||
         data.data.message === "NIK Not Equals ON Tilaka System" ||
         data.data.message === "Error, tilaka Name not valid"
@@ -265,20 +267,11 @@ const LinkAccount = (props: Props) => {
         data.data.message ===
         "Saat ini akun Anda terkunci. Silahkan coba login beberapa saat lagi."
       ) {
-        setIsLoading(true);
+        setIsLoading(false);
         toast.dismiss();
         toast.error(
           "Saat ini akun Anda terkunci. Silahkan coba login beberapa menit lagi."
         );
-        setTimeout(() => {
-          router.replace({
-            pathname: handleRoute("link-account/failure"),
-            query: {
-              ...router.query,
-              account_locked: "1",
-            },
-          });
-        }, 2500);
       } else if (
         data.data.message ===
         "Penerbitan sertifikat dalam proses, cek email Anda untuk informasi sertifikat"
