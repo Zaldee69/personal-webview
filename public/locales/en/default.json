@@ -269,7 +269,8 @@
   },
   "linkAccountFailed5x": {
     "title": "Identity Authentication Failed",
-    "subtitle": "Please continue linking account verification process manually by using the link received in your email"
+    "subtitle": "Please continue linking account verification process manually by using the link received in your email",
+    "subtitle1": "To continue the Linking Process, you will be directed to Manual Registration Page within {{timeLeft}} seconds"
   },
   "setMFA": {
     "title": "Setting MFA",

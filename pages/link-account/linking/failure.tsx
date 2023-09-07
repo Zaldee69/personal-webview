@@ -175,7 +175,7 @@ const LinkAccountFailure = (props: Props) => {
                 values={{
                   timeLeft: timeLeft <= 0 ? 0 : timeLeft,
                 }}
-                i18nKey="ekycFailed.subtitle"
+                i18nKey="linkAccountFailed5x.subtitle1"
               ></Trans>
             </Paragraph>
           </>
