@@ -38,6 +38,7 @@ import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfiguratio
 import Paragraph from "@/components/atoms/Paraghraph";
 import Heading from "@/components/atoms/Heading";
 import Label from "@/components/atoms/Label";
+import useGenerateRedirectUrl from "@/hooks/useGenerateRedirectUrl";
 
 interface IPropsLogin {}
 
@@ -98,9 +99,10 @@ const FRModal: React.FC<IModal> = ({
             {
               pathname: router.pathname,
               query: {
-                ...routerQuery,
+                redirect_url: routerQuery.redirect_url,
                 user_identifier: res.data.tilaka_name,
                 request_id: res.data.request_id,
+                status: "Sukses",
               },
             },
             undefined,
@@ -118,8 +120,22 @@ const FRModal: React.FC<IModal> = ({
           toast.error(res.message || "Ada yang salah", { icon: <XIcon /> });
           if (
             res.message.toLowerCase() ===
-            "authhashsign gagal. gagal FR sudah 5 kali".toLocaleLowerCase()
+              "authhashsign gagal. gagal FR sudah 5 kali".toLocaleLowerCase() ||
+            res.message === "signing sudah selesai"
           ) {
+            router.push(
+              {
+                pathname: router.pathname,
+                query: {
+                  redirect_url: routerQuery.redirect_url,
+                  user_identifier: routerQuery.user,
+                  // request_id: res.data.request_id,
+                  status: "Gagal",
+                },
+              },
+              undefined,
+              { shallow: false }
+            );
             setModal(false);
             signingFailure(res.message || "Ada yang salah");
           }
@@ -259,6 +275,7 @@ const OTPModal: React.FC<IModal> = ({
                 ...routerQuery,
                 user_identifier: res.data.tilaka_name,
                 request_id: res.data.request_id,
+                status: "Sukses",
               },
             },
             undefined,
@@ -277,7 +294,19 @@ const OTPModal: React.FC<IModal> = ({
             res.message.toLowerCase() ===
             "authhashsign gagal. salah OTP sudah 5 kali".toLocaleLowerCase()
           ) {
-            setModal(false);
+            router.push(
+              {
+                pathname: router.pathname,
+                query: {
+                  ...routerQuery,
+                  user_identifier: res.data.tilaka_name,
+                  request_id: res.data.request_id,
+                  status: "Gagal",
+                },
+              },
+              undefined,
+              { shallow: true }
+            );
             signingFailure(res.message || "Ada yang salah");
             setEndTimeToZero();
           }
@@ -495,7 +524,18 @@ export const SigningSuccess = () => {
     request_id: routerQuery.request_id,
     status: "Sukses",
   };
-  const queryString = new URLSearchParams(params as any).toString();
+
+  const { generatedUrl } = useGenerateRedirectUrl({
+    params,
+    url: router.query.redirect_url as string,
+  });
+
+  useEffect(() => {
+    if (routerQuery.redirect_url)
+      setTimeout(() => {
+        window.top!.location.href = generatedUrl;
+      }, 5000);
+  }, []);
 
   const { t }: any = i18n;
 
@@ -529,12 +569,7 @@ export const SigningSuccess = () => {
       </div>
       <div className="mt-32">
         {routerQuery.redirect_url && (
-          <a
-            href={concateRedirectUrlParams(
-              routerQuery.redirect_url,
-              queryString
-            )}
-          >
+          <a href={generatedUrl}>
             <span
               style={{
                 color: themeConfigurationAvaliabilityChecker(
@@ -565,13 +600,32 @@ export const SigningFailure = () => {
 
   const themeConfiguration = useSelector((state: RootState) => state.theme);
 
+  const {user_identifier, redirect_url} = routerQuery
+
   const params = {
-    user_identifier: routerQuery.user,
-    id: routerQuery.id,
-    status: "Gagal"
+    user_identifier,
+    status: "",
   };
-  const queryString = new URLSearchParams(params as any).toString();
+
+  if (router.pathname === "/signing/authhash") {
+    params.status = "Gagal";
+  } else {
+    params.status = "Blocked";
+  }
+
   const { t }: any = i18n;
+
+  const { generatedUrl } = useGenerateRedirectUrl({
+    params,
+    url: redirect_url as string,
+  });
+
+  // useEffect(() => {
+  //   if (redirect_url)
+  //     setTimeout(() => {
+  //       window.top!.location.href = generatedUrl;
+  //     }, 5000);
+  // }, []);
 
   return (
     <div
@@ -603,10 +657,7 @@ export const SigningFailure = () => {
         {routerQuery.redirect_url && (
           <div className="text-primary text-base font-medium font-poppins underline hover:cursor-pointer">
             <a
-              href={concateRedirectUrlParams(
-                routerQuery.redirect_url,
-                queryString
-              )}
+              href={generatedUrl}
             >
               <span
                 style={{

@@ -172,6 +172,12 @@ const LinkAccount = (props: Props) => {
         getExpFromToken(data.data.data[0]) as number
       );
 
+      const params = {
+        tilaka_name: form.tilaka_name,
+        request_id,
+        redirect_url: data.data.message
+      }
+
       // penautan and penautan_consent will redirected to /linking/* result page
       if (signing === "1" || setting === "1") {
         toast.dismiss("load");
@@ -192,14 +198,12 @@ const LinkAccount = (props: Props) => {
                 } else {
                   router.replace({
                     pathname: handleRoute("link-account/success"),
-                    query: { ...queryWithDynamicRedirectURL },
+                    query: {...params},
                   });
                 }
               } else {
-                router.replace({
-                  pathname: handleRoute("link-account/success"),
-                  query: { ...queryWithDynamicRedirectURL },
-                });
+                toast.dismiss();
+                toast.error("Sudah melakukan penautan");
               }
             });
           } else if (certif[0].status == "Enroll") {
@@ -230,15 +234,14 @@ const LinkAccount = (props: Props) => {
         } else {
           router.replace({
             pathname: handleRoute("link-account/success"),
-            query: { ...queryWithDynamicRedirectURL },
+            query: { ...params },
           });
         }
       }
     } else if (data.status === "FULLFILLED" && !data.data.success) {
       setIsLoading(false);
       if (
-        data.data.message ===
-          `Invalid Username / Password for Tilaka Name ${form?.tilaka_name}` ||
+        data.data.message.includes('Invalid Username / Password for Tilaka Name') ||
         data.data.message === "User Not Found" ||
         data.data.message === "NIK Not Equals ON Tilaka System" ||
         data.data.message === "Error, tilaka Name not valid"
@@ -254,6 +257,10 @@ const LinkAccount = (props: Props) => {
             ...restRouterQuery,
           } as TLoginProps)
         );
+      } else if (data.data.message === "Error, No Required Param Exist") {
+        setIsLoading(false);
+        toast.dismiss();
+        toast.error(data.data.message);
       } else if (
         data.data.message ===
         "Saat ini akun Anda terkunci. Silahkan coba login beberapa saat lagi."

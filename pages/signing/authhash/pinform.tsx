@@ -83,8 +83,9 @@ const PinFormDedicatedChannel = (props: Props) => {
           const params = {
             user_identifier: res.data.tilaka_name,
             request_id: res.data.request_id,
+            // signing_id: id,
             status: "Sukses",
-          };
+          }; 
 
           const queryString = new URLSearchParams(params as any).toString();
 

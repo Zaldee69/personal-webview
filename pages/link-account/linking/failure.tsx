@@ -45,8 +45,6 @@ const LinkAccountFailure = (props: Props) => {
   
   const second = 5;
 
-  console.log(props)
-
   const { timeLeft } = useCountdown(second);
 
   const themeConfiguration = useSelector((state: RootState) => state.theme);

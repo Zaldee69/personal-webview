@@ -40,6 +40,7 @@ import Footer from "@/components/Footer";
 import Heading from "@/components/atoms/Heading";
 import Paragraph from "@/components/atoms/Paraghraph";
 import Label from "@/components/atoms/Label";
+import useGenerateRedirectUrl from "@/hooks/useGenerateRedirectUrl";
 
 interface IParameterFromRequestSign {
   user?: string;
@@ -823,9 +824,9 @@ const SigningWithoutRead = () => {
             style={{
               backgroundColor: themeConfigurationAvaliabilityChecker(
                 themeConfiguration?.data.button_color as string
-                ),
+              ),
                 borderRadius: "6px"
-              }}
+            }}
             size="none"
             className="px-4 fit-content py-2.5"
             disabled={shouldDisableSubmit || !agree}
@@ -859,6 +860,18 @@ const SigningSuccess = (props: TPropsSigningSuccess) => {
 
   const { t }: any = i18n;
 
+  const { generatedUrl } = useGenerateRedirectUrl({
+    params,
+    url: router.query.redirect_url as string,
+  });
+
+  useEffect(() => {
+    if (routerQuery.redirect_url)
+      setTimeout(() => {
+        window.top!.location.href = generatedUrl;
+      }, 5000);
+  }, []);
+
   return (
     <div
       style={{
@@ -874,15 +887,15 @@ const SigningSuccess = (props: TPropsSigningSuccess) => {
           {t("signSuccess")}
         </Heading>
         <div
-            className="bg-contain mx-auto w-52 h-52 bg-center bg-no-repeat"
-            style={{
-              backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
-                themeConfiguration.data.asset_signing_success as string,
-                "ASSET",
-                `${assetPrefix}/images/signingSuccess.svg`
-              )})`,
-            }}
-          ></div>
+          className="bg-contain mx-auto w-52 h-52 bg-center bg-no-repeat"
+          style={{
+            backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
+              themeConfiguration.data.asset_signing_success as string,
+              "ASSET",
+              `${assetPrefix}/images/signingSuccess.svg`
+            )})`,
+          }}
+        ></div>
         <div className="mt-3">
           <Paragraph size="sm">
             {props.documentCount} {t("documentSuccess")}
@@ -935,6 +948,18 @@ const SigningOnProgress = (props: TPropsSigningSuccess) => {
 
   const { t }: any = i18n;
 
+  const { generatedUrl } = useGenerateRedirectUrl({
+    params,
+    url: router.query.redirect_url as string,
+  });
+
+  useEffect(() => {
+    if (routerQuery.redirect_url)
+      setTimeout(() => {
+        window.top!.location.href = generatedUrl;
+      }, 5000);
+  }, []);
+
   return (
     <div
       style={{
@@ -950,15 +975,15 @@ const SigningOnProgress = (props: TPropsSigningSuccess) => {
           {t("authenticationSuccessTitle")}
         </Heading>
         <div
-            className="bg-contain mx-auto w-52 h-52 bg-center bg-no-repeat"
-            style={{
-              backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
+          className="bg-contain mx-auto w-52 h-52 bg-center bg-no-repeat"
+          style={{
+            backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
                 themeConfiguration.data.asset_signing_authenticated_success as string,
-                "ASSET",
-                `${assetPrefix}/images/progress.svg`
-              )})`,
-            }}
-          ></div>
+              "ASSET",
+              `${assetPrefix}/images/progress.svg`
+            )})`,
+          }}
+        ></div>
         <div className="mt-3">
           <Paragraph size="sm" className="whitespace-pre-line">
             {t("authenticationSuccessSubtitle")}
@@ -979,10 +1004,7 @@ const SigningOnProgress = (props: TPropsSigningSuccess) => {
                 size: "none",
                 className: "font-medium",
               })}
-              href={concateRedirectUrlParams(
-                routerQuery.redirect_url,
-                queryString
-              )}
+              href={generatedUrl}
             >
               <span>{t("livenessSuccessButtonTitle")}</span>
             </a>
@@ -1005,10 +1027,22 @@ const SigningFailure = (props: TPropsSigningFailure) => {
   const params = {
     user_identifier: routerQuery.user,
     request_id: routerQuery.request_id,
-    status: props.error.status,
+    status: 'Gagal',
   };
   const queryString = new URLSearchParams(params as any).toString();
   const { t }: any = i18n;
+
+  const { generatedUrl } = useGenerateRedirectUrl({
+    params,
+    url: router.query.redirect_url as string,
+  });
+
+  useEffect(() => {
+    if (routerQuery.redirect_url)
+      setTimeout(() => {
+        window.top!.location.href = generatedUrl;
+      }, 5000);
+  }, []);
 
   return (
     <div
@@ -1024,16 +1058,16 @@ const SigningFailure = (props: TPropsSigningFailure) => {
         <Heading>
           {t("signFailed")}
         </Heading>
-           <div
-            className="bg-contain mx-auto w-52 h-52 bg-center bg-no-repeat"
-            style={{
-              backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
-                themeConfiguration.data.asset_signing_failed as string,
-                "ASSET",
-                `${assetPrefix}/images/signingFailure.svg`
-              )})`,
-            }}
-          ></div>
+        <div
+          className="bg-contain mx-auto w-52 h-52 bg-center bg-no-repeat"
+          style={{
+            backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
+              themeConfiguration.data.asset_signing_failed as string,
+              "ASSET",
+              `${assetPrefix}/images/signingFailure.svg`
+            )})`,
+          }}
+        ></div>
         <div className="mt-3">
           <Paragraph size="sm" >
             {t("signFailedSubtitle")}{" "}
@@ -1054,10 +1088,7 @@ const SigningFailure = (props: TPropsSigningFailure) => {
                 size: "none",
                 className: "font-medium",
               })}
-              href={concateRedirectUrlParams(
-                routerQuery.redirect_url,
-                queryString
-              )}
+              href={generatedUrl}
             >
               <span>{t("livenessSuccessButtonTitle")}</span>
             </a>

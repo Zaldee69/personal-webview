@@ -191,6 +191,7 @@ const Form: React.FC = () => {
 
           const query: any = {
             request_id,
+            status: res.data.status,
             ...restRouterQuery,
           };
 
