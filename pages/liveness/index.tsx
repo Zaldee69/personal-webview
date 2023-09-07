@@ -130,6 +130,9 @@ const Liveness = () => {
 
             if (routerQuery.redirect_url) {
               params.status = res.data.status;
+              if(!res.data.pin_form){
+                params.redirect_url = routerQuery.redirect_url as string;
+              }
             }
 
             //block for dedicated channel
@@ -145,7 +148,6 @@ const Liveness = () => {
               }
               //block for regular channel
             } else {
-              params.redirect_url = routerQuery.redirect_url as string;
               params.request_id = routerQuery.request_id as string;
               toast.success(res?.message || "pengecekan step berhasil", {
                 icon: <CheckOvalIcon />,
@@ -547,7 +549,7 @@ const Liveness = () => {
                   }
 
                   router.push({
-                    pathname: handleRoute("liveness-fail"),
+                    pathname: handleRoute("liveness-failure"),
                     query,
                   });
                 }

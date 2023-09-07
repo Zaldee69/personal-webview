@@ -65,8 +65,8 @@ const AuthPinForm = (props: Props) => {
           if (redirect_url) {
             const params = {
               user_identifier: user,
-              signing_id: id,
               status: "Sukses",
+              request_id: router.query.request_id || router.query.register_id
             };
             const queryString = new URLSearchParams(params as any).toString();
             window.top!.location.href = concateRedirectUrlParams(
@@ -89,7 +89,7 @@ const AuthPinForm = (props: Props) => {
           ) {
             const params = {
               user_identifier: user,
-              signing_id: id,
+              request_id: router.query.request_id || router.query.register_id,
               status: "Blocked",
             };
             const queryString = new URLSearchParams(params as any).toString();

@@ -19,11 +19,13 @@ import Heading from "@/components/atoms/Heading";
 import Paragraph from "@/components/atoms/Paraghraph";
 import { Trans } from "react-i18next";
 import { useCountdown } from "@/hooks/useCountdown";
+import useGenerateRedirectUrl from "@/hooks/useGenerateRedirectUrl";
 
 interface TQueryParams {
-  status?: string;
+  status?: string | undefined | string[];
+  reason_code: string | undefined | string[];
   request_id: string;
-  reason_code?: string;
+  register_id: string;
 }
 
 const LivenessFailure = () => {
@@ -35,10 +37,15 @@ const LivenessFailure = () => {
     routerQuery.transaction_id ||
     routerQuery.request_id ||
     routerQuery.registration_id;
+
+  const { reason_code, redirect_url, status } = routerQuery;
+
   const params: TQueryParams = {
     request_id: uuid as string,
+    register_id: uuid as string,
+    reason_code,
+    status,
   };
-  const reason_code = routerQuery.reason_code;
 
   if (reason_code === "3") {
     params.reason_code = "3";
@@ -50,7 +57,6 @@ const LivenessFailure = () => {
 
   const { timeLeft } = useCountdown(second);
 
-  const queryString = new URLSearchParams(params as any).toString();
   const message =
     reason_code === "1"
       ? t("ekycFailed.errorCode1")
@@ -60,15 +66,23 @@ const LivenessFailure = () => {
       ? t("ekycFailed.errorCode3")
       : t("livenessFailed3xSubtitle");
   const isRedirectToManualForm = reason_code === "1" || reason_code === "2";
+
+  const { generatedUrl } = useGenerateRedirectUrl({
+    params,
+    url: redirect_url as string,
+  });
+
   useEffect(() => {
-    if (isRedirectToManualForm) {
-      setTimeout(() => {
+    setTimeout(() => {
+      if (isRedirectToManualForm) {
         router.push({
           pathname: handleRoute("manual-form"),
-          query: routerQuery,
+          query: { ...params },
         });
-      }, 5000);
-    }
+      } else if (redirect_url && reason_code === "3") {
+        window.top!.location.href = generatedUrl;
+      }
+    }, 5000);
   }, []);
   return (
     <div
@@ -124,12 +138,9 @@ const LivenessFailure = () => {
                 </div>
               )}
             </Paragraph>
-            {routerQuery.redirect_url && reason_code === "3" ? (
+            {redirect_url && reason_code === "3" ? (
               <a
-                href={concateRedirectUrlParams(
-                  routerQuery.redirect_url as string,
-                  queryString
-                )}
+                href={generatedUrl}
               >
                 <span
                   style={{
