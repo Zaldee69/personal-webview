@@ -860,16 +860,13 @@ const SigningSuccess = (props: TPropsSigningSuccess) => {
 
   const { t }: any = i18n;
 
-  const { generatedUrl } = useGenerateRedirectUrl({
+  const { generatedUrl, autoRedirect } = useGenerateRedirectUrl({
     params,
     url: router.query.redirect_url as string,
   });
 
   useEffect(() => {
-    if (routerQuery.redirect_url)
-      setTimeout(() => {
-        window.top!.location.href = generatedUrl;
-      }, 5000);
+    autoRedirect()
   }, []);
 
   return (
@@ -948,16 +945,13 @@ const SigningOnProgress = (props: TPropsSigningSuccess) => {
 
   const { t }: any = i18n;
 
-  const { generatedUrl } = useGenerateRedirectUrl({
+  const { generatedUrl, autoRedirect } = useGenerateRedirectUrl({
     params,
     url: router.query.redirect_url as string,
   });
 
   useEffect(() => {
-    if (routerQuery.redirect_url)
-      setTimeout(() => {
-        window.top!.location.href = generatedUrl;
-      }, 5000);
+    autoRedirect()
   }, []);
 
   return (
@@ -1032,16 +1026,13 @@ const SigningFailure = (props: TPropsSigningFailure) => {
   const queryString = new URLSearchParams(params as any).toString();
   const { t }: any = i18n;
 
-  const { generatedUrl } = useGenerateRedirectUrl({
+  const { generatedUrl, autoRedirect } = useGenerateRedirectUrl({
     params,
     url: router.query.redirect_url as string,
   });
 
   useEffect(() => {
-    if (routerQuery.redirect_url)
-      setTimeout(() => {
-        window.top!.location.href = generatedUrl;
-      }, 5000);
+    autoRedirect()
   }, []);
 
   return (

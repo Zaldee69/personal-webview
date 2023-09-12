@@ -32,15 +32,13 @@ const FormSuccess = (props: Props) => {
     uuid,
   };
 
-  const { generatedUrl } = useGenerateRedirectUrl({
+  const { generatedUrl, autoRedirect } = useGenerateRedirectUrl({
     params,
     url: routerQuery.redirect_url as string,
   });
 
   useEffect(() => {
-    if (routerQuery.redirect_url) {
-      window.top!.location.href = generatedUrl;
-    }
+    autoRedirect()
   }, [router.isReady]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (

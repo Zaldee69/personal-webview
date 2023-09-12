@@ -15,7 +15,16 @@ const useGenerateRedirectUrl = ({
 
   const generatedUrl = concateRedirectUrlParams(url, queryString);
 
-  return { generatedUrl };
+  const timeout = Number(process.env.NEXT_PUBLIC_AUTO_REDIRECT_TIMEOUT) * 1000 || 5000;
+
+  const autoRedirect = () => {
+    if (url)
+      setTimeout(() => {
+        window.top!.location.href = generatedUrl;
+      }, timeout as number);
+  };
+
+  return { generatedUrl, autoRedirect };
 };
 
 export default useGenerateRedirectUrl;

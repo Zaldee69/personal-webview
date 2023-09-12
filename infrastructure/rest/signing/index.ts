@@ -11,7 +11,7 @@ import {
 } from "./types";
 
 const BASE_URL =
-  process.env.NEXT_PUBLIC_DS_API_URL || "https://dev-api.tilaka.id";
+  process.env.NEXT_PUBLIC_DS_API_URL || "http://10.117.1.151:8080";
 
 export const restSigning = ({
   payload,
@@ -101,7 +101,7 @@ export const RestSigningAuthhashsign = ({
 }): Promise<ISigningAuthhashsignResponseData> => {
   return axios
     .post<ISigningAuthhashsignResponseData>(
-      `${BASE_URL}/signing-authhashsign`,
+      `${BASE_URL}/signing/authhashsign`,
       payload,
       {
         headers: {

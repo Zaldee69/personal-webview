@@ -40,7 +40,7 @@ const LinkAccountSuccess = (props: Props) => {
 
   const {redirect_url, request_id, tilaka_name} = routerQuery
 
-  const { generatedUrl } = useGenerateRedirectUrl({
+  const { generatedUrl, autoRedirect } = useGenerateRedirectUrl({
     url: redirect_url as string,
     params: {
       request_id,
@@ -52,9 +52,7 @@ const LinkAccountSuccess = (props: Props) => {
     if (!routerIsReady) return;
     if (!isSigning) {
       restLogout({});
-      setTimeout(() => {
-        window.top!.location.href = generatedUrl;
-      }, 5000);
+      autoRedirect()
     } else {
       setTimeout(() => {
         router.replace({

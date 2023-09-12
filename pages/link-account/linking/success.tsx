@@ -46,10 +46,10 @@ const LinkAccountSuccess = (props: Props) => {
       let params: any = {};
 
       if (queryWithDynamicRedirectURL.request_id) {
-        params["request-id"] = queryWithDynamicRedirectURL.request_id;
+        params["request_id"] = queryWithDynamicRedirectURL.request_id;
       }
       if (queryWithDynamicRedirectURL.tilaka_name) {
-        params["tilaka-name"] = queryWithDynamicRedirectURL.tilaka_name;
+        params["tilaka_name"] = queryWithDynamicRedirectURL.tilaka_name;
       }
 
       let queryString = new URLSearchParams(params as any).toString();
