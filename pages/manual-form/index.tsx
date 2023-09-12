@@ -248,7 +248,7 @@ const Index = (props: Props) => {
         token: res.token,
       };
 
-      if (res.channel_type === "REGULAR" && props.checkStepResultDataRoute !== "penautan") {
+      if (res.channel_type === "REGULAR" && props.checkStepResultDataRoute !== "manual_form") {
         toast.dismiss();
         router.push({
           pathname: handleRoute("manual-form/final"),
