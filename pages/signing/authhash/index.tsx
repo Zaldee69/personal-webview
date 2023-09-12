@@ -32,7 +32,6 @@ import Link from "next/link";
 import { PinInput } from "react-input-pin-code";
 import { RestSigningAuthhashsign } from "infrastructure";
 import FRCamera from "@/components/FRCamera";
-import { concateRedirectUrlParams } from "@/utils/concateRedirectUrlParams";
 import Button, { buttonVariants } from "@/components/atoms/Button";
 import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
 import Paragraph from "@/components/atoms/Paraghraph";
@@ -42,7 +41,7 @@ import useGenerateRedirectUrl from "@/hooks/useGenerateRedirectUrl";
 
 interface IPropsLogin {}
 
-interface IParameterFromRequestSign {
+export interface IParameterFromRequestSign {
   user?: string;
   id?: string;
   channel_id?: string;
@@ -65,7 +64,6 @@ const AUTHHASH_PATHNAME = handleRoute("signing/authhash");
 const FRModal: React.FC<IModal> = ({
   modal,
   setModal,
-  callbackSuccess,
   callbackFailure,
 }) => {
   const router = useRouter();
@@ -76,9 +74,6 @@ const FRModal: React.FC<IModal> = ({
   const [isFRSuccess, setIsFRSuccess] = useState<boolean>(false);
   const themeConfiguration = useSelector((state: RootState) => state.theme);
 
-  const signingFailure = (message: string) => {
-    callbackFailure({ message, status: "Gagal" });
-  };
   const captureProcessor = (base64Img: string | null | undefined) => {
     RestSigningAuthhashsign({
       params: {
@@ -95,9 +90,9 @@ const FRModal: React.FC<IModal> = ({
     })
       .then((res) => {
         if (res.success) {
-          router.push(
+          router.replace(
             {
-              pathname: router.pathname,
+              pathname: handleRoute("signing/success"),
               query: {
                 redirect_url: routerQuery.redirect_url,
                 user_identifier: res.data.tilaka_name,
@@ -105,8 +100,6 @@ const FRModal: React.FC<IModal> = ({
                 status: "Sukses",
               },
             },
-            undefined,
-            { shallow: true }
           );
           toast.dismiss("info");
           toast(`Pencocokan berhasil`, {
@@ -125,7 +118,7 @@ const FRModal: React.FC<IModal> = ({
           ) {
             router.push(
               {
-                pathname: router.pathname,
+                pathname: handleRoute("signing/failure"),
                 query: {
                   redirect_url: routerQuery.redirect_url,
                   user_identifier: routerQuery.user,
@@ -137,7 +130,6 @@ const FRModal: React.FC<IModal> = ({
               { shallow: false }
             );
             setModal(false);
-            signingFailure(res.message || "Ada yang salah");
           }
         }
       })
@@ -161,7 +153,6 @@ const FRModal: React.FC<IModal> = ({
             "authhashsign gagal. gagal FR sudah 5 kali".toLocaleLowerCase()
           ) {
             setModal(false);
-            signingFailure(err.response?.data?.message || "Ada yang salah");
           }
         }
       });
@@ -169,7 +160,6 @@ const FRModal: React.FC<IModal> = ({
 
   useEffect(() => {
     if (isFRSuccess) {
-      callbackSuccess();
       if (modal) {
         document.body.style.overflow = "hidden";
       }
@@ -300,7 +290,7 @@ const OTPModal: React.FC<IModal> = ({
                 query: {
                   ...routerQuery,
                   user_identifier: res.data.tilaka_name,
-                  request_id: res.data.request_id,
+                  // request_id: res.data.request_id,
                   status: "Gagal",
                 },
               },
@@ -511,177 +501,6 @@ const OTPModal: React.FC<IModal> = ({
   ) : null;
 };
 
-export const SigningSuccess = () => {
-  const router = useRouter();
-  const routerQuery: NextParsedUrlQuery & {
-    redirect_url?: string;
-  } & IParameterFromRequestSign = router.query;
-
-  const themeConfiguration = useSelector((state: RootState) => state.theme);
-
-  const params = {
-    user_identifier: routerQuery.user,
-    request_id: routerQuery.request_id,
-    status: "Sukses",
-  };
-
-  const { generatedUrl } = useGenerateRedirectUrl({
-    params,
-    url: router.query.redirect_url as string,
-  });
-
-  useEffect(() => {
-    if (routerQuery.redirect_url)
-      setTimeout(() => {
-        window.top!.location.href = generatedUrl;
-      }, 5000);
-  }, []);
-
-  const { t }: any = i18n;
-
-  return (
-    <div
-      style={{
-        backgroundColor: themeConfigurationAvaliabilityChecker(
-          themeConfiguration?.data.background as string,
-          "BG"
-        ),
-      }}
-      className="px-10 pt-16 pb-9 text-center flex flex-col justify-center min-h-screen"
-    >
-      <div>
-        <Heading>{t("authenticationSuccessTitle")}</Heading>
-        <div
-          className="bg-contain mx-auto w-52 h-52 bg-center bg-no-repeat"
-          style={{
-            backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
-              themeConfiguration.data.asset_signing_success as string,
-              "ASSET",
-              `${assetPrefix}/images/signingSuccess.svg`
-            )})`,
-          }}
-        ></div>
-        <div className="mt-3">
-          <Paragraph size="sm" className="whitespace-pre-line">
-            {t("authenticationSuccessSubtitle")}
-          </Paragraph>
-        </div>
-      </div>
-      <div className="mt-32">
-        {routerQuery.redirect_url && (
-          <a href={generatedUrl}>
-            <span
-              style={{
-                color: themeConfigurationAvaliabilityChecker(
-                  themeConfiguration?.data.action_font_color as string
-                ),
-              }}
-              className={buttonVariants({
-                variant: "link",
-                size: "none",
-                className: "font-medium",
-              })}
-            >
-              {t("livenessSuccessButtonTitle")}
-            </span>
-          </a>
-        )}
-        <Footer />
-      </div>
-    </div>
-  );
-};
-
-export const SigningFailure = () => {
-  const router = useRouter();
-  const routerQuery: NextParsedUrlQuery & {
-    redirect_url?: string;
-  } & IParameterFromRequestSign = router.query;
-
-  const themeConfiguration = useSelector((state: RootState) => state.theme);
-
-  const {user_identifier, redirect_url} = routerQuery
-
-  const params = {
-    user_identifier,
-    status: "",
-  };
-
-  if (router.pathname === "/signing/authhash") {
-    params.status = "Gagal";
-  } else {
-    params.status = "Blocked";
-  }
-
-  const { t }: any = i18n;
-
-  const { generatedUrl } = useGenerateRedirectUrl({
-    params,
-    url: redirect_url as string,
-  });
-
-  // useEffect(() => {
-  //   if (redirect_url)
-  //     setTimeout(() => {
-  //       window.top!.location.href = generatedUrl;
-  //     }, 5000);
-  // }, []);
-
-  return (
-    <div
-      style={{
-        backgroundColor: themeConfigurationAvaliabilityChecker(
-          themeConfiguration?.data.background as string,
-          "BG"
-        ),
-      }}
-      className="px-10 pt-16 pb-9 text-center flex flex-col justify-center min-h-screen"
-    >
-      <div>
-        <Heading>{t("signFailed")}</Heading>
-        <div
-          className="bg-contain mx-auto w-52 h-52 bg-center bg-no-repeat"
-          style={{
-            backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
-              themeConfiguration.data.asset_signing_failed as string,
-              "ASSET",
-              `${assetPrefix}/images/signingFailure.svg`
-            )})`,
-          }}
-        ></div>
-        <div className="mt-3">
-          <Paragraph size="sm">{t("signFailedSubtitle")} </Paragraph>
-        </div>
-      </div>
-      <div className="mt-32">
-        {routerQuery.redirect_url && (
-          <div className="text-primary text-base font-medium font-poppins underline hover:cursor-pointer">
-            <a
-              href={generatedUrl}
-            >
-              <span
-                style={{
-                  color: themeConfigurationAvaliabilityChecker(
-                    themeConfiguration?.data.action_font_color as string
-                  ),
-                }}
-                className={buttonVariants({
-                  variant: "link",
-                  size: "none",
-                  className: "font-medium",
-                })}
-              >
-                {t("livenessSuccessButtonTitle")}
-              </span>
-            </a>
-          </div>
-        )}
-        <Footer />
-      </div>
-    </div>
-  );
-};
-
 const Login = ({}: IPropsLogin) => {
   const router = useRouter();
   const dispatch: AppDispatch = useDispatch();
@@ -847,11 +666,6 @@ const Login = ({}: IPropsLogin) => {
     localStorage.removeItem("refresh_token_hashsign");
   };
 
-  if (isSuccess === "1") {
-    return <SigningSuccess />;
-  } else if (isSuccess === "0") {
-    return <SigningFailure />;
-  }
 
   return (
     <div

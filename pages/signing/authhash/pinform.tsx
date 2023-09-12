@@ -7,8 +7,6 @@ import React, { useEffect, useState } from "react";
 import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/app/store";
-import { SigningFailure, SigningSuccess } from ".";
-import { concateRedirectUrlParams } from "@/utils/concateRedirectUrlParams";
 import { handleRoute } from "@/utils/handleRoute";
 
 type Props = {};
@@ -50,8 +48,6 @@ const PinFormDedicatedChannel = (props: Props) => {
 
   const [isProcessed, setIsProcessed] = useState<boolean>(false);
 
-  const [isSuccess, setIsSuccess] = useState<"-1" | "0" | "1">("-1");
-
   const digitLength: number = 6;
 
   const themeConfiguration = useSelector((state: RootState) => state.theme);
@@ -80,35 +76,15 @@ const PinFormDedicatedChannel = (props: Props) => {
     })
       .then((res) => {
         if (res.success) {
-          const params = {
-            user_identifier: res.data.tilaka_name,
-            request_id: res.data.request_id,
-            // signing_id: id,
-            status: "Sukses",
-          }; 
-
-          const queryString = new URLSearchParams(params as any).toString();
-
-          if (redirect_url) {
-            window.top!.location.href = concateRedirectUrlParams(
+          router.push({
+            pathname: handleRoute("/signing/success"),
+            query: {
               redirect_url,
-              queryString
-            );
-          } else {
-            router.push(
-              {
-                pathname: handleRoute(pathname as string),
-                query: {
-                  ...router.query,
-                  user_identifier: res.data.tilaka_name,
-                  request_id: res.data.request_id,
-                },
-              },
-              undefined,
-              { shallow: true }
-            );
-            setIsSuccess("1");
-          }
+              user_identifier: res.data.tilaka_name,
+              request_id: res.data.request_id,
+              status: "Sukses"
+            },
+          });
         } else {
           setPinConfirmError({
             isError: true,
@@ -119,19 +95,17 @@ const PinFormDedicatedChannel = (props: Props) => {
 
           if (
             res.message ===
-              "penandatanganan dokumen gagal. pin sudah salah 3 kali" &&
-            redirect_url
+            "penandatanganan dokumen gagal. pin sudah salah 3 kali"
           ) {
-            const queryString = new URLSearchParams({
-              user_identifier: user,
-              id,
-              status: "Blocked"
-            } as any).toString();
-
-            window.top!.location.href = concateRedirectUrlParams(
-              redirect_url as string,
-              queryString
-            );
+            router.push({
+              pathname: handleRoute("signing/failure"),
+              query: {
+                redirect_url,
+                user_identifier: user,
+                // request_id: res.data.request_id,
+                status: "Blocked",
+              },
+            });
           }
         }
       })
@@ -158,12 +132,6 @@ const PinFormDedicatedChannel = (props: Props) => {
   }, [router.isReady]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!shouldRender) return;
-
-  if (isSuccess === "1") {
-    return <SigningSuccess />;
-  } else if (isSuccess === "0") {
-    return <SigningFailure />;
-  }
 
   return (
     <div

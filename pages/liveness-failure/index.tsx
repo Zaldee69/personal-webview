@@ -67,22 +67,22 @@ const LivenessFailure = () => {
       : t("livenessFailed3xSubtitle");
   const isRedirectToManualForm = reason_code === "1" || reason_code === "2";
 
-  const { generatedUrl } = useGenerateRedirectUrl({
+  const { generatedUrl, autoRedirect } = useGenerateRedirectUrl({
     params,
     url: redirect_url as string,
   });
 
   useEffect(() => {
-    setTimeout(() => {
-      if (isRedirectToManualForm) {
+    if (isRedirectToManualForm) {
+        setTimeout(() => {
         router.push({
           pathname: handleRoute("manual-form"),
           query: { ...params },
         });
-      } else if (redirect_url && reason_code === "3") {
-        window.top!.location.href = generatedUrl;
-      }
-    }, 5000);
+      }, 5000);
+    } else if (redirect_url && reason_code === "3") {
+      autoRedirect();
+    }
   }, []);
   return (
     <div
@@ -139,9 +139,7 @@ const LivenessFailure = () => {
               )}
             </Paragraph>
             {redirect_url && reason_code === "3" ? (
-              <a
-                href={generatedUrl}
-              >
+              <a href={generatedUrl}>
                 <span
                   style={{
                     color: themeConfigurationAvaliabilityChecker(

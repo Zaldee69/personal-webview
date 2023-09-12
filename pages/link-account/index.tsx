@@ -175,8 +175,8 @@ const LinkAccount = (props: Props) => {
       const params = {
         tilaka_name: form.tilaka_name,
         request_id,
-        redirect_url: data.data.message,
-      };
+        redirect_url: data.data.message
+      }
 
       // penautan and penautan_consent will redirected to /linking/* result page
       if (signing === "1" || setting === "1") {
@@ -198,7 +198,7 @@ const LinkAccount = (props: Props) => {
                 } else {
                   router.replace({
                     pathname: handleRoute("link-account/success"),
-                    query: { ...params },
+                    query: {...params},
                   });
                 }
               } else {
@@ -241,9 +241,7 @@ const LinkAccount = (props: Props) => {
     } else if (data.status === "FULLFILLED" && !data.data.success) {
       setIsLoading(false);
       if (
-        data.data.message.includes(
-          "Invalid Username / Password for Tilaka Name"
-        ) ||
+        data.data.message.includes('Invalid Username / Password for Tilaka Name') ||
         data.data.message === "User Not Found" ||
         data.data.message === "NIK Not Equals ON Tilaka System" ||
         data.data.message === "Error, tilaka Name not valid"

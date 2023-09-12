@@ -41,7 +41,7 @@ const SettingMFASuccess = (props: Props) => {
 
   const { t }: any = i18n;
 
-  const { generatedUrl } = useGenerateRedirectUrl({
+  const { generatedUrl, autoRedirect } = useGenerateRedirectUrl({
     params,
     url: router.query.redirect_url as string,
   });
@@ -50,10 +50,7 @@ const SettingMFASuccess = (props: Props) => {
     if (!routerIsReady) return;
     if (!isSigning) {
       restLogout({});
-      if (routerQuery.redirect_url)
-        setTimeout(() => {
-          window.top!.location.href = generatedUrl;
-        }, 5000);
+      autoRedirect()
     } else {
       setTimeout(() => {
         router.replace({

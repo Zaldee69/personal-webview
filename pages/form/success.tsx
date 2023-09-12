@@ -34,16 +34,13 @@ const FormSuccess = (props: Props) => {
     status,
   };
 
-  const { generatedUrl } = useGenerateRedirectUrl({
+  const { generatedUrl, autoRedirect } = useGenerateRedirectUrl({
     params,
     url: redirect_url as string,
   });
 
   useEffect(() => {
-    if(routerQuery.redirect_url)
-    setTimeout(() => {
-      window.top!.location.href = generatedUrl;
-    }, 5000);
+    autoRedirect();
   }, []);
 
   return (
