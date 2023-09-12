@@ -257,7 +257,7 @@ export const serverSideRenderReturnConditions = ({
         const params: any = { ...cQuery, request_id: uuid };
         const queryString = new URLSearchParams(params as any).toString();
 
-        if (!currentPathnameWithoutParams.includes("/manual-form")) {
+        if (!currentPathnameWithoutParams.includes("/manual-form") && !currentPathnameWithoutParams.includes("/link-account/linking/failure")) {
           return {
             redirect: {
               permanent: false,
