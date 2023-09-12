@@ -165,7 +165,7 @@ const LinkAccountFailure = (props: Props) => {
             )})`,
           }}
         ></div>
-        {failedCount >= 5 && (
+        {failedCount >= 5 || router.query.next_path === 'manual_form' && (
           <>
             <Heading className="text-base my-5">
               {t("linkAccountFailed5x.title")}

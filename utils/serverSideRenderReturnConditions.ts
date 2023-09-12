@@ -254,14 +254,20 @@ export const serverSideRenderReturnConditions = ({
           props: {},
         };
       } else if (checkStepResult?.res?.data.route === "manual_form") {
-        const params: any = { ...cQuery, request_id: uuid };
+        const params: any = {
+          ...cQuery,
+          request_id: uuid,
+          next_path: "manual_form",
+        };
         const queryString = new URLSearchParams(params as any).toString();
 
         if (!currentPathnameWithoutParams.includes("/manual-form") && !currentPathnameWithoutParams.includes("/link-account/linking/failure")) {
           return {
             redirect: {
               permanent: false,
-              destination: handleRoute("manual-form?" + queryString),
+              destination: handleRoute(
+                "link-account/linking/failure?" + queryString
+              ),
             },
             props: {},
           };
