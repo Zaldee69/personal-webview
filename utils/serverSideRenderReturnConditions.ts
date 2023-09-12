@@ -238,7 +238,7 @@ export const serverSideRenderReturnConditions = ({
             `${assetPrefix}/link-account/success` ||
           currentPathnameWithoutParams === "/link-account/success" ||
           currentPathnameWithoutParams === `${assetPrefix}/link-account` ||
-          currentPathnameWithoutParams === "/link-account" ||
+          currentPathnameWithoutParams === "/link-account" || currentPathnameWithoutParams.includes("/liveness") ||
           isNotRedirect
         ) {
           return {
