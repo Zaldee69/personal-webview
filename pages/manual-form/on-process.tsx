@@ -62,8 +62,8 @@ const Index = () => {
     >
       <div className="px-5 pt-8 max-w-md mx-auto text-center">
         <div>
-          <Heading className="text-lg font-bold mb-14 ">
-            Pendaftaran Dalam Proses
+          <Heading className="text-lg mb-14">
+          {t("registrationInProcessTitle")}
           </Heading>
           <Image
             src={`${assetPrefix}/images/waiting.svg`}
