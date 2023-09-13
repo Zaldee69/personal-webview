@@ -100,6 +100,7 @@ const Liveness = () => {
   };
 
   const generateAction = () => {
+    setIsDisabled(true)
     const body = {
       uuid: routerQuery.request_id as string,
     };
@@ -373,7 +374,6 @@ const Liveness = () => {
           <Loading title={t("loadingTitle")} />
         </div>
         <div className={["relative", isLoading ? "hidden" : "block"].join(" ")}>
-          {!isMustReload ? <Initializing /> : <InitializingFailed />}
           <Camera
             currentActionIndex={currentActionIndex}
             setCurrentActionIndex={setCurrentActionIndex}
