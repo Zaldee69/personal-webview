@@ -502,12 +502,12 @@ const FRModal = ({
       faceImage: base64Img?.split(",")[1] as string,
     };
 
-    const doRedirect = (path: string) => {
+    const doRedirect = (path: string, additionParams?: any) => {
       router.push({
         pathname: handleRoute(path),
         query: {
           ...router.query,
-          next_path: "manual_form",
+          ...additionParams
         },
       });
     };
@@ -535,7 +535,7 @@ const FRModal = ({
           toast.error(res.message, { icon: <XIcon /> });
           setFRFailedCount("count", res.data.failMfa);
           if (res.data.failMfa >= 5) {
-            doRedirect("link-account/linking/failure");
+            doRedirect("link-account/linking/failure", {tilaka_name: tilakaName, next_path: "manual_form"});
           }
         }
       })

@@ -15,10 +15,7 @@ import { useSelector } from "react-redux";
 
 interface IParams {
   request_id: string;
-  register_id: string;
-  reason_code: string;
-  status: string;
-  "register-id"?: string;
+  tilaka_name: string;
 }
 
 const Index = () => {
@@ -27,19 +24,12 @@ const Index = () => {
   const { t }: any = i18n;
   const themeConfiguration = useSelector((state: RootState) => state.theme);
 
-  const { request_id, reason_code, status, redirect_url, next_path } =
-    routerQuery;
+  const { request_id, tilaka_name, redirect_url } = routerQuery;
 
   const params: IParams = {
     request_id: request_id as string,
-    register_id: request_id as string,
-    reason_code: reason_code as string,
-    status: next_path?.length! > 1 ? "Sukses" : (status as string),
+    tilaka_name: tilaka_name as string,
   };
-
-  if (next_path?.length! > 1) {
-    params["register-id"] = "Sukses";
-  }
 
   const { generatedUrl, autoRedirect } = useGenerateRedirectUrl({
     params,
@@ -47,7 +37,7 @@ const Index = () => {
   });
 
   useEffect(() => {
-    autoRedirect()
+    autoRedirect();
   }, []);
 
   return (
@@ -63,7 +53,7 @@ const Index = () => {
       <div className="px-5 pt-8 max-w-md mx-auto text-center">
         <div>
           <Heading className="text-lg mb-14">
-          {t("registrationInProcessTitle")}
+            {t("registrationInProcessTitle")}
           </Heading>
           <Image
             src={`${assetPrefix}/images/waiting.svg`}
