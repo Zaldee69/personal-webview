@@ -42,7 +42,7 @@ const LinkAccountFailure = (props: Props) => {
   const [redirectUrl, setRedirectUrl] = useState<string>(
     routerQuery.redirect_url as string
   );
-  
+
   const second = 5;
 
   const { timeLeft } = useCountdown(second);
@@ -165,7 +165,7 @@ const LinkAccountFailure = (props: Props) => {
             )})`,
           }}
         ></div>
-        {failedCount >= 5 || router.query.next_path === 'manual_form' && (
+        {failedCount >= 5 && (
           <>
             <Heading className="text-base my-5">
               {t("linkAccountFailed5x.title")}
@@ -180,6 +180,22 @@ const LinkAccountFailure = (props: Props) => {
             </Paragraph>
           </>
         )}
+        {props.checkStepResultDataRoute === "manual_form" &&
+          failedCount === 0 && (
+            <>
+              <Heading className="text-base my-5">
+                {t("linkAccountFailed5x.title")}
+              </Heading>
+              <Paragraph>
+                <Trans
+                  values={{
+                    timeLeft: timeLeft <= 0 ? 0 : timeLeft,
+                  }}
+                  i18nKey="linkAccountFailed5x.subtitle1"
+                ></Trans>
+              </Paragraph>
+            </>
+          )}
         {props.checkStepResultDataRoute === "penautan_consent" ? (
           routerQuery.reject_by_user === "1" ? (
             <div className="mt-14">
