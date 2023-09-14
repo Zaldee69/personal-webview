@@ -49,11 +49,11 @@ const PinFormComponent = (props: IPropsPinFormComponent): JSX.Element => {
   const [values, setValues] = useState<Array<number>>([]);
   const [digitArr, setDigitArr] = useState<Array<boolean>>(
     Array.apply(null, Array(props.digitLength)).map((_) => false)
-    );
-    const [onDelete, setOnDelete] = useState<boolean>(false);
-    const [submitted, setSubmitted] = useState<boolean>(false);
-    const themeConfiguration = useSelector((state: RootState) => state.theme);
-    
+  );
+  const [onDelete, setOnDelete] = useState<boolean>(false);
+  const [submitted, setSubmitted] = useState<boolean>(false);
+  const themeConfiguration = useSelector((state: RootState) => state.theme);
+
   const shouldShowErrorAfterSubmit: boolean =
     values.length === props.digitLength && props.isErrorAfterSubmit
       ? true
@@ -66,11 +66,18 @@ const PinFormComponent = (props: IPropsPinFormComponent): JSX.Element => {
     props.onClickNumberHandlerCallback(value);
   };
   const onClickDeleteHandler = (_: React.SyntheticEvent) => {
-    setValues((prev) => {
-      prev.pop();
-      return [...prev];
-    });
-    if (values.length === 0) {
+    if(props.isErrorAfterSubmit || props.isError){
+      setValues([]);
+        setDigitArr(
+          Array.apply(null, Array(props.digitLength)).map((_) => false)
+        );
+    } else {
+      setValues((prev) => {
+        prev.pop();
+        return [...prev];
+      });
+    }
+    if (values.length === 0 || props.isErrorAfterSubmit || props.isError) {
       setOnDelete(false);
     } else {
       setOnDelete(true);
