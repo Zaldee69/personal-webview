@@ -260,7 +260,7 @@ const OTPModal: React.FC<IModal> = ({
         if (res.success) {
           router.push(
             {
-              pathname: router.pathname,
+              pathname: handleRoute("/signing/success"),
               query: {
                 ...routerQuery,
                 user_identifier: res.data.tilaka_name,
@@ -286,7 +286,7 @@ const OTPModal: React.FC<IModal> = ({
           ) {
             router.push(
               {
-                pathname: router.pathname,
+                pathname: handleRoute("/signing/failure"),
                 query: {
                   ...routerQuery,
                   user_identifier: res.data.tilaka_name,
