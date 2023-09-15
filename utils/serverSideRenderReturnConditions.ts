@@ -253,10 +253,11 @@ export const serverSideRenderReturnConditions = ({
           },
           props: {},
         };
-      } else if (checkStepResult?.res?.data.route === "manual_form") {
+      } else if (checkStepResult?.res?.data?.route === "manual_form") {
         const params: any = {
           ...cQuery,
           request_id: uuid,
+          tilaka_name: checkStepResult.res.data.user_identifier,
           next_path: "manual_form",
         };
         const queryString = new URLSearchParams(params as any).toString();
