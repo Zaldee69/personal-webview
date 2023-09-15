@@ -30,7 +30,7 @@ export const serverSideRenderReturnConditions = ({
   const cQuery = context.query;
   const uuid =
     cQuery.transaction_id || cQuery.request_id || cQuery.registration_id;
-
+    
   if (checkStepResult.err) {
     if (checkStepResult?.err.response?.data?.data?.errors?.[0]) {
       // ?
@@ -226,7 +226,7 @@ export const serverSideRenderReturnConditions = ({
       }
     } else {
       if (
-        checkStepResult.res?.data?.errors?.[0] === "registrationId tidak valid"
+        checkStepResult.res?.data?.errors?.[0] === "registrationId tidak valid" && checkStepResult?.res?.data?.route.length < 1
       ) {
         const params: any = { ...cQuery, request_id: uuid };
         const queryString = new URLSearchParams(params as any).toString();
@@ -268,6 +268,25 @@ export const serverSideRenderReturnConditions = ({
               permanent: false,
               destination: handleRoute(
                 "link-account/linking/failure?" + queryString
+              ),
+            },
+            props: {},
+          };
+        }
+      } else if (checkStepResult?.res?.data?.route === "done_manual_form") {
+        const params: any = {
+          ...cQuery,
+          request_id: uuid,
+          tilaka_name: checkStepResult.res.data.user_identifier,
+        };
+        const queryString = new URLSearchParams(params as any).toString();
+
+        if (!currentPathnameWithoutParams.includes("/manual-form/on-process")) {
+          return {
+            redirect: {
+              permanent: false,
+              destination: handleRoute(
+                "manual-form/on-process?" + queryString
               ),
             },
             props: {},
