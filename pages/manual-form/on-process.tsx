@@ -4,9 +4,12 @@ import Heading from "@/components/atoms/Heading";
 import Paragraph from "@/components/atoms/Paraghraph";
 import useGenerateRedirectUrl from "@/hooks/useGenerateRedirectUrl";
 import { RootState } from "@/redux/app/store";
-import { concateRedirectUrlParams } from "@/utils/concateRedirectUrlParams";
+import { serverSideRenderReturnConditions } from "@/utils/serverSideRenderReturnConditions";
 import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
 import i18n from "i18";
+import { RestKycCheckStepv2 } from "infrastructure";
+import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
+import { GetServerSideProps } from "next";
 import { assetPrefix } from "next.config";
 import Image from "next/legacy/image";
 import { useRouter } from "next/router";
@@ -18,7 +21,11 @@ interface IParams {
   tilaka_name: string;
 }
 
-const Index = () => {
+interface Props {
+  tilaka_name: string
+}
+
+const Index = (props: Props) => {
   const router = useRouter();
   const routerQuery = router.query;
   const { t }: any = i18n;
@@ -28,7 +35,7 @@ const Index = () => {
 
   const params: IParams = {
     request_id: request_id as string,
-    tilaka_name: tilaka_name as string,
+    tilaka_name: tilaka_name as string || props.tilaka_name,
   };
 
   const { generatedUrl, autoRedirect } = useGenerateRedirectUrl({
@@ -88,6 +95,44 @@ const Index = () => {
       </div>
     </div>
   );
+};
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const cQuery = context.query;
+  const isNotRedirect = true;
+  const uuid =
+    cQuery.transaction_id || cQuery.request_id || cQuery.registration_id;
+
+  const checkStepResult: {
+    res?: TKycCheckStepResponseData;
+    err?: {
+      response: {
+        data: {
+          success: boolean;
+          message: string;
+          data: { errors: string[] };
+        };
+      };
+    };
+  } = await RestKycCheckStepv2({
+    registerId: uuid as string,
+  })
+    .then((res) => {
+      return { res };
+    })
+    .catch((err) => {
+      return { err };
+    });
+
+  const serverSideRenderReturnConditionsResult =
+    serverSideRenderReturnConditions({ context, checkStepResult, isNotRedirect });
+
+  serverSideRenderReturnConditionsResult["props"] = {
+    ...serverSideRenderReturnConditionsResult["props"],
+    tilaka_name: checkStepResult.res?.data?.user_identifier || null,
+  };
+
+  return serverSideRenderReturnConditionsResult;
 };
 
 export default Index;
