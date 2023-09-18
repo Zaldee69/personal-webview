@@ -203,8 +203,8 @@ export const serverSideRenderReturnConditions = ({
           props: {},
         };
       } else if (
-        checkStepResult.res.data.route === "penautan" ||
-        checkStepResult.res.data.route === "penautan_consent"
+        checkStepResult.res?.data?.route === "penautan" ||
+        checkStepResult.res?.data?.route === "penautan_consent"
       ) {
         const params: any = { ...cQuery, request_id: uuid };
         const queryString = new URLSearchParams(params as any).toString();
@@ -226,7 +226,7 @@ export const serverSideRenderReturnConditions = ({
       }
     } else {
       if (
-        checkStepResult.res?.data?.errors?.[0] === "registrationId tidak valid" && checkStepResult?.res?.data?.route.length < 1
+        checkStepResult.res?.data?.errors?.[0] === "registrationId tidak valid" && checkStepResult?.res?.data?.route?.length < 1
       ) {
         const params: any = { ...cQuery, request_id: uuid };
         const queryString = new URLSearchParams(params as any).toString();
