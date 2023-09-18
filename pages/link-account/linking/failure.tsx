@@ -170,7 +170,7 @@ const LinkAccountFailure = (props: Props) => {
             <Heading className="text-base my-5">
               {t("linkAccountFailed5x.title")}
             </Heading>
-            <Paragraph>
+            <Paragraph className="whitespace-pre-line" >
               <Trans
                 values={{
                   timeLeft: timeLeft <= 0 ? 0 : timeLeft,
@@ -186,7 +186,7 @@ const LinkAccountFailure = (props: Props) => {
               <Heading className="text-base my-5">
                 {t("linkAccountFailed5x.title")}
               </Heading>
-              <Paragraph>
+              <Paragraph className="whitespace-pre-line" >
                 <Trans
                   values={{
                     timeLeft: timeLeft <= 0 ? 0 : timeLeft,
