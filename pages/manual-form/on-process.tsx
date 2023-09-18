@@ -68,7 +68,7 @@ const Index = (props: Props) => {
             height="194"
             alt="liveness-success-ill"
           />
-          <Paragraph className="text-md text-neutral200 mt-14">
+          <Paragraph className="text-md whitespace-break-spaces text-neutral200 mt-14">
             {t("registrationInProcessSubtitle")}
           </Paragraph>
           <div className="mt-20 text-primary text-base poppins-medium underline hover:cursor-pointer">
