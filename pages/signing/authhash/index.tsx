@@ -122,7 +122,7 @@ const FRModal: React.FC<IModal> = ({
                 query: {
                   redirect_url: routerQuery.redirect_url,
                   user_identifier: routerQuery.user,
-                  // request_id: res.data.request_id,
+                  request_id: res.data.request_id,
                   status: "Gagal",
                 },
               },
@@ -290,7 +290,7 @@ const OTPModal: React.FC<IModal> = ({
                 query: {
                   ...routerQuery,
                   user_identifier: res.data.tilaka_name,
-                  // request_id: res.data.request_id,
+                  request_id: res.data.request_id,
                   status: "Gagal",
                 },
               },

@@ -102,7 +102,7 @@ const PinFormDedicatedChannel = (props: Props) => {
               query: {
                 redirect_url,
                 user_identifier: user,
-                // request_id: res.data.request_id,
+                request_id: res.data.request_id,
                 status: "Blocked",
               },
             });
