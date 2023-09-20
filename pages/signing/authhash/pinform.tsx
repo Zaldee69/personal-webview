@@ -56,7 +56,6 @@ const PinFormDedicatedChannel = (props: Props) => {
     setPinConfirmError({ isError: false, message: "" });
   };
   const onClickDeleteHandlerConfirmCallback = () => {
-    setIsButtonNumberDisabled(false);
     setPinConfirmError({ isError: false, message: "" });
   };
   const submitFormConfirmCallback = (pinConfirm: string) => {
@@ -90,13 +89,13 @@ const PinFormDedicatedChannel = (props: Props) => {
             isError: true,
             message: res?.message || "gagal",
           });
-          setIsButtonNumberDisabled(true);
           setIsProcessed(false);
 
           if (
             res.message ===
             "penandatanganan dokumen gagal. pin sudah salah 3 kali"
           ) {
+            setIsButtonNumberDisabled(true);
             router.push({
               pathname: handleRoute("signing/failure"),
               query: {
@@ -106,7 +105,10 @@ const PinFormDedicatedChannel = (props: Props) => {
                 status: "Blocked",
               },
             });
+          }else {
+            setIsButtonNumberDisabled(false);
           }
+          
         }
       })
       .catch((err) => {
@@ -158,7 +160,7 @@ const PinFormDedicatedChannel = (props: Props) => {
           isErrorAfterSubmitMessage={pinConfirmErrorAfterSubmit.message}
           isError={pinConfirmError.isError}
           isErrorMessage={pinConfirmError.message}
-          isButtonNumberDisabled={isButtonNumberDisabled}
+          isButtonNumberDisabled={isButtonNumberDisabled} 
           isProcessed={isProcessed}
           showPoweredByTilaka
         />

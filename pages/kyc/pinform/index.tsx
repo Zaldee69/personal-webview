@@ -68,6 +68,7 @@ const PinFormDedicatedChannel = (props: Props) => {
   const onClickDeleteHandlerConfirmCallback = () => {
     setIsButtonNumberDisabled(false);
     setPinConfirmError({ isError: false, message: "" });
+    setPinConfirmErrorAfterSubmit({ isError: false, message: "" });
   };
   const submitFormConfirmCallback = (pinConfirm: string) => {
     setIsButtonNumberDisabled(true);
@@ -79,6 +80,7 @@ const PinFormDedicatedChannel = (props: Props) => {
         message: t("confirmPinDoesntMatch"),
       });
       setIsProcessed(false);
+      setIsButtonNumberDisabled(false);
       return;
     }
 
@@ -117,7 +119,7 @@ const PinFormDedicatedChannel = (props: Props) => {
               isError: true,
               message: res?.message || "gagal",
             });
-            setIsButtonNumberDisabled(true);
+            setIsButtonNumberDisabled(false);
             setIsProcessed(false);
           }
         })
@@ -126,7 +128,7 @@ const PinFormDedicatedChannel = (props: Props) => {
             isError: true,
             message: err.response?.data?.message || "gagal",
           });
-          setIsButtonNumberDisabled(true);
+          setIsButtonNumberDisabled(false);
           setIsProcessed(false);
         });
     } else {

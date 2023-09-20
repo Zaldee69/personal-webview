@@ -57,6 +57,7 @@ const PinFormDedicatedChannel = (props: Props) => {
   };
   const onClickDeleteHandlerConfirmCallback = () => {
     setPinConfirmError({ isError: false, message: "" });
+    setPinConfirmErrorAfterSubmit({ isError: false, message: "" });
   };
   const onClickCancel = (_: React.SyntheticEvent) => {
     const params = {
