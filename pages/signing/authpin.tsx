@@ -84,21 +84,26 @@ const AuthPinForm = (props: Props) => {
           });
           if (
             res?.message ===
-              "penandatanganan dokumen gagal. pin sudah salah 3 kali" &&
-            redirect_url
+            "penandatanganan dokumen gagal. pin sudah salah 3 kali" || res.message === "proses signing sudah selesai"
           ) {
             const params = {
               user_identifier: user,
               request_id: router.query.request_id || router.query.register_id,
               status: "Blocked",
             };
-            const queryString = new URLSearchParams(params as any).toString();
-            setTimeout(() => {
-              window.top!.location.href = concateRedirectUrlParams(
-                redirect_url as string,
-                queryString
-              );
-            }, 2000);
+
+            if (redirect_url) {
+              const queryString = new URLSearchParams(params as any).toString();
+              setTimeout(() => {
+                window.top!.location.href = concateRedirectUrlParams(
+                  redirect_url as string,
+                  queryString
+                );
+              }, 2000);
+            } else {
+              setIsButtonNumberDisabled(true);
+              setIsProcessed(false);
+            }
           } else {
             setIsButtonNumberDisabled(false);
             setIsProcessed(false);
