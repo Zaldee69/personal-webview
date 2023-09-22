@@ -179,9 +179,10 @@ const Login = ({}: Props) => {
         if (certif[0].status == "Aktif") {
           getUserName({}).then((res) => {
             const data = JSON.parse(res.data);
-            if (data.typeMfa == null) {
+            const path = "setting-signature-and-mfa"
+            if (data.typeMfa == null || router.query.next_path === path) {
               router.replace({
-                pathname: handleRoute("setting-signature-and-mfa"),
+                pathname: handleRoute(path),
                 query: {
                   ...queryWithDynamicRedirectURL,
                 },

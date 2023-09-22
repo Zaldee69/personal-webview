@@ -16,7 +16,10 @@ import { GetServerSideProps } from "next";
 import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
 import { serverSideRenderReturnConditions } from "@/utils/serverSideRenderReturnConditions";
 import i18n from "i18";
-import { RestKycCheckStepv2 } from "infrastructure/rest/personal";
+import {
+  RestKycCheckStepv2,
+  RestPersonalFaceRecognitionV2,
+} from "infrastructure/rest/personal";
 import Button from "@/components/atoms/Button";
 import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
 import { useSelector } from "react-redux";
@@ -25,6 +28,13 @@ import Footer from "@/components/Footer";
 import { assetPrefix } from "next.config";
 import Heading from "@/components/atoms/Heading";
 import Paragraph from "@/components/atoms/Paraghraph";
+import { Trans } from "react-i18next";
+import RadioButton from "@/components/atoms/RadioButton";
+import FaceRecognitionModal from "@/components/modal/FaceRecognitionModal";
+import handleUnauthenticated from "@/utils/handleUnauthenticated";
+import { TSetDefaultSignatureRequestData } from "infrastructure/rest/b2b/types";
+import fRFailureCounter from "@/utils/fRFailureCounter";
+import { fontsType } from "@/constants/index";
 
 type Props = {};
 
@@ -38,54 +48,283 @@ type Tform = {
     | "MrsSaintDelafield-Regular"
     | "SCRIPTIN"
     | "";
-  mfa_method: "fr" | "otp" | "otp_ponsel";
+  mfa_type: "fr" | "otp" | "otp_ponsel";
 };
+
+interface Payload {
+  signature: TSetDefaultSignatureRequestData;
+  mfa_type: Tform["mfa_type"];
+}
 
 function SettingSignatureAndMFA({}: Props) {
   const [form, formSetter] = useState<Tform>({
     signature_type: 1,
     signature_font_type: "",
-    mfa_method: "fr",
+    mfa_type: "fr",
   });
-  const [imageURL, setImageURL] = useState<string>();
-  const [data, setData] = useState<string>();
-  let ref: any = null;
-  const sigPad = useRef<any>();
-  const router = useRouter();
-  const { t }: any = i18n;
   const [showModalOtpPonsel, showModalOtpPonselSetter] =
     useState<boolean>(false);
+
+  const [imageURL, setImageURL] = useState<string>();
+  const [data, setData] = useState<string>();
   const [agreeOtpPonsel, agreeOtpPonselSetter] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [defaultMfa, setDefaultMfa] = useState<"fr" | "otp" | null>(null);
+  const [isShowFrModal, setIsShowFrModal] = useState<boolean>(false);
+  const [isShowOtpModalConfirmation, setIsShowOtpModalConfirmation] =
+    useState<boolean>(false);
+
+  let ref: any = null;
+
+  const sigPad = useRef<any>();
+  const router = useRouter();
+
+  const { t }: any = i18n;
+
+  const themeConfiguration = useSelector((state: RootState) => state.theme);
+
   const handleFormOnChange = (e: React.FormEvent<HTMLInputElement>): void => {
     formSetter({ ...form, [e.currentTarget.name]: e.currentTarget.value });
     ref = e.currentTarget;
 
-    if (ref.name !== "mfa_method" && ref.name !== "signature_type") {
+    if (ref.name !== "mfa_type" && ref.name !== "signature_type") {
       convertToDataURL();
     }
   };
 
-  const themeConfiguration = useSelector((state: RootState) => state.theme);
+  const handleGetUserDataSuccess = (data: string) => {
+    const userData = JSON.parse(data);
+    const { name, typeMfa } = userData;
 
-  const getTilakaName = () => {
-    getUserName({})
+    if (typeMfa) {
+      formSetter({ ...form, ["mfa_type"]: typeMfa.toLowerCase() });
+      setDefaultMfa(typeMfa.toLowerCase());
+    }
+    setData(name);
+  };
+
+  const handleSubmitStarted = () => {
+    toast(`Loading...`, {
+      type: "info",
+      toastId: "info",
+      isLoading: true,
+      position: "top-center",
+      style: {
+        backgroundColor: themeConfiguration?.data.toast_color,
+      },
+    });
+    setIsLoading(true);
+  };
+
+  const handleFieldEmpty = (signature_type: number) => {
+    toast.dismiss("info");
+    setIsLoading(false);
+    toast(
+      `${signature_type === 0 ? t("handwritingRequired") : t("FontRequired")}`,
+      {
+        type: "error",
+        toastId: "error",
+        position: "top-center",
+        icon: XIcon,
+      }
+    );
+  };
+
+  const handleChangeSignatureAndMfaSuccess = (
+    message: string,
+    isMustRedirect: boolean
+  ) => {
+    toast.dismiss("info");
+    toast(
+      isMustRedirect ? "Penggatian tanda tangan dan MFA berhasil" : message,
+      {
+        type: "success",
+        toastId: "success",
+      }
+    );
+
+    let redirectPath: string;
+
+    if (isMustRedirect) {
+      if (router.query.setting === "1" && router.query.signing !== "1") {
+        redirectPath = "link-account/success";
+      } else if (router.query.v2 === "1") {
+        redirectPath = "signing/v2";
+      } else {
+        redirectPath = "signing";
+      }
+      setTimeout(() => {
+        toast.dismiss("success");
+        redirectTo(redirectPath);
+      }, 3000);
+    } else if (form.mfa_type === "fr") {
+      setIsShowOtpModalConfirmation(false);
+    } else {
+      setIsShowFrModal(false);
+    }
+  };
+
+  const handleChangeSignatureAndMfaFailure = (message: string) => {
+    toast.dismiss("info");
+    setIsLoading(false);
+    toast(message, {
+      type: "error",
+      toastId: "error",
+      position: "top-center",
+      icon: XIcon,
+    });
+  };
+
+  const handleSetMFAType = (
+    mfa_type: Tform["mfa_type"],
+    isMustRedirect: boolean
+  ) => {
+    restSetDefaultMFA({
+      payload: {
+        mfa_type,
+      },
+    })
       .then((res) => {
-        const data = JSON.parse(res.data);
-        setData(data.name);
+        handleChangeSignatureAndMfaSuccess(res.message, isMustRedirect);
+        getUserData();
       })
       .catch((err) => {
-        switch (err.response.status) {
-          case 401:
-            // unauthorized
-            router.replace({
-              pathname: handleRoute("login"),
-              query: { ...router.query },
-            });
-            break;
+        if (err.response?.status === 401) {
+          handleUnauthenticated({ redirectTo });
+        } else {
+          handleChangeSignatureAndMfaFailure("Terjadi kesalahan");
+        }
+      });
+  };
 
-          default:
-            break;
+  const handleSetSignature = async (signature: Payload["signature"]) => {
+    const res = await restSetDefaultSignature({
+      payload: signature,
+    })
+      .then((res) => res)
+      .catch((err) => {
+        if (err.response.status === 401) {
+          setIsLoading(false);
+          handleUnauthenticated({ redirectTo });
+        } else {
+          handleChangeSignatureAndMfaFailure("Terjadi kesalahan");
+        }
+      });
+    return res;
+  };
+
+  const handleAddSignatureAndMFA = async (payload: Payload) => {
+    const { signature, mfa_type } = payload;
+
+    const res = await handleSetSignature(signature);
+    if (res?.success) {
+      if (!defaultMfa) {
+        handleChangeSignatureAndMfaSuccess(
+          "Penggatian tanda tangan dan MFA berhasil",
+          false
+        );
+      } else {
+        handleSetMFAType(mfa_type, true);
+      }
+    } else {
+      handleChangeSignatureAndMfaFailure(res?.message!);
+    }
+  };
+
+  const redirectTo = (pathname = "login") => {
+    router.replace({
+      pathname: handleRoute(pathname),
+      query: { ...router.query, next_path: "setting-signature-and-mfa" },
+    });
+  };
+
+  const getUserData = () => {
+    getUserName({})
+      .then((res) => {
+        handleGetUserDataSuccess(res.data);
+      })
+      .catch((err) => {
+        if (err.response?.status === 401) {
+          handleUnauthenticated({ redirectTo });
+        }
+      });
+  };
+
+  const convertToDataURL = async () => {
+    const canvas = await html2canvas(ref.parentNode.children[1], {
+      height: 60,
+      backgroundColor: "rgba(0, 0, 0, 0)",
+    });
+    canvas.style.backgroundColor = "rgba(0, 0, 0, 0)";
+    const image = canvas.toDataURL("image/png");
+    setImageURL(image);
+  };
+
+  const handleFormOnSubmit = (
+    e: React.SyntheticEvent,
+    type: "change_mfa" | "submit"
+  ): void => {
+    e.preventDefault();
+
+    const signature_image = sigPad.current
+      .getTrimmedCanvas()
+      .toDataURL("image/png");
+
+    const { signature_type, signature_font_type, mfa_type } = form;
+
+    const signature = {
+      signature_type,
+      font_type: signature_type == 0 ? "" : signature_font_type,
+      signature_image:
+        signature_type == 1 ? (imageURL as string) : signature_image,
+    };
+
+    if (
+      (signature_type == 0 && sigPad.current.isEmpty() && type === "submit") ||
+      (signature_type == 1 && !imageURL && type === "submit")
+    ) {
+      handleFieldEmpty(signature_type);
+    } else if (type === "change_mfa") {
+      if (mfa_type === "fr") {
+        setIsShowOtpModalConfirmation(true);
+      } else {
+        setIsShowFrModal(true);
+      }
+    } else {
+      handleSubmitStarted();
+      handleAddSignatureAndMFA({ signature, mfa_type });
+    }
+  };
+
+  const captureProcessor = (base64Img: string | null | undefined) => {
+    const payload = {
+      face_image: base64Img?.split(",")[1] as string,
+    };
+
+    const mfa_type = "otp";
+
+    RestPersonalFaceRecognitionV2({ payload })
+      .then((res) => {
+        if (res.success) {
+          handleSetMFAType(mfa_type, false);
+        } else {
+          toast.dismiss("info");
+          fRFailureCounter({
+            setModal: setIsShowFrModal,
+            redirectTo,
+            errorMessage: res.message,
+          });
+        }
+      })
+      .catch((err) => {
+        setIsShowFrModal(false);
+        toast.dismiss("info");
+        if (err.response?.status === 401) {
+          handleUnauthenticated({ redirectTo });
+        } else {
+          toast.error(err.response?.data?.message || "Gagal validasi wajah", {
+            icon: <XIcon />,
+          });
         }
       });
   };
@@ -99,158 +338,16 @@ function SettingSignatureAndMFA({}: Props) {
         query: { ...router.query },
       });
     } else {
-      getTilakaName();
+      getUserData();
     }
   }, [router, router.isReady]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  //Convert HTML element to base64 png
-  const convertToDataURL = async () => {
-    const canvas = await html2canvas(ref.parentNode.children[1], {
-      height: 60,
-      backgroundColor: "rgba(0, 0, 0, 0)",
-    });
-    canvas.style.backgroundColor = "rgba(0, 0, 0, 0)";
-    const image = canvas.toDataURL("image/png");
-    setImageURL(image);
-  };
-
-  const handleFormOnSubmit = (e: React.SyntheticEvent): void => {
-    e.preventDefault();
-    toast(`Loading...`, {
-      type: "info",
-      toastId: "info",
-      isLoading: true,
-      position: "top-center",
-      style: {
-        backgroundColor: themeConfiguration?.data.toast_color as string,
-      },
-    });
-    setIsLoading(true);
-    const signature_image = sigPad.current
-      .getTrimmedCanvas()
-      .toDataURL("image/png");
-    const target = e.target as typeof e.target & {
-      signature_type: { value: Tform["signature_type"] };
-      signature_font_type: { value: Tform["signature_font_type"] };
-      mfa_method: { value: Tform["mfa_method"] };
-    };
-
-    const signature_type = target.signature_type.value;
-    const font_type = target.signature_font_type.value;
-    const mfa_type = target.mfa_method.value;
-
-    const payload = {
-      signature_type,
-      font_type: signature_type == 0 ? "" : font_type,
-      signature_image:
-        signature_type == 1 ? (imageURL as string) : signature_image,
-    };
-
-    if (
-      (signature_type == 0 && sigPad.current.isEmpty()) ||
-      (signature_type == 1 && !imageURL)
-    ) {
-      toast.dismiss("info");
-      setIsLoading(false);
-      toast(
-        `${
-          signature_type === 0 ? t("handwritingRequired") : t("FontRequired")
-        }`,
-        {
-          type: "error",
-          toastId: "error",
-          position: "top-center",
-          icon: XIcon,
-        }
-      );
-    } else {
-      restSetDefaultSignature({
-        payload,
-      })
-        .then((res) => {
-          if (res.success) {
-            toast.dismiss("info");
-            toast(res.message, {
-              type: "success",
-              toastId: "success",
-            });
-            if (router.query.setting === "1" && router.query.signing !== "1") {
-              setTimeout(() => {
-                toast.dismiss("success");
-                router.replace({
-                  pathname: handleRoute("link-account/success"),
-                  query: { ...router.query },
-                });
-              }, 3000);
-            } else {
-              setTimeout(() => {
-                toast.dismiss("success");
-                router.replace({
-                  pathname:
-                    router.query.v2 === "1"
-                      ? handleRoute("signing/v2")
-                      : handleRoute("signing"),
-                  query: { ...router.query },
-                });
-              }, 3000);
-            }
-          } else {
-            toast.dismiss("info");
-            setIsLoading(false);
-            toast(res.message, {
-              type: "error",
-              toastId: "error",
-              position: "top-center",
-              icon: XIcon,
-            });
-          }
-        })
-        .catch((err) => {
-          setIsLoading(false);
-          if (err.response?.status === 401) {
-            toast.dismiss("info");
-            toast("Anda harus login terlebih dahulu", {
-              type: "error",
-              toastId: "error",
-              position: "top-center",
-              icon: XIcon,
-            });
-            router.replace({
-              pathname: handleRoute("login"),
-              query: { ...router.query },
-            });
-          } else {
-            toast.dismiss("info");
-            toast("Penggantian tanda tangan gagal", {
-              type: "error",
-              toastId: "error",
-              position: "top-center",
-              icon: XIcon,
-            });
-          }
-        });
-
-      restSetDefaultMFA({
-        payload: {
-          mfa_type,
-        },
-      })
-        .then((res) => {
-          return res;
-        })
-        .catch((err) => {
-          {
-          }
-        });
-    }
-  };
 
   return (
     <div
       className="min-h-screen"
       style={{
         backgroundColor: themeConfigurationAvaliabilityChecker(
-          themeConfiguration?.data.background as string,
+          themeConfiguration?.data.background,
           "BG"
         ),
       }}
@@ -261,13 +358,27 @@ function SettingSignatureAndMFA({}: Props) {
       </Head>
       <div className="p-4 max-w-md mx-auto">
         <Heading className="mt-2">{t("settingSignatureTitleAndMFA")}</Heading>
-        <form onSubmit={handleFormOnSubmit}>
+        <FaceRecognitionModal
+          isShowModal={isShowFrModal}
+          setIsShowModal={setIsShowFrModal}
+          callbackCaptureProcessor={captureProcessor}
+          signingFailedRedirectTo={handleRoute("login")}
+          title={t("setMFA.modal.title")}
+        />
+        <OtpModalConfirmation
+          onClickHandler={() => handleSetMFAType("fr", false)}
+          isShowOtpModalConfirmation={isShowOtpModalConfirmation}
+          setIsShowOtpModalConfirmation={setIsShowOtpModalConfirmation}
+          isDisabled={false}
+          setIsDisabled={setIsShowOtpModalConfirmation}
+        />
+        <form>
           <div
             className="bg-contain w-64 mx-auto my-5 h-64 bg-center bg-no-repeat"
             style={{
               backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
                 themeConfiguration.data
-                  .asset_activation_setting_signature_and_mfa as string,
+                  .asset_activation_setting_signature_and_mfa,
                 "ASSET",
                 `${assetPrefix}/images/ttdSetting.svg`
               )})`,
@@ -283,120 +394,44 @@ function SettingSignatureAndMFA({}: Props) {
             </p>
           </div>
           <div className="mt-5">
-            <label className="flex items-center">
-              <input
-                name="signature_type"
-                value={0}
-                onChange={handleFormOnChange}
-                checked={form.signature_type == 0}
-                type="radio"
-                className="appearance-none bg-white w-4 h-4 ring-1 ring-neutral40 border-2 border-neutral40 rounded-full checked:bg-primary checked:ring-primary"
-              />
-              <Paragraph className="ml-2.5">{t("signatureOption1")}</Paragraph>
-            </label>
-            <label className="flex items-center mt-3.5">
-              <input
-                name="signature_type"
-                value={1}
-                onChange={handleFormOnChange}
-                checked={form.signature_type == 1}
-                type="radio"
-                className="appearance-none bg-white w-4 h-4 ring-1 ring-neutral40 border-2 border-neutral40 rounded-full checked:bg-primary checked:ring-primary"
-              />
-              <Paragraph className="ml-2.5">{t("signatureOption2")}</Paragraph>
-            </label>
+            <RadioButton
+              onChangeHandler={handleFormOnChange}
+              isChecked={form.signature_type == 0}
+              value={0}
+              title={t("signatureOption1")}
+              type="bullet"
+              name="signature_type"
+            />
+            <RadioButton
+              onChangeHandler={handleFormOnChange}
+              isChecked={form.signature_type == 1}
+              value={1}
+              title={t("signatureOption2")}
+              type="bullet"
+              name="signature_type"
+            />
           </div>
-          <div className={form.signature_type == 0 ? undefined : "hidden"}>
+          <div className={form.signature_type == 0 ? "block" : "hidden"}>
             <SignaturePad sigPad={sigPad} />
           </div>
-          <div className={form.signature_type == 1 ? undefined : "hidden"}>
+          <div className={form.signature_type == 1 ? "block" : "hidden"}>
             <div
               className={`grid  ${
                 (data?.length as number) > 15 ? "grid-cols gap-5" : "grid-col-2"
               } gap-3 mt-5`}
             >
-              <label className="relative flex items-center justify-center cursor-pointer">
-                <input
-                  type="radio"
+              {fontsType.map((font: string) => (
+                <RadioButton
+                  type="button"
                   name="signature_font_type"
-                  value="Adine-Kirnberg"
-                  onChange={handleFormOnChange}
-                  checked={form.signature_font_type === "Adine-Kirnberg"}
-                  className="appearance-none border border-_B6B6B6 checked:border-_1A73E8 rounded-md w-full h-12 cursor-pointer"
+                  key={font}
+                  onChangeHandler={handleFormOnChange}
+                  title={data!}
+                  isChecked={form.signature_font_type === font}
+                  fontFamily={font}
+                  value={font}
                 />
-                <p className="text-2xl Adine-Kirnberg text-_030326 absolute w-fit text-center">
-                  {data}
-                </p>
-              </label>
-              <label className="relative flex items-center justify-center cursor-pointer">
-                <input
-                  type="radio"
-                  name="signature_font_type"
-                  value="champignonaltswash"
-                  onChange={handleFormOnChange}
-                  checked={form.signature_font_type === "champignonaltswash"}
-                  className="appearance-none border border-_B6B6B6 checked:border-_1A73E8 rounded-md w-full h-12 cursor-pointer"
-                />
-                <p className="h-full champignonaltswash text-_030326 absolute w-fit text-center">
-                  {data}
-                </p>
-              </label>
-              <label className="relative flex items-center justify-center cursor-pointer">
-                <input
-                  type="radio"
-                  name="signature_font_type"
-                  value="FormalScript"
-                  onChange={handleFormOnChange}
-                  checked={form.signature_font_type === "FormalScript"}
-                  className="appearance-none border border-_B6B6B6 checked:border-_1A73E8 rounded-md w-full h-12 cursor-pointer"
-                />
-                <p className="text-lg FormalScript text-_030326 absolute w-fit text-center">
-                  {data}
-                </p>
-              </label>
-              <label className="relative flex items-center justify-center cursor-pointer">
-                <input
-                  type="radio"
-                  name="signature_font_type"
-                  value="HerrVonMuellerhoff-Regular"
-                  onChange={handleFormOnChange}
-                  checked={
-                    form.signature_font_type === "HerrVonMuellerhoff-Regular"
-                  }
-                  className="appearance-none border border-_B6B6B6 checked:border-_1A73E8 rounded-md w-full h-12 cursor-pointer"
-                />
-                <p className="h-full HerrVonMuellerhoff-Regular text-_030326 absolute w-fit text-center">
-                  {data}
-                </p>
-              </label>
-              <label className="relative flex items-center justify-center cursor-pointer">
-                <input
-                  type="radio"
-                  name="signature_font_type"
-                  value="MrsSaintDelafield-Regular"
-                  onChange={handleFormOnChange}
-                  checked={
-                    form.signature_font_type === "MrsSaintDelafield-Regular"
-                  }
-                  className="appearance-none border border-_B6B6B6 checked:border-_1A73E8 rounded-md w-full h-12 cursor-pointer"
-                />
-                <p className="h-full MrsSaintDelafield-Regular text-_030326 absolute w-fit text-center">
-                  {data}
-                </p>
-              </label>
-              <label className="relative flex items-center justify-center cursor-pointer">
-                <input
-                  type="radio"
-                  name="signature_font_type"
-                  value="SCRIPTIN"
-                  onChange={handleFormOnChange}
-                  checked={form.signature_font_type === "SCRIPTIN"}
-                  className="appearance-none border border-_B6B6B6 checked:border-_1A73E8 rounded-md w-full h-12 cursor-pointer"
-                />
-                <p className="h-full SCRIPTIN text-_030326 absolute w-fit text-center">
-                  {data}
-                </p>
-              </label>
+              ))}
             </div>
           </div>
           <Paragraph className="mt-8">
@@ -406,46 +441,42 @@ function SettingSignatureAndMFA({}: Props) {
             <div className="pt-1">
               <InfoIcon />
             </div>
-            <p className="text-xs poppins-regular text-blue500 ml-4">
-              {i18n.language === "en" ? (
-                t("choosetAutheticantionModeInformation")
+            <p className="text-xs poppins-regular text-blue500 ml-4 whitespace-break-spaces">
+              {defaultMfa ? (
+                t("choosetAutheticantionModeInformation.haveDefaultMfa")
               ) : (
-                <>
-                  Demi keamanan, diperlukan <i>Multi Factor Authentication</i>{" "}
-                  yang harus Anda gunakan saat melakukan aktivitas tanda tangan
-                  digital atau layanan Tilaka lainnya.
-                </>
+                <Trans
+                  values={{
+                    mfa: "Multi Factor Authentication",
+                  }}
+                  i18nKey="choosetAutheticantionModeInformation.dontHaveDefaultMfa"
+                  components={[<i key={0} />]}
+                />
               )}
             </p>
           </div>
           <div className="mt-6">
-            <label className="flex items-center hover:cursor-pointer">
-              <input
-                name="mfa_method"
-                value="fr"
-                onChange={handleFormOnChange}
-                checked={form.mfa_method === "fr"}
-                type="radio"
-                className="appearance-none hover:cursor-pointer bg-white w-4 h-4 ring-1 ring-neutral40 border-2 border-neutral40 rounded-full checked:bg-primary checked:ring-primary"
-              />
-              <Paragraph className="ml-2.5">Face Recognition</Paragraph>
-            </label>
-            <label className="flex items-center hover:cursor-pointer mt-3.5">
-              <input
-                name="mfa_method"
-                value="otp"
-                onChange={handleFormOnChange}
-                checked={form.mfa_method === "otp"}
-                type="radio"
-                className="appearance-none hover:cursor-pointer bg-white w-4 h-4 ring-1 ring-neutral40 border-2 border-neutral40 rounded-full checked:bg-primary checked:ring-primary"
-              />
-              <Paragraph className="ml-2.5">OTP via Email</Paragraph>
-            </label>
+            <RadioButton
+              name="mfa_type"
+              onChangeHandler={handleFormOnChange}
+              isChecked={form.mfa_type === "fr"}
+              title="Face Recognition"
+              type="bullet"
+              value="fr"
+            />
+            <RadioButton
+              name="mfa_type"
+              onChangeHandler={handleFormOnChange}
+              isChecked={form.mfa_type === "otp"}
+              title="OTP via Email"
+              type="bullet"
+              value="otp"
+            />
             <label className="flex items-center mt-3.5">
               <input
                 disabled
-                name="mfa_method"
-                value="mfa_method_otp_ponsel"
+                name="mfa_type"
+                value="mfa_type_otp_ponsel"
                 onChange={agreeOtpPonsel ? handleFormOnChange : undefined}
                 onClick={
                   agreeOtpPonsel
@@ -454,7 +485,7 @@ function SettingSignatureAndMFA({}: Props) {
                         showModalOtpPonselSetter(true);
                       }
                 }
-                checked={form.mfa_method === "otp_ponsel"}
+                checked={form.mfa_type === "otp_ponsel"}
                 type="radio"
                 className="appearance-none disabled:opacity-50 bg-white w-4 h-4 ring-1 ring-neutral40 border-2 border-neutral40 rounded-full checked:bg-primary checked:ring-primary"
               />
@@ -463,19 +494,51 @@ function SettingSignatureAndMFA({}: Props) {
               </p>
             </label>
           </div>
-          <Button
-            size="none"
-            type="submit"
-            className="mt-8 px-6 py-2.5 text-base bg-primary block mx-auto"
-            disabled={isLoading}
-            style={{
-              backgroundColor: themeConfigurationAvaliabilityChecker(
-                themeConfiguration?.data.button_color as string
-              ),
-            }}
-          >
-            {t("next")}
-          </Button>
+          {defaultMfa !== null ? (
+            <>
+              <Button
+                onClick={(e) => handleFormOnSubmit(e, "change_mfa")}
+                disabled={defaultMfa === form.mfa_type}
+                size="full"
+                className="py-2 mx-0 whitespace-nowrap mt-5"
+                style={{
+                  backgroundColor: themeConfigurationAvaliabilityChecker(
+                    themeConfiguration?.data.button_color
+                  ),
+                }}
+              >
+                {t("setMFA.submitBtn")}
+              </Button>
+              <Button
+                size="none"
+                variant="ghost"
+                className="mt-5 px-6 py-2.5 text-base block mx-auto disabled:opacity-50"
+                onClick={(e) => handleFormOnSubmit(e, "submit")}
+                disabled={isLoading || defaultMfa !== form.mfa_type}
+                style={{
+                  color: themeConfigurationAvaliabilityChecker(
+                    themeConfiguration?.data.button_color
+                  ),
+                }}
+              >
+                {t("next")}
+              </Button>
+            </>
+          ) : (
+            <Button
+              onClick={(e) => handleFormOnSubmit(e, "submit")}
+              size="none"
+              className="mt-8 px-6 py-2.5 text-base bg-primary block mx-auto"
+              disabled={isLoading}
+              style={{
+                backgroundColor: themeConfigurationAvaliabilityChecker(
+                  themeConfiguration?.data.button_color
+                ),
+              }}
+            >
+              {t("next")}
+            </Button>
+          )}
           <Footer />
         </form>
         <div
@@ -499,7 +562,7 @@ function SettingSignatureAndMFA({}: Props) {
                   onClick={(_: React.MouseEvent<HTMLButtonElement>) => {
                     agreeOtpPonselSetter(true);
                     showModalOtpPonselSetter(false);
-                    formSetter({ ...form, mfa_method: "otp_ponsel" });
+                    formSetter({ ...form, mfa_type: "otp_ponsel" });
                   }}
                   className="text-white bg-primary p-2.5 w-full rounded-sm"
                 >
@@ -523,11 +586,78 @@ function SettingSignatureAndMFA({}: Props) {
   );
 }
 
+interface IOtpModalConfrimation {
+  isShowOtpModalConfirmation: boolean;
+  setIsShowOtpModalConfirmation: React.Dispatch<React.SetStateAction<boolean>>;
+  onClickHandler: () => void;
+  setIsDisabled: React.Dispatch<React.SetStateAction<boolean>>;
+  isDisabled: boolean;
+}
+
+const OtpModalConfirmation = ({
+  setIsShowOtpModalConfirmation,
+  isShowOtpModalConfirmation,
+  onClickHandler,
+  isDisabled,
+  setIsDisabled,
+}: IOtpModalConfrimation) => {
+  const { t }: any = i18n;
+  const themeConfiguration = useSelector((state: RootState) => state.theme);
+  return isShowOtpModalConfirmation ? (
+    <div
+      style={{ backgroundColor: "rgba(0, 0, 0, .5)" }}
+      className={`fixed z-50 flex items-center transition-all poppins-regular duration-1000 justify-center w-full left-0 top-0 h-full`}
+    >
+      <div className="bg-white max-w-sm px-2 pb-4 rounded-xl w-full mx-5">
+        <div className="px-5 py-5 flex justify-start gap-5 items-start">
+          <div>
+            <p className="poppins-regular block text-center font-semibold ">
+              {t("setMFA.modal.title")}
+            </p>
+            <p className="mt-8 text-sm text-center">
+              {t("setMFA.modal.FRSubtitle")}
+            </p>
+          </div>
+        </div>
+        <div className="poppins-regular justify-center items-center flex-col-reverse flex gap-3  mt-5">
+          <Button
+            variant="ghost"
+            style={{
+              color: themeConfigurationAvaliabilityChecker(
+                themeConfiguration?.data.action_font_color
+              ),
+            }}
+            onClick={() => {
+              setIsDisabled(false);
+              setIsShowOtpModalConfirmation(false);
+            }}
+          >
+            {t("cancel")}
+          </Button>
+          <Button
+            size="none"
+            className="py-2.5"
+            disabled={isDisabled}
+            style={{
+              backgroundColor: themeConfigurationAvaliabilityChecker(
+                themeConfiguration?.data.button_color
+              ),
+            }}
+            onClick={onClickHandler}
+          >
+            {t("confirm")}
+          </Button>
+        </div>
+      </div>
+    </div>
+  ) : null;
+};
+
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const cQuery = context.query;
   const isNotRedirect: boolean = true;
   const uuid =
-    cQuery.transaction_id || cQuery.request_id || cQuery.registration_id;
+    cQuery.transaction_id ?? cQuery.request_id ?? cQuery.registration_id;
 
   const checkStepResult: {
     res?: TKycCheckStepResponseData;

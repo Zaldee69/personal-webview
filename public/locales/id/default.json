@@ -108,7 +108,10 @@
   "chooseSignature": "Pilih tipe tanda tangan",
   "chooseSignatureInformation": "Tanda tangan yang dipilih akan digunakan di dalam dokumen yang Anda tandatangani.",
   "choosetAutheticantionMode": "Pilih metode otentikasi",
-  "choosetAutheticantionModeInformation": "Demi keamanan, diperlukan Multi Factor Authentication yang harus Anda gunakan saat melakukan aktivitas tanda tangan digital atau layanan Tilaka lainnya.",
+  "choosetAutheticantionModeInformation": {
+    "haveDefaultMfa": "Akun anda terdeteksi telah memiliki MFA,\napakah anda ingin melakukan update pada MFA?\nUpdate ini akan diterapkan kepada seluruh akun anda.",
+    "dontHaveDefaultMfa": "Demi keamanan, diperlukan <0>{{mfa}}</0> yang harus Anda gunakan saat melakukan aktivitas tanda tangan digital atau layanan Tilaka lainnya."
+  },
   "autheticantionMode1": "Face Recognition",
   "autheticantionMode2": "OTP via Email",
   "autheticantionMode3": "OTP via Ponsel",
