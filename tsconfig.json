@@ -17,6 +17,7 @@
     "baseUrl": ".",
     "paths": {
       "@/components/*": ["components/*"],
+      "@/constants/*": ["constants/*"],
       "@/hooks/*": ["hooks/*"],
       "@/interface/*": ["interface/*"],
       "@/redux/*": ["redux/*"],
