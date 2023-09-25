@@ -30,7 +30,7 @@ export const serverSideRenderReturnConditions = ({
   const cQuery = context.query;
   const uuid =
     cQuery.transaction_id || cQuery.request_id || cQuery.registration_id;
-    
+
   if (checkStepResult.err) {
     if (checkStepResult?.err.response?.data?.data?.errors?.[0]) {
       // ?
@@ -161,39 +161,25 @@ export const serverSideRenderReturnConditions = ({
       } else if (checkStepResult.res.data.status === "S") {
         const params: any = {
           status: checkStepResult.res.data.status,
+          request_id: uuid,
+          register_id: uuid,
+          redirect_url: cQuery.redirect_url,
         };
 
         if (checkStepResult.res.data.reason_code) {
           params.reason_code = checkStepResult.res.data.reason_code;
         }
 
-        // status S doesn't has `pin_form`
-        if (
-          currentPathnameWithoutParams === `${assetPrefix}/form/success` ||
-          currentPathnameWithoutParams === "/form/success"
-        ) {
-          params.request_id = uuid;
-        } else if (
-          currentPathnameWithoutParams === `${assetPrefix}/kyc/pinform` ||
-          currentPathnameWithoutParams === "/kyc/pinform"
-        ) {
-          params.register_id = uuid;
-        } else {
-          // if condition above not fulfulled, we return `register_id`,
-          // even if the channel is reguler, because if status S we don't know what channel of the uuid
-          params.register_id = uuid;
-        }
+        params.request_id = uuid;
+        params.register_id = uuid;
 
-        const queryString = new URLSearchParams(params as any).toString();
+        const queryString = new URLSearchParams(params).toString();
 
-        if (cQuery.redirect_url && !isNotRedirect) {
+        if (!isNotRedirect) {
           return {
             redirect: {
               permanent: false,
-              destination: concateRedirectUrlParams(
-                cQuery.redirect_url as string,
-                queryString
-              ),
+              destination: handleRoute("/form/success?" + queryString),
             },
             props: {},
           };
@@ -226,7 +212,9 @@ export const serverSideRenderReturnConditions = ({
       }
     } else {
       if (
-        checkStepResult.res?.data?.errors?.[0] === "registrationId tidak valid" && checkStepResult?.res?.data?.route?.length < 1
+        checkStepResult.res?.data?.errors?.[0] ===
+          "registrationId tidak valid" &&
+        checkStepResult?.res?.data?.route?.length < 1
       ) {
         const params: any = { ...cQuery, request_id: uuid };
         const queryString = new URLSearchParams(params as any).toString();
