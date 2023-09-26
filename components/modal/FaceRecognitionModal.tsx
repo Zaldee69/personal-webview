@@ -46,7 +46,7 @@ const FaceRecognitionModal: React.FC<FaceRecognitionModalProps> = (props) => {
         size="none"
         variant="ghost"
         disabled={props.isDisabled}
-        className="mt-3 mb-1 uppercase mx-auto font-bold text-base h-9"
+        className="mt-3 mb-1 uppercase mx-auto font-bold disabled:opacity-50 text-base h-9"
         style={{
           color: themeConfigurationAvaliabilityChecker(
             themeConfiguration?.data.action_font_color
