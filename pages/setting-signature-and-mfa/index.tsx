@@ -138,7 +138,6 @@ function SettingSignatureAndMFA({}: Props) {
     isMustRedirect: boolean
   ) => {
     toast.dismiss("info");
-    setIsLoading(false);
     toast(
       isMustRedirect ? "Penggatian tanda tangan dan MFA berhasil" : message,
       {
@@ -163,7 +162,9 @@ function SettingSignatureAndMFA({}: Props) {
       }, 3000);
     } else if (form.mfa_type === "fr") {
       setIsShowOtpModalConfirmation(false);
+      setIsLoading(false);
     } else {
+      setIsLoading(false);
       setIsShowFrModal(false);
     }
   };
@@ -198,7 +199,9 @@ function SettingSignatureAndMFA({}: Props) {
     })
       .then((res) => {
         handleChangeSignatureAndMfaSuccess(res.message, isMustRedirect);
-        getUserData();
+        if(!isMustRedirect){
+          getUserData();
+        }
       })
       .catch((err) => {
         if (err.response?.status === 401) {
@@ -231,12 +234,12 @@ function SettingSignatureAndMFA({}: Props) {
     const res = await handleSetSignature(signature);
     if (res?.success) {
       if (!defaultMfa) {
+        handleSetMFAType(mfa_type, true);
+      } else {
         handleChangeSignatureAndMfaSuccess(
           "Penggatian tanda tangan dan MFA berhasil",
-          false
+          true
         );
-      } else {
-        handleSetMFAType(mfa_type, true);
       }
     } else {
       handleChangeSignatureAndMfaFailure(res?.message!);
