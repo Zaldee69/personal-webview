@@ -47,7 +47,7 @@ const loginQueueInitial = { queue: false, data: { existingToken: undefined } };
 const Login = ({}: Props) => {
   const [password, setPassword] = useState<string>("");
   const [tilakaName, setTilakaName] = useState("");
-  const [certifModal, setCertifModal] = useState<boolean>(true);
+  const [certifModal, setCertifModal] = useState<boolean>(false);
   const [type, setType] = useState<{ password: string }>({
     password: "password",
   });
