@@ -16,7 +16,8 @@ interface FaceRecognitionModalProps {
   callbackCaptureProcessor: (base64Img: string | null | undefined) => void;
   isShowModal: boolean;
   setIsShowModal: React.Dispatch<React.SetStateAction<boolean>>;
-  title: string
+  title: string;
+  isDisabled: boolean
 }
 
 const FaceRecognitionModal: React.FC<FaceRecognitionModalProps> = (props) => {
@@ -26,7 +27,7 @@ const FaceRecognitionModal: React.FC<FaceRecognitionModalProps> = (props) => {
 
   const { t }: any = i18n;
   return props.isShowModal ? (
-    <ModalLayout>
+    <ModalLayout size="md" >
       <Heading className="block pt-2 text-center">{props.title}</Heading>
       <Paragraph size="sm" className="mt-2 block text-center">
         {t("frSubtitle1")}
@@ -43,7 +44,9 @@ const FaceRecognitionModal: React.FC<FaceRecognitionModalProps> = (props) => {
       <Button
         onClick={() => props.setIsShowModal(false)}
         size="none"
-        className="mt-3 mb-1 uppercase font-bold text-base h-9"
+        variant="ghost"
+        disabled={props.isDisabled}
+        className="mt-3 mb-1 uppercase mx-auto font-bold text-base h-9"
         style={{
           color: themeConfigurationAvaliabilityChecker(
             themeConfiguration?.data.action_font_color
