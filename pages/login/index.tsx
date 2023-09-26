@@ -35,14 +35,10 @@ import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfiguratio
 import Paragraph from "@/components/atoms/Paraghraph";
 import Heading from "@/components/atoms/Heading";
 import Label from "@/components/atoms/Label";
+import Modal from "@/components/modal/Modal";
+import { Trans } from "react-i18next";
 
 type Props = {};
-
-type ModalProps = {
-  certifModal: boolean;
-  setCertifModal: React.Dispatch<React.SetStateAction<boolean>>;
-  theme: TThemeResponse | undefined;
-};
 
 type TEventMessageDataToken = string | undefined;
 
@@ -51,7 +47,7 @@ const loginQueueInitial = { queue: false, data: { existingToken: undefined } };
 const Login = ({}: Props) => {
   const [password, setPassword] = useState<string>("");
   const [tilakaName, setTilakaName] = useState("");
-  const [certifModal, setCertifModal] = useState<boolean>(false);
+  const [certifModal, setCertifModal] = useState<boolean>(true);
   const [type, setType] = useState<{ password: string }>({
     password: "password",
   });
@@ -179,7 +175,7 @@ const Login = ({}: Props) => {
         if (certif[0].status == "Aktif") {
           getUserName({}).then((res) => {
             const data = JSON.parse(res.data);
-            const path = "setting-signature-and-mfa"
+            const path = "setting-signature-and-mfa";
             if (data.typeMfa == null || router.query.next_path === path) {
               router.replace({
                 pathname: handleRoute(path),
@@ -277,11 +273,31 @@ const Login = ({}: Props) => {
         ),
       }}
     >
-      <CertifModal
-        setCertifModal={setCertifModal}
-        certifModal={certifModal}
-        theme={theme}
-      />
+      <Modal
+        isShowModal={certifModal}
+        setModal={setCertifModal}
+        headingTitle={t("dontHaveCertifTitle")}
+        size="sm"
+      >
+        <div className="flex flex-col pb-4 px-2 justify-center">
+          <div
+            className="bg-contain w-32 mx-auto mt-3 h-32 bg-center bg-no-repeat"
+            style={{
+              backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
+                theme?.data.asset_activation_cert_error as string,
+                "ASSET",
+                `${assetPrefix}/images/certif.svg`
+              )})`,
+            }}
+          ></div>
+          <Paragraph className="text-center mt-5">
+            {t("dontHaveCertifSubtitle")}
+          </Paragraph>
+          <Paragraph className="text-center">
+            <Trans i18nKey="contactCantika" components={[<a href="mailto:cantika@tilaka.id" className="border-b" key={0} />]} />
+          </Paragraph>
+        </div>
+      </Modal>
       <Head>
         <title>Tilaka</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
@@ -297,11 +313,7 @@ const Login = ({}: Props) => {
         </div>
         <form onSubmit={submitHandler}>
           <div className="flex flex-col  mt-20">
-            <Label
-              size="base"
-              className="px-2"
-              htmlFor="password"
-            >
+            <Label size="base" className="px-2" htmlFor="password">
               {t("passwordLabel")}
             </Label>
             <div className="relative flex-1">
@@ -332,10 +344,7 @@ const Login = ({}: Props) => {
                 checked={rememberMe}
                 onChange={() => setRememberMe(!rememberMe)}
               />
-              <Label
-                size="base"
-                htmlFor="rememberMe"
-              >
+              <Label size="base" htmlFor="rememberMe">
                 {t("rememberMe")}
               </Label>
             </div>
@@ -451,63 +460,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 };
 
 export default Login;
-
-const CertifModal = ({ certifModal, setCertifModal, theme }: ModalProps) => {
-  const { t }: any = i18n;
-  return certifModal ? (
-    <div
-      style={{ backgroundColor: "rgba(0, 0, 0, .5)" }}
-      className="fixed z-50 flex items-start transition-all duration-1000 pb-3 justify-center w-full left-0 top-0 h-full "
-    >
-      <div className="bg-white max-w-md mt-20 pt-5 px-2 pb-4 rounded-xl w-full mx-5">
-        <Heading className="text-center">
-          {t("dontHaveCertifTitle")}
-        </Heading>
-        <div className="flex flex-col justify-center">
-          <div
-            className="bg-contain w-32 mx-auto mt-3 h-32 bg-center bg-no-repeat"
-            style={{
-              backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
-                theme?.data.asset_activation_cert_error as string,
-                "ASSET",
-                `${assetPrefix}/images/certif.svg`
-              )})`,
-            }}
-          ></div>
-          <Paragraph className="text-center mt-5">
-            {t("dontHaveCertifSubtitle")}
-          </Paragraph>
-        </div>
-        <Button
-          style={{
-            backgroundColor: themeConfigurationAvaliabilityChecker(
-              theme?.data.button_color as string
-            ),
-          }}
-          size="full"
-          className=" mt-8 disabled:opacity-50 text-white h-9"
-        >
-          {t("createNewCertif")}
-        </Button>
-        <Button
-          variant="ghost"
-          onClick={() => {
-            // restLogout({})
-            setCertifModal(false);
-          }}
-          className="uppercase w-full mt-4 mx-auto rounded-sm h-9"
-          style={{
-            color: themeConfigurationAvaliabilityChecker(
-              theme?.data.action_font_color as string
-            ),
-          }}
-        >
-          {t("cancel")}
-        </Button>
-      </div>
-    </div>
-  ) : null;
-};
 
 type TPropsLoginQueue = {
   existingToken: TEventMessageDataToken;
