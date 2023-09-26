@@ -110,10 +110,15 @@ export const serverSideRenderReturnConditions = ({
         const params: any = {
           ...cQuery,
           request_id: uuid,
+          register_id: uuid,
         };
 
         if (checkStepResult.res.data.reason_code) {
           params.reason_code = checkStepResult.res.data.reason_code;
+        }
+
+        if(checkStepResult.res.data.token){
+          params.token = checkStepResult.res.data.token
         }
 
         const queryString = new URLSearchParams(params as any).toString();
@@ -136,6 +141,22 @@ export const serverSideRenderReturnConditions = ({
                     : ""
                 }`
               ),
+            },
+            props: {},
+          };
+        } else if (checkStepResult.res.data?.route === "done_set_password") {
+          return {
+            redirect: {
+              permanent: false,
+              destination: handleRoute("manual-form/success?" + queryString),
+            },
+            props: {},
+          };
+        } else if (checkStepResult.res.data?.route === "set_password") {
+          return {
+            redirect: {
+              permanent: false,
+              destination: handleRoute("manual-form/final?" + queryString),
             },
             props: {},
           };
