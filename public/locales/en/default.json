@@ -142,7 +142,7 @@
   "relogin2": "Please fill the password to re-login. ",
   "close": "Close",
   "dontHaveCertifTitle": "You don’t have any certificate",
-  "dontHaveCertifSubtitle": "Your certificate has expired or has been revoked. Please reenroll to use digital signature.",
+  "dontHaveCertifSubtitle": "Your certificate has expired or has been revoked",
   "createNewCertif": "Create New Certificate",
   "handwritingRequired": "Handwriting cannot be empty",
   "FontRequired": "You must choose a font type",
@@ -293,7 +293,8 @@
     "submitButton": "Submit"
   },
   "neverRegisteredBefore": "Never registered before?",
-  "contactUs": "Contact Us"
+  "contactUs": "Contact Us",
+  "contactCantika": "Contact <0>cantika@tilaka.id</0>"
 }
 
 

@@ -142,7 +142,7 @@
   "relogin2": "Mohon lakukan login ulang dengan mengisi Kata Sandi.",
   "close": "Tutup",
   "dontHaveCertifTitle": "Anda tidak memiliki sertifikat",
-  "dontHaveCertifSubtitle": "Sertifikat Anda telah kadaluarsa atau telah dicabut. Mohon membuat sertifikat baru untuk melakukan penandatanganan",
+  "dontHaveCertifSubtitle": "Sertifikat Anda telah kadaluarsa atau telah dicabut",
   "createNewCertif": "Buat Sertifikat Baru",
   "handwritingRequired": "Tanda tangan goresan tidak boleh kosong",
   "FontRequired": "Anda harus memilih salah satu tipe font",
@@ -292,5 +292,6 @@
     "submitButton": "Kirim"
   },
   "neverRegisteredBefore": "Tidak pernah mendaftar sebelumnya?",
-  "contactUs": "Hubungi Kami"
+  "contactUs": "Hubungi Kami",
+  "contactCantika": "Hubungi <0>cantika@tilaka.id</0>"
 }
