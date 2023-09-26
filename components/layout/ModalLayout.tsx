@@ -2,10 +2,10 @@ import React from "react";
 
 type Props = {
   children: React.ReactNode;
-  size: "sm" | "md" | "lg"
+  size?: "sm" | "md" | "lg"
 };
 
-const ModalLayout = ({ children, size }: Props) => {
+const ModalLayout = ({ children, size= "md" }: Props) => {
   const modalSize = 'max-w-'.concat(size)
   return (
     <div
