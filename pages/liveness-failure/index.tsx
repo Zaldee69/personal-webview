@@ -98,7 +98,7 @@ const LivenessFailure = () => {
         <title>Liveness</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
-      <div className="px-5 pt-8 sm:w-full md:w-4/5 mx-auto">
+      <div className="px-5 pt-8 max-w-md md:w-4/5 mx-auto">
         <div className="flex flex-col gap-16 items-center justify-center">
           <Heading className="text-center">{t("ekycFailed.title")}</Heading>
           <div
@@ -113,28 +113,18 @@ const LivenessFailure = () => {
             }}
           ></div>
           <div className="flex flex-col items-center gap-10 ">
-            <Paragraph size="sm" className="text-center">
+            <Paragraph className="text-center">
               {message}
               {isRedirectToManualForm && (
-                <div>
-                  <div className="hidden lg:block">
-                    <Paragraph className="text-center">
-                      {t("ekycFailed.subtitle1")} <br />
-                      {t("ekycFailed.subtitle2")}
-                    </Paragraph>
-                  </div>
-                  <div className="block lg:hidden">
-                    <Paragraph className="text-center text-red-100">
-                      <Paragraph>
-                        <Trans
-                          values={{
-                            timeLeft: timeLeft <= 0 ? 0 : timeLeft,
-                          }}
-                          i18nKey="ekycFailed.subtitle"
-                        ></Trans>
-                      </Paragraph>
-                    </Paragraph>
-                  </div>
+                <div className="block">
+                  <Paragraph className="whitespace-pre-line">
+                    <Trans
+                      values={{
+                        timeLeft: timeLeft <= 0 ? 0 : timeLeft,
+                      }}
+                      i18nKey="ekycFailed.subtitle"
+                    ></Trans>
+                  </Paragraph>
                 </div>
               )}
             </Paragraph>
