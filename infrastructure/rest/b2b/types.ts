@@ -1,16 +1,26 @@
+export type TSignatureType = {
+  signature_type: 0 | 1
+}
+
+export type TFontType = {
+  font_type?:
+  | "Adine-Kirnberg"
+  | "champignonaltswash"
+  | "FormalScript"
+  | "HerrVonMuellerhoff-Regular"
+  | "MrsSaintDelafield-Regular"
+  | "SCRIPTIN"
+  | ""
+}
+
+export type TMultiFactorAuthenticationType = {
+  mfa_type : "otp" | "fr" | "otp_ponsel"
+}
+
 export type TSetDefaultSignatureRequestData = {
   signature_image: string
-  signature_type: 0 | 1;
-  font_type?:
-    | "Adine-Kirnberg"
-    | "champignonaltswash"
-    | "FormalScript"
-    | "HerrVonMuellerhoff-Regular"
-    | "MrsSaintDelafield-Regular"
-    | "SCRIPTIN"
-    | ""
   company_id?: string;
-};
+} & TSignatureType & TFontType;
 
 export type TSetDefaultSignatureResponseData = {
   success: boolean;
@@ -18,9 +28,7 @@ export type TSetDefaultSignatureResponseData = {
   data: any;
 };
 
-export type TSetDefaultMFARequestData = {
-  mfa_type : "otp" | "fr" | "otp_ponsel"
-}
+export type TSetDefaultMFARequestData  = {} & TMultiFactorAuthenticationType
 
 export type TConfirmCertificateRequestData = {
   serial_number: string,

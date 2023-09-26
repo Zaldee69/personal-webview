@@ -1,76 +1,79 @@
+import { useState, useRef, useEffect } from "react";
+import { toast } from "react-toastify";
+import i18n from "i18";
+import InfoIcon from "../../public/icons/InfoIcon";
+import html2canvas from "html2canvas";
+import XIcon from "@/public/icons/XIcon";
+import { assetPrefix } from "next.config";
+import { Trans } from "react-i18next";
+
+import { GetServerSideProps } from "next";
+import { useRouter } from "next/router";
+import Head from "next/head";
+
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/app/store";
+
+import { fontsType } from "@/constants/index";
+
+import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
+import {
+  TFontType,
+  TMultiFactorAuthenticationType,
+  TSetDefaultSignatureRequestData,
+  TSignatureType,
+} from "infrastructure/rest/b2b/types";
 import {
   restSetDefaultSignature,
   restSetDefaultMFA,
   getUserName,
 } from "infrastructure/rest/b2b";
-import { useState, useRef, useEffect } from "react";
-import SignaturePad from "../../components/SignaturePad";
-import InfoIcon from "../../public/icons/InfoIcon";
-import html2canvas from "html2canvas";
-import { toast } from "react-toastify";
-import XIcon from "@/public/icons/XIcon";
-import { useRouter } from "next/router";
-import Head from "next/head";
-import { handleRoute } from "@/utils/handleRoute";
-import { GetServerSideProps } from "next";
-import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
-import { serverSideRenderReturnConditions } from "@/utils/serverSideRenderReturnConditions";
-import i18n from "i18";
 import {
   RestKycCheckStepv2,
   RestPersonalFaceRecognitionV2,
 } from "infrastructure/rest/personal";
-import Button from "@/components/atoms/Button";
+
 import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
-import { useSelector } from "react-redux";
-import { RootState } from "@/redux/app/store";
+import { serverSideRenderReturnConditions } from "@/utils/serverSideRenderReturnConditions";
+import { handleRoute } from "@/utils/handleRoute";
+import handleUnauthenticated from "@/utils/handleUnauthenticated";
+import fRFailureCounter from "@/utils/fRFailureCounter";
+
+import SignaturePad from "@/components/SignaturePad";
+import Button from "@/components/atoms/Button";
 import Footer from "@/components/Footer";
-import { assetPrefix } from "next.config";
 import Heading from "@/components/atoms/Heading";
 import Paragraph from "@/components/atoms/Paraghraph";
-import { Trans } from "react-i18next";
 import RadioButton from "@/components/atoms/RadioButton";
 import FaceRecognitionModal from "@/components/modal/FaceRecognitionModal";
-import handleUnauthenticated from "@/utils/handleUnauthenticated";
-import { TSetDefaultSignatureRequestData } from "infrastructure/rest/b2b/types";
-import fRFailureCounter from "@/utils/fRFailureCounter";
-import { fontsType } from "@/constants/index";
+import ConfirmationModal from "@/components/modal/ConfirmationModal";
 
 type Props = {};
 
-type Tform = {
-  signature_type: 0 | 1;
-  signature_font_type?:
-    | "Adine-Kirnberg"
-    | "champignonaltswash"
-    | "FormalScript"
-    | "HerrVonMuellerhoff-Regular"
-    | "MrsSaintDelafield-Regular"
-    | "SCRIPTIN"
-    | "";
-  mfa_type: "fr" | "otp" | "otp_ponsel";
+type Tform = {} & TSignatureType & TFontType & TMultiFactorAuthenticationType;
+
+type Payload = {
+  signature: TSetDefaultSignatureRequestData;
+} & TMultiFactorAuthenticationType;
+
+const INITIAL_FORM_STATE: Tform = {
+  signature_type: 1,
+  font_type: "",
+  mfa_type: "fr",
 };
 
-interface Payload {
-  signature: TSetDefaultSignatureRequestData;
-  mfa_type: Tform["mfa_type"];
-}
-
 function SettingSignatureAndMFA({}: Props) {
-  const [form, formSetter] = useState<Tform>({
-    signature_type: 1,
-    signature_font_type: "",
-    mfa_type: "fr",
-  });
-  const [showModalOtpPonsel, showModalOtpPonselSetter] =
-    useState<boolean>(false);
-
+  const [form, formSetter] = useState<Tform>(INITIAL_FORM_STATE);
   const [imageURL, setImageURL] = useState<string>();
   const [data, setData] = useState<string>();
   const [agreeOtpPonsel, agreeOtpPonselSetter] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [defaultMfa, setDefaultMfa] = useState<"fr" | "otp" | null>(null);
   const [isShowFrModal, setIsShowFrModal] = useState<boolean>(false);
+  const [defaultMfa, setDefaultMfa] = useState<
+    TMultiFactorAuthenticationType["mfa_type"] | null
+  >(null);
+  const [showModalOtpPonsel, showModalOtpPonselSetter] =
+    useState<boolean>(false);
   const [isShowOtpModalConfirmation, setIsShowOtpModalConfirmation] =
     useState<boolean>(false);
 
@@ -135,6 +138,7 @@ function SettingSignatureAndMFA({}: Props) {
     isMustRedirect: boolean
   ) => {
     toast.dismiss("info");
+    setIsLoading(false);
     toast(
       isMustRedirect ? "Penggatian tanda tangan dan MFA berhasil" : message,
       {
@@ -179,6 +183,14 @@ function SettingSignatureAndMFA({}: Props) {
     mfa_type: Tform["mfa_type"],
     isMustRedirect: boolean
   ) => {
+    // will show prompt when change MFA from OTP to FR
+    // change MFA from OTP to FR will not show promt, because the prompt was handled by FRCamera components
+    if (mfa_type === "fr" && !isMustRedirect) {
+      handleSubmitStarted();
+    } else {
+      setIsLoading(true);
+    }
+
     restSetDefaultMFA({
       payload: {
         mfa_type,
@@ -270,11 +282,11 @@ function SettingSignatureAndMFA({}: Props) {
       .getTrimmedCanvas()
       .toDataURL("image/png");
 
-    const { signature_type, signature_font_type, mfa_type } = form;
+    const { signature_type, font_type, mfa_type } = form;
 
     const signature = {
       signature_type,
-      font_type: signature_type == 0 ? "" : signature_font_type,
+      font_type: signature_type == 0 ? "" : font_type,
       signature_image:
         signature_type == 1 ? (imageURL as string) : signature_image,
     };
@@ -283,7 +295,7 @@ function SettingSignatureAndMFA({}: Props) {
       (signature_type == 0 && sigPad.current.isEmpty() && type === "submit") ||
       (signature_type == 1 && !imageURL && type === "submit")
     ) {
-      handleFieldEmpty(signature_type);
+      handleFieldEmpty(Number(signature_type));
     } else if (type === "change_mfa") {
       if (mfa_type === "fr") {
         setIsShowOtpModalConfirmation(true);
@@ -301,6 +313,8 @@ function SettingSignatureAndMFA({}: Props) {
       face_image: base64Img?.split(",")[1] as string,
     };
 
+    setIsLoading(true);
+
     const mfa_type = "otp";
 
     RestPersonalFaceRecognitionV2({ payload })
@@ -308,6 +322,7 @@ function SettingSignatureAndMFA({}: Props) {
         if (res.success) {
           handleSetMFAType(mfa_type, false);
         } else {
+          setIsLoading(false);
           toast.dismiss("info");
           fRFailureCounter({
             setModal: setIsShowFrModal,
@@ -331,7 +346,6 @@ function SettingSignatureAndMFA({}: Props) {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (!router.isReady) return;
     if (!token) {
       router.push({
         pathname: handleRoute("login"),
@@ -340,7 +354,7 @@ function SettingSignatureAndMFA({}: Props) {
     } else {
       getUserData();
     }
-  }, [router, router.isReady]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div
@@ -358,20 +372,6 @@ function SettingSignatureAndMFA({}: Props) {
       </Head>
       <div className="p-4 max-w-md mx-auto">
         <Heading className="mt-2">{t("settingSignatureTitleAndMFA")}</Heading>
-        <FaceRecognitionModal
-          isShowModal={isShowFrModal}
-          setIsShowModal={setIsShowFrModal}
-          callbackCaptureProcessor={captureProcessor}
-          signingFailedRedirectTo={handleRoute("login")}
-          title={t("setMFA.modal.title")}
-        />
-        <OtpModalConfirmation
-          onClickHandler={() => handleSetMFAType("fr", false)}
-          isShowOtpModalConfirmation={isShowOtpModalConfirmation}
-          setIsShowOtpModalConfirmation={setIsShowOtpModalConfirmation}
-          isDisabled={false}
-          setIsDisabled={setIsShowOtpModalConfirmation}
-        />
         <form>
           <div
             className="bg-contain w-64 mx-auto my-5 h-64 bg-center bg-no-repeat"
@@ -423,11 +423,11 @@ function SettingSignatureAndMFA({}: Props) {
               {fontsType.map((font: string) => (
                 <RadioButton
                   type="button"
-                  name="signature_font_type"
+                  name="font_type"
                   key={font}
                   onChangeHandler={handleFormOnChange}
                   title={data!}
-                  isChecked={form.signature_font_type === font}
+                  isChecked={form.font_type === font}
                   fontFamily={font}
                   value={font}
                 />
@@ -499,8 +499,8 @@ function SettingSignatureAndMFA({}: Props) {
               <Button
                 onClick={(e) => handleFormOnSubmit(e, "change_mfa")}
                 disabled={defaultMfa === form.mfa_type}
-                size="full"
-                className="py-2 mx-0 whitespace-nowrap mt-5"
+                size="none"
+                className="py-2 mx-auto whitespace-nowrap mt-5"
                 style={{
                   backgroundColor: themeConfigurationAvaliabilityChecker(
                     themeConfiguration?.data.button_color
@@ -582,33 +582,24 @@ function SettingSignatureAndMFA({}: Props) {
           </div>
         </div>
       </div>
-    </div>
-  );
-}
-
-interface IOtpModalConfrimation {
-  isShowOtpModalConfirmation: boolean;
-  setIsShowOtpModalConfirmation: React.Dispatch<React.SetStateAction<boolean>>;
-  onClickHandler: () => void;
-  setIsDisabled: React.Dispatch<React.SetStateAction<boolean>>;
-  isDisabled: boolean;
-}
-
-const OtpModalConfirmation = ({
-  setIsShowOtpModalConfirmation,
-  isShowOtpModalConfirmation,
-  onClickHandler,
-  isDisabled,
-  setIsDisabled,
-}: IOtpModalConfrimation) => {
-  const { t }: any = i18n;
-  const themeConfiguration = useSelector((state: RootState) => state.theme);
-  return isShowOtpModalConfirmation ? (
-    <div
-      style={{ backgroundColor: "rgba(0, 0, 0, .5)" }}
-      className={`fixed z-50 flex items-center transition-all poppins-regular duration-1000 justify-center w-full left-0 top-0 h-full`}
-    >
-      <div className="bg-white max-w-sm px-2 pb-4 rounded-xl w-full mx-5">
+      {/* modal */}
+      <FaceRecognitionModal
+        isShowModal={isShowFrModal}
+        isDisabled={isLoading}
+        setIsShowModal={setIsShowFrModal}
+        callbackCaptureProcessor={captureProcessor}
+        signingFailedRedirectTo={handleRoute("login")}
+        title={t("setMFA.modal.title")}
+      />
+      <ConfirmationModal
+        isShow={isShowOtpModalConfirmation}
+        isDisabled={isLoading}
+        onCancelHandler={() => {
+          setIsLoading(false);
+          setIsShowOtpModalConfirmation(false);
+        }}
+        onConfirmHandler={() => handleSetMFAType("fr", false)}
+      >
         <div className="px-5 py-5 flex justify-start gap-5 items-start">
           <div>
             <p className="poppins-regular block text-center font-semibold ">
@@ -619,39 +610,10 @@ const OtpModalConfirmation = ({
             </p>
           </div>
         </div>
-        <div className="poppins-regular justify-center items-center flex-col-reverse flex gap-3  mt-5">
-          <Button
-            variant="ghost"
-            style={{
-              color: themeConfigurationAvaliabilityChecker(
-                themeConfiguration?.data.action_font_color
-              ),
-            }}
-            onClick={() => {
-              setIsDisabled(false);
-              setIsShowOtpModalConfirmation(false);
-            }}
-          >
-            {t("cancel")}
-          </Button>
-          <Button
-            size="none"
-            className="py-2.5"
-            disabled={isDisabled}
-            style={{
-              backgroundColor: themeConfigurationAvaliabilityChecker(
-                themeConfiguration?.data.button_color
-              ),
-            }}
-            onClick={onClickHandler}
-          >
-            {t("confirm")}
-          </Button>
-        </div>
-      </div>
+      </ConfirmationModal>
     </div>
-  ) : null;
-};
+  );
+}
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const cQuery = context.query;
