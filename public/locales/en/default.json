@@ -263,7 +263,7 @@
   "checkEmail2": "Please check your email for Tilaka Name information.",
   "ekycFailed": {
     "title": "e-KYC Failed",
-    "subtitle": "To continue the Registration Process, you will be directed to Manual Verification Page within {{timeLeft}} seconds",
+    "subtitle": "To continue the Registration Process, you will be directed to Manual Verification Page\n within {{timeLeft}} seconds",
     "subtitle1": "To continue the Registration Process, you will be directed ",
     "subtitle2": "to Manual Verification Page within 5 seconds",
     "errorCode1": "Dukcapil Checking Failed",
