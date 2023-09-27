@@ -106,7 +106,7 @@ export const serverSideRenderReturnConditions = ({
             },
           };
         }
-      } else if (checkStepResult.res.data.status === "F") {
+      } else if (checkStepResult.res.data.status === "F" || checkStepResult.res.data.status === "E") {
         const params: any = {
           ...cQuery,
           request_id: uuid,
