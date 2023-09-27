@@ -121,6 +121,10 @@ export const serverSideRenderReturnConditions = ({
           params.token = checkStepResult.res.data.token
         }
 
+        if(checkStepResult.res.data?.route === "done_set_password"){
+          params.status = "S"
+        }
+
         const queryString = new URLSearchParams(params as any).toString();
 
         if (
