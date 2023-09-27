@@ -47,10 +47,18 @@ const LivenessFailure = () => {
     status,
   };
 
-  if (reason_code === "3") {
-    params.reason_code = "3";
-  } else {
-    params.status = "F";
+  switch (reason_code) {
+    case "3":
+      params.reason_code = "3";
+      break;
+    case "2":
+      params.status = "F";
+      break;
+    case "1":
+      params.status = "E";
+      break;
+    default:
+      break;
   }
 
   const second = 5;
@@ -74,7 +82,7 @@ const LivenessFailure = () => {
 
   useEffect(() => {
     if (isRedirectToManualForm) {
-        setTimeout(() => {
+      setTimeout(() => {
         router.push({
           pathname: handleRoute("manual-form"),
           query: { ...params },

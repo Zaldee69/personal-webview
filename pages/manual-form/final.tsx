@@ -194,7 +194,10 @@ const Form: React.FC = () => {
 
         const query: any = {
           request_id,
-          ...restRouterQuery,
+          register_id: request_id,
+          reason_code: router.query.reason_code,
+          redirect_url: router.query.redirect_url,
+          status: "S"
         };
 
         router.replace({
