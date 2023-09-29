@@ -26,9 +26,14 @@ interface TQueryParams {
   reason_code: string | undefined | string[];
   request_id: string;
   register_id: string;
+  redirect_url: string | undefined | string[];
 }
 
-const LivenessFailure = () => {
+interface Props {
+  status: string | null
+}
+
+const LivenessFailure = (props: Props) => {
   const { t }: any = i18n;
   const router = useRouter();
   const routerQuery = router.query;
@@ -38,28 +43,15 @@ const LivenessFailure = () => {
     routerQuery.request_id ||
     routerQuery.registration_id;
 
-  const { reason_code, redirect_url, status } = routerQuery;
+  const { reason_code, redirect_url } = routerQuery;
 
   const params: TQueryParams = {
     request_id: uuid as string,
     register_id: uuid as string,
     reason_code,
-    status,
+    status: props.status as string,
+    redirect_url,
   };
-
-  switch (reason_code) {
-    case "3":
-      params.reason_code = "3";
-      break;
-    case "2":
-      params.status = "F";
-      break;
-    case "1":
-      params.status = "E";
-      break;
-    default:
-      break;
-  }
 
   const second = 5;
 
@@ -187,7 +179,14 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       return { err };
     });
 
-  return serverSideRenderReturnConditions({ context, checkStepResult });
+  const serverSideRenderReturnConditionsResult =
+    serverSideRenderReturnConditions({ context, checkStepResult });
+
+  serverSideRenderReturnConditionsResult["props"] = {
+    status: checkStepResult.res?.data?.status || null,
+  };
+
+  return serverSideRenderReturnConditionsResult;
 };
 
 export default LivenessFailure;
