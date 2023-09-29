@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import Footer from "../../components/Footer";
-import { RestKycCheckStep, RestKycFinalForm } from "../../infrastructure";
+import { RestKycCheckStep, RestKycCheckStepv2, RestKycFinalForm } from "../../infrastructure";
 import EyeIcon from "../../public/icons/EyeIcon";
 import EyeIconOff from "./../../public/icons/EyeIconOff";
 import QuestionIcon from "./../../public/icons/QuestionIcon";
@@ -22,6 +22,9 @@ import Heading from "@/components/atoms/Heading";
 import Paragraph from "@/components/atoms/Paraghraph";
 import ErrorMessage from "@/components/atoms/ErrorMessage";
 import Label from "@/components/atoms/Label";
+import { GetServerSideProps } from "next";
+import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
+import { serverSideRenderReturnConditions } from "@/utils/serverSideRenderReturnConditions";
 interface InputType {
   password: string | number;
   confirmPassword: string | number;
@@ -232,116 +235,6 @@ const Form: React.FC = () => {
       });
   };
 
-  useEffect(() => {
-    if (!router.isReady) return;
-    toast.info("pengecekan step...", { toastId: "kycCheckStepRequestToast" });
-    RestKycCheckStep({ payload: { registerId: request_id as string } })
-      .then((res) => {
-        if (res.success) {
-          if (res.data.status === "D") {
-            toast.dismiss();
-            toast.success(res?.message || "pengecekan step berhasil", {
-              icon: <CheckOvalIcon />,
-            });
-            // ketika res.data.pin_form === false, tidak akan redirect kemana-mana, karena sudah benar dihalaman ini.
-            if (res.data.pin_form) {
-              router.replace({
-                pathname: handleRoute("kyc/pinform"),
-                query: { ...restRouterQuery, registration_id: request_id },
-              });
-            }
-          } else if (res.data.status === "F") {
-            toast.dismiss();
-            toast.error(
-              res?.message ||
-                "pengecekan step berhasil, tetapi proses ekyc bermasalah",
-              {
-                icon: <XIcon />,
-              }
-            );
-            if (
-              res.data.status === "F" &&
-              res.data.pin_form &&
-              restRouterQuery.redirect_url
-            ) {
-              window.top!.location.href = concateRedirectUrlParams(
-                restRouterQuery.redirect_url as string,
-                `uuid=${request_id}${
-                  res.data.reason_code
-                    ? "%26reason_code=" + res.data.reason_code
-                    : ""
-                }`
-              );
-            } else {
-              const query: any = {
-                ...restRouterQuery,
-                request_id,
-              };
-
-              if (res.data.reason_code) {
-                query.reason_code = res.data.reason_code;
-              }
-
-              router.push({
-                pathname: handleRoute("liveness-failure"),
-                query,
-              });
-            }
-          } else if (res.data.status === "S" || res.data.status === "E") {
-            toast.dismiss();
-            const params: any = {
-              uuid: request_id,
-              status: res.data.status,
-            };
-
-            if (res.data.reason_code) {
-              params.reason_code = res.data.reason_code;
-            }
-
-            const queryString = new URLSearchParams(params as any).toString();
-            if (restRouterQuery.redirect_url) {
-              window.top!.location.href = concateRedirectUrlParams(
-                restRouterQuery.redirect_url as string,
-                queryString
-              );
-            } else {
-              toast.success(res?.message || "pengecekan step berhasil", {
-                icon: <CheckOvalIcon />,
-              });
-            }
-          } else if (res.data.status === "B") {
-            toast.dismiss();
-            router.push({
-              pathname: handleRoute("guide"),
-              query: { ...restRouterQuery, request_id },
-            });
-          } else {
-            toast.dismiss();
-            toast.success(res?.message || "pengecekan step berhasil", {
-              icon: <CheckOvalIcon />,
-            });
-          }
-        } else {
-          toast.dismiss();
-          toast.error(res?.message || "pengecekan step tidak sukses", {
-            icon: <XIcon />,
-          });
-        }
-      })
-      .catch((err) => {
-        toast.dismiss();
-        if (err.response?.data?.data?.errors?.[0]) {
-          toast.error(err.response?.data?.data?.errors?.[0], {
-            icon: <XIcon />,
-          });
-        } else {
-          toast.error(err.response?.data?.message || "pengecekan step gagal", {
-            icon: <XIcon />,
-          });
-        }
-      });
-  }, [router.isReady, request_id]); // eslint-disable-line react-hooks/exhaustive-deps
-
   return (
     <div
       className="min-h-screen"
@@ -532,5 +425,36 @@ const Form: React.FC = () => {
     </div>
   );
 };
+
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const cQuery = context.query;
+  const uuid =
+    cQuery.transaction_id || cQuery.request_id || cQuery.registration_id;
+
+  const checkStepResult: {
+    res?: TKycCheckStepResponseData;
+    err?: {
+      response: {
+        data: {
+          success: boolean;
+          message: string;
+          data: { errors: string[] };
+        };
+      };
+    };
+  } = await RestKycCheckStepv2({
+    registerId: uuid as string,
+  })
+    .then((res) => {
+      return { res };
+    })
+    .catch((err) => {
+      return { err };
+    });
+
+  return serverSideRenderReturnConditions({ context, checkStepResult });
+};
+
 
 export default Form;
