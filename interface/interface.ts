@@ -1,3 +1,7 @@
+import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
+import { GetServerSidePropsContext, PreviewData } from "next";
+import { ParsedUrlQuery } from "querystring";
+
 export type TLoginPayload = {
   request_id: string;
   password: string;
@@ -60,4 +64,21 @@ export type TUserData = {
   signatureFont: string
   typeMfa: string
   typeSignature: number
+}
+
+export interface IserverSideRenderReturnConditions {
+  context: GetServerSidePropsContext<ParsedUrlQuery, PreviewData>;
+  checkStepResult: {
+    res?: TKycCheckStepResponseData;
+    err?: {
+      response: {
+        data: {
+          success: boolean;
+          message: string;
+          data: { errors: string[] };
+        };
+      };
+    };
+  };
+  isNotRedirect?: boolean;
 }

@@ -26,7 +26,7 @@ interface TQueryParams {
   reason_code: string | undefined | string[];
   request_id: string;
   register_id: string;
-  redirect_url: string | undefined | string[];
+  redirect_url?: string | undefined | string[];
 }
 
 interface Props {
@@ -50,8 +50,11 @@ const LivenessFailure = (props: Props) => {
     register_id: uuid as string,
     reason_code,
     status: props.status as string,
-    redirect_url,
   };
+
+  if(redirect_url){
+    params.redirect_url = redirect_url
+  }
 
   const second = 5;
 

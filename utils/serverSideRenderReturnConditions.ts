@@ -1,26 +1,8 @@
-import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
-import { GetServerSidePropsContext, PreviewData } from "next";
 import { assetPrefix } from "next.config";
-import { ParsedUrlQuery } from "querystring";
 import { concateRedirectUrlParams } from "./concateRedirectUrlParams";
 import { handleRoute } from "./handleRoute";
+import { IserverSideRenderReturnConditions } from "@/interface/interface";
 
-interface IserverSideRenderReturnConditions {
-  context: GetServerSidePropsContext<ParsedUrlQuery, PreviewData>;
-  checkStepResult: {
-    res?: TKycCheckStepResponseData;
-    err?: {
-      response: {
-        data: {
-          success: boolean;
-          message: string;
-          data: { errors: string[] };
-        };
-      };
-    };
-  };
-  isNotRedirect?: boolean;
-}
 export const serverSideRenderReturnConditions = ({
   context,
   checkStepResult,
@@ -113,16 +95,20 @@ export const serverSideRenderReturnConditions = ({
           register_id: uuid,
         };
 
-        if (checkStepResult.res.data.reason_code) {
-          params.reason_code = checkStepResult.res.data.reason_code;
+        const {reason_code, token, route, status} = checkStepResult.res.data
+
+        if (reason_code) {
+          params.reason_code = reason_code;
         }
 
-        if(checkStepResult.res.data.token){
-          params.token = checkStepResult.res.data.token
+        if(token){
+          params.token = token
         }
 
-        if(checkStepResult.res.data?.route === "done_set_password"){
+        if(route === "done_set_password"){
           params.status = "S"
+        } else {
+          params.status = status
         }
 
         const queryString = new URLSearchParams(params as any).toString();
