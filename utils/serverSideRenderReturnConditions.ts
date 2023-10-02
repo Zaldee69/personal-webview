@@ -2,7 +2,6 @@ import { concateRedirectUrlParams } from "./concateRedirectUrlParams";
 import { handleRoute } from "./handleRoute";
 import { IserverSideRenderReturnConditions } from "@/interface/interface";
 
-
 const getRedirectProps = (
   destination: string,
   isPermanent = false,
@@ -213,5 +212,3 @@ export const serverSideRenderReturnConditions = ({
     };
   }
 };
-
-
