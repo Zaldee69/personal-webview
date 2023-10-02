@@ -52,7 +52,7 @@ const LivenessFailure = (props: Props) => {
     status: props.status as string,
   };
 
-  if(redirect_url){
+  if(redirect_url && reason_code !== "3"){
     params.redirect_url = redirect_url
   }
 
@@ -187,6 +187,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   serverSideRenderReturnConditionsResult["props"] = {
     status: checkStepResult.res?.data?.status || null,
+    reasonCode: checkStepResult.res?.data?.reason_code || null,
   };
 
   return serverSideRenderReturnConditionsResult;
