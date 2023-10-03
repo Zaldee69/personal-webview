@@ -279,7 +279,7 @@ const Login = ({}: Props) => {
         headingTitle={t("dontHaveCertifTitle")}
         size="sm"
       >
-        <div className="flex flex-col pb-4 px-2 justify-center">
+        <div className="flex flex-col pb-6 px-2 justify-center">
           <div
             className="bg-contain w-32 mx-auto mt-3 h-32 bg-center bg-no-repeat"
             style={{
@@ -290,11 +290,11 @@ const Login = ({}: Props) => {
               )})`,
             }}
           ></div>
-          <Paragraph className="text-center mt-5">
+          <Paragraph className="text-center my-5">
             {t("dontHaveCertifSubtitle")}
           </Paragraph>
-          <Paragraph className="text-center">
-            <Trans i18nKey="contactCantika" components={[<a href="mailto:cantika@tilaka.id" className="border-b" key={0} />]} />
+          <Paragraph size="sm" className="text-center">
+            Pertanyaan lebih lanjut? <a href="https://tilaka.id/contact/" target="_blank" className="text-[#4b68af]" key={0} >{t("contactUs")}</a>
           </Paragraph>
         </div>
       </Modal>
