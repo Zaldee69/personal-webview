@@ -294,7 +294,7 @@ const Login = ({}: Props) => {
             {t("dontHaveCertifSubtitle")}
           </Paragraph>
           <Paragraph size="sm" className="text-center">
-            Pertanyaan lebih lanjut? <a href="https://tilaka.id/contact/" target="_blank" className="text-[#4b68af]" key={0} >{t("contactUs")}</a>
+            {t("furtherQuestions")} <a href="https://tilaka.id/contact/" target="_blank" className="text-[#4b68af]" key={0} >{t("contactUs")}</a>
           </Paragraph>
         </div>
       </Modal>
