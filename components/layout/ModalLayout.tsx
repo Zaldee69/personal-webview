@@ -12,7 +12,7 @@ const ModalLayout = ({ children, size= "md" }: Props) => {
       style={{ backgroundColor: "rgba(0, 0, 0, .5)" }}
       className="fixed z-50 flex items-center overflow-hidden transition-all duration-1000 justify-center  w-full left-0 top-0 h-full "
     >
-      <div className={`bg-white px-2 py-3 poppins-regular rounded-md w-fit mx-5 ${modalSize}`}>
+      <div className={`bg-white relative px-2 py-3 poppins-regular rounded-md w-fit mx-5 ${modalSize}`}>
         {children}
       </div>
     </div>
