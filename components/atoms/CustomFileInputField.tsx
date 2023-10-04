@@ -70,7 +70,7 @@ const CustomFileInputField = ({
               <Paragraph className="text-label block font-semibold">
                 {t("upload")} {label}
               </Paragraph>
-              <Label htmlFor={name} className="text-placeholder text-center mb-0">
+              <Label htmlFor="" className="text-placeholder cursor-pointer text-center mb-0">
                 Max. 2MB (.jpg/.jpeg/.png) <br />{" "}
                 {showMaxResolution && t("manualForm.resolutionMinimum")}
               </Label>
