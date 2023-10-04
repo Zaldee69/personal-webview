@@ -42,18 +42,11 @@ const ModalHeading: React.FC<IModalHeadingProps> = ({
 }) => {
   return (
     <div
-      className={`flex py-2 items-center ${
-        withCloseButton ? "justify-between" : "justify-center"
-      } `}
+      className={`${withCloseButton ? "py-5" : "py-4" }`}
     >
+      <Heading className="text-center" >{headingTitle}</Heading>
       {withCloseButton ? (
-        <button className="opacity-0 hover:cursor-default">
-          <CloseIcon />
-        </button>
-      ) : null}
-      <Heading>{headingTitle}</Heading>
-      {withCloseButton ? (
-        <button onClick={() => setModal(false)} className="hover:opacity-50">
+        <button onClick={() => setModal(false)} className="hover:opacity-50 absolute top-1 right-1">
           <CloseIcon />
         </button>
       ) : null}
