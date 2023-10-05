@@ -31,7 +31,7 @@ const FormSuccess = (props: Props) => {
     request_id: request_id,
     register_id: request_id,
     reason_code,
-    status,
+    status: "S",
   };
 
   const { generatedUrl, autoRedirect } = useGenerateRedirectUrl({

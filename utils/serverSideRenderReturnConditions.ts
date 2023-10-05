@@ -13,7 +13,7 @@ export const serverSideRenderReturnConditions = ({
   const uuid =
     cQuery.transaction_id || cQuery.request_id || cQuery.registration_id;
 
-  if (checkStepResult.err) {
+      if (checkStepResult.err) {
     if (checkStepResult?.err.response?.data?.data?.errors?.[0]) {
       // ?
     } else {
@@ -143,13 +143,17 @@ export const serverSideRenderReturnConditions = ({
             props: {},
           };
         } else if (checkStepResult.res.data?.route === "set_password") {
-          return {
-            redirect: {
-              permanent: false,
-              destination: handleRoute("manual-form/final?" + queryString),
-            },
-            props: {},
-          };
+          if(!currentPathnameWithoutParams.includes("/manual-form/final")){
+            return {
+              redirect: {
+                permanent: false,
+                destination: handleRoute("manual-form/final?" + queryString),
+              },
+              props: {},
+            };
+          } else {
+            return { props: {} };
+          }
         }
 
         if (
