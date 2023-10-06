@@ -558,7 +558,7 @@ const FRModal = ({
       });
   };
 
-  return !modal ? (
+  return modal ? (
     <div
       style={{ backgroundColor: "rgba(0, 0, 0, .5)" }}
       className="fixed z-50 flex items-start transition-all duration-1000 justify-center w-full left-0 top-0 h-full "
