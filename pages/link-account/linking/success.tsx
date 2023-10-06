@@ -18,6 +18,7 @@ import Footer from "@/components/Footer";
 import { buttonVariants } from "@/components/atoms/Button";
 import Heading from "@/components/atoms/Heading";
 import Paragraph from "@/components/atoms/Paraghraph";
+import useGenerateRedirectUrl from "@/hooks/useGenerateRedirectUrl";
 
 type Props = {};
 
@@ -27,89 +28,28 @@ const LinkAccountSuccess = (props: Props) => {
   const routerQuery: NextParsedUrlQuery & {
     signing?: "1";
     redirect_url?: string;
+    request_id?: string,
+    tilaka_name?: string
   } = router.query;
   const isSigning: boolean = routerQuery.signing === "1";
-  const [redirectUrl, setRedirectUrl] = useState<string>(
-    routerQuery.redirect_url as string
-  );
+
 
   const { t }: any = i18n;
 
   const themeConfiguration = useSelector((state: RootState) => state.theme);
 
+  const { generatedUrl, autoRedirect } = useGenerateRedirectUrl({
+    params: {
+      request_id: routerQuery.request_id,
+      tilaka_name: routerQuery.tilaka_name
+    },
+    url: routerQuery.redirect_url as string,
+  });
+
   useEffect(() => {
     if (!routerIsReady) return;
     if (!isSigning) {
-      let queryWithDynamicRedirectURL = {
-        ...routerQuery,
-      };
-      let params: any = {};
-
-      if (queryWithDynamicRedirectURL.request_id) {
-        params["request_id"] = queryWithDynamicRedirectURL.request_id;
-      }
-      if (queryWithDynamicRedirectURL.tilaka_name) {
-        params["tilaka_name"] = queryWithDynamicRedirectURL.tilaka_name;
-      }
-
-      let queryString = new URLSearchParams(params as any).toString();
-
-      if (queryWithDynamicRedirectURL.redirect_url?.length) {
-        const currentRedirectUrl =
-          queryWithDynamicRedirectURL.redirect_url as string;
-        const currentRedirectUrlArr = currentRedirectUrl.split("?");
-
-        if (currentRedirectUrlArr.length > 1) {
-          if (
-            currentRedirectUrlArr[1].includes("request-id") &&
-            currentRedirectUrlArr[1].includes("tilaka-name")
-          ) {
-            queryWithDynamicRedirectURL.redirect_url =
-              currentRedirectUrlArr[0] + "?" + currentRedirectUrlArr[1] + "&";
-          } else if (currentRedirectUrlArr[1].includes("request-id")) {
-            const additionParams = {
-              ...params,
-              "tilaka-name": queryWithDynamicRedirectURL.tilaka_name,
-            };
-            queryString = new URLSearchParams(additionParams as any).toString();
-
-            queryWithDynamicRedirectURL.redirect_url =
-              currentRedirectUrlArr[0] +
-              "?" +
-              currentRedirectUrlArr[1] +
-              "&" +
-              queryString;
-          } else if (currentRedirectUrlArr[1].includes("tilaka-name")) {
-            const additionParams = {
-              ...params,
-              "request-id": queryWithDynamicRedirectURL.request_id,
-            };
-            queryString = new URLSearchParams(additionParams as any).toString();
-
-            queryWithDynamicRedirectURL.redirect_url =
-              currentRedirectUrlArr[0] +
-              "?" +
-              currentRedirectUrlArr[1] +
-              "&" +
-              queryString;
-          } else {
-            // manualy input redirect_url on url
-            queryWithDynamicRedirectURL.redirect_url =
-              currentRedirectUrlArr[0] +
-              "?" +
-              currentRedirectUrlArr[1] +
-              "&" +
-              queryString;
-          }
-        } else {
-          // current redirect_url no has param
-          queryWithDynamicRedirectURL.redirect_url =
-            currentRedirectUrlArr[0] + "?" + queryString;
-        }
-      }
-
-      setRedirectUrl(queryWithDynamicRedirectURL.redirect_url as string);
-      restLogout({});
+     autoRedirect()
     } else {
       setTimeout(() => {
         router.replace({
@@ -146,7 +86,7 @@ const LinkAccountSuccess = (props: Props) => {
           {t("linkAccountSuccessSubtitle")}
         </Paragraph>
       </div>
-      {!isSigning && redirectUrl && (
+      {!isSigning && routerQuery.redirect_url && (
         <div className="mt-20 text-primary text-base poppins-medium underline hover:cursor-pointer">
           <a
             style={{
@@ -159,7 +99,7 @@ const LinkAccountSuccess = (props: Props) => {
               size: "none",
               className: "font-medium",
             })}
-            href={concateRedirectUrlParams(redirectUrl, "")}
+            href={concateRedirectUrlParams(generatedUrl, "")}
           >
             <a>{t("livenessSuccessButtonTitle")}</a>
           </a>
