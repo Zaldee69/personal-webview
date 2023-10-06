@@ -88,7 +88,7 @@ const AuthPinForm = (props: Props) => {
           ) {
             const params = {
               user_identifier: user,
-              request_id: router.query.request_id || router.query.register_id,
+              request_id: res.request_id,
               status: "Blocked",
             };
 
