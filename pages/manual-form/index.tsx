@@ -97,7 +97,8 @@ const Index = (props: Props) => {
   };
 
   const onChangeHandler = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    let isErrorImage: boolean = false;
+    let isSizeMoreThan2Mb: boolean = false;
+    let isRatioLessThan200Px: boolean = false;
     let isEligibleFileType: boolean = true;
     const { value, name, files } = e.target;
     const file: File = files?.[0] as File;
@@ -107,9 +108,9 @@ const Index = (props: Props) => {
 
       if (isEligibleFileType) {
         const { width, height } = (await resolutionChecker(file)) as any;
-        isErrorImage =
-          file.size > 2000000 ||
-          ((height < 200 || width < 200) && name === "photo_selfie");
+        isSizeMoreThan2Mb = file.size > 2000000;
+        isRatioLessThan200Px =
+          (height < 200 || width < 200) && name === "photo_selfie";
       }
     }
 
@@ -136,7 +137,7 @@ const Index = (props: Props) => {
       const stateObj = { ...prev, [name]: "" };
       switch (name) {
         case "photo_ktp":
-          if (!isEligibleFileType) {
+          if (isSizeMoreThan2Mb || !isEligibleFileType) {
             stateObj[name] = t("manualForm.photoKtp.errorMessage2");
             setForm({
               ...form,
@@ -145,7 +146,7 @@ const Index = (props: Props) => {
           }
           break;
         case "photo_selfie":
-          if (isErrorImage || !isEligibleFileType) {
+          if (isRatioLessThan200Px || isSizeMoreThan2Mb || !isEligibleFileType) {
             stateObj[name] = t("manualForm.photoSelfie.errorMessage2");
             setForm({
               ...form,
@@ -183,7 +184,6 @@ const Index = (props: Props) => {
       fileFotoKtpRef,
     });
   };
-
 
   const onSubmitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -248,7 +248,10 @@ const Index = (props: Props) => {
         token: res.token,
       };
 
-      if (res.channel_type === "REGULAR" && props.checkStepResultDataRoute !== "manual_form") {
+      if (
+        res.channel_type === "REGULAR" &&
+        props.checkStepResultDataRoute !== "manual_form"
+      ) {
         toast.dismiss();
         router.push({
           pathname: handleRoute("manual-form/final"),
@@ -594,7 +597,11 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     });
 
   const serverSideRenderReturnConditionsResult =
-    serverSideRenderReturnConditions({ context, checkStepResult, isNotRedirect });
+    serverSideRenderReturnConditions({
+      context,
+      checkStepResult,
+      isNotRedirect,
+    });
 
   serverSideRenderReturnConditionsResult["props"] = {
     ...serverSideRenderReturnConditionsResult["props"],
