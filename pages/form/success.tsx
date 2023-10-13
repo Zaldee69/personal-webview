@@ -40,7 +40,9 @@ const FormSuccess = (props: Props) => {
   });
 
   useEffect(() => {
-    autoRedirect();
+    if(redirect_url){
+      autoRedirect();
+    }
   }, []);
 
   return (
