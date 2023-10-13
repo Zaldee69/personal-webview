@@ -144,6 +144,7 @@ const PinFormDedicatedChannel = (props: Props) => {
             if (redirect_url) {
               const params: any = {
                 register_id: registration_id,
+                request_id: registration_id,
                 status: res.data.status === "E" ? "S" : res.data.status,
               };
 
