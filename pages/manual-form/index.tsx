@@ -146,7 +146,11 @@ const Index = (props: Props) => {
           }
           break;
         case "photo_selfie":
-          if (isRatioLessThan200Px || isSizeMoreThan2Mb || !isEligibleFileType) {
+          if (
+            isRatioLessThan200Px ||
+            isSizeMoreThan2Mb ||
+            !isEligibleFileType
+          ) {
             stateObj[name] = t("manualForm.photoSelfie.errorMessage2");
             setForm({
               ...form,
@@ -304,50 +308,54 @@ const Index = (props: Props) => {
       <div className="px-5 pt-8 max-w-md mx-auto">
         <Heading>{t("manualForm.title")}</Heading>
         <form onSubmit={onSubmitHandler}>
-          <Label className="ml-3 mt-5" size="base" htmlFor="nik">
-            NIK
-          </Label>
-          <TextInput
-            name="nik"
-            placeholder={t("manualForm.nik.placeholder")}
-            value={form.nik}
-            onChangeHandler={onChangeHandler}
-            isError={errorMessage.nik.length > 1}
-          />
-          <ErrorMessage errorMessage={errorMessage.nik} />
-          <Label className="ml-3 mt-3" size="base" htmlFor="name">
-            {t("manualForm.name.label")}
-          </Label>
-          <TextInput
-            name="name"
-            placeholder={t("manualForm.name.placeholder")}
-            value={form.name}
-            onChangeHandler={onChangeHandler}
-            isError={errorMessage.name.length > 1}
-          />
-          <ErrorMessage errorMessage={errorMessage.name} />
-          <Label className="ml-3 mt-3" size="base" htmlFor="email">
-            {t("manualForm.email.label")}
-          </Label>
-          <TextInput
-            name="email"
-            placeholder={t("manualForm.email.placeholder")}
-            value={form.email}
-            onChangeHandler={onChangeHandler}
-            isError={errorMessage.email.length > 1}
-          />
-          <ErrorMessage errorMessage={errorMessage.email} />
-          <CustomFileInputField
-            name="photo_ktp"
-            label={t("manualForm.photoKtp.label")}
-            imageBase64={form.photo_ktp}
-            errorMessage={errorMessage.photo_ktp}
-            onDeleteImageHandler={onDeleteImageHandler}
-            onChangeHandler={onChangeHandler}
-            onLabelClicked={onLabelClicked}
-            inputRef={fileFotoKtpRef}
-            showMaxResolution={false}
-          />
+          {restRouterQuery.isWNA !== "1" ? (
+            <>
+              <Label className="ml-3 mt-5" size="base" htmlFor="nik">
+                NIK
+              </Label>
+              <TextInput
+                name="nik"
+                placeholder={t("manualForm.nik.placeholder")}
+                value={form.nik}
+                onChangeHandler={onChangeHandler}
+                isError={errorMessage.nik.length > 1}
+              />
+              <ErrorMessage errorMessage={errorMessage.nik} />
+              <Label className="ml-3 mt-3" size="base" htmlFor="name">
+                {t("manualForm.name.label")}
+              </Label>
+              <TextInput
+                name="name"
+                placeholder={t("manualForm.name.placeholder")}
+                value={form.name}
+                onChangeHandler={onChangeHandler}
+                isError={errorMessage.name.length > 1}
+              />
+              <ErrorMessage errorMessage={errorMessage.name} />
+              <Label className="ml-3 mt-3" size="base" htmlFor="email">
+                {t("manualForm.email.label")}
+              </Label>
+              <TextInput
+                name="email"
+                placeholder={t("manualForm.email.placeholder")}
+                value={form.email}
+                onChangeHandler={onChangeHandler}
+                isError={errorMessage.email.length > 1}
+              />
+              <ErrorMessage errorMessage={errorMessage.email} />
+              <CustomFileInputField
+                name="photo_ktp"
+                label={t("manualForm.photoKtp.label")}
+                imageBase64={form.photo_ktp}
+                errorMessage={errorMessage.photo_ktp}
+                onDeleteImageHandler={onDeleteImageHandler}
+                onChangeHandler={onChangeHandler}
+                onLabelClicked={onLabelClicked}
+                inputRef={fileFotoKtpRef}
+                showMaxResolution={false}
+              />
+            </>
+          ) : null}
           <CustomFileInputField
             label={t("manualForm.photoSelfie.label")}
             name="photo_selfie"
