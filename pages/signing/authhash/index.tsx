@@ -61,11 +61,7 @@ interface IModal {
 
 const AUTHHASH_PATHNAME = handleRoute("signing/authhash");
 
-const FRModal: React.FC<IModal> = ({
-  modal,
-  setModal,
-  callbackFailure,
-}) => {
+const FRModal: React.FC<IModal> = ({ modal, setModal, callbackFailure }) => {
   const router = useRouter();
   const routerQuery: NextParsedUrlQuery & {
     redirect_url?: string;
@@ -90,17 +86,15 @@ const FRModal: React.FC<IModal> = ({
     })
       .then((res) => {
         if (res.success) {
-          router.replace(
-            {
-              pathname: handleRoute("signing/success"),
-              query: {
-                redirect_url: routerQuery.redirect_url,
-                user_identifier: res.data.tilaka_name,
-                request_id: res.data.request_id,
-                status: "Sukses",
-              },
+          router.replace({
+            pathname: handleRoute("signing/success"),
+            query: {
+              redirect_url: routerQuery.redirect_url,
+              user_identifier: res.data.tilaka_name,
+              request_id: res.data.request_id,
+              status: "Sukses",
             },
-          );
+          });
           toast.dismiss("info");
           toast(`Pencocokan berhasil`, {
             type: "success",
@@ -262,8 +256,8 @@ const OTPModal: React.FC<IModal> = ({
             {
               pathname: handleRoute("/signing/success"),
               query: {
-                ...routerQuery,
-                user_identifier: res.data.tilaka_name,
+                redirect_url: routerQuery.redirect_url,
+                user_identifier: routerQuery.user,
                 request_id: res.data.request_id,
                 status: "Sukses",
               },
@@ -288,8 +282,8 @@ const OTPModal: React.FC<IModal> = ({
               {
                 pathname: handleRoute("/signing/failure"),
                 query: {
-                  ...routerQuery,
-                  user_identifier: res.data.tilaka_name,
+                  redirect_url: routerQuery.redirect_url,
+                  user_identifier: routerQuery.user,
                   request_id: res.data.request_id,
                   status: "Gagal",
                 },
@@ -665,7 +659,6 @@ const Login = ({}: IPropsLogin) => {
     removeStorageWithExpiresIn("token_hashsign");
     localStorage.removeItem("refresh_token_hashsign");
   };
-
 
   return (
     <div
