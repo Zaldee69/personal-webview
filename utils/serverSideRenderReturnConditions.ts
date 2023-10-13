@@ -13,7 +13,7 @@ export const serverSideRenderReturnConditions = ({
   const uuid =
     cQuery.transaction_id || cQuery.request_id || cQuery.registration_id;
 
-      if (checkStepResult.err) {
+  if (checkStepResult.err) {
     if (checkStepResult?.err.response?.data?.data?.errors?.[0]) {
       // ?
     } else {
@@ -88,27 +88,30 @@ export const serverSideRenderReturnConditions = ({
             },
           };
         }
-      } else if (checkStepResult.res.data.status === "F" || checkStepResult.res.data.status === "E") {
+      } else if (
+        checkStepResult.res.data.status === "F" ||
+        checkStepResult.res.data.status === "E"
+      ) {
         const params: any = {
           ...cQuery,
           request_id: uuid,
           register_id: uuid,
         };
 
-        const {reason_code, token, route, status} = checkStepResult.res.data
+        const { reason_code, token, route, status } = checkStepResult.res.data;
 
         if (reason_code) {
           params.reason_code = reason_code;
         }
 
-        if(token){
-          params.token = token
+        if (token) {
+          params.token = token;
         }
 
-        if(route === "done_set_password"){
-          params.status = "S"
+        if (route === "done_set_password") {
+          params.status = "S";
         } else {
-          params.status = status
+          params.status = status;
         }
 
         const queryString = new URLSearchParams(params as any).toString();
@@ -125,7 +128,7 @@ export const serverSideRenderReturnConditions = ({
               permanent: false,
               destination: concateRedirectUrlParams(
                 cQuery.redirect_url as string,
-                `status=${status}%26register_id=${uuid}${
+                `status=${status}%26register_id=${uuid}%26register_id=${uuid}${
                   checkStepResult.res.data.reason_code
                     ? "%26reason_code=" + checkStepResult.res.data.reason_code
                     : ""
@@ -143,7 +146,7 @@ export const serverSideRenderReturnConditions = ({
             props: {},
           };
         } else if (checkStepResult.res.data?.route === "set_password") {
-          if(!currentPathnameWithoutParams.includes("/manual-form/final")){
+          if (!currentPathnameWithoutParams.includes("/manual-form/final")) {
             return {
               redirect: {
                 permanent: false,
@@ -189,6 +192,30 @@ export const serverSideRenderReturnConditions = ({
         params.register_id = uuid;
 
         const queryString = new URLSearchParams(params).toString();
+
+        if (checkStepResult.res.data.pin_form) {
+          if (cQuery.redirect_url) {
+            return {
+              redirect: {
+                permanent: false,
+                destination: concateRedirectUrlParams(
+                  cQuery.redirect_url as string,
+                  `status=${
+                    params.status
+                  }%26register_id=${uuid}%26request_id=${uuid}${
+                    checkStepResult.res.data.reason_code
+                      ? "%26reason_code=" + checkStepResult.res.data.reason_code
+                      : ""
+                  }`
+                ),
+              },
+            };
+          } else {
+            return {
+              props: {},
+            };
+          }
+        }
 
         if (!isNotRedirect) {
           return {
@@ -241,7 +268,8 @@ export const serverSideRenderReturnConditions = ({
             `${assetPrefix}/link-account/success` ||
           currentPathnameWithoutParams === "/link-account/success" ||
           currentPathnameWithoutParams === `${assetPrefix}/link-account` ||
-          currentPathnameWithoutParams === "/link-account" || currentPathnameWithoutParams.includes("/liveness") ||
+          currentPathnameWithoutParams === "/link-account" ||
+          currentPathnameWithoutParams.includes("/liveness") ||
           isNotRedirect
         ) {
           return {
@@ -265,7 +293,12 @@ export const serverSideRenderReturnConditions = ({
         };
         const queryString = new URLSearchParams(params as any).toString();
 
-        if (!currentPathnameWithoutParams.includes("/manual-form") && !currentPathnameWithoutParams.includes("/link-account/linking/failure")) {
+        if (
+          !currentPathnameWithoutParams.includes("/manual-form") &&
+          !currentPathnameWithoutParams.includes(
+            "/link-account/linking/failure"
+          )
+        ) {
           return {
             redirect: {
               permanent: false,
@@ -288,9 +321,7 @@ export const serverSideRenderReturnConditions = ({
           return {
             redirect: {
               permanent: false,
-              destination: handleRoute(
-                "manual-form/on-process?" + queryString
-              ),
+              destination: handleRoute("manual-form/on-process?" + queryString),
             },
             props: {},
           };
