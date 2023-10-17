@@ -525,6 +525,7 @@ const Liveness = () => {
                   const params: any = {
                     status: status,
                     register_id: routerQuery.request_id,
+                    request_id: routerQuery.request_id,
                   };
 
                   if (result?.data.reason_code) {
