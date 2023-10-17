@@ -36,7 +36,9 @@ const SettingSignatureSuccess = (props: Props) => {
   const { t }: any = i18n;
 
   const { generatedUrl, autoRedirect } = useGenerateRedirectUrl({
-    params: routerQuery.tilaka_name,
+    params: {
+      tilaka_name: routerQuery.tilaka_name
+    },
     url: router.query.redirect_url as string,
   });
 

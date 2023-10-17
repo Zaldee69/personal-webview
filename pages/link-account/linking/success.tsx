@@ -41,7 +41,8 @@ const LinkAccountSuccess = (props: Props) => {
   const { generatedUrl, autoRedirect } = useGenerateRedirectUrl({
     params: {
       request_id: routerQuery.request_id,
-      tilaka_name: routerQuery.tilaka_name
+      tilaka_name: routerQuery.tilaka_name,
+      status: "S"
     },
     url: routerQuery.redirect_url as string,
   });

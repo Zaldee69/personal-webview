@@ -17,6 +17,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/redux/app/store";
 import Heading from "@/components/atoms/Heading";
 import Paragraph from "@/components/atoms/Paraghraph";
+import useGenerateRedirectUrl from "@/hooks/useGenerateRedirectUrl";
 
 const LivenessFailure = () => {
   const { t }: any = i18n;
@@ -33,16 +34,14 @@ const LivenessFailure = () => {
     register_id: uuid
   };
 
-  const queryString = new URLSearchParams(params as any).toString();
+  const { generatedUrl, autoRedirect } = useGenerateRedirectUrl({
+    params,
+    url: routerQuery.redirect_url  as string,
+  });
 
   useEffect(() => {
     if (routerQuery.redirect_url) {
-      setTimeout(() => {
-        router.push({
-          pathname: routerQuery.redirect_url as string,
-          query: queryString,
-        });
-      }, 5000);
+      autoRedirect()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router.isReady]);
@@ -80,10 +79,7 @@ const LivenessFailure = () => {
             </Paragraph>
             {routerQuery.redirect_url && (
               <a
-                href={concateRedirectUrlParams(
-                  routerQuery.redirect_url as string,
-                  queryString
-                )}
+                href={generatedUrl}
               >
                 <span
                   style={{
