@@ -137,7 +137,7 @@ export const serverSideRenderReturnConditions = ({
             },
             props: {},
           };
-        } else if (checkStepResult.res.data?.route === "done_set_password") {
+        } else if (checkStepResult.res.data?.route === "done_set_password" && !currentPathnameWithoutParams.includes("/link-account")) {
           return {
             redirect: {
               permanent: false,
