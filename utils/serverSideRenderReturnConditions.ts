@@ -184,7 +184,7 @@ export const serverSideRenderReturnConditions = ({
         };
 
         if (cQuery.redirect_url) {
-          params.reason_code = cQuery.redirect_url;
+          params.redirect_url = cQuery.redirect_url;
         }
 
         if (checkStepResult.res.data.reason_code) {
