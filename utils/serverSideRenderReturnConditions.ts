@@ -181,8 +181,11 @@ export const serverSideRenderReturnConditions = ({
           status: checkStepResult.res.data.status,
           request_id: uuid,
           register_id: uuid,
-          redirect_url: cQuery.redirect_url,
         };
+
+        if (cQuery.redirect_url) {
+          params.reason_code = cQuery.redirect_url;
+        }
 
         if (checkStepResult.res.data.reason_code) {
           params.reason_code = checkStepResult.res.data.reason_code;
