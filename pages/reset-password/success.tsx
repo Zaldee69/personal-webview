@@ -28,7 +28,7 @@ type Props = {};
  * Email
  * /reset-password?kunciRahasia=rahasia&redirect_url=http%253A%252F%252Flocalhost%253A3000%252Flogin
  */
-const autoRedirect = false;
+const autoRedirect = true;
 const timeoutInSecond = 5;
 
 const LinkAccount = (props: Props) => {
@@ -93,11 +93,11 @@ const LinkAccount = (props: Props) => {
           <Paragraph size="sm" className="mt-4 text-center">
             Silahkan login kembali menggunakan Kata Sandi Anda yang terbaru
           </Paragraph>
-          {autoRedirect && redirect_url && (
+          {/* {autoRedirect && redirect_url && (
             <Paragraph size="sm" className="mt-4 text-center">
               Silahkan login ulang dalam {currentSecond} detik
             </Paragraph>
-          )}
+          )} */}
           {redirect_url ? (
               <a
                 className="mt-14 block"
