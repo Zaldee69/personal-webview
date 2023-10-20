@@ -31,7 +31,7 @@ interface TQueryParams {
 }
 
 interface Props {
-  status: string | null
+  status: string | null;
 }
 
 const LivenessFailure = (props: Props) => {
@@ -51,11 +51,14 @@ const LivenessFailure = (props: Props) => {
     register_id: uuid as string,
     reason_code,
     status: props.status as string,
-    lang
   };
 
-  if(redirect_url && reason_code !== "3"){
-    params.redirect_url = redirect_url
+  if (lang) {
+    params["lang"] = lang;
+  }
+
+  if (redirect_url && reason_code !== "3") {
+    params.redirect_url = redirect_url;
   }
 
   const second = 5;
