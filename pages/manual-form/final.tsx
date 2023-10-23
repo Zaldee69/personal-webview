@@ -206,6 +206,10 @@ const Form: React.FC = () => {
           status: "S",
         };
 
+        if(router.query.lang){
+          query.lang = router.query.lang
+        }
+
         router.replace({
           pathname: handleRoute("manual-form/success"),
           query,
