@@ -305,13 +305,13 @@ const LinkAccount = (props: Props) => {
     >
       <Head>
         <title>
-          {setting === "1" ? t("finalFormTitle") : t("linkAccountTitle")}
+          {setting === "1" ? t("activationAccount") : t("linkAccountTitle")}
         </title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
-      <div className="px-5 py-9 max-w-md mx-auto">
+      <div className="px-5 py-9 max-w-md mx-auto">ff
         <Heading className="text-lg poppins-semibold text-neutral800">
-          {setting === "1" ? t("finalFormTitle") : t("linkAccountTitle")}
+          {setting === "1" ? t("activationAccount") : t("linkAccountTitle")}
         </Heading>
         <div
           className="bg-contain my-3 w-52 mx-auto h-64 bg-center bg-no-repeat"
