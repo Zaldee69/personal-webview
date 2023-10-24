@@ -28,6 +28,7 @@
   "copy": "Salin",
   "copied": "Disalin",
   "finalFormTitle": "Buat Akun",
+  "activationAccount": "Aktivasi Akun",
   "finalFormSubtitle": "Mohon mengisi data-data berikut sebagai proses pembuatan akun Tilaka",
   "finalFormTooltip": "Tilaka Name tidak dapat diubah dan akan digunakan sebagai username untuk pengguna masuk ke akun Tilaka dan menggunakan layanan Tilaka.",
   "tilakaNamePlaceHolder": "Masukkan Tilaka Name",
