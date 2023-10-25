@@ -413,11 +413,11 @@ const Form: React.FC = () => {
                 themeConfiguration?.data.button_color as string
               ),
             }}
-            className={`mt-10 uppercase h-9 mx-auto block`}
+            className={`mt-10 p-2.5 mx-auto`}
             disabled={disabled as boolean}
             size="none"
           >
-            {t("CTA")}
+            {t("finalFormTitle")}
           </Button>
         </form>
         <Footer />

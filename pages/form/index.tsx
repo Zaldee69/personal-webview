@@ -207,7 +207,7 @@ const Form: React.FC = () => {
               });
             }
           }
-          
+
           router.replace({
             pathname: handleRoute("form/success"),
             query,
@@ -291,7 +291,7 @@ const Form: React.FC = () => {
               autoComplete="off"
               type="text"
               placeholder={t("tilakaNamePlaceHolder")}
-              className={` py-3 focus:outline-none  placeholder:text-placeholder placeholder:font-light   px-2 rounded-md border border-borderColor ${
+              className={` py-3 focus:outline-none font-poppins placeholder:text-placeholder placeholder:font-light   px-2 rounded-md border border-borderColor ${
                 error.tilakaName
                   ? "border-error "
                   : "border-borderColor focus:ring"
@@ -299,7 +299,7 @@ const Form: React.FC = () => {
             />
             <ErrorMessage errorMessage={error.tilakaName} />
           </div>
-          <div className="flex flex-col  mt-5">
+          <div className="flex flex-col mt-5">
             <Label size="base" className="px-2" htmlFor="password">
               {t("passwordLabel")}
             </Label>
@@ -310,7 +310,7 @@ const Form: React.FC = () => {
                 name="password"
                 type={type.password}
                 placeholder={t("passwordPlaceholder")}
-                className={` py-3 focus:outline-none  placeholder:text-placeholder placeholder:font-light  px-2 rounded-md border  w-full ${
+                className={` py-3 focus:outline-none font-poppins placeholder:text-placeholder placeholder:font-light  px-2 rounded-md border  w-full ${
                   error.password
                     ? "border-error "
                     : "border-borderColor focus:ring"
@@ -338,7 +338,7 @@ const Form: React.FC = () => {
                 name="confirmPassword"
                 type={type.confirmPassword}
                 placeholder={t("passwordConfirmationPlaceholder")}
-                className={` py-3 focus:outline-none  placeholder:text-placeholder placeholder:font-light  px-2 rounded-md border border-borderColor w-full ${
+                className={` py-3 focus:outline-none font-poppins  placeholder:text-placeholder placeholder:font-light  px-2 rounded-md border border-borderColor w-full ${
                   error.confirmPassword
                     ? "border-error "
                     : "border-borderColor focus:ring"
@@ -358,7 +358,7 @@ const Form: React.FC = () => {
               <ErrorMessage errorMessage={error.confirmPassword} />
             </div>
           </div>
-          <div className="flex flex-row mt-5">
+          <div className="flex flex-row mt-5 gap-1">
             <input
               tabIndex={4}
               id="tnc"
@@ -367,8 +367,8 @@ const Form: React.FC = () => {
               className=" border-borderColor"
               onChange={onChangeHandler}
             />
-            <label className="ml-2 text-neutral " htmlFor="tnc">
-              <Paragraph className="inline">{t("agree")} </Paragraph>
+            <Label htmlFor="tnc">
+              {t("agree")}{" "}
               <span className="text-primary">
                 <a
                   href="https://repository.tilaka.id/CP_CPS.pdf"
@@ -394,7 +394,7 @@ const Form: React.FC = () => {
                 </a>
                 ,{" "}
               </span>
-              <Paragraph className="inline">{t("and")}</Paragraph>
+              {t("and")}
               <a
                 target="blank"
                 href="https://repository.tilaka.id/perjanjian-pemilik-sertifikat.pdf"
@@ -403,7 +403,7 @@ const Form: React.FC = () => {
                 {" "}
                 {t("certificate")}
               </a>
-            </label>
+            </Label>
           </div>
           <Button
             disabled={disabled as boolean}
@@ -413,10 +413,10 @@ const Form: React.FC = () => {
                 themeConfiguration?.data.button_color as string
               ),
             }}
-            className="mt-24 p-2.5 block mx-auto"
+            className="mt-10 p-2.5 block mx-auto"
             size="none"
           >
-            {t("CTA")}
+            {t("finalFormTitle")}
           </Button>
         </form>
         <Footer />
@@ -424,7 +424,6 @@ const Form: React.FC = () => {
     </div>
   );
 };
-
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const cQuery = context.query;
@@ -454,6 +453,5 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   return serverSideRenderReturnConditions({ context, checkStepResult });
 };
-
 
 export default Form;
