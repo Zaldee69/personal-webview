@@ -309,7 +309,7 @@ const LinkAccount = (props: Props) => {
         </title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
-      <div className="px-5 py-9 max-w-md mx-auto">ff
+      <div className="px-5 py-9 max-w-md mx-auto">
         <Heading className="text-lg poppins-semibold text-neutral800">
           {setting === "1" ? t("activationAccount") : t("linkAccountTitle")}
         </Heading>
