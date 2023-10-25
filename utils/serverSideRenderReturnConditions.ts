@@ -192,6 +192,10 @@ export const serverSideRenderReturnConditions = ({
           params.redirect_url = cQuery.redirect_url;
         }
 
+        if (cQuery.lang) {
+          params.lang = cQuery.lang;
+        }
+
         if (checkStepResult.res.data.reason_code) {
           params.reason_code = checkStepResult.res.data.reason_code;
         }
