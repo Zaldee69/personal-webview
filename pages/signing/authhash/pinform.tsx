@@ -81,7 +81,8 @@ const PinFormDedicatedChannel = (props: Props) => {
               redirect_url,
               user_identifier: res.data.tilaka_name,
               request_id: res.data.request_id,
-              status: "Sukses"
+              status: "Sukses",
+              signing_id: id
             },
           });
         } else {
@@ -103,6 +104,7 @@ const PinFormDedicatedChannel = (props: Props) => {
                 user_identifier: user,
                 request_id: res.data.request_id,
                 status: "Blocked",
+                signing_id: id
               },
             });
           }else {
