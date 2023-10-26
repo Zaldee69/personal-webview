@@ -31,6 +31,8 @@ const LinkAccountSuccess = (props: Props) => {
     redirect_url?: string;
     tilaka_name?: string;
     request_id?: string;
+    "tilaka-name"?: string;
+    "request-id"?: string;
   } = router.query;
   const isSigning: boolean = routerQuery.signing === "1";
 
@@ -38,21 +40,31 @@ const LinkAccountSuccess = (props: Props) => {
 
   const themeConfiguration = useSelector((state: RootState) => state.theme);
 
-  const {redirect_url, request_id, tilaka_name} = routerQuery
+  const { redirect_url, request_id, tilaka_name } = routerQuery;
+
+  const params: any = {
+    request_id,
+    tilaka_name,
+  };
+
+  if (routerQuery["tilaka-name"]) {
+    params["tilaka-name"] = tilaka_name;
+  }
+
+  if (routerQuery["request-id"]) {
+    params["request-id"] = request_id;
+  }
 
   const { generatedUrl, autoRedirect } = useGenerateRedirectUrl({
     url: redirect_url as string,
-    params: {
-      request_id,
-      tilaka_name
-    }
+    params,
   });
 
   useEffect(() => {
     if (!routerIsReady) return;
     if (!isSigning) {
       restLogout({});
-      autoRedirect()
+      autoRedirect();
     } else {
       setTimeout(() => {
         router.replace({
