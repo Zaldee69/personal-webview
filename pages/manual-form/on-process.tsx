@@ -19,6 +19,7 @@ import { useSelector } from "react-redux";
 interface IParams {
   request_id: string;
   tilaka_name: string;
+  status: string
 }
 
 interface Props {
@@ -36,6 +37,7 @@ const Index = (props: Props) => {
   const params: IParams = {
     request_id: request_id as string,
     tilaka_name: tilaka_name as string || props.tilaka_name,
+    status: "S"
   };
 
   const { generatedUrl, autoRedirect } = useGenerateRedirectUrl({

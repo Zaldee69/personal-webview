@@ -128,7 +128,7 @@ export const serverSideRenderReturnConditions = ({
               permanent: false,
               destination: concateRedirectUrlParams(
                 cQuery.redirect_url as string,
-                `status=${status}%26register_id=${uuid}%26register_id=${uuid}${
+                `status=${status}%26register_id=${uuid}%26request_id=${uuid}${
                   checkStepResult.res.data.reason_code
                     ? "%26reason_code=" + checkStepResult.res.data.reason_code
                     : ""

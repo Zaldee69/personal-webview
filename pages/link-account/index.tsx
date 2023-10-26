@@ -102,7 +102,7 @@ const LinkAccount = (props: Props) => {
     show: boolean;
     data: { queryWithDynamicRedirectURL: any } | null;
   }>({ show: false, data: null });
-  const { nik, request_id, signing, setting, is_penautan, ...restRouterQuery } =
+  const { nik, request_id, signing, setting, is_penautan, redirect_url, ...restRouterQuery } =
     router.query;
   const dispatch: AppDispatch = useDispatch();
   const data = useSelector((state: RootState) => state.login);
@@ -162,8 +162,23 @@ const LinkAccount = (props: Props) => {
       let queryWithDynamicRedirectURL = {
         ...router.query,
       };
+
+      const setRedirectUrl= (url: string) => {
+        queryWithDynamicRedirectURL["redirect_url"] = url
+      }
+
       if (data.data.message.length > 0 && setting === "1") {
-        queryWithDynamicRedirectURL["redirect_url"] = data.data.message;
+        if(redirect_url){
+          setRedirectUrl(redirect_url as string)
+          queryWithDynamicRedirectURL["request-id"] = request_id
+          queryWithDynamicRedirectURL["tilaka-name"] = form.tilaka_name
+        } else {
+          setRedirectUrl(data.data.message)
+        }
+      } else {
+        setRedirectUrl(redirect_url as string)
+        queryWithDynamicRedirectURL["request-id"] = request_id
+        queryWithDynamicRedirectURL["tilaka-name"] = form.tilaka_name
       }
       localStorage.setItem("refresh_token", data.data.data[1] as string);
       setStorageWithExpiresIn(
@@ -967,6 +982,9 @@ const ModalConsent = ({
         query: {
           ...queryWithDynamicRedirectURL,
           reject_by_user: "1",
+          tilaka_name: tilakaName,
+          request_id: router.query.request_id
+
         },
       });
     } else {
@@ -1144,3 +1162,4 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 };
 
 export default LinkAccount;
+
