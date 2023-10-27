@@ -102,6 +102,7 @@ const PinFormDedicatedChannel = (props: Props) => {
             if (redirect_url) {
               const params = {
                 register_id: registration_id,
+                request_id: registration_id,
                 status: "S",
               };
               const queryString = new URLSearchParams(params as any).toString();
