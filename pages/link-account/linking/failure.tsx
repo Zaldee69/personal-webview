@@ -23,6 +23,7 @@ import Heading from "@/components/atoms/Heading";
 import Paragraph from "@/components/atoms/Paraghraph";
 import { useCountdown } from "@/hooks/useCountdown";
 import { Trans } from "react-i18next";
+import useGenerateRedirectUrl from "@/hooks/useGenerateRedirectUrl";
 
 type Props = {
   checkStepResultDataRoute: TKycCheckStepResponseData["data"]["route"];
@@ -39,9 +40,6 @@ const LinkAccountFailure = (props: Props) => {
     reject_by_user?: "1";
     account_locked?: "1";
   } = router.query;
-  const [redirectUrl, setRedirectUrl] = useState<string>(
-    routerQuery.redirect_url as string
-  );
 
   const second = 5;
 
@@ -50,6 +48,16 @@ const LinkAccountFailure = (props: Props) => {
   const themeConfiguration = useSelector((state: RootState) => state.theme);
 
   const failedCount = getFRFailedCount("count");
+
+  const { generatedUrl, autoRedirect } = useGenerateRedirectUrl({
+    params: {
+      request_id: routerQuery.request_id || routerQuery["request-id"],
+      "request-id": routerQuery.request_id || routerQuery["request-id"],
+      tilaka_name: routerQuery.tilaka_name || routerQuery["tilaka-name"],
+      "tilaka-name": routerQuery.tilaka_name || routerQuery["tilaka-name"],
+    },
+    url: routerQuery.redirect_url as string,
+  });
 
   useEffect(() => {
     if (!routerIsReady) return;
@@ -65,81 +73,13 @@ const LinkAccountFailure = (props: Props) => {
         resetFRFailedCount("count");
       }, 5000);
     } else {
-      let queryWithDynamicRedirectURL = {
-        ...routerQuery,
-      };
-      let params: any = {};
-
-      if (queryWithDynamicRedirectURL.request_id) {
-        params["request-id"] = queryWithDynamicRedirectURL.request_id;
+      if (
+        routerQuery.redirect_url &&
+        props.checkStepResultDataRoute &&
+        routerQuery.reject_by_user === "1"
+      ) {
+        autoRedirect();
       }
-      if (queryWithDynamicRedirectURL.tilaka_name) {
-        params["tilaka-name"] = queryWithDynamicRedirectURL.tilaka_name;
-      }
-      if (queryWithDynamicRedirectURL.status) {
-        params["status"] = queryWithDynamicRedirectURL.status;
-      }
-      if (queryWithDynamicRedirectURL.reason) {
-        params["reason"] = queryWithDynamicRedirectURL.reason;
-      }
-
-      let queryString = new URLSearchParams(params as any).toString();
-
-      if (queryWithDynamicRedirectURL.redirect_url?.length) {
-        const currentRedirectUrl =
-          queryWithDynamicRedirectURL.redirect_url as string;
-        const currentRedirectUrlArr = currentRedirectUrl.split("?");
-
-        if (currentRedirectUrlArr.length > 1) {
-          if (
-            currentRedirectUrlArr[1].includes("request-id") &&
-            currentRedirectUrlArr[1].includes("tilaka-name")
-          ) {
-            queryWithDynamicRedirectURL.redirect_url =
-              currentRedirectUrlArr[0] + "?" + currentRedirectUrlArr[1] + "&";
-          } else if (currentRedirectUrlArr[1].includes("request-id")) {
-            const additionParams = {
-              ...params,
-              "tilaka-name": queryWithDynamicRedirectURL.tilaka_name,
-            };
-            queryString = new URLSearchParams(additionParams as any).toString();
-
-            queryWithDynamicRedirectURL.redirect_url =
-              currentRedirectUrlArr[0] +
-              "?" +
-              currentRedirectUrlArr[1] +
-              "&" +
-              queryString;
-          } else if (currentRedirectUrlArr[1].includes("tilaka-name")) {
-            const additionParams = {
-              ...params,
-              "request-id": queryWithDynamicRedirectURL.request_id,
-            };
-            queryString = new URLSearchParams(additionParams as any).toString();
-
-            queryWithDynamicRedirectURL.redirect_url =
-              currentRedirectUrlArr[0] +
-              "?" +
-              currentRedirectUrlArr[1] +
-              "&" +
-              queryString;
-          } else {
-            // manualy input redirect_url on url
-            queryWithDynamicRedirectURL.redirect_url =
-              currentRedirectUrlArr[0] +
-              "?" +
-              currentRedirectUrlArr[1] +
-              "&" +
-              queryString;
-          }
-        } else {
-          // current redirect_url no has param
-          queryWithDynamicRedirectURL.redirect_url =
-            currentRedirectUrlArr[0] + "?" + queryString;
-        }
-      }
-
-      setRedirectUrl(queryWithDynamicRedirectURL.redirect_url as string);
     }
   }, [routerIsReady, routerQuery]);
 
@@ -170,7 +110,7 @@ const LinkAccountFailure = (props: Props) => {
             <Heading className="text-base my-5">
               {t("linkAccountFailed5x.title")}
             </Heading>
-            <Paragraph className="whitespace-pre-line" >
+            <Paragraph className="whitespace-pre-line">
               <Trans
                 values={{
                   timeLeft: timeLeft <= 0 ? 0 : timeLeft,
@@ -186,7 +126,7 @@ const LinkAccountFailure = (props: Props) => {
               <Heading className="text-base my-5">
                 {t("linkAccountFailed5x.title")}
               </Heading>
-              <Paragraph className="whitespace-pre-line" >
+              <Paragraph className="whitespace-pre-line">
                 <Trans
                   values={{
                     timeLeft: timeLeft <= 0 ? 0 : timeLeft,
@@ -235,7 +175,7 @@ const LinkAccountFailure = (props: Props) => {
               </Link>
             </div>
           ) : (
-            redirectUrl && (
+            routerQuery.redirect_url && (
               <div className="mt-20 text-primary text-base poppins-medium underline hover:cursor-pointer">
                 <a
                   style={{
@@ -248,7 +188,7 @@ const LinkAccountFailure = (props: Props) => {
                     size: "none",
                     className: "font-medium",
                   })}
-                  href={concateRedirectUrlParams(redirectUrl, "")}
+                  href={generatedUrl}
                 >
                   {t("livenessSuccessButtonTitle")}
                 </a>
