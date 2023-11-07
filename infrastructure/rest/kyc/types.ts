@@ -25,6 +25,7 @@ export type TKycCheckStepResponseData = {
     route: "penautan" | "penautan_consent" | "manual_form" | "done_manual_form" | "done_set_password" | "set_password";
     errors?: string[];
     user_identifier: string
+    nationality_type: string
   };
 };
 
