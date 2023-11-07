@@ -51,6 +51,7 @@ type TModal = {
 
 type Props = {
   checkStepResultDataRoute: TKycCheckStepResponseData["data"]["route"];
+  nationalityType: TKycCheckStepResponseData["data"]["nationality_type"]
 };
 
 const Index = (props: Props) => {
@@ -221,7 +222,7 @@ const Index = (props: Props) => {
       (x) => x === ""
     );
 
-    if (isFormEmpty || !isErrorMessageEmpty) return;
+    if ((isFormEmpty || !isErrorMessageEmpty) && props.nationalityType !== "WNA") return;
 
     toast(`Loading...`, {
       type: "info",
@@ -239,6 +240,7 @@ const Index = (props: Props) => {
         ...form,
         register_id: request_id as string,
       };
+      
       const res = await RestPersonalPManualReg(formReq);
       if (!res.success) {
         setIsLoading(false);
@@ -308,7 +310,7 @@ const Index = (props: Props) => {
       <div className="px-5 pt-8 max-w-md mx-auto">
         <Heading>{t("manualForm.title")}</Heading>
         <form onSubmit={onSubmitHandler}>
-          {restRouterQuery.isWNA !== "1" ? (
+          {props.nationalityType !== "WNA" ? (
             <>
               <Label className="ml-3 mt-5" size="base" htmlFor="nik">
                 NIK
@@ -370,7 +372,7 @@ const Index = (props: Props) => {
 
           <Button
             type="submit"
-            disabled={errorMessage.nik.length > 1 || isLoading}
+            disabled={(errorMessage.nik.length > 1 || isLoading) && props.nationalityType !== "WNA"}
             size="sm"
             className="bg-primary btn font-semibold mt-7 h-9 hover:opacity-50"
             style={{
@@ -614,6 +616,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   serverSideRenderReturnConditionsResult["props"] = {
     ...serverSideRenderReturnConditionsResult["props"],
     checkStepResultDataRoute: checkStepResult.res?.data?.route || null,
+    nationalityType: checkStepResult.res?.data?.nationality_type || null,
   };
 
   return serverSideRenderReturnConditionsResult;
