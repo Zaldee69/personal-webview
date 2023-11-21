@@ -30,10 +30,20 @@ import { ActionGuide1, ActionGuide2 } from "@/components/atoms/ActionGuide";
 import { actionText } from "@/utils/actionText";
 import { assetPrefix } from "next.config";
 import { GetServerSideProps } from "next";
-import { RestKycCheckStepv2 } from "infrastructure/rest/personal";
+import {
+  RestGenerateOTPRegistration,
+  RestKycCheckStepv2,
+  RestResendOTPRegistration,
+  RestVerifyOTPRegistration,
+} from "infrastructure/rest/personal";
 import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
 import { serverSideRenderReturnConditions } from "@/utils/serverSideRenderReturnConditions";
 import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
+import Modal from "@/components/modal/Modal";
+import { PinInput } from "react-input-pin-code";
+import Button from "@/components/atoms/Button";
+import { TOTPResponse } from "infrastructure/rest/personal/types";
+import Loader from "@/public/icons/Loader";
 
 type TQueryParams = {
   request_id?: string;
@@ -43,9 +53,13 @@ type TQueryParams = {
   status?: string;
 };
 
+interface Props extends TOTPResponse {
+  uuid: string;
+}
+
 let human: any = undefined;
 
-const Liveness = () => {
+const Liveness = (props: Props) => {
   const router = useRouter();
   const routerQuery = router.query;
 
@@ -60,6 +74,7 @@ const Liveness = () => {
   const [isDisabled, setIsDisabled] = useState<boolean>(false);
   const [humanDone, setHumanDone] = useState(false);
   const [isClicked, setIsClicked] = useState<boolean>(false);
+  const [isCreateOTPSuccess, setIsCreateOTPSuccess] = useState<boolean>(false);
 
   const actionList = useSelector(
     (state: RootState) => state.liveness.actionList
@@ -91,6 +106,12 @@ const Liveness = () => {
   }, [progress]);
 
   const dispatch: AppDispatch = useDispatch();
+
+  const handleSuccessCreateOTP = () => {
+    setIsCreateOTPSuccess(true);
+    generateAction();
+    dispatch(resetImages());
+  };
 
   const setHumanReady = () => {
     const loading: any = document.getElementById("loading");
@@ -130,7 +151,7 @@ const Liveness = () => {
 
             if (routerQuery.redirect_url) {
               params.status = res.data.status;
-              if(!res.data.pin_form){
+              if (!res.data.pin_form) {
                 params.redirect_url = routerQuery.redirect_url as string;
               }
             }
@@ -222,11 +243,11 @@ const Liveness = () => {
             res.message === "Anda berada di tahap pengisian formulir" ||
             res.data.status === "D"
           ) {
-             toast(res.message, {
-               type: "success",
-               autoClose: 5000,
-               position: "top-center",
-             });
+            toast(res.message, {
+              type: "success",
+              autoClose: 5000,
+              position: "top-center",
+            });
             if (res.data.pin_form) {
               router.replace({
                 pathname: handleRoute("kyc/pinform"),
@@ -422,10 +443,37 @@ const Liveness = () => {
             query.reason_code = result.data.reason_code;
           }
 
-          router.replace({
-            pathname: handleRoute("kyc/pinform"),
-            query,
-          });
+          const params = {
+            register_id: props.uuid,
+            request_id: props.uuid,
+            status: "S",
+          };
+
+          RestKycFinalForm({
+            payload: {
+              registerId: props.uuid,
+            },
+          })
+            .then((res) => {
+              if (res.success) {
+                if (routerQuery.redirect_url) {
+                  const queryString = new URLSearchParams(
+                    params as any
+                  ).toString();
+
+                  window.top!.location.href = concateRedirectUrlParams(
+                    routerQuery.redirect_url as string,
+                    queryString
+                  );
+                } else {
+                  router.replace({
+                    pathname: handleRoute("form/success/"),
+                    query,
+                  });
+                }
+              }
+            })
+            .catch((err) => console.log(err));
         } else {
           const query: any = {
             ...routerQuery,
@@ -644,12 +692,23 @@ const Liveness = () => {
 
   useEffect(() => {
     if (!router.isReady) return;
-    generateAction();
-    dispatch(resetImages());
+    if (props.verified) {
+      generateAction();
+      dispatch(resetImages());
+    }
   }, [router.isReady]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  if (!isLivenessStarted)
-    return <Guide setIsClicked={setIsClicked} isDisabled={isDisabled} />;
+  if (!isLivenessStarted) {
+    if (
+      !isCreateOTPSuccess &&
+      !props.verified &&
+      props.message !== "request_id tidak valid"
+    ) {
+      return <OTP handleSuccessCreateOTP={handleSuccessCreateOTP} {...props} />;
+    } else {
+      return <Guide setIsClicked={setIsClicked} isDisabled={isDisabled} />;
+    }
+  }
 
   return (
     <div
@@ -753,9 +812,222 @@ const Liveness = () => {
             )}
           </div>
         )}
-        <Footer />
         <UnsupportedDeviceModal />
+        <Footer />
       </div>
+    </div>
+  );
+};
+
+interface IOTPProps extends Props {
+  handleSuccessCreateOTP: () => void;
+}
+
+const OTP = ({ success, uuid, handleSuccessCreateOTP }: IOTPProps) => {
+  const [isShowModalOTP, setIsShowModalOTP] = useState<boolean>(true);
+  const [otpValues, setOtpValues] = useState(["", "", "", "", "", ""]);
+  const [isCountDone, setIsCountDone] = useState<boolean>(false);
+  const [timeRemaining, setTimeRemaining] = useState<string>("0");
+  const [isMaxResend, setIsMaxResend] = useState<boolean>(false);
+  const [isProcessResend, setIsProcessResend] = useState<boolean>(false);
+  const [isProcessVerify, setIsProcessVerify] = useState<boolean>(false);
+
+  const interval = 60000;
+
+  const themeConfiguration = useSelector((state: RootState) => state.theme);
+  const { t }: any = i18n;
+
+  const reset = () => {
+    localStorage.endTime = +new Date() + interval;
+  };
+
+  const resendOTP = () => {
+    setIsProcessResend(true);
+    RestResendOTPRegistration({ request_id: uuid })
+      .then((res) => {
+        const errorMessage =
+          res.message === "tidak bisa resend OTP. resend OTP sudah maksimal" &&
+          !res.success
+            ? "Jumlah pengiriman kode OTP telah mencapai batas maksimal"
+            : res.message;
+
+        if (res.success) {
+          timerHandler();
+          reset();
+          setIsCountDone(true);
+          toast.success("OTP Terkirim", {
+            icon: <CheckOvalIcon />,
+          });
+        } else {
+          if (
+            res.message === "tidak bisa resend OTP. resend OTP sudah maksimal"
+          ) {
+            setIsMaxResend(true);
+          } else {
+            timerHandler();
+            reset();
+            setIsCountDone(true);
+          }
+          toast.error(errorMessage, {
+            icon: <XIcon />,
+          });
+        }
+        setIsProcessResend(false);
+      })
+      .catch((err) => {
+        console.log(err);
+        setIsProcessResend(false);
+      });
+  };
+
+  const verifyOTP = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (otpValues.length < 6) return;
+
+    setIsProcessVerify(true);
+    RestVerifyOTPRegistration({
+      payload: {
+        otp: otpValues.join(""),
+        request_id: uuid,
+      },
+    })
+      .then((res) => {
+        if (res.success) {
+          setIsShowModalOTP(false);
+          handleSuccessCreateOTP();
+        } else {
+          setIsProcessVerify(false);
+          setOtpValues(["", "", "", "", "", ""]);
+          toast.error(
+            res.message === "verifikasi gagal. OTP salah"
+              ? "Kode OTP Salah"
+              : res.message,
+            {
+              icon: <XIcon />,
+            }
+          );
+        }
+      })
+      .catch((err) => {
+        setIsProcessVerify(false);
+        console.log(err);
+      });
+  };
+
+  const timerHandler = () => {
+    setInterval(function () {
+      const date: any = new Date();
+      const remaining = localStorage.endTime - date;
+      const timeRemaining = Math.floor(remaining / 1000).toString();
+      if (remaining >= 1) {
+        setTimeRemaining(timeRemaining);
+      } else {
+        setIsCountDone(false);
+      }
+    }, 100);
+  };
+
+  useEffect(() => {
+    if (success) {
+      timerHandler();
+      reset();
+      setIsCountDone(true);
+    } else {
+      setIsCountDone(true);
+      timerHandler();
+    }
+  }, []);
+
+  return (
+    <div className="bg-white min-h-screen">
+      <Modal
+        setModal={setIsShowModalOTP}
+        isShowModal={isShowModalOTP}
+        headingTitle={t("frSubtitle2")}
+        withCloseButton={false}
+      >
+        <div className="h-72 px-4 pb-4">
+          <p className="text-center text-neutral200 mt-2">
+          {t("OTPModalSubtitle")}
+          </p>
+          <form onSubmit={verifyOTP}>
+            <PinInput
+              containerStyle={{
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 5,
+                marginTop: "30px",
+              }}
+              inputStyle={{ alignItems: "center", gap: 5, marginTop: "10px" }}
+              placeholder=""
+              size="lg"
+              values={otpValues}
+              onChange={(_, __, values) => setOtpValues(values)}
+            />
+            {isMaxResend ? (
+              <p className="text-center mt-2 text-sm text-red300">
+                {t("OTPResendMaxLimit")}
+              </p>
+            ) : (
+              <div className="flex justify-center text-sm gap-1 mt-5">
+                <p className="text-neutral200">{t("dindtReceiveOtp")}</p>
+                <div
+                  style={{
+                    color: themeConfigurationAvaliabilityChecker(
+                      themeConfiguration?.data.action_font_color as string,
+                      "BG"
+                    ),
+                  }}
+                  className="font-semibold"
+                >
+                  {!isCountDone ? (
+                    <Button
+                      variant="ghost"
+                      type="button"
+                      disabled={isProcessResend}
+                      style={{
+                        color: themeConfigurationAvaliabilityChecker(
+                          themeConfiguration?.data.action_font_color as string
+                        ),
+                      }}
+                      className="mx-0"
+                      size="none"
+                      onClick={resendOTP}
+                    >
+                      {isProcessResend ? (
+                        <Loader color="#0052CC" size={20} />
+                      ) : (
+                        t("resend")
+                      )}
+                    </Button>
+                  ) : (
+                    <p className="text-primary">{`0:${timeRemaining}`}</p>
+                  )}
+                </div>
+              </div>
+            )}
+            <Button
+              disabled={otpValues.join("").length < 6 || isProcessVerify}
+              type="submit"
+              className="mt-10"
+              style={{
+                backgroundColor: themeConfigurationAvaliabilityChecker(
+                  themeConfiguration?.data.button_color as string
+                ),
+              }}
+            >
+              {isProcessVerify ? (
+                <div className="mx-auto flex justify-center">
+                  <Loader />
+                </div>
+              ) : (
+                t("send")
+              )}
+            </Button>
+          </form>
+        </div>
+      </Modal>
     </div>
   );
 };
@@ -787,11 +1059,30 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       return { err };
     });
 
-  return serverSideRenderReturnConditions({
-    context,
-    checkStepResult,
-    isNotRedirect,
-  });
+  const serverSideRenderReturnConditionsResult =
+    serverSideRenderReturnConditions({
+      context,
+      checkStepResult,
+      isNotRedirect,
+    });
+
+  const generateOTPResults = await RestGenerateOTPRegistration({
+    request_id: uuid as string,
+  })
+    .then((res) => {
+      return res;
+    })
+    .catch((err) => {
+      return err;
+    });
+
+  serverSideRenderReturnConditionsResult["props"] = {
+    ...serverSideRenderReturnConditionsResult["props"],
+    ...generateOTPResults,
+    uuid: uuid ? uuid : "",
+  };
+
+  return serverSideRenderReturnConditionsResult;
 };
 
 export default Liveness;

@@ -19,6 +19,7 @@ import {
   TPersonalPManualRegRequestData,
   TPersonalPManualRegResponseData,
   TThemeResponse,
+  TOTPResponse,
 } from "./types";
 
 import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
@@ -235,15 +236,67 @@ export const RestThemeConfiguration = ({
   type?: "channel_id" | "request_id";
 }): Promise<TThemeResponse> => {
   return axios
-    .get(
-      `${BASE_URL}/channel/get_webview_configuration?${type}=${uuid}`
-    )
+    .get(`${BASE_URL}/channel/get_webview_configuration?${type}=${uuid}`)
     .then((res) => {
       if (res.data.success) {
         return res.data;
       }
       return initialState;
     })
+    .catch((err) => {
+      throw err;
+    });
+};
+
+export const RestGenerateOTPRegistration = ({
+  request_id,
+}: {
+  request_id: string;
+}): Promise<TOTPResponse> => {
+  return axios
+    .post(
+      `${BASE_URL}/v2/generateOtpRegistration`,
+      null,
+      {
+        params: {
+          request_id,
+        },
+      }
+    )
+    .then((res) => res.data)
+    .catch((err) => {
+      throw err;
+    });
+};
+
+export const RestResendOTPRegistration = ({
+  request_id,
+}: {
+  request_id: string;
+}): Promise<TOTPResponse> => {
+  return axios
+    .post(`${BASE_URL}/v2/resendOtpRegistration`, null, {
+      params: {
+        request_id,
+      },
+    })
+    .then((res) => res.data)
+    .catch((err) => {
+      throw err;
+    });
+};
+
+export const RestVerifyOTPRegistration = ({
+  payload,
+}: {
+  payload: {
+    otp: string;
+    request_id: string;
+  };
+}): Promise<TOTPResponse> => {
+  return axios
+    .post(`${BASE_URL}/v2/verifyOtpRegistration`, payload)
+    .then((res) => res.data)
     .catch((err) => {
       throw err;
     });

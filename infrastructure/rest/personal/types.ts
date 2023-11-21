@@ -169,3 +169,10 @@ export type TThemeResponse = {
     asset_forget_password_success: string
   };
 };
+
+export type TOTPResponse = {
+  success: boolean;
+  message: string;
+  error: string
+  verified: boolean
+}
