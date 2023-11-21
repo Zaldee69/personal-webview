@@ -42,7 +42,7 @@ const ModalHeading: React.FC<IModalHeadingProps> = ({
 }) => {
   return (
     <div
-      className={`${withCloseButton ? "py-5" : "py-4" }`}
+      className={`${withCloseButton ? "pt-5" : "pt-4" }`}
     >
       <Heading className="text-center" >{headingTitle}</Heading>
       {withCloseButton ? (
