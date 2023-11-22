@@ -44,6 +44,7 @@ import { PinInput } from "react-input-pin-code";
 import Button from "@/components/atoms/Button";
 import { TOTPResponse } from "infrastructure/rest/personal/types";
 import Loader from "@/public/icons/Loader";
+import Heading from "@/components/atoms/Heading";
 
 type TQueryParams = {
   request_id?: string;
@@ -824,7 +825,7 @@ interface IOTPProps extends Props {
 }
 
 const OTP = ({ success, uuid, handleSuccessCreateOTP }: IOTPProps) => {
-  const [isShowModalOTP, setIsShowModalOTP] = useState<boolean>(true);
+  const [isShowOTPForm, setIsShowOTPForm] = useState<boolean>(true);
   const [otpValues, setOtpValues] = useState(["", "", "", "", "", ""]);
   const [isCountDone, setIsCountDone] = useState<boolean>(false);
   const [timeRemaining, setTimeRemaining] = useState<string>("0");
@@ -894,7 +895,7 @@ const OTP = ({ success, uuid, handleSuccessCreateOTP }: IOTPProps) => {
     })
       .then((res) => {
         if (res.success) {
-          setIsShowModalOTP(false);
+          setIsShowOTPForm(false);
           handleSuccessCreateOTP();
         } else {
           setIsProcessVerify(false);
@@ -939,17 +940,21 @@ const OTP = ({ success, uuid, handleSuccessCreateOTP }: IOTPProps) => {
     }
   }, []);
 
-  return (
-    <div className="bg-white min-h-screen">
-      <Modal
-        setModal={setIsShowModalOTP}
-        isShowModal={isShowModalOTP}
-        headingTitle={t("frSubtitle2")}
-        withCloseButton={false}
-      >
-        <div className="h-72 px-4 pb-4">
+  return !isShowOTPForm ? null : (
+    <div
+      style={{
+        backgroundColor: themeConfigurationAvaliabilityChecker(
+          themeConfiguration?.data.background as string,
+          "BG"
+        ),
+      }}
+      className="flex justify-center items-center min-h-screen px-3 pt-3 pb-5"
+    >
+      <div className="py-9 font-poppins max-w-md card-pin-form flex items-center">
+        <div>
+          <Heading className="text-center">{t("frSubtitle2")}</Heading>
           <p className="text-center text-neutral200 mt-2">
-          {t("OTPModalSubtitle")}
+            {t("OTPModalSubtitle")}
           </p>
           <form onSubmit={verifyOTP}>
             <PinInput
@@ -1027,7 +1032,7 @@ const OTP = ({ success, uuid, handleSuccessCreateOTP }: IOTPProps) => {
             </Button>
           </form>
         </div>
-      </Modal>
+      </div>
     </div>
   );
 };
