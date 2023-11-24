@@ -20,6 +20,7 @@ import {
   TPersonalPManualRegResponseData,
   TThemeResponse,
   TOTPResponse,
+  IOTPDedicatedResponse,
 } from "./types";
 
 import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
@@ -254,15 +255,11 @@ export const RestGenerateOTPRegistration = ({
   request_id: string;
 }): Promise<TOTPResponse> => {
   return axios
-    .post(
-      `${BASE_URL}/v2/generateOtpRegistration`,
-      null,
-      {
-        params: {
-          request_id,
-        },
-      }
-    )
+    .post(`${BASE_URL}/v2/generateOtpRegistration`, null, {
+      params: {
+        request_id,
+      },
+    })
     .then((res) => res.data)
     .catch((err) => {
       throw err;
@@ -296,6 +293,26 @@ export const RestVerifyOTPRegistration = ({
 }): Promise<TOTPResponse> => {
   return axios
     .post(`${BASE_URL}/v2/verifyOtpRegistration`, payload)
+    .then((res) => res.data)
+    .catch((err) => {
+      throw err;
+    });
+};
+
+export const RestOTPDedicated = async ({
+  user,
+  id,
+}: {
+  user: string;
+  id: string;
+}): Promise<IOTPDedicatedResponse> => {
+  return axios
+    .get(`${BASE_URL}/totp-dedicated`, {
+      params: {
+        user,
+        id,
+      },
+    })
     .then((res) => res.data)
     .catch((err) => {
       throw err;
