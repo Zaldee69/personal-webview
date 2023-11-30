@@ -10,12 +10,14 @@ interface ILivenessState {
   images: ImageProp[];
   isDone: boolean;
   actionList: string[];
+  isRetry: boolean
 }
 
 const initialState: ILivenessState = {
   images: [],
   isDone: false,
   actionList: [],
+  isRetry: false
 };
 
 const livenessSlice = createSlice({
@@ -34,10 +36,13 @@ const livenessSlice = createSlice({
     setActionList: (state, action: PayloadAction<string[]>) => {
       state.actionList = action.payload;
     },
+    setIsRetry: (state, action: PayloadAction<boolean>) => {
+      state.isRetry = action.payload;
+    },
   },
 });
 
-export const { setImages, setIsDone, setActionList, resetImages } =
+export const { setImages, setIsDone, setActionList, resetImages, setIsRetry} =
   livenessSlice.actions;
 
 export { initialState as initialStateLivenessSlice };

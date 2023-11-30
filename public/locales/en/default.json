@@ -298,7 +298,12 @@
   "contactCantika": "Contact <0>cantika@tilaka.id</0>",
   "furtherQuestions": "Further questions?",
   "OTPModalSubtitle": "The OTP code has been sent to your email address for the verification process",
-  "OTPResendMaxLimit": "You have reached the maximum limit for sending OTP codes"
+  "OTPResendMaxLimit": "You have reached the maximum limit for sending OTP codes",
+  "livenessSelfiePreview": {
+    "title": "Selfie Image",
+    "subtitle": "This image will be used for Dukcapil verification, please ensure that the image is clear . Max retry are 3x.",
+    "retryBtn": "Retry"
+  }
 }
 
 

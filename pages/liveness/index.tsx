@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Head from "next/head";
 import { AppDispatch, RootState } from "@/redux/app/store";
@@ -16,16 +16,18 @@ import XIcon from "@/public/icons/XIcon";
 import CheckOvalIcon from "@/public/icons/CheckOvalIcon";
 import Footer from "../../components/Footer";
 import ProgressStepBar from "../../components/ProgressStepBar";
-import { resetImages, setActionList } from "@/redux/slices/livenessSlice";
+import {
+  resetImages,
+  setActionList,
+  setIsDone,
+  setIsRetry,
+} from "@/redux/slices/livenessSlice";
 import { handleRoute } from "@/utils/handleRoute";
 import Loading from "@/components/Loading";
-import SkeletonLoading from "@/components/SkeletonLoading";
 import { concateRedirectUrlParams } from "@/utils/concateRedirectUrlParams";
 import i18n from "i18";
 import UnsupportedDeviceModal from "@/components/UnsupportedDeviceModal";
 import Guide from "@/components/Guide";
-import InitializingFailed from "@/components/atoms/InitializingFailed";
-import Initializing from "@/components/atoms/Initializing";
 import { ActionGuide1, ActionGuide2 } from "@/components/atoms/ActionGuide";
 import { actionText } from "@/utils/actionText";
 import { assetPrefix } from "next.config";
@@ -39,12 +41,13 @@ import {
 import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
 import { serverSideRenderReturnConditions } from "@/utils/serverSideRenderReturnConditions";
 import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
-import Modal from "@/components/modal/Modal";
 import { PinInput } from "react-input-pin-code";
 import Button from "@/components/atoms/Button";
 import { TOTPResponse } from "infrastructure/rest/personal/types";
 import Loader from "@/public/icons/Loader";
 import Heading from "@/components/atoms/Heading";
+import { cn } from "@/utils/twClassMerge";
+import LivenessImagePreview from "@/components/LivenessImagePreview";
 
 type TQueryParams = {
   request_id?: string;
@@ -94,6 +97,26 @@ const Liveness = (props: Props) => {
       : actionList[currentActionIndex] === "blink"
       ? "pejam"
       : "hadap-depan";
+
+  const imageSrc1 = themeConfigurationAvaliabilityChecker(
+    currentIndex === "hadap-depan"
+      ? (themeConfiguration.data.asset_liveness_action_selfie as string)
+      : currentIndex === "buka-mulut"
+      ? (themeConfiguration.data.asset_liveness_action_open_mouth as string)
+      : (themeConfiguration.data.asset_liveness_action_blink as string),
+    "ASSET",
+    `${assetPrefix}/images/${currentIndex}.svg`
+  );
+
+  const imageSrc2 = themeConfigurationAvaliabilityChecker(
+    currentIndex === "hadap-depan" || !isStepDone
+      ? (themeConfiguration.data.asset_liveness_action_selfie as string)
+      : currentIndex === "buka-mulut"
+      ? (themeConfiguration.data.asset_liveness_action_open_mouth as string)
+      : (themeConfiguration.data.asset_liveness_action_blink as string),
+    "ASSET",
+    `${assetPrefix}/images/${currentIndex}.svg`
+  );
 
   useEffect(() => {
     const track: any = document.querySelector(".track");
@@ -355,6 +378,10 @@ const Liveness = (props: Props) => {
     setIsLoading(true);
     setFailedMessage("");
 
+    dispatch(setIsDone(false));
+    setCurrentActionIndex(2);
+    dispatch(setIsRetry(false));
+
     try {
       const body: TKycVerificationRequestData = {
         registerId: router.query.request_id as string,
@@ -527,7 +554,7 @@ const Liveness = (props: Props) => {
                   position: "top-center",
                 }
               );
-              setIsLoading(false);
+              // setIsLoading(false);
             } else if (status === "F") {
               toast(
                 result?.data?.numFailedLivenessCheck &&
@@ -603,22 +630,21 @@ const Liveness = (props: Props) => {
                     query,
                   });
                 }
-              }, 5000);
-              setIsLoading(false);
+              }, 1000);
             }
-          } else {
-            setIsLoading(false);
-          }
+          } 
         }
       }
+      localStorage.removeItem("retry_count");
     } catch (e) {
+      localStorage.removeItem("retry_count");
       toast.dismiss("verification");
       toast(`${e || "Tidak merespon!"}`, {
         type: "error",
         autoClose: e ? 5000 : false,
         position: "top-center",
       });
-      setIsLoading(false);
+      // setIsLoading(false);
       setTimeout(() => {
         router.push({
           pathname: handleRoute("liveness-fail"),
@@ -627,7 +653,7 @@ const Liveness = (props: Props) => {
             request_id: router.query.request_id,
           },
         });
-      }, 5000);
+      }, 1000);
     }
   };
 
@@ -668,11 +694,6 @@ const Liveness = (props: Props) => {
   }, []);
 
   useEffect(() => {
-    if (!isDone) return;
-    changePage();
-  }, [isDone]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  useEffect(() => {
     if (!humanDone && isClicked) {
       toast.dismiss();
       toast(`Loading...`, {
@@ -711,6 +732,15 @@ const Liveness = (props: Props) => {
     }
   }
 
+  if (isDone && !isLoading) {
+    return (
+      <LivenessImagePreview
+        setCurrentActionIndex={setCurrentActionIndex}
+        verifyLiveness={changePage}
+      />
+    );
+  }
+
   return (
     <div
       className="min-h-screen"
@@ -726,51 +756,19 @@ const Liveness = (props: Props) => {
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
       <div className="py-10 max-w-sm mx-auto px-2">
-        <h2 className="poppins-regular text-xl font-semibold">
-          {isGenerateAction ? <SkeletonLoading width="w-2/5" /> : "Liveness"}
-        </h2>
-        {(!isStepDone && actionList.length > 1) || isMustReload ? (
+        <h2 className="poppins-regular text-xl font-semibold">Liveness</h2>
+        {!isStepDone && actionList.length > 1 ? (
           <ActionGuide2
-            imageSrc={themeConfigurationAvaliabilityChecker(
-              currentIndex === "hadap-depan" || !isStepDone
-                ? (themeConfiguration.data
-                    .asset_liveness_action_selfie as string)
-                : currentIndex === "buka-mulut"
-                ? (themeConfiguration.data
-                    .asset_liveness_action_open_mouth as string)
-                : (themeConfiguration.data
-                    .asset_liveness_action_blink as string),
-              "ASSET",
-              `${assetPrefix}/images/${currentIndex}.svg`
-            )}
+            imageSrc={imageSrc2}
             isGenerateAction={isGenerateAction}
             isMustReload={isMustReload}
           />
         ) : (
           <div>
-            {isGenerateAction && (
-              <div className="flex gap-5 mx-2 mt-5">
-                <SkeletonLoading width="w-[60px]" height="h-[50px]" />
-                <div className="flex items-center w-full flex-col">
-                  <SkeletonLoading width="w-full" height="h-[20px]" isDouble />
-                </div>
-              </div>
-            )}
             {!isLoading && (
               <ActionGuide1
                 actionList={actionList}
-                imageSrc={themeConfigurationAvaliabilityChecker(
-                  currentIndex === "hadap-depan"
-                    ? (themeConfiguration.data
-                        .asset_liveness_action_selfie as string)
-                    : currentIndex === "buka-mulut"
-                    ? (themeConfiguration.data
-                        .asset_liveness_action_open_mouth as string)
-                    : (themeConfiguration.data
-                        .asset_liveness_action_blink as string),
-                  "ASSET",
-                  `${assetPrefix}/images/${currentIndex}.svg`
-                )}
+                imageSrc={imageSrc1}
                 currentActionIndex={currentActionIndex}
                 failedMessage={failedMessage}
                 actionText={actionText}
@@ -779,15 +777,22 @@ const Liveness = (props: Props) => {
           </div>
         )}
         <div
-          className={[
-            "mt-5 rounded-md h-[270px] flex justify-center items-center sm:w-full md:w-full",
-            isLoading ? "block" : "hidden",
-          ].join(" ")}
+          className={cn(
+            "mt-5 rounded-md h-[270px] justify-center items-center sm:w-full md:w-full",
+            {
+              flex: isLoading,
+              hidden: !isLoading,
+            }
+          )}
         >
           <Loading title={t("loadingTitle")} />
         </div>
-        <div className={["relative", isLoading ? "hidden" : "block"].join(" ")}>
-          {!isMustReload ? <Initializing /> : <InitializingFailed />}
+        <div
+          className={cn("relative", {
+            block: !isLoading,
+            hidden: isLoading,
+          })}
+        >
           <Camera
             currentActionIndex={currentActionIndex}
             setCurrentActionIndex={setCurrentActionIndex}
@@ -799,20 +804,10 @@ const Liveness = (props: Props) => {
             human={human}
           />
         </div>
-        {isGenerateAction ? (
-          <div className="w-2/5 h-[5px] mx-auto mt-5 border-b-2 border-[#E6E6E6] "></div>
-        ) : (
-          <div>
-            {isMustReload ? (
-              <ProgressStepBar actionList={actionList} currentActionIndex={0} />
-            ) : (
-              <ProgressStepBar
-                actionList={actionList}
-                currentActionIndex={isStepDone ? currentActionIndex : 0}
-              />
-            )}
-          </div>
-        )}
+        <ProgressStepBar
+          actionList={actionList}
+          currentActionIndex={isStepDone ? currentActionIndex : 0}
+        />
         <UnsupportedDeviceModal />
         <Footer />
       </div>

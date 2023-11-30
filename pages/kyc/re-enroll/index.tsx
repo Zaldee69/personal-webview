@@ -21,7 +21,12 @@ import {
 import { handleRoute } from "@/utils/handleRoute";
 import SkeletonLoading from "@/components/SkeletonLoading";
 import { concateRedirectUrlParams } from "@/utils/concateRedirectUrlParams";
-import { resetImages, setActionList } from "@/redux/slices/livenessSlice";
+import {
+  resetImages,
+  setActionList,
+  setIsDone,
+  setIsRetry,
+} from "@/redux/slices/livenessSlice";
 import { TKycVerificationIssueRequestData } from "infrastructure/rest/kyc/types";
 import UnsupportedDeviceModal from "@/components/UnsupportedDeviceModal";
 import Guide from "@/components/Guide";
@@ -30,6 +35,8 @@ import Initializing from "@/components/atoms/Initializing";
 import { ActionGuide1, ActionGuide2 } from "@/components/atoms/ActionGuide";
 import CheckOvalIcon from "@/public/icons/CheckOvalIcon";
 import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
+import LivenessImagePreview from "@/components/LivenessImagePreview";
+import { cn } from "@/utils/twClassMerge";
 
 let human: any = undefined;
 
@@ -62,6 +69,26 @@ const ReEnrollMekari = () => {
       : actionList[currentActionIndex] === "blink"
       ? "pejam"
       : "hadap-depan";
+
+  const actionImage1 = themeConfigurationAvaliabilityChecker(
+    currentIndex === "hadap-depan" || !isStepDone
+      ? (themeConfiguration.data.asset_liveness_action_selfie as string)
+      : currentIndex === "buka-mulut"
+      ? (themeConfiguration.data.asset_liveness_action_open_mouth as string)
+      : (themeConfiguration.data.asset_liveness_action_blink as string),
+    "ASSET",
+    `${assetPrefix}/images/${currentIndex}.svg`
+  );
+
+  const actionImage2 = themeConfigurationAvaliabilityChecker(
+    currentIndex === "hadap-depan"
+      ? (themeConfiguration.data.asset_liveness_action_selfie as string)
+      : currentIndex === "buka-mulut"
+      ? (themeConfiguration.data.asset_liveness_action_open_mouth as string)
+      : (themeConfiguration.data.asset_liveness_action_blink as string),
+    "ASSET",
+    `${assetPrefix}/images/${currentIndex}.svg`
+  );
 
   const router = useRouter();
   const routerQuery = router.query;
@@ -108,7 +135,7 @@ const ReEnrollMekari = () => {
         }
       }
     } catch (e: any) {
-      setIsLoading(false);
+      // setIsLoading(false);
       const msg = e.response?.data?.data?.errors?.[0];
       if (msg) {
         toast.error(msg, {
@@ -188,6 +215,10 @@ const ReEnrollMekari = () => {
     setIsLoading(true);
     setFailedMessage("");
 
+    dispatch(setIsDone(false));
+    setCurrentActionIndex(2);
+    dispatch(setIsRetry(false));
+
     try {
       const body: TKycVerificationIssueRequestData = {
         issueId: routerQuery.issue_id as string,
@@ -231,7 +262,7 @@ const ReEnrollMekari = () => {
         }
       } else {
         if (result.data.status === "F") {
-          setIsLoading(false);
+          // setIsLoading(false);
           if (routerQuery.redirect_url) {
             setTimeout(() => {
               const params: any = {
@@ -249,7 +280,7 @@ const ReEnrollMekari = () => {
                 routerQuery.redirect_url as string,
                 queryString
               );
-            }, 2000);
+            }, 1000);
           }
         } else {
           const query: any = {
@@ -268,8 +299,9 @@ const ReEnrollMekari = () => {
           });
         }
       }
+      localStorage.removeItem("retry_count");
     } catch (e: any) {
-      setIsLoading(false);
+      localStorage.removeItem("retry_count");
       const msg = e.response?.data?.data?.errors?.[0];
       if (msg) {
         toast.error(msg, {
@@ -349,15 +381,19 @@ const ReEnrollMekari = () => {
   }, [progress]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    if (!isDone) return;
-    verifyLiveness();
-  }, [isDone]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  useEffect(() => {
     if (!router.isReady) return;
     checkStep();
     dispatch(resetImages());
   }, [router.isReady]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  if (isDone && !isLoading) {
+    return (
+      <LivenessImagePreview
+        setCurrentActionIndex={setCurrentActionIndex}
+        verifyLiveness={verifyLiveness}
+      />
+    );
+  }
 
   if (!isLivenessStarted)
     return <Guide setIsClicked={setIsClicked} isDisabled={isDisabled} />;
@@ -377,51 +413,19 @@ const ReEnrollMekari = () => {
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
       <div className="py-10 max-w-sm mx-auto px-2">
-        <h2 className="font-poppins text-xl font-semibold">
-          {isGenerateAction ? <SkeletonLoading width="w-2/5" /> : "Liveness"}
-        </h2>
-        {(!isStepDone && actionList.length > 1) || isMustReload ? (
+        <h2 className="font-poppins text-xl font-semibold">Liveness</h2>
+        {!isStepDone && actionList.length > 1 ? (
           <ActionGuide2
-            imageSrc={themeConfigurationAvaliabilityChecker(
-              currentIndex === "hadap-depan" || !isStepDone
-                ? (themeConfiguration.data
-                    .asset_liveness_action_selfie as string)
-                : currentIndex === "buka-mulut"
-                ? (themeConfiguration.data
-                    .asset_liveness_action_open_mouth as string)
-                : (themeConfiguration.data
-                    .asset_liveness_action_blink as string),
-              "ASSET",
-              `${assetPrefix}/images/${currentIndex}.svg`
-            )}
+            imageSrc={actionImage1}
             isGenerateAction={isGenerateAction}
             isMustReload={isMustReload}
           />
         ) : (
           <div>
-            {isGenerateAction && (
-              <div className="flex gap-5 mx-2 mt-5">
-                <SkeletonLoading width="w-[60px]" height="h-[50px]" />
-                <div className="flex items-center w-full flex-col">
-                  <SkeletonLoading width="w-full" height="h-[20px]" isDouble />
-                </div>
-              </div>
-            )}
             {!isLoading && (
               <ActionGuide1
                 actionList={actionList}
-                imageSrc={themeConfigurationAvaliabilityChecker(
-                  currentIndex === "hadap-depan"
-                    ? (themeConfiguration.data
-                        .asset_liveness_action_selfie as string)
-                    : currentIndex === "buka-mulut"
-                    ? (themeConfiguration.data
-                        .asset_liveness_action_open_mouth as string)
-                    : (themeConfiguration.data
-                        .asset_liveness_action_blink as string),
-                  "ASSET",
-                  `${assetPrefix}/images/${currentIndex}.svg`
-                )}
+                imageSrc={actionImage2}
                 currentActionIndex={currentActionIndex}
                 failedMessage={failedMessage}
                 actionText={actionText}
@@ -430,15 +434,22 @@ const ReEnrollMekari = () => {
           </div>
         )}
         <div
-          className={[
-            "mt-5 rounded-md h-[350px] flex justify-center items-center sm:w-full md:w-full",
-            isLoading ? "block" : "hidden",
-          ].join(" ")}
+          className={cn(
+            "mt-5 rounded-md h-[270px] justify-center items-center sm:w-full md:w-full",
+            {
+              flex: isLoading,
+              hidden: !isLoading,
+            }
+          )}
         >
           <Loading title={t("loadingTitle")} />
         </div>
-        <div className={["relative", isLoading ? "hidden" : "block"].join(" ")}>
-          {!isMustReload ? <Initializing /> : <InitializingFailed />}
+        <div
+          className={cn("relative", {
+            block: !isLoading,
+            hidden: isLoading,
+          })}
+        >
           <Camera
             currentActionIndex={currentActionIndex}
             setCurrentActionIndex={setCurrentActionIndex}
@@ -450,20 +461,10 @@ const ReEnrollMekari = () => {
             human={human}
           />
         </div>
-        {isGenerateAction ? (
-          <div className="w-2/5 h-[5px] mx-auto mt-10 border-b-2 border-[#E6E6E6] "></div>
-        ) : (
-          <div>
-            {isMustReload ? (
-              <ProgressStepBar actionList={actionList} currentActionIndex={0} />
-            ) : (
-              <ProgressStepBar
-                actionList={actionList}
-                currentActionIndex={isStepDone ? currentActionIndex : 0}
-              />
-            )}
-          </div>
-        )}
+        <ProgressStepBar
+          actionList={actionList}
+          currentActionIndex={isStepDone ? currentActionIndex : 0}
+        />
         <Footer />
         <UnsupportedDeviceModal />
       </div>
