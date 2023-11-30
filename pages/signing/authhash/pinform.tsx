@@ -106,8 +106,7 @@ const PinFormDedicatedChannel = ({ id, user, success }: Props) => {
           });
         } else {
           if (
-            res.message === "authhashsign gagal. salah OTP sudah 5 kali" ||
-            res.message === "signing sudah selesai"
+            res.message === "authhashsign gagal. salah OTP sudah 5 kali"
           ) {
             router.push({
               pathname: handleRoute("signing/failure"),
