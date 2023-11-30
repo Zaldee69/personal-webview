@@ -47,7 +47,7 @@ const LivenessImagePreview = ({
   return (
     <div className="py-10 max-w-sm mx-auto px-2">
       <Heading>{t("livenessSelfiePreview.title")}</Heading>
-      <Paragraph size="sm" className="mt-2">
+      <Paragraph size="sm" className="mt-2 whitespace-pre-line">
         {t("livenessSelfiePreview.subtitle")}
       </Paragraph>
       <div className="relative mt-4">
