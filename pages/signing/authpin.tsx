@@ -109,8 +109,7 @@ const AuthPinForm = ({ id, user, success }: Props) => {
 
           if (
             res?.message ===
-              "penandatanganan dokumen gagal. pin sudah salah 3 kali" ||
-            res.message === "proses signing sudah selesai"
+            "penandatanganan dokumen gagal. salah OTP sudah 5 kali"
           ) {
             const params = {
               user_identifier: user,
@@ -128,9 +127,9 @@ const AuthPinForm = ({ id, user, success }: Props) => {
                 );
               }, 2000);
             }
+          } else {
+            setIsProcessVerify(false);
           }
-
-          setIsProcessVerify(false);
         }
       })
       .catch((err) => {
