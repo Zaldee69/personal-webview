@@ -634,7 +634,7 @@ const Liveness = (props: Props) => {
                 }
               }, 1000);
             }
-          }
+          } 
         }
       }
       localStorage.removeItem("retry_count");
