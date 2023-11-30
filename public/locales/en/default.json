@@ -297,7 +297,7 @@
   "contactUs": "Contact Us",
   "contactCantika": "Contact <0>cantika@tilaka.id</0>",
   "furtherQuestions": "Further questions?",
-  "OTPModalSubtitle": "The OTP code has been sent to your email address for the verification process",
+  "OTPModalSubtitle": "The OTP code has been sent to your email address for the email verification process",
   "OTPResendMaxLimit": "You have reached the maximum limit for sending OTP codes",
   "livenessSelfiePreview": {
     "title": "Selfie Image",
