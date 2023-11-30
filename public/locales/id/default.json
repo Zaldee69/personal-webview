@@ -297,5 +297,10 @@
   "contactCantika": "Hubungi <0>cantika@tilaka.id</0>",
   "furtherQuestions": "Pertanyaan lebih lanjut?",
   "OTPModalSubtitle": "Kode OTP dikirimkan ke alamat email Anda untuk proses verifikasi",
-  "OTPResendMaxLimit": "Anda telah mencapai batas maksimal pengiriman kode OTP"
+  "OTPResendMaxLimit": "Anda telah mencapai batas maksimal pengiriman kode OTP",
+  "livenessSelfiePreview": {
+    "title": "Hasil Hadap Depan",
+    "subtitle": "Gambar ini akan digunakan untuk verifikasi Dukcapil, pastikan wajah Anda terlihat dengan jelas. Maksimal pengulangan adalah 3x.",
+    "retryBtn": "Ulang"
+  }
 }
