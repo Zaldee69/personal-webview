@@ -467,15 +467,16 @@ const Liveness = (props: Props) => {
             registration_id: router.query.request_id,
           };
 
-          if (result.data.reason_code) {
-            query.reason_code = result.data.reason_code;
-          }
-
           const params = {
             register_id: props.uuid,
             request_id: props.uuid,
             status: "S",
+            reason_code: "",
           };
+
+          if (result.data.reason_code) {
+            query.reason_code = result.data.reason_code;
+          }
 
           RestKycFinalForm({
             payload: {
@@ -484,6 +485,7 @@ const Liveness = (props: Props) => {
           })
             .then((res) => {
               if (res.success) {
+                params.reason_code = res.data.reason_code!;
                 if (routerQuery.redirect_url) {
                   const queryString = new URLSearchParams(
                     params as any
@@ -632,7 +634,7 @@ const Liveness = (props: Props) => {
                 }
               }, 1000);
             }
-          } 
+          }
         }
       }
       localStorage.removeItem("retry_count");
@@ -717,6 +719,12 @@ const Liveness = (props: Props) => {
     if (props.verified) {
       generateAction();
       dispatch(resetImages());
+    }
+    if (!props.success && props.message === "request_id tidak valid") {
+      setIsDisabled(true)
+      toast.error("registrationId tidak valid", {
+        icon: <XIcon />,
+      });
     }
   }, [router.isReady]); // eslint-disable-line react-hooks/exhaustive-deps
 
