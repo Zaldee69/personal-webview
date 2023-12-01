@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 import { AppDispatch, RootState } from "@/redux/app/store";
 import i18n from "i18";
-import { Dispatch, SetStateAction, useEffect } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Heading from "./atoms/Heading";
 import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
@@ -17,6 +17,7 @@ import {
   setFRFailedCount as setIsRetryCount,
 } from "@/utils/frFailedCountGetterSetter";
 import Footer from "./Footer";
+import { cn } from "@/utils/twClassMerge";
 
 const LivenessImagePreview = ({
   verifyLiveness,
@@ -29,6 +30,8 @@ const LivenessImagePreview = ({
   const images = useSelector((state: RootState) => state.liveness.images);
   const isDone = useSelector((state: RootState) => state.liveness.isDone);
 
+  const [isDisabledRetryButton, setDisabledRetryButton] = useState<boolean>(false);
+
   const dispatch: AppDispatch = useDispatch();
 
   const { t }: any = i18n;
@@ -36,7 +39,10 @@ const LivenessImagePreview = ({
   useEffect(() => {
     const retryCount = getRetryCount("retry_count");
     if (retryCount >= 3) {
-      verifyLiveness();
+      setTimeout(() => {
+        verifyLiveness();
+      }, 5000);
+      setDisabledRetryButton(true);
     }
   }, [isDone]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -68,6 +74,7 @@ const LivenessImagePreview = ({
         {t("next")}
       </Button>
       <Button
+        disabled={isDisabledRetryButton}
         onClick={() => {
           dispatch(resetImages());
           setCurrentActionIndex(0);
@@ -87,7 +94,9 @@ const LivenessImagePreview = ({
           paddingLeft: 0,
           paddingRight: 0,
         }}
-        className="border px-3 mt-2 py-2.5 text-sm font-medium block mx-auto w-40"
+        className={cn(
+          "border px-3 mt-2 py-2.5 text-sm font-medium mx-auto w-40"
+        )}
       >
         {t("livenessSelfiePreview.retryBtn")}
       </Button>
