@@ -18,6 +18,7 @@ import { IOTPDedicatedResponse } from "infrastructure/rest/personal/types";
 import { toast } from "react-toastify";
 import CheckOvalIcon from "@/public/icons/CheckOvalIcon";
 import XIcon from "@/public/icons/XIcon";
+import { concateRedirectUrlParams } from "@/utils/concateRedirectUrlParams";
 
 interface Props extends IOTPDedicatedResponse {
   id: string;
@@ -94,30 +95,48 @@ const PinFormDedicatedChannel = ({ id, user, success }: Props) => {
     })
       .then((res) => {
         if (res.success) {
-          router.push({
-            pathname: handleRoute("/signing/success"),
-            query: {
-              redirect_url,
-              user_identifier: res.data.tilaka_name,
-              request_id: res.data.request_id,
-              status: "Sukses",
-              signing_id: id,
-            },
+          toast.success("Penandatangan Berhasil", {
+            icon: <CheckOvalIcon />,
           });
+          const params = {
+            redirect_url,
+            user_identifier: res.data.tilaka_name,
+            request_id: res.data.request_id,
+            status: "Sukses",
+            signing_id: id,
+          };
+
+          if (redirect_url) {
+            const queryString = new URLSearchParams(params as any).toString();
+            setTimeout(() => {
+              window.top!.location.href = concateRedirectUrlParams(
+                redirect_url as string,
+                queryString
+              );
+            }, 2000);
+          }
         } else {
-          if (
-            res.message === "authhashsign gagal. salah OTP sudah 5 kali"
-          ) {
-            router.push({
-              pathname: handleRoute("signing/failure"),
-              query: {
-                redirect_url,
-                user_identifier: user,
-                request_id: res.data.request_id,
-                status: "Blocked",
-                signing_id: id,
-              },
+          if (res.message === "authhashsign gagal. salah OTP sudah 5 kali") {
+            toast.error(res.message, {
+              icon: <XIcon />,
             });
+            const params = {
+              redirect_url,
+              user_identifier: user,
+              request_id: res.data.request_id,
+              status: "Blocked",
+              signing_id: id,
+            };
+
+            if (redirect_url) {
+              const queryString = new URLSearchParams(params as any).toString();
+              setTimeout(() => {
+                window.top!.location.href = concateRedirectUrlParams(
+                  redirect_url as string,
+                  queryString
+                );
+              }, 2000);
+            }
           } else {
             toast.error(res.message, {
               icon: <XIcon />,
