@@ -7,7 +7,6 @@ import Heading from "./atoms/Heading";
 import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
 import {
   resetImages,
-  setImages,
   setIsDone,
   setIsRetry,
 } from "@/redux/slices/livenessSlice";
@@ -17,6 +16,7 @@ import {
   getFRFailedCount as getRetryCount,
   setFRFailedCount as setIsRetryCount,
 } from "@/utils/frFailedCountGetterSetter";
+import Footer from "./Footer";
 
 const LivenessImagePreview = ({
   verifyLiveness,
@@ -28,10 +28,6 @@ const LivenessImagePreview = ({
   const themeConfiguration = useSelector((state: RootState) => state.theme);
   const images = useSelector((state: RootState) => state.liveness.images);
   const isDone = useSelector((state: RootState) => state.liveness.isDone);
-
-  const tempActionImage = images.filter(
-    (image) => image.action !== "look_straight"
-  )[0];
 
   const dispatch: AppDispatch = useDispatch();
 
@@ -50,7 +46,7 @@ const LivenessImagePreview = ({
       <Paragraph size="sm" className="mt-2 whitespace-pre-line">
         {t("livenessSelfiePreview.subtitle")}
       </Paragraph>
-      <div className="relative mt-4">
+      <div className="my-9">
         <img
           className="rounded-md"
           src={images.filter((el) => el.action === "look_straight")[0].value}
@@ -67,14 +63,13 @@ const LivenessImagePreview = ({
             themeConfiguration?.data.button_color as string
           ),
         }}
-        className="bg-neutral200 mt-4 px-3 py-2.5 text-sm font-medium block mx-auto w-40"
+        className="bg-neutral200 mt-6 px-3 py-2.5 text-sm font-medium block mx-auto w-40"
       >
         {t("next")}
       </Button>
       <Button
         onClick={() => {
           dispatch(resetImages());
-          dispatch(setImages(tempActionImage));
           setCurrentActionIndex(0);
           dispatch(setIsDone(false));
           dispatch(setIsRetry(true));
@@ -96,6 +91,9 @@ const LivenessImagePreview = ({
       >
         {t("livenessSelfiePreview.retryBtn")}
       </Button>
+      <div className="mt-20">
+        <Footer />
+      </div>
     </div>
   );
 };
