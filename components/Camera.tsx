@@ -385,7 +385,7 @@ const Camera: React.FC<Props> = ({
       } else {
         setCurrentActionState(actionList[currentActionIndex]);
       }
-      if (currentActionIndex === actionList.length || isRetry) {
+      if (currentActionIndex === actionList.length) {
         setIsCurrentStepDone(true);
         webcamRef.current = null;
         dispatch(setIsDone(true));
