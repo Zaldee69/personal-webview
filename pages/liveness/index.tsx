@@ -497,7 +497,7 @@ const Liveness = (props: Props) => {
                   );
                 } else {
                   router.replace({
-                    pathname: handleRoute("form/success/"),
+                    pathname: handleRoute("form/success"),
                     query,
                   });
                 }
@@ -627,14 +627,25 @@ const Liveness = (props: Props) => {
                     query.reason_code = result?.data.reason_code;
                   }
 
-                  router.push({
-                    pathname: handleRoute("liveness-failure"),
-                    query,
-                  });
+                  if (result.data.pin_form) {
+                    router.push({
+                      pathname: handleRoute("liveness-failure"),
+                      query: {
+                        status: status,
+                        register_id: routerQuery.request_id,
+                        request_id: routerQuery.request_id,
+                      },
+                    });
+                  } else {
+                    router.push({
+                      pathname: handleRoute("liveness-failure"),
+                      query,
+                    });
+                  }
                 }
               }, 1000);
             }
-          } 
+          }
         }
       }
       localStorage.removeItem("retry_count");
@@ -721,7 +732,7 @@ const Liveness = (props: Props) => {
       dispatch(resetImages());
     }
     if (!props.success && props.message === "request_id tidak valid") {
-      setIsDisabled(true)
+      setIsDisabled(true);
       toast.error("registrationId tidak valid", {
         icon: <XIcon />,
       });
