@@ -99,7 +99,6 @@ const PinFormDedicatedChannel = ({ id, user, success }: Props) => {
             icon: <CheckOvalIcon />,
           });
           const params = {
-            redirect_url,
             user_identifier: res.data.tilaka_name,
             request_id: res.data.request_id,
             status: "Sukses",
@@ -121,7 +120,6 @@ const PinFormDedicatedChannel = ({ id, user, success }: Props) => {
               icon: <XIcon />,
             });
             const params = {
-              redirect_url,
               user_identifier: user,
               request_id: res.data.request_id,
               status: "Blocked",
