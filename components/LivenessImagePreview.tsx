@@ -30,11 +30,28 @@ const LivenessImagePreview = ({
   const images = useSelector((state: RootState) => state.liveness.images);
   const isDone = useSelector((state: RootState) => state.liveness.isDone);
 
-  const [isDisabledRetryButton, setDisabledRetryButton] = useState<boolean>(false);
+  const [isHideRetryButton, setHideRetryButton] = useState<boolean>(false);
+  const [retakeButtonTitle, setRetakeButtonTitle] = useState<string>("");
 
   const dispatch: AppDispatch = useDispatch();
 
   const { t }: any = i18n;
+
+  const setButtonTitleForRetakeCount = (retryCount: number) => {
+    switch (retryCount) {
+      case 0:
+        setRetakeButtonTitle(t("livenessSelfiePreview.retake.1"));
+        break;
+
+      case 1:
+        setRetakeButtonTitle(t("livenessSelfiePreview.retake.2"));
+        break;
+
+      case 2:
+        setRetakeButtonTitle(t("livenessSelfiePreview.retake.3"));
+        break;
+    }
+  };
 
   useEffect(() => {
     const retryCount = getRetryCount("retry_count");
@@ -42,8 +59,14 @@ const LivenessImagePreview = ({
       setTimeout(() => {
         verifyLiveness();
       }, 5000);
-      setDisabledRetryButton(true);
+      setHideRetryButton(true);
     }
+    // else {
+    //   if (isDone) {
+    //     setIsRetryCount("retry_count", Number(retryCount) + 1);
+    //   }
+    // }
+    setButtonTitleForRetakeCount(Number(retryCount));
   }, [isDone]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
@@ -52,7 +75,7 @@ const LivenessImagePreview = ({
       <Paragraph size="sm" className="mt-2 whitespace-pre-line">
         {t("livenessSelfiePreview.subtitle")}
       </Paragraph>
-      <div className="my-9">
+      <div className="my-6">
         <img
           className="rounded-md"
           src={images.filter((el) => el.action === "look_straight")[0].value}
@@ -60,6 +83,7 @@ const LivenessImagePreview = ({
         />
       </div>
       <Button
+        size="none"
         onClick={() => {
           dispatch(setIsDone(false));
           verifyLiveness();
@@ -69,37 +93,39 @@ const LivenessImagePreview = ({
             themeConfiguration?.data.button_color as string
           ),
         }}
-        className="bg-neutral200 mt-6 px-3 py-2.5 text-sm font-medium block mx-auto w-40"
+        className="bg-neutral200 mt-6 px-3 py-2.5 text-sm font-medium block mx-auto w-44"
       >
         {t("next")}
       </Button>
-      <Button
-        disabled={isDisabledRetryButton}
-        onClick={() => {
-          dispatch(resetImages());
-          setCurrentActionIndex(0);
-          dispatch(setIsDone(false));
-          dispatch(setIsRetry(true));
-          const retryCount = Number(getRetryCount("retry_count"));
+      {isHideRetryButton ? null : (
+        <Button
+          size="none"
+          onClick={() => {
+            dispatch(resetImages());
+            setCurrentActionIndex(0);
+            dispatch(setIsDone(false));
+            dispatch(setIsRetry(true));
+            const retryCount = Number(getRetryCount("retry_count"));
 
-          setIsRetryCount("retry_count", retryCount + 1);
-        }}
-        style={{
-          color: themeConfigurationAvaliabilityChecker(
-            themeConfiguration?.data.button_color as string
-          ),
-          borderColor: themeConfigurationAvaliabilityChecker(
-            themeConfiguration?.data.button_color as string
-          ),
-          paddingLeft: 0,
-          paddingRight: 0,
-        }}
-        className={cn(
-          "border px-3 mt-2 py-2.5 text-sm font-medium mx-auto w-40"
-        )}
-      >
-        {t("livenessSelfiePreview.retryBtn")}
-      </Button>
+            setIsRetryCount("retry_count", retryCount + 1);
+          }}
+          style={{
+            color: themeConfigurationAvaliabilityChecker(
+              themeConfiguration?.data.button_color as string
+            ),
+            borderColor: themeConfigurationAvaliabilityChecker(
+              themeConfiguration?.data.button_color as string
+            ),
+       
+          }}
+          className={cn(
+            "border px-3 mt-2 py-2.5 text-sm font-medium mx-auto w-44"
+          )}
+        >
+          {retakeButtonTitle}
+        </Button>
+      )}
+
       <div className="mt-20">
         <Footer />
       </div>

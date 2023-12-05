@@ -301,8 +301,13 @@
   "OTPResendMaxLimit": "You have reached the maximum limit for sending OTP codes",
   "livenessSelfiePreview": {
     "title": "Selfie Image",
-    "subtitle": "This image will be used for Dukcapil verification, please ensure that the image is clear. \n Max retry are 3x.",
-    "retryBtn": "Retry"
+    "subtitle": "This image will be used for Dukcapil verification, please ensure that the image is clear. \n This image can be retaken up to 3 times.",
+    "retryBtn": "Retake",
+    "retake": {
+      "1": "1st Retake",
+      "2": "2nd Retake",
+      "3": "Last Retake"
+    }
   }
 }
 
