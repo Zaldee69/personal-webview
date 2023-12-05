@@ -737,6 +737,15 @@ const Liveness = (props: Props) => {
         icon: <XIcon />,
       });
     }
+    const currentUUID = localStorage.getItem("currentUUID");
+    if (currentUUID) {
+      if (currentUUID != routerQuery.request_id) {
+        localStorage.setItem("retry_count", "0");
+        localStorage.setItem("currentUUID", String(routerQuery.request_id));
+      }
+    } else {
+      localStorage.setItem("currentUUID", String(routerQuery.request_id));
+    }
   }, [router.isReady]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!isLivenessStarted) {

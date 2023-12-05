@@ -14,10 +14,11 @@ import Button from "./atoms/Button";
 import Paragraph from "./atoms/Paraghraph";
 import {
   getFRFailedCount as getRetryCount,
-  setFRFailedCount as setIsRetryCount,
+  setFRFailedCount as setRetryCount,
 } from "@/utils/frFailedCountGetterSetter";
 import Footer from "./Footer";
 import { cn } from "@/utils/twClassMerge";
+import { useRouter } from "next/router";
 
 const LivenessImagePreview = ({
   verifyLiveness,
@@ -36,6 +37,10 @@ const LivenessImagePreview = ({
   const dispatch: AppDispatch = useDispatch();
 
   const { t }: any = i18n;
+
+  const router = useRouter();
+
+  const { request_id } = router.query;
 
   const setButtonTitleForRetakeCount = (retryCount: number) => {
     switch (retryCount) {
@@ -62,7 +67,7 @@ const LivenessImagePreview = ({
       setHideRetryButton(true);
     } else {
       if (isDone) {
-        setIsRetryCount("retry_count", Number(retryCount) + 1);
+        setRetryCount("retry_count", Number(retryCount) + 1);
       }
     }
     setButtonTitleForRetakeCount(Number(retryCount));
