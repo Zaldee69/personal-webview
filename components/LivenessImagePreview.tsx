@@ -60,12 +60,11 @@ const LivenessImagePreview = ({
         verifyLiveness();
       }, 5000);
       setHideRetryButton(true);
+    } else {
+      if (isDone) {
+        setIsRetryCount("retry_count", Number(retryCount) + 1);
+      }
     }
-    // else {
-    //   if (isDone) {
-    //     setIsRetryCount("retry_count", Number(retryCount) + 1);
-    //   }
-    // }
     setButtonTitleForRetakeCount(Number(retryCount));
   }, [isDone]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -93,7 +92,7 @@ const LivenessImagePreview = ({
             themeConfiguration?.data.button_color as string
           ),
         }}
-        className="bg-neutral200 mt-6 px-3 py-2.5 text-sm font-medium block mx-auto w-44"
+        className="bg-neutral200 mt-[42px] px-3 py-2.5 text-sm font-medium block mx-auto w-44"
       >
         {t("next")}
       </Button>
@@ -105,9 +104,6 @@ const LivenessImagePreview = ({
             setCurrentActionIndex(0);
             dispatch(setIsDone(false));
             dispatch(setIsRetry(true));
-            const retryCount = Number(getRetryCount("retry_count"));
-
-            setIsRetryCount("retry_count", retryCount + 1);
           }}
           style={{
             color: themeConfigurationAvaliabilityChecker(
@@ -116,7 +112,6 @@ const LivenessImagePreview = ({
             borderColor: themeConfigurationAvaliabilityChecker(
               themeConfiguration?.data.button_color as string
             ),
-       
           }}
           className={cn(
             "border px-3 mt-2 py-2.5 text-sm font-medium mx-auto w-44"
