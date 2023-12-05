@@ -300,7 +300,13 @@
   "OTPResendMaxLimit": "Anda telah mencapai batas maksimal pengiriman kode OTP",
   "livenessSelfiePreview": {
     "title": "Hasil Hadap Depan",
-    "subtitle": "Gambar ini akan digunakan untuk verifikasi Dukcapil, pastikan wajah Anda terlihat dengan jelas. Maksimal pengulangan adalah 3x.",
-    "retryBtn": "Ulang"
+    "subtitle": "Gambar ini akan digunakan untuk verifikasi Dukcapil, pastikan wajah Anda terlihat dengan jelas. \n Gambar ini dapat diambil ulang hingga 3 kali.",
+    "retryBtn": "Ambil Ulang",
+    "retake": {
+      "1": "Ambil ulang ke-1",
+      "2": "Ambil ulang ke-2",
+      "3": "Ambil ulang terakhir"
+    }
   }
+  
 }
