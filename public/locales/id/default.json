@@ -303,12 +303,12 @@
     "subtitle": "Gambar ini akan digunakan untuk verifikasi Dukcapil. Maksimal pengulangan adalah 3 kali.",
     "retryBtn": "Ambil Ulang",
     "retake": {
-      "1": "Ambil ulang (1/3)",
-      "2": "Ambil ulang (2/3)",
-      "3": "Ambil ulang (3/3)"
+      "1": "Ambil Ulang (1/3)",
+      "2": "Ambil Ulang (2/3)",
+      "3": "Ambil Ulang (3/3)"
     },
     "hasReachMaxRetakeSubtitle": "Maksimum percobaan pengambilan gambar telah tercapai.\nAnda akan diarahkan secara otomatis ke tahap berikutnya dalam 5 detik.",
-    "listHeading": "Pastikan Bahwa:",
+    "listHeading": "Pastikan bahwa:",
     "list1": "Wajah terlihat jelas dan tidak terpotong",
     "list2": "Wajah tidak tertutup kacamata, masker atau topi",
     "list3": "Wajah menghadap kamera dengan latar belakang jelas, dan tidak ada orang lain",
