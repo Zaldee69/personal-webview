@@ -307,7 +307,7 @@
       "2": "Ambil ulang (2/3)",
       "3": "Ambil ulang (3/3)"
     },
-    "hasReachMaxRetakeSubtitle": "Jumlah percobaan pengambilan gambar maksimum telah tercapai. Anda akan di arahkan secara otomatis ke tahap berikutnya dalam 5 detik.",
+    "hasReachMaxRetakeSubtitle": "Maksimum percobaan pengambilan gambar telah tercapai.\nAnda akan diarahkan secara otomatis ke tahap berikutnya dalam 5 detik.",
     "listHeading": "Pastikan Bahwa:",
     "list1": "Wajah terlihat jelas dan tidak terpotong",
     "list2": "Wajah tidak tertutup kacamata, masker atau topi",
