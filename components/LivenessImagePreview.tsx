@@ -108,7 +108,9 @@ const LivenessImagePreview = ({
           <Paragraph size="sm">{t("livenessSelfiePreview.list2")}</Paragraph>
         </span>
         <span className="flex gap-2 items-start">
-          <CheckEvalGreenIcon />{" "}
+          <div className="flex-shrink">
+            <CheckEvalGreenIcon />
+          </div>
           <Paragraph size="sm">{t("livenessSelfiePreview.list3")}</Paragraph>
         </span>
         <span className="flex gap-2 items-start">
@@ -116,6 +118,12 @@ const LivenessImagePreview = ({
             <CheckEvalGreenIcon />
           </div>
           <Paragraph size="sm">{t("livenessSelfiePreview.list4")}</Paragraph>
+        </span>
+        <span className="flex gap-2 items-start">
+          <div className="flex-shrink">
+            <CheckEvalGreenIcon />
+          </div>
+          <Paragraph size="sm">{t("livenessSelfiePreview.list5")}</Paragraph>
         </span>
       </div>
 

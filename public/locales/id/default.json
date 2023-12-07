@@ -310,9 +310,10 @@
     "hasReachMaxRetakeSubtitle": "Jumlah percobaan pengambilan gambar maksimum telah tercapai. Anda akan di arahkan secara otomatis ke tahap berikutnya dalam 5 detik.",
     "listHeading": "Pastikan Bahwa:",
     "list1": "Wajah terlihat jelas dan tidak terpotong",
-    "list2": "Wajah menghadap kamera dengan latar belakang jelas, dan tidak ada orang lain",
-    "list3": "Gambar diambil di tempat terang",
-    "list4": "Mengenakan pakaian sopan dan tidak tertutup kacamata, masker atau topi"
+    "list2": "Wajah tidak tertutup kacamata, masker atau topi",
+    "list3": "Wajah menghadap kamera dengan latar belakang jelas, dan tidak ada orang lain",
+    "list4": "Mengenakan pakaian sopan",
+    "list5": "Gambar diambil di tempat terang"
   }
   
 }
