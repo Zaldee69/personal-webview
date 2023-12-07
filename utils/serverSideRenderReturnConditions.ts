@@ -244,7 +244,8 @@ export const serverSideRenderReturnConditions = ({
         };
       } else if (
         checkStepResult.res?.data?.route === "penautan" ||
-        checkStepResult.res?.data?.route === "penautan_consent"
+        checkStepResult.res?.data?.route === "penautan_consent" ||
+        checkStepResult.res?.data?.route === "penautan_company"
       ) {
         const params: any = { ...cQuery, request_id: uuid };
         const queryString = new URLSearchParams(params as any).toString();
