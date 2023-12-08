@@ -299,9 +299,9 @@ const ReEnrollMekari = () => {
           });
         }
       }
-      localStorage.removeItem("retry_count");
+      localStorage.removeItem((routerQuery.request_id + "c") as string);
     } catch (e: any) {
-      localStorage.removeItem("retry_count");
+      localStorage.removeItem((routerQuery.request_id + "c") as string);
       const msg = e.response?.data?.data?.errors?.[0];
       if (msg) {
         toast.error(msg, {
@@ -384,15 +384,6 @@ const ReEnrollMekari = () => {
     if (!router.isReady) return;
     checkStep();
     dispatch(resetImages());
-    const currentUUID = localStorage.getItem("currentUUID");
-    if (currentUUID) {
-      if (currentUUID != routerQuery.request_id) {
-        localStorage.setItem("retry_count", "0");
-        localStorage.setItem("currentUUID", String(routerQuery.request_id));
-      }
-    } else {
-      localStorage.setItem("currentUUID", String(routerQuery.request_id));
-    }
   }, [router.isReady]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (isDone && !isLoading) {

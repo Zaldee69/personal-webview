@@ -648,9 +648,9 @@ const Liveness = (props: Props) => {
           }
         }
       }
-      localStorage.removeItem("retry_count");
+      localStorage.removeItem((routerQuery.request_id + "c") as string);
     } catch (e) {
-      localStorage.removeItem("retry_count");
+      localStorage.removeItem((routerQuery.request_id + "c") as string);
       toast.dismiss("verification");
       toast(`${e || "Tidak merespon!"}`, {
         type: "error",
@@ -736,15 +736,6 @@ const Liveness = (props: Props) => {
       toast.error("registrationId tidak valid", {
         icon: <XIcon />,
       });
-    }
-    const currentUUID = localStorage.getItem("currentUUID");
-    if (currentUUID) {
-      if (currentUUID != routerQuery.request_id) {
-        localStorage.setItem("retry_count", "0");
-        localStorage.setItem("currentUUID", String(routerQuery.request_id));
-      }
-    } else {
-      localStorage.setItem("currentUUID", String(routerQuery.request_id));
     }
   }, [router.isReady]); // eslint-disable-line react-hooks/exhaustive-deps
 

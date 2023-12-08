@@ -18,8 +18,10 @@ import {
 } from "@/utils/frFailedCountGetterSetter";
 import Footer from "./Footer";
 import { cn } from "@/utils/twClassMerge";
-import { useRouter } from "next/router";
 import CheckEvalGreenIcon from "@/public/icons/CheckOvalGreenIcon";
+import { useCountdown } from "@/hooks/useCountdown";
+import { Trans } from "react-i18next";
+import { useRouter } from "next/router";
 
 const LivenessImagePreview = ({
   verifyLiveness,
@@ -33,30 +35,21 @@ const LivenessImagePreview = ({
   const isDone = useSelector((state: RootState) => state.liveness.isDone);
 
   const [isHideRetryButton, setHideRetryButton] = useState<boolean>(false);
-  const [retakeButtonTitle, setRetakeButtonTitle] = useState<string>("");
+
+  const router = useRouter();
 
   const dispatch: AppDispatch = useDispatch();
 
   const { t }: any = i18n;
 
-  const setButtonTitleForRetakeCount = (retryCount: number) => {
-    switch (retryCount) {
-      case 0:
-        setRetakeButtonTitle(t("livenessSelfiePreview.retake.1"));
-        break;
+  const second = 5;
 
-      case 1:
-        setRetakeButtonTitle(t("livenessSelfiePreview.retake.2"));
-        break;
-
-      case 2:
-        setRetakeButtonTitle(t("livenessSelfiePreview.retake.3"));
-        break;
-    }
-  };
+  const { timeLeft } = useCountdown(second);
+  const { request_id } = router.query;
 
   useEffect(() => {
-    const retryCount = getRetryCount("retry_count");
+    if (!router.isReady) return;
+    const retryCount = getRetryCount((request_id + "c") as string);
     if (retryCount >= 3) {
       setTimeout(() => {
         verifyLiveness();
@@ -64,10 +57,9 @@ const LivenessImagePreview = ({
       setHideRetryButton(true);
     } else {
       if (isDone) {
-        setRetryCount("retry_count", Number(retryCount) + 1);
+        setRetryCount((request_id + "c") as string, Number(retryCount) + 1);
       }
     }
-    setButtonTitleForRetakeCount(Number(retryCount));
   }, [isDone]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
@@ -75,9 +67,16 @@ const LivenessImagePreview = ({
       <Heading>{t("livenessSelfiePreview.title")}</Heading>
 
       <Paragraph size="sm" className="mt-2 whitespace-pre-line">
-        {isHideRetryButton
-          ? t("livenessSelfiePreview.hasReachMaxRetakeSubtitle")
-          : t("livenessSelfiePreview.subtitle")}
+        {isHideRetryButton ? (
+          <Trans
+            values={{
+              timeLeft: timeLeft <= 0 ? 0 : timeLeft,
+            }}
+            i18nKey="livenessSelfiePreview.hasReachMaxRetakeSubtitle"
+          ></Trans>
+        ) : (
+          t("livenessSelfiePreview.subtitle")
+        )}
       </Paragraph>
 
       <div className="my-6">
@@ -164,7 +163,11 @@ const LivenessImagePreview = ({
             "border px-3 mt-2 py-2.5 text-sm font-medium mx-auto w-44"
           )}
         >
-          {retakeButtonTitle}
+          {t(
+            `livenessSelfiePreview.retake.${Number(
+              getRetryCount((request_id + "c") as string)
+            )}`
+          )}
         </Button>
       )}
 
