@@ -45,11 +45,12 @@ const LivenessImagePreview = ({
   const second = 5;
 
   const { timeLeft } = useCountdown(second);
-  const { request_id } = router.query;
+  const { request_id, issue_id } = router.query;
 
   useEffect(() => {
     if (!router.isReady) return;
-    const retryCount = getRetryCount((request_id + "c") as string);
+    const UUID = request_id ? request_id : issue_id;
+    const retryCount = getRetryCount((UUID + "c") as string);
     if (retryCount >= 3) {
       setTimeout(() => {
         verifyLiveness();
@@ -57,7 +58,7 @@ const LivenessImagePreview = ({
       setHideRetryButton(true);
     } else {
       if (isDone) {
-        setRetryCount((request_id + "c") as string, Number(retryCount) + 1);
+        setRetryCount((UUID + "c") as string, Number(retryCount) + 1);
       }
     }
   }, [isDone]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -165,7 +166,7 @@ const LivenessImagePreview = ({
         >
           {t(
             `livenessSelfiePreview.retake.${Number(
-              getRetryCount((request_id + "c") as string)
+              getRetryCount((request_id ? request_id + "c" : issue_id + "c") as string)
             )}`
           )}
         </Button>
