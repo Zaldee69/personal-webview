@@ -299,9 +299,9 @@ const ReEnrollMekari = () => {
           });
         }
       }
-      localStorage.removeItem((routerQuery.request_id + "c") as string);
+      localStorage.removeItem((routerQuery.issue_id + "c") as string);
     } catch (e: any) {
-      localStorage.removeItem((routerQuery.request_id + "c") as string);
+      localStorage.removeItem((routerQuery.issue_id + "c") as string);
       const msg = e.response?.data?.data?.errors?.[0];
       if (msg) {
         toast.error(msg, {
