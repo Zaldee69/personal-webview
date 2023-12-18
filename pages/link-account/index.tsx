@@ -239,7 +239,7 @@ const LinkAccount = (props: Props) => {
         });
       } else {
         toast.dismiss("load");
-        if (data.data.data[2] === "penautan") {
+        if (data.data.data[2] === "penautan" || data.data.data[2] === "penautan_company") {
           setModal(true);
         } else if (data.data.data[2] === "penautan_consent") {
           setModalConsent({
