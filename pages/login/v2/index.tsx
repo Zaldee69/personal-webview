@@ -300,16 +300,16 @@ const Login = ({}: IPropsLogin) => {
                   query: router.query
                 }}
                 passHref
-                legacyBehavior
+                target="_blank"
               >
-                <a style={{
+                <p style={{
                     color: themeConfigurationAvaliabilityChecker(
                       themeConfiguration?.data.action_font_color as string
                     ),
                   }}
                   className={buttonVariants({ variant: "ghost", size: "none" })}>
                   {t("linkAccountForgotPasswordButton")}
-                </a>
+                </p>
               </Link>
               <div className="block mx-2.5">
                 <Image
@@ -320,17 +320,20 @@ const Login = ({}: IPropsLogin) => {
                 />
               </div>
               <Link href={{
-                pathname: handleRoute("forgot-tilaka-name"),
-                query: router.query
-              }} legacyBehavior passHref>
-                <a style={{
+                    pathname: handleRoute("forgot-tilaka-name"),
+                    query: router.query
+                  }}               
+                    rel="noopener noreferrer"
+                    passHref
+                  >
+                <p style={{
                     color: themeConfigurationAvaliabilityChecker(
                       themeConfiguration?.data.action_font_color as string
                     ),
                   }}
                   className={buttonVariants({ variant: "ghost", size: "none" })}>
                   {t("linkAccountForgotTilakaName")}
-                </a>
+                </p>
               </Link>
             </div>
           </div>

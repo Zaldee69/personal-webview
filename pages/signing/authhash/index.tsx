@@ -714,9 +714,10 @@ const Login = ({}: IPropsLogin) => {
                   query: router.query,
                 }}
                 passHref
-                legacyBehavior
+                target="_blank"
+                rel="noopener noreferrer"
               >
-                <a
+                <p
                   style={{
                     color: themeConfigurationAvaliabilityChecker(
                       themeConfiguration?.data.action_font_color as string
@@ -725,7 +726,7 @@ const Login = ({}: IPropsLogin) => {
                   className={buttonVariants({ variant: "ghost", size: "none" })}
                 >
                   {t("linkAccountForgotPasswordButton")}
-                </a>
+                </p>
               </Link>
               <div className="block mx-2.5">
                 <Image
@@ -741,9 +742,10 @@ const Login = ({}: IPropsLogin) => {
                   query: router.query,
                 }}
                 passHref
-                legacyBehavior
+                target="_blank"
+                rel="noopener noreferrer"
               >
-                <a
+                <p
                   style={{
                     color: themeConfigurationAvaliabilityChecker(
                       themeConfiguration?.data.action_font_color as string
@@ -752,7 +754,7 @@ const Login = ({}: IPropsLogin) => {
                   className={buttonVariants({ variant: "ghost", size: "none" })}
                 >
                   {t("linkAccountForgotTilakaName")}
-                </a>
+                </p>
               </Link>
             </div>
           </div>

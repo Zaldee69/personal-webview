@@ -405,10 +405,11 @@ const LinkAccount = (props: Props) => {
                 pathname: handleRoute("forgot-password"),
                 query: router.query,
               }}
+              target="_blank"
+              rel="noopener noreferrer"
               passHref
-              legacyBehavior
             >
-              <a
+              <p
                 style={{
                   color: themeConfigurationAvaliabilityChecker(
                     themeConfiguration?.data.action_font_color as string
@@ -421,7 +422,7 @@ const LinkAccount = (props: Props) => {
                 })}
               >
                 {t("linkAccountForgotPasswordButton")}
-              </a>
+              </p>
             </Link>
             <div className="block mx-2.5">
               <Image
@@ -436,10 +437,11 @@ const LinkAccount = (props: Props) => {
                 pathname: handleRoute("forgot-tilaka-name"),
                 query: router.query,
               }}
+              target="_blank"
+              rel="noopener noreferrer"
               passHref
-              legacyBehavior
             >
-              <a
+              <p
                 style={{
                   color: themeConfigurationAvaliabilityChecker(
                     themeConfiguration?.data.action_font_color as string
@@ -452,7 +454,7 @@ const LinkAccount = (props: Props) => {
                 })}
               >
                 {t("linkAccountForgotTilakaName")}
-              </a>
+              </p>
             </Link>
           </div>
           <Button
