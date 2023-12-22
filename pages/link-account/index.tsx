@@ -60,6 +60,7 @@ type Tform = {
 type IModal = {
   modal: boolean;
   setModal: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsDisabled: React.Dispatch<React.SetStateAction<boolean>>;
   formSetter: React.Dispatch<React.SetStateAction<Tform>>;
   tilakaName: string;
 };
@@ -486,6 +487,7 @@ const LinkAccount = (props: Props) => {
         <Footer />
       </div>
       <FRModal
+        setIsDisabled={setIsLoading}
         formSetter={formSetter}
         tilakaName={form.tilaka_name}
         modal={modal}
@@ -508,7 +510,13 @@ const LinkAccount = (props: Props) => {
   );
 };
 
-const FRModal = ({ modal, setModal, tilakaName, formSetter }: IModal) => {
+const FRModal = ({
+  modal,
+  setModal,
+  tilakaName,
+  formSetter,
+  setIsDisabled,
+}: IModal) => {
   const [isFRSuccess, setIsFRSuccess] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const { t }: any = i18n;
@@ -595,6 +603,7 @@ const FRModal = ({ modal, setModal, tilakaName, formSetter }: IModal) => {
       callbackCaptureProcessor={captureProcessor}
       signingFailedRedirectTo={handleRoute("login")}
       title={t("linkingAccount")}
+      onCancelCallback={() => setIsDisabled(false)}
     />
   );
 };

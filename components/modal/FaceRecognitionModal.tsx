@@ -21,40 +21,52 @@ interface FaceRecognitionModalProps {
   setIsShowModal: React.Dispatch<React.SetStateAction<boolean>>;
   title: string;
   isDisabled: boolean;
+  onCancelCallback?: () => void;
 }
 
-const FaceRecognitionModal: React.FC<FaceRecognitionModalProps> = (props) => {
+const FaceRecognitionModal: React.FC<FaceRecognitionModalProps> = ({
+  isShowModal,
+  title,
+  setIsShowModal,
+  signingFailedRedirectTo,
+  callbackCaptureProcessor,
+  onCancelCallback = () => {},
+  isDisabled,
+}) => {
   const [isFRSuccess, setIsFRSuccess] = useState<boolean>(false);
   const [isUserMediaError, setIsUserMediaError] = useState<boolean>(false);
 
   const themeConfiguration = useSelector((state: RootState) => state.theme);
 
   const { t }: any = i18n;
-  return props.isShowModal ? (
+  return isShowModal ? (
     <ModalLayout size="md">
       {isUserMediaError ? (
         <CameraNotFound />
       ) : (
         <Fragment>
-          <Heading className="block pt-2 text-center">{props.title}</Heading>
+          <Heading className="block pt-2 text-center">{title}</Heading>
           <Paragraph size="sm" className="mt-2 block text-center">
             {t("frSubtitle1")}
           </Paragraph>
           <FRCamera
             setIsUserMediaError={setIsUserMediaError}
-            setModal={props.setIsShowModal}
+            setModal={setIsShowModal}
             setIsFRSuccess={setIsFRSuccess}
-            signingFailedRedirectTo={props.signingFailedRedirectTo}
+            signingFailedRedirectTo={signingFailedRedirectTo}
             tokenIdentifier="token_v2"
             countIdentifier="count_v2"
-            callbackCaptureProcessor={props.callbackCaptureProcessor}
+            callbackCaptureProcessor={callbackCaptureProcessor}
             countdownRepeatDelay={5}
           />
           <Button
-            onClick={() => props.setIsShowModal(false)}
+            onClick={() => {
+              setIsShowModal(false);
+              onCancelCallback();
+            }}
             size="none"
             variant="ghost"
-            disabled={props.isDisabled}
+            disabled={isDisabled}
             className="mt-3 mb-1 uppercase mx-auto font-bold disabled:opacity-50 text-base h-9"
             style={{
               color: themeConfigurationAvaliabilityChecker(
