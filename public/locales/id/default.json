@@ -314,6 +314,11 @@
     "list3": "Wajah menghadap kamera dengan latar belakang jelas, dan tidak ada orang lain",
     "list4": "Mengenakan pakaian sopan",
     "list5": "Gambar diambil di tempat terang"
+  },
+  "cameraNotFoundModal": {
+    "title": "Tidak dapat mengakses kamera",
+    "subtitle": "Tilaka memerlukan akses ke kamera Anda. klik ikon kamera diblokir <1/> pada browser Anda untuk memberikan akses kamera.",
+    "button": "Coba lagi"
   }
   
 }

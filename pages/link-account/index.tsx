@@ -45,6 +45,7 @@ import Paragraph from "@/components/atoms/Paraghraph";
 import ModalLayout from "@/components/layout/ModalLayout";
 import CloseIcon from "@/public/icons/CloseIcon";
 import TextInput from "@/components/atoms/TextInput";
+import FaceRecognitionModal from "@/components/modal/FaceRecognitionModal";
 
 type Props = {
   checkStepResultDataRoute: TKycCheckStepResponseData["data"]["route"];
@@ -60,7 +61,6 @@ type IModal = {
   modal: boolean;
   setModal: React.Dispatch<React.SetStateAction<boolean>>;
   formSetter: React.Dispatch<React.SetStateAction<Tform>>;
-  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
   tilakaName: string;
 };
 
@@ -102,8 +102,15 @@ const LinkAccount = (props: Props) => {
     show: boolean;
     data: { queryWithDynamicRedirectURL: any } | null;
   }>({ show: false, data: null });
-  const { nik, request_id, signing, setting, is_penautan, redirect_url, ...restRouterQuery } =
-    router.query;
+  const {
+    nik,
+    request_id,
+    signing,
+    setting,
+    is_penautan,
+    redirect_url,
+    ...restRouterQuery
+  } = router.query;
   const dispatch: AppDispatch = useDispatch();
   const data = useSelector((state: RootState) => state.login);
   const themeConfiguration = useSelector((state: RootState) => state.theme);
@@ -163,22 +170,22 @@ const LinkAccount = (props: Props) => {
         ...router.query,
       };
 
-      const setRedirectUrl= (url: string) => {
-        queryWithDynamicRedirectURL["redirect_url"] = url
-      }
+      const setRedirectUrl = (url: string) => {
+        queryWithDynamicRedirectURL["redirect_url"] = url;
+      };
 
       if (data.data.message.length > 0 && setting === "1") {
-        if(redirect_url){
-          setRedirectUrl(redirect_url as string)
-          queryWithDynamicRedirectURL["request-id"] = request_id
-          queryWithDynamicRedirectURL["tilaka-name"] = form.tilaka_name
+        if (redirect_url) {
+          setRedirectUrl(redirect_url as string);
+          queryWithDynamicRedirectURL["request-id"] = request_id;
+          queryWithDynamicRedirectURL["tilaka-name"] = form.tilaka_name;
         } else {
-          setRedirectUrl(data.data.message)
+          setRedirectUrl(data.data.message);
         }
       } else {
-        setRedirectUrl(redirect_url as string)
-        queryWithDynamicRedirectURL["request-id"] = request_id
-        queryWithDynamicRedirectURL["tilaka-name"] = form.tilaka_name
+        setRedirectUrl(redirect_url as string);
+        queryWithDynamicRedirectURL["request-id"] = request_id;
+        queryWithDynamicRedirectURL["tilaka-name"] = form.tilaka_name;
       }
       localStorage.setItem("refresh_token", data.data.data[1] as string);
       setStorageWithExpiresIn(
@@ -190,8 +197,8 @@ const LinkAccount = (props: Props) => {
       const params = {
         tilaka_name: form.tilaka_name,
         request_id,
-        redirect_url: data.data.message
-      }
+        redirect_url: data.data.message,
+      };
 
       // penautan and penautan_consent will redirected to /linking/* result page
       if (signing === "1" || setting === "1") {
@@ -213,7 +220,7 @@ const LinkAccount = (props: Props) => {
                 } else {
                   router.replace({
                     pathname: handleRoute("link-account/success"),
-                    query: {...params},
+                    query: { ...params },
                   });
                 }
               } else {
@@ -239,7 +246,10 @@ const LinkAccount = (props: Props) => {
         });
       } else {
         toast.dismiss("load");
-        if (data.data.data[2] === "penautan" || data.data.data[2] === "penautan_company") {
+        if (
+          data.data.data[2] === "penautan" ||
+          data.data.data[2] === "penautan_company"
+        ) {
           setModal(true);
         } else if (data.data.data[2] === "penautan_consent") {
           setModalConsent({
@@ -256,7 +266,9 @@ const LinkAccount = (props: Props) => {
     } else if (data.status === "FULLFILLED" && !data.data.success) {
       setIsLoading(false);
       if (
-        data.data.message.includes('Invalid Username / Password for Tilaka Name') ||
+        data.data.message.includes(
+          "Invalid Username / Password for Tilaka Name"
+        ) ||
         data.data.message === "User Not Found" ||
         data.data.message === "NIK Not Equals ON Tilaka System" ||
         data.data.message === "Error, tilaka Name not valid"
@@ -478,7 +490,6 @@ const LinkAccount = (props: Props) => {
         tilakaName={form.tilaka_name}
         modal={modal}
         setModal={setModal}
-        setIsLoading={setIsLoading}
       />
       <ModalConsent
         formSetter={formSetter}
@@ -497,18 +508,9 @@ const LinkAccount = (props: Props) => {
   );
 };
 
-const FRModal = ({
-  modal,
-  setModal,
-  tilakaName,
-  formSetter,
-  setIsLoading,
-}: IModal) => {
+const FRModal = ({ modal, setModal, tilakaName, formSetter }: IModal) => {
   const [isFRSuccess, setIsFRSuccess] = useState<boolean>(false);
-  const controller = new AbortController();
-
-  const themeConfiguration = useSelector((state: RootState) => state.theme);
-
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const { t }: any = i18n;
   const router = useRouter();
 
@@ -524,10 +526,12 @@ const FRModal = ({
         pathname: handleRoute(path),
         query: {
           ...router.query,
-          ...additionParams
+          ...additionParams,
         },
       });
     };
+
+    setIsLoading(true);
 
     RestPersonalFaceRecognition({ payload })
       .then((res) => {
@@ -538,11 +542,15 @@ const FRModal = ({
             position: "top-center",
           });
           setIsFRSuccess(true);
+          setIsLoading(false);
           resetFRFailedCount("count");
-          doRedirect("link-account/linking/success", {tilaka_name: tilakaName});
+          doRedirect("link-account/linking/success", {
+            tilaka_name: tilakaName,
+          });
         } else {
           setIsFRSuccess(false);
           setModal(false);
+          setIsLoading(false);
           if (res.message === "Gagal Validasi Wajah") {
             setTimeout(() => {
               setModal(true);
@@ -552,11 +560,15 @@ const FRModal = ({
           toast.error(res.message, { icon: <XIcon /> });
           setFRFailedCount("count", res.data.failMfa);
           if (res.data.failMfa >= 5) {
-            doRedirect("link-account/linking/failure", {tilaka_name: tilakaName, next_path: "manual_form"});
+            doRedirect("link-account/linking/failure", {
+              tilaka_name: tilakaName,
+              next_path: "manual_form",
+            });
           }
         }
       })
       .catch((err) => {
+        setIsLoading(false);
         setModal(false);
         toast.dismiss("info");
         if (err.response?.status === 401) {
@@ -575,48 +587,16 @@ const FRModal = ({
       });
   };
 
-  return modal ? (
-    <div
-      style={{ backgroundColor: "rgba(0, 0, 0, .5)" }}
-      className="fixed z-50 flex items-start transition-all duration-1000 justify-center w-full left-0 top-0 h-full "
-    >
-      <div className="bg-white max-w-md mt-20 pt-5 px-2 pb-3 rounded-md w-full mx-5 ">
-        <>
-          <Heading size="sm" className="block text-center">
-            {t("linkingAccount")}
-          </Heading>
-          <Paragraph size="sm" className="mt-2 block text-center">
-            {t("frSubtitle3")}
-          </Paragraph>
-          <FRCamera
-            setModal={setModal}
-            setIsFRSuccess={setIsFRSuccess}
-            signingFailedRedirectTo={handleRoute("login/v2")}
-            tokenIdentifier="token_v2"
-            callbackCaptureProcessor={captureProcessor}
-          />
-          <Button
-            onClick={() => {
-              controller.abort();
-              setIsLoading(false);
-              toast.dismiss("info");
-              restLogout({});
-              setModal(!modal);
-            }}
-            size="none"
-            className="mt-5 mb-2 uppercase text-base font-bold h-9"
-            style={{
-              color: themeConfigurationAvaliabilityChecker(
-                themeConfiguration?.data.action_font_color as string
-              ),
-            }}
-          >
-            {t("cancel")}
-          </Button>
-        </>
-      </div>
-    </div>
-  ) : null;
+  return (
+    <FaceRecognitionModal
+      isShowModal={modal}
+      isDisabled={isLoading}
+      setIsShowModal={setModal}
+      callbackCaptureProcessor={captureProcessor}
+      signingFailedRedirectTo={handleRoute("login")}
+      title={t("linkingAccount")}
+    />
+  );
 };
 
 const ModalConsent = ({
@@ -985,8 +965,7 @@ const ModalConsent = ({
           ...queryWithDynamicRedirectURL,
           reject_by_user: "1",
           tilaka_name: tilakaName,
-          request_id: router.query.request_id
-
+          request_id: router.query.request_id,
         },
       });
     } else {
@@ -1164,4 +1143,3 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 };
 
 export default LinkAccount;
-

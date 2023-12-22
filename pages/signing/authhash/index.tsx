@@ -38,6 +38,7 @@ import Paragraph from "@/components/atoms/Paraghraph";
 import Heading from "@/components/atoms/Heading";
 import Label from "@/components/atoms/Label";
 import useGenerateRedirectUrl from "@/hooks/useGenerateRedirectUrl";
+import FaceRecognitionModal from "@/components/modal/FaceRecognitionModal";
 
 interface IPropsLogin {}
 
@@ -68,9 +69,11 @@ const FRModal: React.FC<IModal> = ({ modal, setModal, callbackFailure }) => {
     fr?: "1";
   } & IParameterFromRequestSign = router.query;
   const [isFRSuccess, setIsFRSuccess] = useState<boolean>(false);
-  const themeConfiguration = useSelector((state: RootState) => state.theme);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const captureProcessor = (base64Img: string | null | undefined) => {
+    setIsLoading(true);
+
     RestSigningAuthhashsign({
       params: {
         id: routerQuery.id as string,
@@ -102,6 +105,7 @@ const FRModal: React.FC<IModal> = ({ modal, setModal, callbackFailure }) => {
           });
           setIsFRSuccess(true);
         } else {
+          setIsLoading(false);
           setIsFRSuccess(false);
           toast.dismiss("info");
           toast.error(res.message || "Ada yang salah", { icon: <XIcon /> });
@@ -128,6 +132,7 @@ const FRModal: React.FC<IModal> = ({ modal, setModal, callbackFailure }) => {
         }
       })
       .catch((err) => {
+        setIsLoading(false);
         setIsFRSuccess(false);
         toast.dismiss("info");
         if (err.response?.status === 401) {
@@ -164,43 +169,17 @@ const FRModal: React.FC<IModal> = ({ modal, setModal, callbackFailure }) => {
 
   const { t }: any = i18n;
 
-  return modal ? (
-    <div
-      style={{ backgroundColor: "rgba(0, 0, 0, .5)" }}
-      className="fixed z-50 flex items-start transition-all duration-1000 justify-center w-full left-0 top-0 h-full "
-    >
-      <div className="bg-white max-w-md mt-20 pt-5 px-2 pb-3 rounded-md w-full mx-5 ">
-        <>
-          <p className="font-poppins block text-center font-semibold ">
-            {t("frTitle")}
-          </p>
-          <span className="font-poppins mt-2 block text-center text-sm font-normal">
-            {t("frSubtitle1")}
-          </span>
-          <FRCamera
-            setModal={setModal}
-            setIsFRSuccess={setIsFRSuccess}
-            signingFailedRedirectTo={AUTHHASH_PATHNAME}
-            tokenIdentifier="token_hashsign"
-            callbackCaptureProcessor={captureProcessor}
-            countdownRepeatDelay={5}
-          />
-          <Button
-            onClick={() => setModal(!modal)}
-            size="none"
-            className="mt-3 uppercase text-base font-bold h-9"
-            style={{
-              color: themeConfigurationAvaliabilityChecker(
-                themeConfiguration?.data.action_font_color as string
-              ),
-            }}
-          >
-            {t("cancel")}
-          </Button>
-        </>
-      </div>
-    </div>
-  ) : null;
+  return (
+    <FaceRecognitionModal
+      isShowModal={modal}
+      isDisabled={isLoading}
+      setIsShowModal={setModal}
+      callbackCaptureProcessor={captureProcessor}
+      signingFailedRedirectTo={AUTHHASH_PATHNAME}
+      title={t("frTitle")}
+      tokenIdentifier="token_hashsign"
+    />
+  );
 };
 
 const OTPModal: React.FC<IModal> = ({

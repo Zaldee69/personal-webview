@@ -314,7 +314,7 @@ export const FRModal: React.FC<Active | any> = ({ modal, setModal }) => {
             <Paragraph className="mt-2 block text-center text-sm font-normal">
               {t("frSubtitle1")}
             </Paragraph>
-            <FRCamera setModal={setModal} setIsFRSuccess={setIsFRSuccess} />
+            {/* <FRCamera setModal={setModal} setIsFRSuccess={setIsFRSuccess} /> */}
             <Button
               onClick={() => setModal(!modal)}
               size="full"

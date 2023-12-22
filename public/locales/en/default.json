@@ -315,7 +315,11 @@
     "list3": "Face facing forward with clear background,\nand no other people",
     "list4": "Wearing modest clothing",
     "list5": "Image taken in a well-lit area"
-
+  },
+  "cameraNotFoundModal": {
+    "title": "Unable to access the camera",
+    "subtitle": "Tilaka needs access to your camera. Click on the blocked camera icon <1/> in your browser to grant camera access.",
+    "button": "Try again"
   }
 }
 

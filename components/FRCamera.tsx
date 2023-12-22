@@ -25,6 +25,7 @@ interface Props {
   countIdentifier?: string;
   callbackCaptureProcessor?: (base64Img: string | null | undefined) => void;
   countdownRepeatDelay?: number;
+  setIsUserMediaError: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 let dom: any;
@@ -37,6 +38,7 @@ const FRCamera = ({
   countIdentifier = "count",
   callbackCaptureProcessor,
   countdownRepeatDelay = 15,
+  setIsUserMediaError,
 }: Props) => {
   const constraint: Constraint = {
     width: 1280,
@@ -216,6 +218,7 @@ const FRCamera = ({
         minScreenshotHeight={960}
         videoConstraints={constraint}
         onLoadedMetadata={(e) => onPlay()}
+        onUserMediaError={() => setIsUserMediaError(true)}
       />
     </div>
   );
