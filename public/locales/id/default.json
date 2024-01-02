@@ -176,6 +176,7 @@
   "rememberMe": "Ingat saya",
   "livenessSuccess": "Liveness Berhasil",
   "settingSignatureSuccessTitle": "Pengaturan Tanda Tangan Berhasil",
+  "settingSignatureAndMFASuccessTitle": "Pengaturan Tanda Tangan dan MFA Berhasil",
   "settingMFASuccessTitle": "Pengaturan MFA Berhasil",
   "settingSignatureSuccessSubtitle": "Pengaturan tanda tangan berhasil disimpan.",
   "settingSignatureSuccessButton": "Kembali ke Halaman Utama",

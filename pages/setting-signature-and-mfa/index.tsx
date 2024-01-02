@@ -154,7 +154,7 @@ function SettingSignatureAndMFA({}: Props) {
       } else if (router.query.v2 === "1") {
         redirectPath = "signing/v2";
       } else {
-        redirectPath = "setting-signature/success";
+        redirectPath = "setting-signature-and-mfa/success";
       }
       setTimeout(() => {
         toast.dismiss("success");
