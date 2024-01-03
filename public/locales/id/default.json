@@ -227,7 +227,6 @@
       "label": "Foto e-KTP",
       "uploadPhoto": "Unggah Foto e-KTP",
       "errorMessage1": "Foto e-KTP wajib diunggah",
-      "errorMessage2": "Foto e-KTP tidak memenuhi ketentuan",
       "termTitle": "Ketentuan foto e-KTP",
       "term1": "Foto e-KTP terlihat dengan jelas.",
       "term2": "Data pada e-KTP dapat dibaca.",
@@ -236,8 +235,6 @@
     "photoSelfie": {
       "label": "Foto Selfie",
       "uploadPhoto": "Unggah Foto Selfie",
-      "errorMessage1": "Foto Selfie wajib diunggah",
-      "errorMessage2": "Foto Selfie tidak memenuhi ketentuan",
       "termTitle": "Ketentuan foto selfie",
       "term1": "Wajah menghadap depan dan terlihat dengan jelas.",
       "term2": "Lepaskan atribut seperti kacamata topi dan masker, serta rambut tidak menutupi wajah.",
@@ -245,7 +242,10 @@
       "term4": "Ekstensi dokumen berupa .JPG / .JPEG /.PNG dengan batas ukuran 2MB dan batas resolusi minimal 200 x 200 pixel."
     },
     "extensionAndSizeRequirement": "Max. 2MB (.jpg/.jpeg/.png)",
-    "resolutionMinimum": "Resolusi min. 200 x 200 pixel"
+    "resolutionMinimum": "Resolusi min. 200 x 200 pixel",
+    "invalidFileType": "Format file harus jpg, jpeg atau png",
+    "InvalidResolution": "Resolusi minimal 200x200 pixel",
+    "invalidFileSize": "File harus berukuran 1MB - 2MB"
   },
   "forgotPassword": {
     "title": "Lupa Kata Sandi",

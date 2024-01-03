@@ -227,7 +227,6 @@
       "label": "e-KTP",
       "uploadPhoto": "Upload e-KTP Image",
       "errorMessage1": "e-KTP image must be uploaded",
-      "errorMessage2": "e-KTP image does not meet requirements",
       "termTitle": "e-KTP Requirement",
       "term1": "e-KTP image clear and visible.",
       "term2": "e-KTP data are readable.",
@@ -246,7 +245,10 @@
     },
     "uploadPhoto": "Unggah Foto",
     "extensionAndSizeRequirement": "Max. 2MB (.jpg/.jpeg/.png)",
-    "resolutionMinimum": "Resolution min. 200 x 200 pixel"
+    "resolutionMinimum": "Resolution min. 200 x 200 pixel",
+    "invalidFileType": "File format must be JPG, JPEG or PNG",
+    "InvalidResolution": "Minimum resolution 200x200 pixels",
+    "invalidFileSize": "File size should be 1MB - 2MB"
   },
   "forgotPassword": {
     "title": "Forgot Password",

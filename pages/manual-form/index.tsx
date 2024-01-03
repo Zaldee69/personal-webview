@@ -51,8 +51,12 @@ type TModal = {
 
 type Props = {
   checkStepResultDataRoute: TKycCheckStepResponseData["data"]["route"];
-  nationalityType: TKycCheckStepResponseData["data"]["nationality_type"]
+  nationalityType: TKycCheckStepResponseData["data"]["nationality_type"];
 };
+
+const MAX_FILE_SIZE = 2000000;
+const MIN_FILE_SIZE = 1000000;
+const MIN_RESOLUTION = 200;
 
 const Index = (props: Props) => {
   const router = useRouter();
@@ -99,6 +103,7 @@ const Index = (props: Props) => {
 
   const onChangeHandler = async (e: React.ChangeEvent<HTMLInputElement>) => {
     let isSizeMoreThan2Mb: boolean = false;
+    let isSizeLessThan1Mb: boolean = false;
     let isRatioLessThan200Px: boolean = false;
     let isEligibleFileType: boolean = true;
     const { value, name, files } = e.target;
@@ -109,9 +114,11 @@ const Index = (props: Props) => {
 
       if (isEligibleFileType) {
         const { width, height } = (await resolutionChecker(file)) as any;
-        isSizeMoreThan2Mb = file.size > 2000000;
+        isSizeMoreThan2Mb = file.size > MAX_FILE_SIZE;
+        isSizeLessThan1Mb = file.size < MIN_FILE_SIZE;
         isRatioLessThan200Px =
-          (height < 200 || width < 200) && name === "photo_selfie";
+          (height < MIN_RESOLUTION || width < MIN_RESOLUTION) &&
+          name === "photo_selfie";
       }
     }
 
@@ -135,34 +142,30 @@ const Index = (props: Props) => {
     };
 
     setErrorMessage((prev) => {
-      const stateObj = { ...prev, [name]: "" };
-      switch (name) {
-        case "photo_ktp":
-          if (isSizeMoreThan2Mb || !isEligibleFileType) {
-            stateObj[name] = t("manualForm.photoKtp.errorMessage2");
-            setForm({
-              ...form,
-              ["photo_ktp"]: "",
-            });
-          }
-          break;
-        case "photo_selfie":
-          if (
-            isRatioLessThan200Px ||
-            isSizeMoreThan2Mb ||
-            !isEligibleFileType
-          ) {
-            stateObj[name] = t("manualForm.photoSelfie.errorMessage2");
-            setForm({
-              ...form,
-              ["photo_selfie"]: "",
-            });
-          }
-          break;
-        case "nik":
-          stateObj[name] = inputValidator.nikValidator(value);
-        default:
-          break;
+      const stateObj: any = { ...prev, [name]: "" };
+
+      if (name === "photo_ktp" || "photo_selfie") {
+        if (!isEligibleFileType) {
+          stateObj[name] = t("manualForm.invalidFileType");
+          setForm({
+            ...form,
+            [name]: "",
+          });
+        } else if (isRatioLessThan200Px) {
+          stateObj[name] = t("manualForm.InvalidResolution");
+          setForm({
+            ...form,
+            [name]: "",
+          });
+        } else if (isSizeMoreThan2Mb || isSizeLessThan1Mb) {
+          stateObj[name] = t("manualForm.invalidFileSize");
+          setForm({
+            ...form,
+            [name]: "",
+          });
+        }
+      } else if (name === "nik") {
+        stateObj[name] = inputValidator.nikValidator(value);
       }
 
       return stateObj;
@@ -222,7 +225,11 @@ const Index = (props: Props) => {
       (x) => x === ""
     );
 
-    if ((isFormEmpty || !isErrorMessageEmpty) && props.nationalityType !== "WNA") return;
+    if (
+      (isFormEmpty || !isErrorMessageEmpty) &&
+      props.nationalityType !== "WNA"
+    )
+      return;
 
     toast(`Loading...`, {
       type: "info",
@@ -240,7 +247,7 @@ const Index = (props: Props) => {
         ...form,
         register_id: request_id as string,
       };
-      
+
       const res = await RestPersonalPManualReg(formReq);
       if (!res.success) {
         setIsLoading(false);
@@ -372,7 +379,10 @@ const Index = (props: Props) => {
 
           <Button
             type="submit"
-            disabled={(errorMessage.nik.length > 1 || isLoading) && props.nationalityType !== "WNA"}
+            disabled={
+              (errorMessage.nik.length > 1 || isLoading) &&
+              props.nationalityType !== "WNA"
+            }
             size="sm"
             className="bg-primary btn font-semibold mt-7 h-9 hover:opacity-50"
             style={{
