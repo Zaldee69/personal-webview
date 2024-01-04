@@ -224,6 +224,14 @@ const LinkAccount = (props: Props) => {
                     query: { ...params },
                   });
                 }
+              } else if (setting === "1" && data.signatureBase64 == null){ 
+                router.replace({
+                  pathname: handleRoute("setting-signature"),
+                  query: {
+                    ...queryWithDynamicRedirectURL,
+                    tilaka_name: form.tilaka_name,
+                  },
+                });
               } else {
                 toast.dismiss();
                 toast.error("Sudah melakukan penautan");
