@@ -226,7 +226,7 @@ const LinkAccount = (props: Props) => {
                 }
               } else if (setting === "1" && (data.signatureBase64 == null || data.signatureBase64 == "null")){ 
                 router.replace({
-                  pathname: handleRoute("setting-signature"),
+                  pathname: handleRoute("setting-signature-and-mfa"),
                   query: {
                     ...queryWithDynamicRedirectURL,
                     tilaka_name: form.tilaka_name,
