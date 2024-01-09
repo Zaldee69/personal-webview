@@ -325,6 +325,7 @@ const Login = ({}: IPropsLogin) => {
                   }}               
                     rel="noopener noreferrer"
                     passHref
+                    target="_blank"
                   >
                 <p style={{
                     color: themeConfigurationAvaliabilityChecker(
