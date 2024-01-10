@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect } from "react";
 import { CountdownCircleTimer } from "react-countdown-circle-timer";
 import Webcam from "react-webcam";
 import { RootState } from "@/redux/app/store";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { restSigning } from "infrastructure/rest/signing";
 import { restLogout } from "infrastructure/rest/b2b";
 import { useRouter } from "next/router";
@@ -10,6 +10,9 @@ import { toast } from "react-toastify";
 import XIcon from "@/public/icons/XIcon";
 import { handleRoute } from "./../utils/handleRoute";
 import i18n from "i18";
+import useCameraPermission, {
+  TPermissionState,
+} from "@/hooks/useCameraPermission";
 
 interface Constraint {
   width: number;
@@ -28,8 +31,6 @@ interface Props {
   setIsUserMediaError: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-let dom: any;
-
 const FRCamera = ({
   setIsFRSuccess,
   setModal,
@@ -46,47 +47,23 @@ const FRCamera = ({
     facingMode: "user",
   };
 
-  const dispatch = useDispatch();
   const { t }: any = i18n;
   const themeConfiguration = useSelector((state: RootState) => state.theme);
 
   const document = useSelector((state: RootState) => state.document);
   const signature = useSelector((state: RootState) => state.signature);
+  const cameraPermission: TPermissionState = useCameraPermission();
 
   const router = useRouter();
   const { transaction_id, request_id } = router.query;
 
-  const [successState, setIsSuccessState] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const webcamRef = useRef<Webcam | null>(null);
-
-  const checkCamera = async () => {
-    try {
-      const devices = await navigator.mediaDevices.enumerateDevices();
-      const videoInputs = [];
-      Object.keys(devices).forEach((key: any) => {
-        if (devices[key].kind === "videoinput") {
-          videoInputs.push(devices[key]);
-        }
-      });
-
-      if (videoInputs.length === 0) {
-        setIsSuccessState(false);
-      } else {
-        dom = {
-          // grab instances of dom objects so we dont have to look them up later
-          video: webcamRef.current?.video,
-          canvas: null,
-        };
-      }
-    } catch (_) {
-      setIsSuccessState(false);
-    }
-  };
 
   const onPlay = () => {
     setIsPlaying(true);
   };
+
   const count = parseInt(localStorage.getItem(countIdentifier) as string);
   localStorage.setItem(countIdentifier, count ? count.toString() : "0");
 
@@ -178,8 +155,8 @@ const FRCamera = ({
   }, [webcamRef]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    checkCamera();
-  });
+    if (cameraPermission === "denied") setIsUserMediaError(true);
+  }, [cameraPermission]);
 
   return (
     <div className="relative">
