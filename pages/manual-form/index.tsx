@@ -1,36 +1,30 @@
-import CustomFileInputField from "@/components/atoms/CustomFileInputField";
-import ErrorMessage from "@/components/atoms/ErrorMessage";
-import Label from "@/components/atoms/Label";
-import TextInput from "@/components/atoms/TextInput";
-import Footer from "@/components/Footer";
-import ModalLayout from "@/components/layout/ModalLayout";
+import React, { useEffect, useRef, useState } from "react";
+import { useSelector } from "react-redux";
+import { GetServerSideProps } from "next";
+import { useRouter } from "next/router";
+import { toast } from "react-toastify";
+import { assetPrefix } from "next.config";
+import i18n from "i18";
+import { RootState } from "@/redux/app/store";
 import { fileToBase64 } from "@/utils/fileToBase64";
 import { handleRoute } from "@/utils/handleRoute";
 import { inputValidator } from "@/utils/inputValidator";
-import { assetPrefix } from "next.config";
-import { useRouter } from "next/router";
-import { toast } from "react-toastify";
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
-import Image from "next/legacy/image";
-import i18n from "i18";
+import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
+import { serverSideRenderReturnConditions } from "@/utils/serverSideRenderReturnConditions";
+import XIcon from "@/public/icons/XIcon";
 import { RestKycCheckStepv2, RestPersonalPManualReg } from "infrastructure";
 import { TPersonalPManualRegRequestData } from "infrastructure/rest/personal/types";
-import XIcon from "@/public/icons/XIcon";
-import Button from "@/components/atoms/Button";
-import { RootState } from "@/redux/app/store";
-import { useSelector } from "react-redux";
-import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
-import Heading from "@/components/atoms/Heading";
-import Paragraph from "@/components/atoms/Paraghraph";
-import { GetServerSideProps } from "next";
 import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
-import { serverSideRenderReturnConditions } from "@/utils/serverSideRenderReturnConditions";
+
+import Button from "@/components/atoms/Button";
+import CustomFileInputField from "@/components/atoms/CustomFileInputField";
+import ErrorMessage from "@/components/atoms/ErrorMessage";
+import Footer from "@/components/Footer";
+import Heading from "@/components/atoms/Heading";
+import Label from "@/components/atoms/Label";
+import ModalLayout from "@/components/layout/ModalLayout";
+import Paragraph from "@/components/atoms/Paraghraph";
+import TextInput from "@/components/atoms/TextInput";
 
 type TForm = {
   nik: string;
@@ -54,8 +48,7 @@ type Props = {
   nationalityType: TKycCheckStepResponseData["data"]["nationality_type"];
 };
 
-const MAX_FILE_SIZE = 2000000;
-const MIN_FILE_SIZE = 1000000;
+const MIN_FILE_SIZE = (1024 * 1024) / 2;
 const MIN_RESOLUTION = 200;
 
 const Index = (props: Props) => {
@@ -102,7 +95,6 @@ const Index = (props: Props) => {
   };
 
   const onChangeHandler = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    let isSizeMoreThan2Mb: boolean = false;
     let isSizeLessThan1Mb: boolean = false;
     let isRatioLessThan200Px: boolean = false;
     let isEligibleFileType: boolean = true;
@@ -114,7 +106,6 @@ const Index = (props: Props) => {
 
       if (isEligibleFileType) {
         const { width, height } = (await resolutionChecker(file)) as any;
-        isSizeMoreThan2Mb = file.size > MAX_FILE_SIZE;
         isSizeLessThan1Mb = file.size < MIN_FILE_SIZE;
         isRatioLessThan200Px =
           (height < MIN_RESOLUTION || width < MIN_RESOLUTION) &&
@@ -151,13 +142,13 @@ const Index = (props: Props) => {
             ...form,
             [name]: "",
           });
-        } else if (isRatioLessThan200Px) {
+        } else if (isRatioLessThan200Px && name === "photo_selfie") {
           stateObj[name] = t("manualForm.InvalidResolution");
           setForm({
             ...form,
             [name]: "",
           });
-        } else if (isSizeMoreThan2Mb || isSizeLessThan1Mb) {
+        } else if (isSizeLessThan1Mb && name === "photo_ktp") {
           stateObj[name] = t("manualForm.invalidFileSize");
           setForm({
             ...form,
@@ -362,6 +353,7 @@ const Index = (props: Props) => {
                 onLabelClicked={onLabelClicked}
                 inputRef={fileFotoKtpRef}
                 showMaxResolution={false}
+                placeholder="Min. 500KB (.jpg/.jpeg/.png)"
               />
             </>
           ) : null}
@@ -504,10 +496,7 @@ const PhotoSelfieTermModal = ({ show, fileFotoSelfieRef }: TModal) => {
   }, [show.selfie]);
 
   return show.selfie ? (
-    <div
-      style={{ backgroundColor: "rgba(0, 0, 0, .5)" }}
-      className="fixed z-50 flex items-center transition-all duration-1000 justify-center w-full left-0 top-0 h-full"
-    >
+    
       <div className="bg-white max-w-md pt-5 px-2 pb-3 rounded-md w-full ">
         <div className="md:px-10  py-3">
           <Heading className="text-lg font-bold">
@@ -585,7 +574,6 @@ const PhotoSelfieTermModal = ({ show, fileFotoSelfieRef }: TModal) => {
           </Button>
         </div>
       </div>
-    </div>
   ) : null;
 };
 
