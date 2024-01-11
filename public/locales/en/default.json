@@ -230,7 +230,7 @@
       "termTitle": "e-KTP Requirement",
       "term1": "e-KTP image clear and visible.",
       "term2": "e-KTP data are readable.",
-      "term3": "Ensure image extension in .JPG  .JPEG / .PNG with maximum file size 2MB."
+      "term3": "Ensure image extension in .JPG  .JPEG / .PNG with minimum file size 500KB."
     },
     "photoSelfie": {
       "label": "Selfie",
@@ -241,14 +241,14 @@
       "term1": "Face facing forward and visible.",
       "term2": "Take off any accessories such as glasses, hat, face masks, and hair doesn’t cover the face.",
       "term3": "Ensure the lighting is good, not too bright and not too dark.",
-      "term4": "Ensure image extension in .JPG  .JPEG / .PNG with maximum file size 2MB and minimum resolution 200x200 pixel"
+      "term4": "Ensure image extension in .JPG  .JPEG / .PNG with maximum and minimum resolution 200x200 pixel"
     },
     "uploadPhoto": "Unggah Foto",
     "extensionAndSizeRequirement": "Max. 2MB (.jpg/.jpeg/.png)",
     "resolutionMinimum": "Resolution min. 200 x 200 pixel",
     "invalidFileType": "File format must be JPG, JPEG or PNG",
     "InvalidResolution": "Minimum resolution 200x200 pixels",
-    "invalidFileSize": "File size should be 1MB - 2MB"
+    "invalidFileSize": "File size must be a minimum of 500kb."
   },
   "forgotPassword": {
     "title": "Forgot Password",
