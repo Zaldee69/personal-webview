@@ -496,7 +496,10 @@ const PhotoSelfieTermModal = ({ show, fileFotoSelfieRef }: TModal) => {
   }, [show.selfie]);
 
   return show.selfie ? (
-    
+    <div
+      style={{ backgroundColor: "rgba(0, 0, 0, .5)" }}
+      className="fixed z-50 flex items-center transition-all duration-1000 justify-center w-full left-0 top-0 h-full"
+    >
       <div className="bg-white max-w-md pt-5 px-2 pb-3 rounded-md w-full ">
         <div className="md:px-10  py-3">
           <Heading className="text-lg font-bold">
@@ -574,6 +577,7 @@ const PhotoSelfieTermModal = ({ show, fileFotoSelfieRef }: TModal) => {
           </Button>
         </div>
       </div>
+    </div>
   ) : null;
 };
 
