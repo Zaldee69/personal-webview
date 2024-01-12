@@ -609,7 +609,6 @@ const FRModal = ({
       isDisabled={isLoading}
       setIsShowModal={setModal}
       callbackCaptureProcessor={captureProcessor}
-      signingFailedRedirectTo={handleRoute("login")}
       title={t("linkingAccount")}
       onCancelCallback={() => setIsDisabled(false)}
     />

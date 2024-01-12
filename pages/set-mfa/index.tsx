@@ -389,7 +389,6 @@ const FRModal = ({
       isDisabled={isLoading}
       setIsShowModal={setShowModalFr}
       callbackCaptureProcessor={captureProcessor}
-      signingFailedRedirectTo={handleRoute("login")}
       title={t("setMFA.modal.title")}
     />
   );

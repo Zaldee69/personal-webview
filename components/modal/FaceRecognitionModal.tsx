@@ -13,9 +13,6 @@ import CameraOff from "@/public/icons/CameraOff";
 import { Trans } from "react-i18next";
 
 interface FaceRecognitionModalProps {
-  signingFailedRedirectTo: string;
-  tokenIdentifier?: string;
-  countIdentifier?: string;
   callbackCaptureProcessor: (base64Img: string | null | undefined) => void;
   isShowModal: boolean;
   setIsShowModal: React.Dispatch<React.SetStateAction<boolean>>;
@@ -28,12 +25,10 @@ const FaceRecognitionModal: React.FC<FaceRecognitionModalProps> = ({
   isShowModal,
   title,
   setIsShowModal,
-  signingFailedRedirectTo,
   callbackCaptureProcessor,
   onCancelCallback = () => {},
   isDisabled,
 }) => {
-  const [isFRSuccess, setIsFRSuccess] = useState<boolean>(false);
   const [isUserMediaError, setIsUserMediaError] = useState<boolean>(false);
 
   const themeConfiguration = useSelector((state: RootState) => state.theme);
@@ -51,13 +46,7 @@ const FaceRecognitionModal: React.FC<FaceRecognitionModalProps> = ({
           </Paragraph>
           <FRCamera
             setIsUserMediaError={setIsUserMediaError}
-            setModal={setIsShowModal}
-            setIsFRSuccess={setIsFRSuccess}
-            signingFailedRedirectTo={signingFailedRedirectTo}
-            tokenIdentifier="token_v2"
-            countIdentifier="count_v2"
             callbackCaptureProcessor={callbackCaptureProcessor}
-            countdownRepeatDelay={5}
           />
           <Button
             onClick={() => {

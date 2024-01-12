@@ -1188,10 +1188,7 @@ const FRModal: React.FC<IModal> = ({
       isDisabled={isLoading}
       setIsShowModal={setModal}
       callbackCaptureProcessor={captureProcessor}
-      signingFailedRedirectTo={handleRoute("login/v2")}
       title={t("frTitle")}
-      tokenIdentifier="token_v2"
-      countIdentifier="count_v2"
     />
   );
 };

@@ -1,14 +1,9 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, useCallback } from "react";
 import { CountdownCircleTimer } from "react-countdown-circle-timer";
 import Webcam from "react-webcam";
 import { RootState } from "@/redux/app/store";
 import { useSelector } from "react-redux";
-import { restSigning } from "infrastructure/rest/signing";
-import { restLogout } from "infrastructure/rest/b2b";
-import { useRouter } from "next/router";
 import { toast } from "react-toastify";
-import XIcon from "@/public/icons/XIcon";
-import { handleRoute } from "./../utils/handleRoute";
 import i18n from "i18";
 import useCameraPermission, {
   TPermissionState,
@@ -21,26 +16,11 @@ interface Constraint {
 }
 
 interface Props {
-  setIsFRSuccess: React.Dispatch<React.SetStateAction<boolean>>;
-  setModal: React.Dispatch<React.SetStateAction<boolean>>;
-  signingFailedRedirectTo?: string;
-  tokenIdentifier?: string;
-  countIdentifier?: string;
-  callbackCaptureProcessor?: (base64Img: string | null | undefined) => void;
-  countdownRepeatDelay?: number;
+  callbackCaptureProcessor: (base64Img: string | null | undefined) => void;
   setIsUserMediaError: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const FRCamera = ({
-  setIsFRSuccess,
-  setModal,
-  signingFailedRedirectTo = handleRoute("login"),
-  tokenIdentifier = "token",
-  countIdentifier = "count",
-  callbackCaptureProcessor,
-  countdownRepeatDelay = 15,
-  setIsUserMediaError,
-}: Props) => {
+const FRCamera = ({ callbackCaptureProcessor, setIsUserMediaError }: Props) => {
   const constraint: Constraint = {
     width: 1280,
     height: 720,
@@ -49,25 +29,16 @@ const FRCamera = ({
 
   const { t }: any = i18n;
   const themeConfiguration = useSelector((state: RootState) => state.theme);
-
-  const document = useSelector((state: RootState) => state.document);
-  const signature = useSelector((state: RootState) => state.signature);
   const cameraPermission: TPermissionState = useCameraPermission();
-
-  const router = useRouter();
-  const { transaction_id, request_id } = router.query;
 
   const [isPlaying, setIsPlaying] = useState(false);
   const webcamRef = useRef<Webcam | null>(null);
 
-  const onPlay = () => {
+  const onPlay = useCallback(() => {
     setIsPlaying(true);
-  };
+  }, []);
 
-  const count = parseInt(localStorage.getItem(countIdentifier) as string);
-  localStorage.setItem(countIdentifier, count ? count.toString() : "0");
-
-  const capture = React.useCallback(() => {
+  const capture = useCallback(async () => {
     toast(t("loadingTitle"), {
       type: "info",
       toastId: "info",
@@ -77,82 +48,10 @@ const FRCamera = ({
         backgroundColor: themeConfiguration?.data.toast_color as string,
       },
     });
+
     const imageSrc = webcamRef?.current?.getScreenshot();
-    if (callbackCaptureProcessor) {
-      callbackCaptureProcessor(imageSrc);
-    } else {
-      restSigning({
-        payload: {
-          file_name: new Date().getTime().toString(),
-          otp_pin: "",
-          content_pdf: document.response.data.document,
-          width: document.response.data.width,
-          height: document.response.data.height,
-          face_image: imageSrc?.split(",")[1] as string,
-          coordinate_x: document.response.data.posX,
-          coordinate_y: document.response.data.posY,
-          signature_image:
-            signature.data.font ||
-            signature.data.scratch ||
-            document.response.data.tandaTangan,
-          page_number: document.response.data.page_number,
-          qr_content: "",
-          tilakey: "",
-          company_id: "",
-          api_id: "",
-          trx_id: (transaction_id as string) || (request_id as string),
-        },
-      })
-        .then((res) => {
-          if (res.success) {
-            localStorage.setItem(countIdentifier, "0");
-            toast.dismiss("info");
-            toast(`Pencocokan berhasil`, {
-              type: "success",
-              position: "top-center",
-            });
-            setIsFRSuccess(true);
-          } else if (!res.success) {
-            toast.dismiss("info");
-            toast.error(res.message, { icon: <XIcon /> });
-            setModal(false);
-          }
-        })
-        .catch((err) => {
-          toast.dismiss("info");
-          if (err.response?.status === 401) {
-            localStorage.removeItem(tokenIdentifier);
-            localStorage.setItem(countIdentifier, "0");
-            router.replace({
-              pathname: signingFailedRedirectTo,
-              query: { ...router.query },
-            });
-          } else {
-            setModal(false);
-            setTimeout(() => {
-              setModal(true);
-            }, 100);
-            toast.error(t("faceValidationFailed"), { icon: <XIcon /> });
-            const newCount =
-              parseInt(localStorage.getItem(countIdentifier) as string) + 1;
-            localStorage.setItem(countIdentifier, newCount.toString());
-            const count = parseInt(
-              localStorage.getItem(countIdentifier) as string
-            );
-            setModal(false);
-            if (count >= 5) {
-              localStorage.removeItem(tokenIdentifier);
-              localStorage.setItem(countIdentifier, "0");
-              restLogout({});
-              router.replace({
-                pathname: signingFailedRedirectTo,
-                query: { ...router.query },
-              });
-            }
-          }
-        });
-    }
-  }, [webcamRef]); // eslint-disable-line react-hooks/exhaustive-deps
+    callbackCaptureProcessor(imageSrc);
+  }, []);
 
   useEffect(() => {
     if (cameraPermission === "denied") setIsUserMediaError(true);
@@ -168,8 +67,7 @@ const FRCamera = ({
           onComplete={() => {
             capture();
             return {
-              shouldRepeat: true,
-              delay: countdownRepeatDelay,
+              shouldRepeat: false,
             };
           }}
           isPlaying={isPlaying}
@@ -194,7 +92,7 @@ const FRCamera = ({
         mirrored={false}
         minScreenshotHeight={960}
         videoConstraints={constraint}
-        onLoadedMetadata={(e) => onPlay()}
+        onLoadedMetadata={onPlay}
         onUserMediaError={() => setIsUserMediaError(true)}
       />
     </div>
