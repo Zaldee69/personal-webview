@@ -353,7 +353,7 @@ const Index = (props: Props) => {
                 onLabelClicked={onLabelClicked}
                 inputRef={fileFotoKtpRef}
                 showMaxResolution={false}
-                placeholder="Min. 500KB (.jpg/.jpeg/.png)"
+                placeholder={t("manualForm.photoKtp.placeholder")}
               />
             </>
           ) : null}
@@ -367,6 +367,7 @@ const Index = (props: Props) => {
             onLabelClicked={onLabelClicked}
             inputRef={fileFotoSelfieRef}
             showMaxResolution
+            placeholder="(.jpg/.jpeg/.png)"
           />
 
           <Button

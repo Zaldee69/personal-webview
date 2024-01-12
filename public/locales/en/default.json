@@ -230,7 +230,8 @@
       "termTitle": "e-KTP Requirement",
       "term1": "e-KTP image clear and visible.",
       "term2": "e-KTP data are readable.",
-      "term3": "Ensure image extension in .JPG  .JPEG / .PNG with minimum file size 500KB."
+      "term3": "Ensure image extension in .JPG  .JPEG / .PNG with minimum file size 500KB.",
+      "placeholder": "Size min. 500KB \n (.jpg/.jpeg/.png)"
     },
     "photoSelfie": {
       "label": "Selfie",
@@ -248,7 +249,7 @@
     "resolutionMinimum": "Resolution min. 200 x 200 pixel",
     "invalidFileType": "File format must be JPG, JPEG or PNG",
     "InvalidResolution": "Minimum resolution 200x200 pixels",
-    "invalidFileSize": "File size must be a minimum of 500kb."
+    "invalidFileSize": "File size must be a minimum of 500KB."
   },
   "forgotPassword": {
     "title": "Forgot Password",
