@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useImperativeHandle, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { GetServerSideProps } from "next";
 import { useRouter } from "next/router";
@@ -101,8 +101,10 @@ const Index = (props: Props) => {
     const { value, name, files } = e.target;
     const file: File = files?.[0] as File;
     if (name === "photo_ktp" || name === "photo_selfie") {
-      const fileType = ["jpg", "jpeg", "png", "JPG", "JPEG", "PNG"];
-      isEligibleFileType = fileType.some((el) => file?.name.includes(el));
+      const fileType = ["jpg", "jpeg", "png"];
+      isEligibleFileType = fileType.some((el) =>
+        file?.name.toLowerCase().includes(el)
+      );
 
       if (isEligibleFileType) {
         const { width, height } = (await resolutionChecker(file)) as any;
@@ -137,6 +139,7 @@ const Index = (props: Props) => {
 
       if (name === "photo_ktp" || "photo_selfie") {
         if (!isEligibleFileType) {
+          fileFotoKtpRef.current?.value;
           stateObj[name] = t("manualForm.invalidFileType");
           setForm({
             ...form,

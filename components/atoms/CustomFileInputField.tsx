@@ -52,6 +52,7 @@ const CustomFileInputField = ({
             id={name}
             ref={inputRef}
             className="hidden"
+            value={inputRef.current?.value || ""}
             type="file"
             accept="image/jpg, image/jpeg, image/png"
             onChange={onChangeHandler}
