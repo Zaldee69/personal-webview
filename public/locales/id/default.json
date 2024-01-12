@@ -230,7 +230,9 @@
       "termTitle": "Ketentuan foto e-KTP",
       "term1": "Foto e-KTP terlihat dengan jelas.",
       "term2": "Data pada e-KTP dapat dibaca.",
-      "term3": "Ekstensi dokumen berupa .JPG / .JPEG /.PNG dengan batas ukuran minimun 500kb."
+      "term3": "Ekstensi dokumen berupa .JPG / .JPEG /.PNG dengan batas ukuran minimal 500KB.",
+      "placeholder": "Ukuran min. 500KB \n (.jpg/.jpeg/.png)"
+
     },
     "photoSelfie": {
       "label": "Foto Selfie",
@@ -245,7 +247,7 @@
     "resolutionMinimum": "Resolusi min. 200 x 200 pixel",
     "invalidFileType": "Format file harus jpg, jpeg atau png",
     "InvalidResolution": "Resolusi minimal 200x200 pixel",
-    "invalidFileSize": "File harus berukuran minimal 500kb"
+    "invalidFileSize": "File harus berukuran minimal 500KB"
   },
   "forgotPassword": {
     "title": "Lupa Kata Sandi",
