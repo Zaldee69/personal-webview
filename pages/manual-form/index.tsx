@@ -101,7 +101,7 @@ const Index = (props: Props) => {
     const { value, name, files } = e.target;
     const file: File = files?.[0] as File;
     if (name === "photo_ktp" || name === "photo_selfie") {
-      const fileType = ["jpg", "jpeg", "png"];
+      const fileType = ["jpg", "jpeg", "png", "JPG", "JPEG", "PNG"];
       isEligibleFileType = fileType.some((el) => file?.name.includes(el));
 
       if (isEligibleFileType) {
