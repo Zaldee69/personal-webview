@@ -175,9 +175,7 @@ const FRModal: React.FC<IModal> = ({ modal, setModal, callbackFailure }) => {
       isDisabled={isLoading}
       setIsShowModal={setModal}
       callbackCaptureProcessor={captureProcessor}
-      signingFailedRedirectTo={AUTHHASH_PATHNAME}
       title={t("frTitle")}
-      tokenIdentifier="token_hashsign"
     />
   );
 };

@@ -591,7 +591,6 @@ function SettingSignatureAndMFA({}: Props) {
         isDisabled={isLoading}
         setIsShowModal={setIsShowFrModal}
         callbackCaptureProcessor={captureProcessor}
-        signingFailedRedirectTo={handleRoute("login")}
         title={t("setMFA.modal.title")}
       />
       <ConfirmationModal
