@@ -1,44 +1,43 @@
-import React, { useState, useEffect, Dispatch, SetStateAction } from "react";
+import React, { useState, useEffect, SetStateAction, Dispatch } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useRouter } from "next/router";
+import Link from "next/link";
+import Image from "next/legacy/image";
+import { toast } from "react-toastify";
+import { PinInput } from "react-input-pin-code";
+import i18n from "i18";
 import {
   getCertificateList,
   getUserName,
   restGetOtp,
   restLogout,
 } from "infrastructure/rest/b2b";
-import Footer from "@/components/Footer";
-import EyeIcon from "@/public/icons/EyeIcon";
-import EyeIconOff from "@/public/icons/EyeIconOff";
 import { AppDispatch, RootState } from "@/redux/app/store";
-import { useDispatch, useSelector } from "react-redux";
 import { login } from "@/redux/slices/loginSlice";
-import { TLoginInitialState, TLoginProps } from "@/interface/interface";
-import Head from "next/head";
-import toastCaller from "@/utils/toastCaller";
-import { toast } from "react-toastify";
-import XIcon from "@/public/icons/XIcon";
-import { useRouter } from "next/router";
-import { handleRoute } from "../../../utils/handleRoute";
-import Image from "next/legacy/image";
+import { handleRoute } from "@/utils/handleRoute";
 import { assetPrefix } from "../../../next.config";
-import { NextParsedUrlQuery } from "next/dist/server/request-meta";
-import i18n from "i18";
 import {
   getStorageWithExpiresIn,
   removeStorageWithExpiresIn,
   setStorageWithExpiresIn,
 } from "@/utils/localStorageWithExpiresIn";
 import { getExpFromToken } from "@/utils/getExpFromToken";
-import Link from "next/link";
-import { PinInput } from "react-input-pin-code";
 import { RestSigningAuthhashsign } from "infrastructure";
-import FRCamera from "@/components/FRCamera";
-import Button, { buttonVariants } from "@/components/atoms/Button";
 import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
+import toastCaller from "@/utils/toastCaller";
+import Footer from "@/components/Footer";
+import EyeIcon from "@/public/icons/EyeIcon";
+import EyeIconOff from "@/public/icons/EyeIconOff";
+import XIcon from "@/public/icons/XIcon";
+import FaceRecognitionModal from "@/components/modal/FaceRecognitionModal";
+import Button, { buttonVariants } from "@/components/atoms/Button";
 import Paragraph from "@/components/atoms/Paraghraph";
 import Heading from "@/components/atoms/Heading";
 import Label from "@/components/atoms/Label";
-import useGenerateRedirectUrl from "@/hooks/useGenerateRedirectUrl";
-import FaceRecognitionModal from "@/components/modal/FaceRecognitionModal";
+
+import { TLoginInitialState, TLoginProps } from "@/interface/interface";
+import { NextParsedUrlQuery } from "next/dist/server/request-meta";
+import Head from "next/head";
 
 interface IPropsLogin {}
 
@@ -111,8 +110,7 @@ const FRModal: React.FC<IModal> = ({ modal, setModal, callbackFailure }) => {
           toast.error(res.message || "Ada yang salah", { icon: <XIcon /> });
           if (
             res.message.toLowerCase() ===
-              "authhashsign gagal. gagal FR sudah 5 kali".toLocaleLowerCase() ||
-            res.message === "signing sudah selesai"
+            "authhashsign gagal. gagal FR sudah 5 kali".toLocaleLowerCase()
           ) {
             router.push(
               {
@@ -127,8 +125,8 @@ const FRModal: React.FC<IModal> = ({ modal, setModal, callbackFailure }) => {
               undefined,
               { shallow: false }
             );
-            setModal(false);
           }
+          setModal(false);
         }
       })
       .catch((err) => {
@@ -669,6 +667,7 @@ const Login = ({}: IPropsLogin) => {
             <div className="relative flex-1">
               <input
                 onChange={(e) => onChangeHandler(e)}
+                autoFocus
                 value={password}
                 name="password"
                 type={type.password}
