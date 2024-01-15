@@ -324,6 +324,7 @@
     "title": "Unable to access the camera",
     "subtitle": "Tilaka needs access to your camera. Click on the blocked camera icon <1/> in your browser to grant camera access.",
     "button": "Try again"
-  }
+  },
+  "signingComplete": "User has finished signing"
 }
 

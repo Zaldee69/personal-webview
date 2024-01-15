@@ -322,6 +322,7 @@
     "title": "Tidak dapat mengakses kamera",
     "subtitle": "Tilaka memerlukan akses ke kamera Anda. klik ikon kamera diblokir <1/> pada browser Anda untuk memberikan akses kamera.",
     "button": "Coba lagi"
-  }
+  },
+  "signingComplete": "User sudah selesai signing"
   
 }
