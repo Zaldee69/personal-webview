@@ -104,10 +104,14 @@ const FRModal: React.FC<IModal> = ({ modal, setModal, callbackFailure }) => {
           });
           setIsFRSuccess(true);
         } else {
+          const ERROR_MESSAGE =
+            res.message === "signing sudah selesai"
+              ? t("signingComplete")
+              : res.message;
           setIsLoading(false);
           setIsFRSuccess(false);
           toast.dismiss("info");
-          toast.error(res.message || "Ada yang salah", { icon: <XIcon /> });
+          toast.error(ERROR_MESSAGE || "Ada yang salah", { icon: <XIcon /> });
           if (
             res.message.toLowerCase() ===
             "authhashsign gagal. gagal FR sudah 5 kali".toLocaleLowerCase()
