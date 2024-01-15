@@ -33,7 +33,7 @@ const fRFailureCounter = ({
     toast.error(failureMessage, { icon: XIcon });
     setFRFailedCount(failureCountIdentifier, 0);
     localStorage.removeItem(tokenIdentifier);
-    handleUnauthenticated({ redirectTo });
+    redirectTo()
   } else {
     toast.error(errorMessage, { icon: XIcon });
     setModal(false);
