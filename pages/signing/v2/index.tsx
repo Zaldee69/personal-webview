@@ -42,6 +42,7 @@ import Paragraph from "@/components/atoms/Paraghraph";
 import Label from "@/components/atoms/Label";
 import useGenerateRedirectUrl from "@/hooks/useGenerateRedirectUrl";
 import FaceRecognitionModal from "@/components/modal/FaceRecognitionModal";
+import fRFailureCounter from "@/utils/fRFailureCounter";
 
 interface IParameterFromRequestSign {
   user?: string;
@@ -1124,19 +1125,19 @@ const FRModal: React.FC<IModal> = ({
           setIsFRSuccess(true);
         } else {
           setIsLoading(false);
-          setIsFRSuccess(false);
           toast.dismiss("info");
-          toast.error(res.message || "Ada yang salah", { icon: <XIcon /> });
-          const newCount =
-            parseInt(localStorage.getItem("count_v2") as string) + 1;
-          localStorage.setItem("count_v2", newCount.toString());
+          fRFailureCounter({
+            setModal: setModal,
+            failureCountIdentifier: "count_v2",
+            redirectTo: () => "",
+            errorMessage: res.message,
+          });
           const count = parseInt(localStorage.getItem("count_v2") as string);
           if (
             count >= 5 ||
             res.message.toLowerCase() ===
               "penandatanganan dokumen gagal. gagal FR sudah 5 kali".toLocaleLowerCase()
           ) {
-            setModal(false);
             signingFailure(res.message || "Ada yang salah");
           }
         }
