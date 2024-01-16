@@ -116,21 +116,30 @@ const FRModal: React.FC<IModal> = ({ modal, setModal, callbackFailure }) => {
             res.message.toLowerCase() ===
             "authhashsign gagal. gagal FR sudah 5 kali".toLocaleLowerCase()
           ) {
-            router.push(
-              {
-                pathname: handleRoute("signing/failure"),
-                query: {
-                  redirect_url: routerQuery.redirect_url,
-                  user_identifier: routerQuery.user,
-                  request_id: res.data.request_id,
-                  status: "Gagal",
+            setModal(false);
+            setTimeout(() => {
+              router.push(
+                {
+                  pathname: handleRoute("signing/failure"),
+                  query: {
+                    redirect_url: routerQuery.redirect_url,
+                    user_identifier: routerQuery.user,
+                    request_id: res.data.request_id,
+                    status: "Gagal",
+                  },
                 },
-              },
-              undefined,
-              { shallow: false }
-            );
+                undefined,
+                { shallow: false }
+              );
+            }, 1500);
+          } else if (res.message === "signing sudah selesai") {
+            setModal(false);
+          } else {
+            setModal(false);
+            setTimeout(() => {
+              setModal(true);
+            }, 100);
           }
-          setModal(false);
         }
       })
       .catch((err) => {
