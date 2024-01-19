@@ -260,7 +260,13 @@ const OTPModal: React.FC<IModal> = ({
           setSuccessSigning(false);
           toast.dismiss("loading");
           setValues(["", "", "", "", "", ""]);
-          toast.error(res.message || "Ada yang salah", { icon: <XIcon /> });
+
+          const ERROR_MESSAGE =
+            res.message === "signing sudah selesai"
+              ? t("signingComplete")
+              : res.message;
+
+          toast.error(ERROR_MESSAGE || "Ada yang salah", { icon: <XIcon /> });
 
           if (
             res.message.toLowerCase() ===
