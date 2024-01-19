@@ -136,7 +136,12 @@ const PinFormDedicatedChannel = ({ id, user, success }: Props) => {
               }, 2000);
             }
           } else {
-            toast.error(res.message, {
+            const ERROR_MESSAGE =
+              res.message === "signing sudah selesai"
+                ? t("signingComplete")
+                : res.message;
+
+            toast.error(ERROR_MESSAGE, {
               icon: <XIcon />,
             });
           }
