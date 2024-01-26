@@ -116,6 +116,27 @@ export const serverSideRenderReturnConditions = ({
 
         const queryString = new URLSearchParams(params as any).toString();
 
+        // if status = F && reason_code = 3 redirect to
+        if (status === "F" && reason_code === "3") {
+          if (
+            currentPathnameWithoutParams !==
+              `${assetPrefix}/liveness-failure` &&
+            currentPathnameWithoutParams !== "/liveness-failure"
+          ) {
+            return {
+              redirect: {
+                permanent: false,
+                destination: handleRoute("/liveness-failure?" + queryString),
+              },
+              props: {
+                // kyc_checkstep_token: checkStepResult.res?.data?.token || null,
+              },
+            };
+          } else {
+            return { props: {} };
+          }
+        }
+
         if (
           checkStepResult.res.data.status === "F" &&
           checkStepResult.res.data.pin_form &&
