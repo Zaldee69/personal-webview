@@ -292,7 +292,24 @@ const Camera: React.FC<Props> = ({
             faceIsHalf,
             isDarkImage,
             blink_left_eye,
-            blink_right_eye
+            blink_right_eye,
+          });
+        } else if (actionList[currentActionIndex] == "blink") {
+          progressSetter(0);
+          perfSetter("none");
+          await blinkHandler({
+            distance,
+            blink_left_eye,
+            blink_right_eye,
+            wrongActionSetter,
+            progressSetter,
+            count,
+            isIndexDone,
+            setIndexDone,
+            currentActionIndex,
+            clicked,
+            capture,
+            perfSetter,
           });
         }
       }
