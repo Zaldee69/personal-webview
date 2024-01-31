@@ -280,7 +280,7 @@ const RevokeMekari = () => {
         },
         body: { enabled: false },
         hand: { enabled: false },
-        object: { enabled: false },
+        object: { enabled: true, maxDetected: 2 },
         gesture: { enabled: true },
         debug: true,
       };
