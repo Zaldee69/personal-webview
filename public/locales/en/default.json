@@ -325,6 +325,10 @@
     "subtitle": "Tilaka needs access to your camera. Click on the blocked camera icon <1/> in your browser to grant camera access.",
     "button": "Try again"
   },
-  "signingComplete": "User has finished signing"
+  "signingComplete": "User has finished signing",
+  "imageDark": "Face not detected, image too dark",
+  "faceMoreThan1": "Multiple faces detected",
+  "sideFace": "The face is only detected halfway",
+  "openEyes": "Open both eyes wider"
 }
 
