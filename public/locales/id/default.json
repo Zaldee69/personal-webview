@@ -323,6 +323,9 @@
     "subtitle": "Tilaka memerlukan akses ke kamera Anda. klik ikon kamera diblokir <1/> pada browser Anda untuk memberikan akses kamera.",
     "button": "Coba lagi"
   },
-  "signingComplete": "User sudah selesai signing"
-  
+  "signingComplete": "User sudah selesai signing",
+  "imageDark": "Wajah tidak terdeteksi, gambar terlalu gelap",
+  "faceMoreThan1": "Lebih dari satu wajah terdeteksi",
+  "sideFace": "Wajah hanya terdeteksi setengah",
+  "openEyes": "Buka kedua mata lebih lebar"
 }
