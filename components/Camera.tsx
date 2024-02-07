@@ -199,7 +199,8 @@ const Camera: React.FC<Props> = ({
         const distance = interpolated.face[0].iris;
 
         const isDarkImage =
-          calculateImageBrightness(interpolated.face[0].boxRaw) > 0.4 &&
+          calculateImageBrightness(interpolated.face[0].boxRaw) >
+            Number(process.env.NEXT_PUBLIC_DARKNESS_LEVEL_TRESHOLD) &&
           distance < 30;
 
         const faceData = interpolated.face[0].annotations;
@@ -231,6 +232,16 @@ const Camera: React.FC<Props> = ({
           } else if (item.gesture == "blink right eye") {
             blink_right_eye = true;
           }
+        });
+
+        console.log({
+          "Person on cam:": totalPersonOnCam,
+          "Darkness level:": calculateImageBrightness(
+            interpolated.face[0].boxRaw
+          ),
+          "Face half:": isFaceHalf,
+          "Left eye closed:": blink_left_eye,
+          "Right eye closed:": blink_right_eye,
         });
 
         if (actionList[currentActionIndex] == "look_straight") {
