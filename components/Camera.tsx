@@ -200,7 +200,7 @@ const Camera: React.FC<Props> = ({
 
         const isDarkImage =
           calculateImageBrightness(interpolated.face[0].boxRaw) >
-            Number(process.env.NEXT_PUBLIC_DARKNESS_LEVEL_TRESHOLD) &&
+            Number(process.env.NEXT_PUBLIC_DARKNESS_LEVEL_TRESHOLD) || 0.40 &&
           distance < 30;
 
         const faceData = interpolated.face[0].annotations;
