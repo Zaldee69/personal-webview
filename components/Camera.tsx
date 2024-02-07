@@ -321,6 +321,9 @@ const Camera: React.FC<Props> = ({
             clicked,
             capture,
             perfSetter,
+            totalPersonOnCam,
+            faceIsHalf,
+            isDarkImage,
           });
         }
       }
