@@ -68,6 +68,16 @@ const openMouthHandler = async ({
       capture.click();
       clicked = true;
     }
+  } else if (!isDarkImage) {
+    wrongActionSetter(true, t("imageDark"));
+    log(t(""), "");
+    count = 1;
+    progressSetter(0);
+  } else if (faceIsHalf) {
+    wrongActionSetter(true, t("sideFace"));
+    log(t(""), "");
+    count = 1;
+    progressSetter(0);
   } else if (totalPersonOnCam > 1) {
     wrongActionSetter(true, t("faceMoreThan1"));
     log(t(""), "");
@@ -78,18 +88,8 @@ const openMouthHandler = async ({
     log(t(""), "");
     count = 1;
     progressSetter(0);
-  } else if (faceIsHalf) {
-    wrongActionSetter(true, t("sideFace"));
-    log(t(""), "");
-    count = 1;
-    progressSetter(0);
-  } else if (distance > 25) {
+  }  else if (distance > 25) {
     wrongActionSetter(true, t("closeYourFace"));
-    log(t(""), "");
-    count = 1;
-    progressSetter(0);
-  } else if (!isDarkImage) {
-    wrongActionSetter(true, t("imageDark"));
     log(t(""), "");
     count = 1;
     progressSetter(0);

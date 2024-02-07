@@ -91,25 +91,25 @@ const blinkHandler = async ({
       count = 1;
       progressSetter(0);
     }
-  } else if (totalPersonOnCam > 1) {
-    wrongActionSetter(true, t("faceMoreThan1"));
+  } else if (!isDarkImage) {
+    wrongActionSetter(true, t("imageDark"));
     log(t(""), "");
     count = 1;
-    blinkCount = 1;
+    progressSetter(0);
   } else if (faceIsHalf) {
     wrongActionSetter(true, t("sideFace"));
     log(t(""), "");
     blinkCount = 1;
     count = 1;
     wrongActionSetter(true, t("closeYourFace"));
-  } else if (distance > 25) {
-    log(t("closeYourFace"), "");
-  } else if (!isDarkImage) {
-    wrongActionSetter(true, t("imageDark"));
+  } else if (totalPersonOnCam > 1) {
+    wrongActionSetter(true, t("faceMoreThan1"));
     log(t(""), "");
     count = 1;
-    progressSetter(0);
-  } else {
+    blinkCount = 1;
+  } else if (distance > 25) {
+    log(t("closeYourFace"), "");
+  }  else {
     wrongActionSetter(true, t("blinkError"));
     log(t("dontMove"), "");
     blinkCount = 1;
