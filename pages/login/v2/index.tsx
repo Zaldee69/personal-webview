@@ -70,6 +70,7 @@ const Login = ({}: IPropsLogin) => {
     password: "password",
   });
   const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
+  const [rememberMe, setRememberMe] = useState<boolean>(false);
   const [autoLogoutModal, setAutoLogoutModal] = useState<boolean>(false);
   const [loginQueue, setLoginQueue] = useState<{
     queue: boolean;
@@ -105,19 +106,19 @@ const Login = ({}: IPropsLogin) => {
   useEffect(() => {
     if (isSubmitted && data.status === "FULLFILLED" && data.data.success) {
       localStorage.setItem("count_v2", "0");
-      setStorageWithExpiresIn(
-        "token_v2",
-        data.data.data[0],
-        getExpFromToken(data.data.data[0]) as number
-      );
-
-      localStorage.setItem("refresh_token_v2", data.data.data[1] as string);
 
       doIn(data);
-
-    } 
+    }
     toastCaller(data, themeConfiguration?.data.toast_color as string);
   }, [data.status]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (rememberMe) {
+      localStorage.setItem("rememberMe", true as any);
+    } else {
+      localStorage.removeItem("rememberMe");
+    }
+  }, [rememberMe]);
 
   useEffect(() => {
     const parentWindow = window.parent;
@@ -161,15 +162,9 @@ const Login = ({}: IPropsLogin) => {
 
     if (data) {
       setDoInAuto(false);
-
     }
 
-    getCertificateList({
-      token: getStorageWithExpiresIn("token_v2", handleRoute("login/v2"), {
-        ...queryWithDynamicRedirectURL,
-        showAutoLogoutInfo: "1",
-      }),
-    }).then((res) => {
+    getCertificateList().then((res) => {
       const certif = JSON.parse(res.data);
       if (!id) {
         toast.dismiss("success");
@@ -185,6 +180,7 @@ const Login = ({}: IPropsLogin) => {
             pathname: handleRoute("signing/v2"),
             query: {
               ...queryWithDynamicRedirectURL,
+              login_from: "login/v2"
             },
           });
         } else if (
@@ -218,6 +214,7 @@ const Login = ({}: IPropsLogin) => {
         password,
         tilaka_name: user,
         channel_id: channel_id,
+        remember: rememberMe,
       } as TLoginProps)
     );
     setPassword("");
@@ -243,11 +240,15 @@ const Login = ({}: IPropsLogin) => {
   }
 
   return (
-    <div className="min-h-screen" style={{
-      backgroundColor: themeConfigurationAvaliabilityChecker(
-        themeConfiguration?.data.background as string, "BG"
-      ),
-    }} >
+    <div
+      className="min-h-screen"
+      style={{
+        backgroundColor: themeConfigurationAvaliabilityChecker(
+          themeConfiguration?.data.background as string,
+          "BG"
+        ),
+      }}
+    >
       <CertifModal setCertifModal={setCertifModal} certifModal={certifModal} />
       <AutoLogoutInfoModal
         modal={autoLogoutModal}
@@ -268,11 +269,7 @@ const Login = ({}: IPropsLogin) => {
         </div>
         <form onSubmit={submitHandler}>
           <div className="flex flex-col  mt-20">
-            <Label
-              size="base"
-              className="px-2"
-              htmlFor="password"
-            >
+            <Label size="base" className="px-2" htmlFor="password">
               {t("passwordLabel")}
             </Label>
             <div className="relative flex-1">
@@ -293,21 +290,36 @@ const Login = ({}: IPropsLogin) => {
                 {type.password === "password" ? <EyeIcon /> : <EyeIconOff />}
               </button>
             </div>
+            <div className="flex items-center mt-5">
+              <input
+                type="checkbox"
+                className="mr-2 !w-5 !h-5"
+                id="rememberMe"
+                name="rememberMe"
+                checked={rememberMe}
+                onChange={() => setRememberMe(!rememberMe)}
+              />
+              <Label size="base" htmlFor="rememberMe">
+                {t("rememberMe")}
+              </Label>
+            </div>
             <div className="flex justify-center items-center mt-5">
               <Link
                 href={{
                   pathname: handleRoute("forgot-password"),
-                  query: router.query
+                  query: router.query,
                 }}
                 passHref
                 target="_blank"
               >
-                <p style={{
+                <p
+                  style={{
                     color: themeConfigurationAvaliabilityChecker(
                       themeConfiguration?.data.action_font_color as string
                     ),
                   }}
-                  className={buttonVariants({ variant: "ghost", size: "none" })}>
+                  className={buttonVariants({ variant: "ghost", size: "none" })}
+                >
                   {t("linkAccountForgotPasswordButton")}
                 </p>
               </Link>
@@ -319,38 +331,41 @@ const Login = ({}: IPropsLogin) => {
                   alt="lineVertical"
                 />
               </div>
-              <Link href={{
-                    pathname: handleRoute("forgot-tilaka-name"),
-                    query: router.query
-                  }}               
-                    rel="noopener noreferrer"
-                    passHref
-                    target="_blank"
-                  >
-                <p style={{
+              <Link
+                href={{
+                  pathname: handleRoute("forgot-tilaka-name"),
+                  query: router.query,
+                }}
+                rel="noopener noreferrer"
+                passHref
+                target="_blank"
+              >
+                <p
+                  style={{
                     color: themeConfigurationAvaliabilityChecker(
                       themeConfiguration?.data.action_font_color as string
                     ),
                   }}
-                  className={buttonVariants({ variant: "ghost", size: "none" })}>
+                  className={buttonVariants({ variant: "ghost", size: "none" })}
+                >
                   {t("linkAccountForgotTilakaName")}
                 </p>
               </Link>
             </div>
           </div>
-          <div className="flex justify-center" >
-          <Button
-            type="submit"
-            style={{
-              backgroundColor: themeConfigurationAvaliabilityChecker(
-                themeConfiguration?.data.button_color as string
-              ),
-            }}
-            className="uppercase mt-24 text-white"
-            disabled={password.length < 1}
-          >
-            {t("loginCTA")}
-          </Button>
+          <div className="flex justify-center">
+            <Button
+              type="submit"
+              style={{
+                backgroundColor: themeConfigurationAvaliabilityChecker(
+                  themeConfiguration?.data.button_color as string
+                ),
+              }}
+              className="uppercase mt-24 text-white"
+              disabled={password.length < 1}
+            >
+              {t("loginCTA")}
+            </Button>
           </div>
         </form>
         <Footer />
@@ -373,9 +388,7 @@ const CertifModal = ({ certifModal, setCertifModal }: ModalProps) => {
       className="fixed z-50 flex items-start transition-all duration-1000 pb-3 justify-center w-full left-0 top-0 h-full "
     >
       <div className="bg-white max-w-md mt-20 pt-5 px-2 pb-3 rounded-xl w-full mx-5">
-        <Heading className="text-center">
-          {t("dontHaveCertifTitle")}
-        </Heading>
+        <Heading className="text-center">{t("dontHaveCertifTitle")}</Heading>
         <div className="flex flex-col justify-center">
           <Image
             src={`${assetPrefix}/images/certif.svg`}
@@ -430,9 +443,7 @@ const AutoLogoutInfoModal: React.FC<IModal> = ({ modal, setModal }) => {
     >
       <div className="bg-white max-w-sm mt-20 pt-6 px-3 pb-3 rounded-xl w-full mx-5">
         <div className="flex flex-col">
-          <Heading className="text-center">
-            {t("youAreLoggedOut")}
-          </Heading>
+          <Heading className="text-center">{t("youAreLoggedOut")}</Heading>
           <div className="flex justify-center">
             <Image
               src={`${assetPrefix}/images/autoLogout.svg`}
@@ -441,9 +452,7 @@ const AutoLogoutInfoModal: React.FC<IModal> = ({ modal, setModal }) => {
               alt="auto-logout-ill"
             />
           </div>
-          <Paragraph
-            className="text-center px-3 mt-2.5 mx-auto"
-          >
+          <Paragraph className="text-center px-3 mt-2.5 mx-auto">
             {t("relogin1")}
             <br /> {t("relogin2")}
           </Paragraph>
@@ -501,14 +510,8 @@ const LoginQueue = ({
 
   useEffect(() => {
     // validate token
-    getUserName({ token: existingToken })
+    getUserName()
       .then((_) => {
-        // token valid and redirect to authenticated page
-        setStorageWithExpiresIn(
-          "token_v2",
-          existingToken as string,
-          getExpFromToken(existingToken as string) as number
-        );
         doIn();
       })
       .catch((_) => {

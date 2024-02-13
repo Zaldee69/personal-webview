@@ -40,7 +40,6 @@ type IOtpModalConfrimation = {
 const SetMfa = () => {
   const { t }: any = i18n;
   const router = useRouter();
-  const dispatch: AppDispatch = useDispatch();
 
   const [isShowModalFr, setShowModalFr] = useState<boolean>(false);
   const [isShowOtpModalConfirmation, setIsShowOtpModalConfirmation] =
@@ -98,23 +97,9 @@ const SetMfa = () => {
           .catch((err) => {
             setIsShowOtpModalConfirmation(false);
             toast.dismiss("info");
-            if (err.response?.status === 401) {
-              toast.error("Anda harus login terlebih dahulu", {
-                icon: <XIcon />,
-              });
-              dispatch(resetInitalState());
-              setIsDisabled(true);
-              setTimeout(() => {
-                router.replace({
-                  pathname: handleRoute("login"),
-                  query: { ...router.query, setting: "2" },
-                });
-              }, 2500);
-            } else {
-              toast.error(err.response?.data?.message || "Terjadi kesalahan", {
-                icon: <XIcon />,
-              });
-            }
+            toast.error(err.response?.data?.message || "Terjadi kesalahan", {
+              icon: <XIcon />,
+            });
           });
       } else {
         toast("Metode otentikasi anda sudah OTP", {
@@ -131,40 +116,21 @@ const SetMfa = () => {
   };
 
   const geTypeMfa = () => {
-    getUserName({})
+    getUserName()
       .then((res) => {
         const data = JSON.parse(res.data);
         setDefaultMfa(data?.typeMfa?.toLowerCase());
         setMfaMethod(data?.typeMfa?.toLowerCase());
       })
       .catch((err) => {
-        if (err.response?.status === 401) {
-          toast("Anda harus login terlebih dahulu", {
-            type: "error",
-            toastId: "error",
-            position: "top-center",
-            icon: XIcon,
-          });
-          router.replace({
-            pathname: handleRoute("login"),
-            query: { ...router.query, setting: "2" },
-          });
-        }
+        throw err;
       });
   };
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
     if (!router.isReady) return;
-    if (!token) {
-      router.push({
-        pathname: handleRoute("login"),
-        query: { ...router.query, setting: "2" },
-      });
-    } else {
-      setIsShowpage(true);
-      geTypeMfa();
-    }
+    setIsShowpage(true);
+    geTypeMfa();
   }, [router.isReady]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
@@ -372,14 +338,9 @@ const FRModal = ({
         setIsLoading(false);
         setShowModalFr(false);
         toast.dismiss("info");
-        if (err.response?.status === 401) {
-          toast.error("Anda harus login terlebih dahulu", { icon: <XIcon /> });
-          doRedirect("login");
-        } else {
-          toast.error(err.response?.data?.message || "Gagal validasi wajah", {
-            icon: <XIcon />,
-          });
-        }
+        toast.error(err.response?.data?.message || "Gagal validasi wajah", {
+          icon: <XIcon />,
+        });
       });
   };
 

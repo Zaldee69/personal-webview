@@ -81,10 +81,6 @@ const FRModal: React.FC<IModal> = ({ modal, setModal, callbackFailure }) => {
       payload: {
         face_image: base64Img?.split(",")[1] as string,
       },
-      token: getStorageWithExpiresIn("token_hashsign", AUTHHASH_PATHNAME, {
-        ...router.query,
-        showAutoLogoutInfo: "1",
-      }),
     })
       .then((res) => {
         if (res.success) {
@@ -146,24 +142,15 @@ const FRModal: React.FC<IModal> = ({ modal, setModal, callbackFailure }) => {
         setIsLoading(false);
         setIsFRSuccess(false);
         toast.dismiss("info");
-        if (err.response?.status === 401) {
-          restLogout({ token: localStorage.getItem("refresh_token_hashsign") });
-          removeStorageWithExpiresIn("token_hashsign");
-          localStorage.removeItem("refresh_token_hashsign");
-          router.replace({
-            pathname: AUTHHASH_PATHNAME,
-            query: { ...router.query, showAutoLogoutInfo: "1" },
-          });
-        } else {
-          toast.error(err.response?.data?.message || "Wajah tidak cocok", {
-            icon: <XIcon />,
-          });
-          if (
-            err.response?.data?.message?.toLowerCase() ===
-            "authhashsign gagal. gagal FR sudah 5 kali".toLocaleLowerCase()
-          ) {
-            setModal(false);
-          }
+
+        toast.error(err.response?.data?.message || "Wajah tidak cocok", {
+          icon: <XIcon />,
+        });
+        if (
+          err.response?.data?.message?.toLowerCase() ===
+          "authhashsign gagal. gagal FR sudah 5 kali".toLocaleLowerCase()
+        ) {
+          setModal(false);
         }
       });
   };
@@ -233,10 +220,6 @@ const OTPModal: React.FC<IModal> = ({
       payload: {
         otp_pin: values.join(""),
       },
-      token: getStorageWithExpiresIn("token_hashsign", AUTHHASH_PATHNAME, {
-        ...router.query,
-        showAutoLogoutInfo: "1",
-      }),
     })
       .then((res) => {
         if (res.success) {
@@ -295,12 +278,8 @@ const OTPModal: React.FC<IModal> = ({
         toast.dismiss("loading");
         setValues(["", "", "", "", "", ""]);
         if (err.response?.status === 401) {
-          restLogout({ token: localStorage.getItem("refresh_token_hashsign") });
-          removeStorageWithExpiresIn("token_hashsign");
-          localStorage.removeItem("refresh_token_hashsign");
-          router.replace({
-            pathname: AUTHHASH_PATHNAME,
-            query: { ...router.query, showAutoLogoutInfo: "1" },
+          toast.error("Terjadi kesalahan", {
+            icon: <XIcon />,
           });
         } else {
           toast.error(err.response?.data?.message || t("otpInvalid"), {
@@ -342,12 +321,7 @@ const OTPModal: React.FC<IModal> = ({
   };
 
   const handleTriggerSendOTP = () => {
-    restGetOtp({
-      token: getStorageWithExpiresIn("token_hashsign", AUTHHASH_PATHNAME, {
-        ...router.query,
-        showAutoLogoutInfo: "1",
-      }),
-    })
+    restGetOtp()
       .then((res) => {
         if (res.success) {
           timerHandler();
@@ -369,19 +343,9 @@ const OTPModal: React.FC<IModal> = ({
         }
       })
       .catch((err) => {
-        if (err?.request?.status === 401) {
-          restLogout({ token: localStorage.getItem("refresh_token_hashsign") });
-          removeStorageWithExpiresIn("token_hashsign");
-          localStorage.removeItem("refresh_token_hashsign");
-          router.replace({
-            pathname: AUTHHASH_PATHNAME,
-            query: { ...router.query, showAutoLogoutInfo: "1" },
-          });
-        } else {
-          toast.error("Kode OTP gagal dikirim", {
-            icon: <XIcon />,
-          });
-        }
+        toast.error("Kode OTP gagal dikirim", {
+          icon: <XIcon />,
+        });
       });
   };
 
@@ -426,7 +390,7 @@ const OTPModal: React.FC<IModal> = ({
             values={values}
             onChange={(value, index, values) => setValues(values)}
           />
-          <div className="flex justify-center text-sm gap-1 mt-5">
+          <div className="flex justify-center items-center text-sm gap-1 mt-5">
             <Paragraph>{t("dindtReceiveOtp")}</Paragraph>
             <div
               style={{
@@ -502,6 +466,7 @@ const Login = ({}: IPropsLogin) => {
   const [openFRModal, setopenFRModal] = useState<boolean>(false);
   const [otpModal, setOtpModal] = useState<boolean>(false);
   const [isSuccess, setIsSuccess] = useState<"-1" | "0" | "1">("-1");
+  const [rememberMe, setRememberMe] = useState<boolean>(false);
 
   const {
     channel_id,
@@ -523,37 +488,19 @@ const Login = ({}: IPropsLogin) => {
   useEffect(() => {
     if (isSubmitted && data.status === "FULLFILLED" && data.data.success) {
       setStorageWithExpiresIn(
-        "token_hashsign",
+        "token",
         data.data.data[0],
         getExpFromToken(data.data.data[0]) as number
       );
 
-      localStorage.setItem(
-        "refresh_token_hashsign",
-        data.data.data[1] as string
-      );
+      localStorage.setItem("refresh_token", data.data.data[1] as string);
       doIn(data);
     }
     toastCaller(data, themeConfiguration?.data.toast_color as string);
   }, [data.status]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const doIn = (data?: TLoginInitialState): void => {
-    let queryWithDynamicRedirectURL = {
-      ...router.query,
-    };
-
-    const token_hashsign = getStorageWithExpiresIn(
-      "token_hashsign",
-      handleRoute("signing/authhash"),
-      {
-        ...queryWithDynamicRedirectURL,
-        showAutoLogoutInfo: "1",
-      }
-    );
-
-    getCertificateList({
-      token: token_hashsign,
-    }).then((res) => {
+    getCertificateList().then((res) => {
       const certif = JSON.parse(res.data);
       if (!id) {
         toast.dismiss("success");
@@ -565,7 +512,7 @@ const Login = ({}: IPropsLogin) => {
         });
       } else {
         if (certif[0].status == "Aktif") {
-          getUserName({ token: token_hashsign })
+          getUserName()
             .then((res) => {
               if (res.success) {
                 const data = JSON.parse(res.data);
@@ -588,28 +535,16 @@ const Login = ({}: IPropsLogin) => {
               }
             })
             .catch((err) => {
-              if (err.response?.status === 401) {
-                restLogout({
-                  token: localStorage.getItem("refresh_token_hashsign"),
-                });
-                removeStorageWithExpiresIn("token_hashsign");
-                localStorage.removeItem("refresh_token_hashsign");
-                router.replace({
-                  pathname: AUTHHASH_PATHNAME,
-                  query: { ...router.query, showAutoLogoutInfo: "1" },
-                });
-              } else {
-                toast(
-                  err.response?.data?.message ||
-                    "Tidak berhasil pada saat memuat Signature MFA",
-                  {
-                    type: "error",
-                    toastId: "error",
-                    position: "top-center",
-                    icon: XIcon,
-                  }
-                );
-              }
+              toast(
+                err.response?.data?.message ||
+                  "Tidak berhasil pada saat memuat Signature MFA",
+                {
+                  type: "error",
+                  toastId: "error",
+                  position: "top-center",
+                  icon: XIcon,
+                }
+              );
             });
         }
       }
@@ -644,15 +579,23 @@ const Login = ({}: IPropsLogin) => {
 
   const mfaCallbackSuccess = () => {
     setIsSuccess("1");
-    removeStorageWithExpiresIn("token_hashsign");
-    localStorage.removeItem("refresh_token_hashsign");
+    removeStorageWithExpiresIn("token");
+    localStorage.removeItem("refresh_token");
   };
 
   const mfaCallbackFailure = () => {
     setIsSuccess("0");
-    removeStorageWithExpiresIn("token_hashsign");
-    localStorage.removeItem("refresh_token_hashsign");
+    removeStorageWithExpiresIn("token");
+    localStorage.removeItem("refresh_token");
   };
+
+  useEffect(() => {
+    if (rememberMe) {
+      localStorage.setItem("rememberMe", true as any);
+    } else {
+      localStorage.removeItem("rememberMe");
+    }
+  }, [rememberMe]);
 
   return (
     <div
@@ -701,6 +644,19 @@ const Login = ({}: IPropsLogin) => {
               >
                 {type.password === "password" ? <EyeIcon /> : <EyeIconOff />}
               </button>
+            </div>
+            <div className="flex items-center mt-5">
+              <input
+                type="checkbox"
+                className="mr-2 !w-5 !h-5"
+                id="rememberMe"
+                name="rememberMe"
+                checked={rememberMe}
+                onChange={() => setRememberMe(!rememberMe)}
+              />
+              <Label size="base" htmlFor="rememberMe">
+                {t("rememberMe")}
+              </Label>
             </div>
             <div className="flex justify-center items-center mt-5">
               <Link
