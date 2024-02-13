@@ -199,16 +199,12 @@ function SettingSignatureAndMFA({}: Props) {
     })
       .then((res) => {
         handleChangeSignatureAndMfaSuccess(res.message, isMustRedirect);
-        if(!isMustRedirect){
+        if (!isMustRedirect) {
           getUserData();
         }
       })
       .catch((err) => {
-        if (err.response?.status === 401) {
-          handleUnauthenticated({ redirectTo });
-        } else {
-          handleChangeSignatureAndMfaFailure("Terjadi kesalahan");
-        }
+        handleChangeSignatureAndMfaFailure("Terjadi kesalahan");
       });
   };
 
@@ -218,12 +214,7 @@ function SettingSignatureAndMFA({}: Props) {
     })
       .then((res) => res)
       .catch((err) => {
-        if (err.response.status === 401) {
-          setIsLoading(false);
-          handleUnauthenticated({ redirectTo });
-        } else {
-          handleChangeSignatureAndMfaFailure("Terjadi kesalahan");
-        }
+        handleChangeSignatureAndMfaFailure("Terjadi kesalahan");
       });
     return res;
   };
@@ -254,14 +245,12 @@ function SettingSignatureAndMFA({}: Props) {
   };
 
   const getUserData = () => {
-    getUserName({})
+    getUserName()
       .then((res) => {
         handleGetUserDataSuccess(res.data);
       })
       .catch((err) => {
-        if (err.response?.status === 401) {
-          handleUnauthenticated({ redirectTo });
-        }
+        throw err;
       });
   };
 
@@ -337,26 +326,14 @@ function SettingSignatureAndMFA({}: Props) {
       .catch((err) => {
         setIsShowFrModal(false);
         toast.dismiss("info");
-        if (err.response?.status === 401) {
-          handleUnauthenticated({ redirectTo });
-        } else {
-          toast.error(err.response?.data?.message || "Gagal validasi wajah", {
-            icon: <XIcon />,
-          });
-        }
+        toast.error(err.response?.data?.message || "Gagal validasi wajah", {
+          icon: <XIcon />,
+        });
       });
   };
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      router.push({
-        pathname: handleRoute("login"),
-        query: { ...router.query },
-      });
-    } else {
-      getUserData();
-    }
+    getUserData();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (

@@ -90,8 +90,6 @@ const Login = ({}: Props) => {
       localStorage.setItem("rememberMe", true as any);
     } else {
       localStorage.removeItem("rememberMe");
-      // localStorage.removeItem("token");
-      localStorage.removeItem("refresh_token");
     }
   }, [rememberMe]);
 
@@ -155,13 +153,14 @@ const Login = ({}: Props) => {
   const doIn = (data?: TLoginInitialState): void => {
     let queryWithDynamicRedirectURL = {
       ...router.query,
+      login_from: "login",
     };
 
     if (data) {
       setDoInAuto(false);
     }
 
-    getCertificateList({ params: company_id as string }).then((res) => {
+    getCertificateList().then((res) => {
       const certif = JSON.parse(res.data);
       if (!transaction_id && signing === "1") {
         toast.dismiss("success");
@@ -173,7 +172,7 @@ const Login = ({}: Props) => {
         });
       } else {
         if (certif[0].status == "Aktif") {
-          getUserName({}).then((res) => {
+          getUserName().then((res) => {
             const data = JSON.parse(res.data);
             const path = "setting-signature-and-mfa";
             if (data.typeMfa == null || router.query.next_path === path) {
@@ -199,7 +198,7 @@ const Login = ({}: Props) => {
               });
             } else {
               router.replace({
-                pathname: handleRoute("signing"),
+                pathname: handleRoute(router.query.origin as string),
                 query: {
                   ...queryWithDynamicRedirectURL,
                 },
@@ -294,7 +293,15 @@ const Login = ({}: Props) => {
             {t("dontHaveCertifSubtitle")}
           </Paragraph>
           <Paragraph size="sm" className="text-center">
-            {t("furtherQuestions")} <a href="https://tilaka.id/contact/" target="_blank" className="text-[#4b68af]" key={0} >{t("contactUs")}</a>
+            {t("furtherQuestions")}{" "}
+            <a
+              href="https://tilaka.id/contact/"
+              target="_blank"
+              className="text-[#4b68af]"
+              key={0}
+            >
+              {t("contactUs")}
+            </a>
           </Paragraph>
         </div>
       </Modal>
@@ -338,7 +345,7 @@ const Login = ({}: Props) => {
             <div className="flex items-center mt-5">
               <input
                 type="checkbox"
-                className="mr-2"
+                className="mr-2 !w-5 !h-5"
                 id="rememberMe"
                 name="rememberMe"
                 checked={rememberMe}
@@ -499,7 +506,7 @@ const LoginQueue = ({
 
   useEffect(() => {
     // validate token
-    getUserName({ token: existingToken })
+    getUserName()
       .then((_) => {
         // token valid and redirect to authenticated page
         setStorageWithExpiresIn(

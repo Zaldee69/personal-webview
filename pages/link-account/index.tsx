@@ -204,10 +204,10 @@ const LinkAccount = (props: Props) => {
       // penautan and penautan_consent will redirected to /linking/* result page
       if (signing === "1" || setting === "1") {
         toast.dismiss("load");
-        getCertificateList({ params: "" as string }).then((res) => {
+        getCertificateList().then((res) => {
           const certif = JSON.parse(res.data);
           if (certif[0].status == "Aktif") {
-            getUserName({}).then((res) => {
+            getUserName().then((res) => {
               const data = JSON.parse(res.data);
               if (data.typeMfa == null) {
                 if (setting === "1") {
@@ -224,7 +224,10 @@ const LinkAccount = (props: Props) => {
                     query: { ...params },
                   });
                 }
-              } else if (setting === "1" && (data.signatureBase64 == null || data.signatureBase64 == "null")){ 
+              } else if (
+                setting === "1" &&
+                (data.signatureBase64 == null || data.signatureBase64 == "null")
+              ) {
                 router.replace({
                   pathname: handleRoute("setting-signature-and-mfa"),
                   query: {

@@ -181,25 +181,14 @@ const SigningWithRead = () => {
   useEffect(() => {
     if (!routerIsReady) return;
 
-    const token_v2 = getStorageWithExpiresIn(
-      "token_v2",
-      handleRoute("login/v2"),
-      {
-        ...router.query,
-        showAutoLogoutInfo: "1",
-      }
-    );
+    const token = getStorageWithExpiresIn("token", handleRoute("login/v2"), {
+      ...router.query,
+      showAutoLogoutInfo: "1",
+    });
     const count = parseInt(localStorage.getItem("count_v2") as string);
     localStorage.setItem("count_v2", count ? count.toString() : "0");
-    if (!token_v2) {
-      router.replace({
-        pathname: handleRoute("login/v2"),
-        query: { ...router.query },
-      });
-    } else {
+    if (token) {
       setShouldRender(true);
-    }
-    if (token_v2) {
       setShouldDisableSubmit(true);
       RestSigningDownloadSignedPDF({
         request_id: routerQuery.request_id as string,
@@ -207,7 +196,7 @@ const SigningWithRead = () => {
         .then((res) => {
           if (res.success) {
             setDocumentList(res.signed_pdf || []);
-            getUserName({ token: token_v2 })
+            getUserName()
               .then((res) => {
                 if (res.success) {
                   const data = JSON.parse(res.data);
@@ -226,35 +215,23 @@ const SigningWithRead = () => {
                 }
               })
               .catch((err) => {
-                if (err.response?.status === 401) {
-                  restLogout({
-                    token: localStorage.getItem("refresh_token_v2"),
-                  });
-                  removeStorageWithExpiresIn("token_v2");
-                  localStorage.removeItem("refresh_token_v2");
-                  router.replace({
-                    pathname: handleRoute("login/v2"),
-                    query: { ...router.query, showAutoLogoutInfo: "1" },
-                  });
-                } else {
-                  toast(
-                    err.response?.data?.message ||
-                      "Tidak berhasil pada saat memuat Signature MFA",
-                    {
-                      type: "error",
-                      toastId: "error",
-                      position: "top-center",
-                      icon: XIcon,
-                    }
-                  );
-                }
+                toast(
+                  err.response?.data?.message ||
+                    "Tidak berhasil pada saat memuat Signature MFA",
+                  {
+                    type: "error",
+                    toastId: "error",
+                    position: "top-center",
+                    icon: XIcon,
+                  }
+                );
               });
           } else {
             setIsSuccess("0");
             setSigningFailureDocumentName("");
             if (res.status === "DENIED") {
               setSiginingFailureError({
-                message: res.message || "Status dokument DENIED",
+                message: res.message || "Status dokumen DENIED",
                 status: res.status,
               });
             } else if (res.status === "PROCESS") {
@@ -293,13 +270,7 @@ const SigningWithRead = () => {
             });
           } else {
             if (err.response.status === 401) {
-              restLogout({ token: localStorage.getItem("refresh_token_v2") });
-              removeStorageWithExpiresIn("token_v2");
-              localStorage.removeItem("refresh_token_v2");
-              router.replace({
-                pathname: handleRoute("login/v2"),
-                query: { ...router.query, showAutoLogoutInfo: "1" },
-              });
+              ////
             } else {
               setIsSuccess("0");
               setSigningFailureDocumentName("");
@@ -563,96 +534,72 @@ const SigningWithoutRead = () => {
   useEffect(() => {
     if (!routerIsReady) return;
 
-    const token_v2 = getStorageWithExpiresIn(
-      "token_v2",
-      handleRoute("login/v2"),
-      {
-        ...router.query,
-        showAutoLogoutInfo: "1",
-      }
-    );
     const count = parseInt(localStorage.getItem("count_v2") as string);
     localStorage.setItem("count_v2", count ? count.toString() : "0");
-    if (!token_v2) {
-      router.replace({
-        pathname: handleRoute("login/v2"),
-        query: { ...router.query },
-      });
-    } else {
-      setShouldRender(true);
-    }
-    if (token_v2) {
-      setShouldDisableSubmit(true);
-      RestSigningDownloadSignedPDF({
-        request_id: routerQuery.request_id as string,
-      })
-        .then((res) => {
-          if (res.success) {
-            setDocumentList(res.signed_pdf || []);
-            getUserName({ token: token_v2 })
-              .then((res) => {
-                if (res.success) {
-                  const data = JSON.parse(res.data);
-                  setTypeMFA(data.typeMfa);
-                  setShouldDisableSubmit(false);
-                } else {
-                  toast(
-                    res?.message || "Ada yang salah saat memuat Signature MFA",
-                    {
-                      type: "error",
-                      toastId: "error",
-                      position: "top-center",
-                      icon: XIcon,
-                    }
-                  );
-                }
-              })
-              .catch((err) => {
-                if (err.response?.status === 401) {
-                  restLogout({
-                    token: localStorage.getItem("refresh_token_v2"),
-                  });
-                  removeStorageWithExpiresIn("token_v2");
-                  localStorage.removeItem("refresh_token_v2");
-                  router.replace({
-                    pathname: handleRoute("login/v2"),
-                    query: { ...router.query, showAutoLogoutInfo: "1" },
-                  });
-                } else {
-                  toast(
-                    err.response?.data?.message ||
-                      "Tidak berhasil pada saat memuat Signature MFA",
-                    {
-                      type: "error",
-                      toastId: "error",
-                      position: "top-center",
-                      icon: XIcon,
-                    }
-                  );
-                }
-              });
-          } else {
-            setIsSuccess("0");
-            setSigningFailureDocumentName("");
-            if (res.status === "DENIED") {
-              setSiginingFailureError({
-                message: res.message || "Status dokument DENIED",
-                status: res.status,
-              });
-            } else if (res.status === "PROCESS") {
-              if (res.signed_pdf === null) {
-                setSiginingFailureError({
-                  message: t("documentExpired"),
-                  status: "Exp",
+    setShouldDisableSubmit(true);
+    RestSigningDownloadSignedPDF({
+      request_id: routerQuery.request_id as string,
+    })
+      .then((res) => {
+        if (res.success) {
+          setDocumentList(res.signed_pdf || []);
+          getUserName()
+            .then((res) => {
+              if (res.success) {
+                const data = JSON.parse(res.data);
+                setTypeMFA(data.typeMfa);
+                setShouldDisableSubmit(false);
+                setShouldRender(true)
+              } else {
+                toast(
+                  res?.message || "Ada yang salah saat memuat Signature MFA",
+                  {
+                    type: "error",
+                    toastId: "error",
+                    position: "top-center",
+                    icon: XIcon,
+                  }
+                );
+              }
+            })
+            .catch((err) => {
+              if (err.response?.status === 401) {
+                restLogout({
+                  token: localStorage.getItem("refresh_token"),
+                });
+                removeStorageWithExpiresIn("token");
+                localStorage.removeItem("refresh_token");
+                router.replace({
+                  pathname: handleRoute("login/v2"),
+                  query: { ...router.query, showAutoLogoutInfo: "1" },
                 });
               } else {
-                setSiginingFailureError({
-                  message:
-                    res.message ||
-                    "Tidak berhasil pada saat memuat list dokumen",
-                  status: "Exp",
-                });
+                toast(
+                  err.response?.data?.message ||
+                    "Tidak berhasil pada saat memuat Signature MFA",
+                  {
+                    type: "error",
+                    toastId: "error",
+                    position: "top-center",
+                    icon: XIcon,
+                  }
+                );
               }
+            });
+        } else {
+          setIsSuccess("0");
+          setSigningFailureDocumentName("");
+          if (res.status === "DENIED") {
+            setSiginingFailureError({
+              message: res.message || "Status dokument DENIED",
+              status: res.status,
+            });
+          } else if (res.status === "PROCESS") {
+            if (res.signed_pdf === null) {
+              setSiginingFailureError({
+                message: t("documentExpired"),
+                status: "Exp",
+              });
             } else {
               setSiginingFailureError({
                 message:
@@ -660,41 +607,47 @@ const SigningWithoutRead = () => {
                 status: "Exp",
               });
             }
+          } else {
+            setSiginingFailureError({
+              message:
+                res.message || "Tidak berhasil pada saat memuat list dokumen",
+              status: "Exp",
+            });
           }
-        })
-        .catch((err) => {
-          if (
-            err.response?.data?.message &&
-            err.response?.data?.data?.errors?.[0]
-          ) {
+        }
+      })
+      .catch((err) => {
+        if (
+          err.response?.data?.message &&
+          err.response?.data?.data?.errors?.[0]
+        ) {
+          setIsSuccess("0");
+          setSigningFailureDocumentName("");
+          setSiginingFailureError({
+            message: `${err.response?.data?.message}, ${err.response?.data?.data?.errors?.[0]}`,
+            status: "Exp",
+          });
+        } else {
+          if (err.response.status === 401) {
+            restLogout({ token: localStorage.getItem("refresh_token") });
+            removeStorageWithExpiresIn("token");
+            localStorage.removeItem("refresh_token");
+            router.replace({
+              pathname: handleRoute("login/v2"),
+              query: { ...router.query, showAutoLogoutInfo: "1" },
+            });
+          } else {
             setIsSuccess("0");
             setSigningFailureDocumentName("");
             setSiginingFailureError({
-              message: `${err.response?.data?.message}, ${err.response?.data?.data?.errors?.[0]}`,
+              message:
+                err.response?.data?.message ||
+                "Kesalahan pada saat memuat list dokumen",
               status: "Exp",
             });
-          } else {
-            if (err.response.status === 401) {
-              restLogout({ token: localStorage.getItem("refresh_token_v2") });
-              removeStorageWithExpiresIn("token_v2");
-              localStorage.removeItem("refresh_token_v2");
-              router.replace({
-                pathname: handleRoute("login/v2"),
-                query: { ...router.query, showAutoLogoutInfo: "1" },
-              });
-            } else {
-              setIsSuccess("0");
-              setSigningFailureDocumentName("");
-              setSiginingFailureError({
-                message:
-                  err.response?.data?.message ||
-                  "Kesalahan pada saat memuat list dokumen",
-                status: "Exp",
-              });
-            }
           }
-        });
-    }
+        }
+      });
   }, [routerIsReady]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!shouldRender) return null;
@@ -1108,7 +1061,7 @@ const FRModal: React.FC<IModal> = ({
         user: routerQuery.user as string,
         async: routerQuery.async as string,
       },
-      token: getStorageWithExpiresIn("token_v2", handleRoute("login/v2"), {
+      token: getStorageWithExpiresIn("token", handleRoute("login/v2"), {
         ...router.query,
         showAutoLogoutInfo: "1",
       }),
@@ -1147,9 +1100,9 @@ const FRModal: React.FC<IModal> = ({
         setIsFRSuccess(false);
         toast.dismiss("info");
         if (err.response?.status === 401) {
-          restLogout({ token: localStorage.getItem("refresh_token_v2") });
-          removeStorageWithExpiresIn("token_v2");
-          localStorage.removeItem("refresh_token_v2");
+          restLogout({ token: localStorage.getItem("refresh_token") });
+          removeStorageWithExpiresIn("token");
+          localStorage.removeItem("refresh_token");
           router.replace({
             pathname: handleRoute("login/v2"),
             query: { ...router.query, showAutoLogoutInfo: "1" },
@@ -1239,7 +1192,7 @@ const OTPModal: React.FC<IModal> = ({
         user: routerQuery.user as string,
         async: routerQuery.async as string,
       },
-      token: getStorageWithExpiresIn("token_v2", handleRoute("login/v2"), {
+      token: getStorageWithExpiresIn("token", handleRoute("login/v2"), {
         ...router.query,
         showAutoLogoutInfo: "1",
       }),
@@ -1275,13 +1228,7 @@ const OTPModal: React.FC<IModal> = ({
         toast.dismiss("loading");
         setValues(["", "", "", "", "", ""]);
         if (err.response?.status === 401) {
-          restLogout({ token: localStorage.getItem("refresh_token_v2") });
-          removeStorageWithExpiresIn("token_v2");
-          localStorage.removeItem("refresh_token_v2");
-          router.replace({
-            pathname: handleRoute("login/v2"),
-            query: { ...router.query, showAutoLogoutInfo: "1" },
-          });
+          ///
         } else {
           toast.error(err.response?.data?.message || t("otpInvalid"), {
             icon: <XIcon />,
@@ -1323,12 +1270,7 @@ const OTPModal: React.FC<IModal> = ({
   };
 
   const handleTriggerSendOTP = () => {
-    restGetOtp({
-      token: getStorageWithExpiresIn("token_v2", handleRoute("login/v2"), {
-        ...router.query,
-        showAutoLogoutInfo: "1",
-      }),
-    })
+    restGetOtp()
       .then((res) => {
         if (res.success) {
           timerHandler();
@@ -1351,9 +1293,9 @@ const OTPModal: React.FC<IModal> = ({
       })
       .catch((err) => {
         if (err?.request?.status === 401) {
-          restLogout({ token: localStorage.getItem("refresh_token_v2") });
-          removeStorageWithExpiresIn("token_v2");
-          localStorage.removeItem("refresh_token_v2");
+          restLogout({ token: localStorage.getItem("refresh_token") });
+          removeStorageWithExpiresIn("token");
+          localStorage.removeItem("refresh_token");
           router.replace({
             pathname: handleRoute("login/v2"),
             query: { ...router.query, showAutoLogoutInfo: "1" },

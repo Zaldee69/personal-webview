@@ -27,6 +27,7 @@ import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
 import { getStorageWithExpiresIn } from "@/utils/localStorageWithExpiresIn";
 import { initialState } from "@/redux/slices/themeSlice";
 import { setTokenToLocalStorage } from "@/utils/token";
+import CORE_API from "@/config/API";
 
 const BASE_URL =
   process.env.NEXT_PUBLIC_PERSONAL_API_URL || "https://dev-api.tilaka.id";
@@ -163,16 +164,10 @@ export const RestPersonalFaceRecognitionV2 = ({
 }: {
   payload: TPersonalFaceRecognitionRequestDataV2;
 }): Promise<TPersonalFaceRecognitionResponseData> => {
-  return axios
-    .post<TPersonalFaceRecognitionResponseData>(
-      `${BASE_URL}/checkFr`,
-      payload,
-      {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      }
-    )
+  return CORE_API.post<TPersonalFaceRecognitionResponseData>(
+    `/checkFr`,
+    payload
+  )
     .then((res) => res.data)
     .catch((err) => {
       throw err;

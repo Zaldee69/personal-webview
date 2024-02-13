@@ -45,7 +45,7 @@ const SettingSignature = ({}: Props) => {
   });
   const [imageURL, setImageURL] = useState<string>();
   const [data, setData] = useState<string>();
-  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   let ref: any = null;
   const sigPad = useRef<any>();
   const router = useRouter();
@@ -63,38 +63,29 @@ const SettingSignature = ({}: Props) => {
   const themeConfiguration = useSelector((state: RootState) => state.theme);
 
   const getTilakaName = () => {
-    getUserName({})
-    .then((res) => {
-      const data = JSON.parse(res.data);
-      setData(data.name);
-    })
-    .catch((err) => {
-      switch (err.response.status) {
-        case 401:
-          // unauthorized
-          router.replace({
-            pathname: handleRoute("login"),
-            query: { ...router.query, setting: "3" },
-          });
-          break;
+    getUserName()
+      .then((res) => {
+        const data = JSON.parse(res.data);
+        setData(data.name);
+      })
+      .catch((err) => {
+        switch (err.response.status) {
+          case 401:
+            // unauthorized
+            router.replace({
+              pathname: handleRoute("login"),
+              query: { ...router.query, setting: "3" },
+            });
+            break;
 
-        default:
-          break;
-      }
-    });
-  }
+          default:
+            break;
+        }
+      });
+  };
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if(!router.isReady) return
-    if (!token) {
-      router.push({
-        pathname: handleRoute("login"),
-        query: { ...router.query, setting: "3" },
-      });
-    } else {
-      getTilakaName();
-    }
+    getTilakaName();
   }, [router, router.isReady]); // eslint-disable-line react-hooks/exhaustive-deps
 
   //Convert HTML element to base64 png
@@ -110,7 +101,7 @@ const SettingSignature = ({}: Props) => {
 
   const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setIsLoading(true)
+    setIsLoading(true);
     toast(`Loading...`, {
       type: "info",
       toastId: "info",
@@ -143,7 +134,7 @@ const SettingSignature = ({}: Props) => {
       (signature_type == 1 && !imageURL)
     ) {
       toast.dismiss("info");
-      setIsLoading(false)
+      setIsLoading(false);
       toast(
         `${
           signature_type === 0 ? t("handwritingRequired") : t("FontRequired")
@@ -187,7 +178,7 @@ const SettingSignature = ({}: Props) => {
               }, 3000);
             }
           } else {
-            setIsLoading(false)
+            setIsLoading(false);
             toast.dismiss("info");
             toast(res.message, {
               type: "error",
@@ -198,28 +189,7 @@ const SettingSignature = ({}: Props) => {
           }
         })
         .catch((err) => {
-          if (err.response?.status === 401) {
-            setIsLoading(false)
-            toast.dismiss("info");
-            toast("Anda harus login terlebih dahulu", {
-              type: "error",
-              toastId: "error",
-              position: "top-center",
-              icon: XIcon,
-            });
-            router.replace({
-              pathname: handleRoute("login"),
-              query: { ...router.query, setting: "3" },
-            });
-          } else {
-            toast.dismiss("info");
-            toast("Penggantian tanda tangan gagal", {
-              type: "error",
-              toastId: "error",
-              position: "top-center",
-              icon: XIcon,
-            });
-          }
+          throw err;
         });
     }
   };
@@ -239,23 +209,20 @@ const SettingSignature = ({}: Props) => {
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
       <div className="p-4 max-w-md mx-auto">
-        <Heading className="mt-2">
-          {t("settingSignatureTitle")}
-        </Heading>
+        <Heading className="mt-2">{t("settingSignatureTitle")}</Heading>
         <form onSubmit={handleFormSubmit}>
-        <div
-          className="bg-contain w-52 mx-auto h-52 bg-center bg-no-repeat"
-          style={{
-            backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
-              themeConfiguration.data.asset_activation_setting_signature_and_mfa as string,
-              "ASSET",
-              `${assetPrefix}/images/ttdSetting.svg`
-            )})`,
-          }}
-        ></div>
-          <Paragraph>
-            {t("chooseSignature")}
-          </Paragraph>
+          <div
+            className="bg-contain w-52 mx-auto h-52 bg-center bg-no-repeat"
+            style={{
+              backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
+                themeConfiguration.data
+                  .asset_activation_setting_signature_and_mfa as string,
+                "ASSET",
+                `${assetPrefix}/images/ttdSetting.svg`
+              )})`,
+            }}
+          ></div>
+          <Paragraph>{t("chooseSignature")}</Paragraph>
           <div className="mt-2 rounded-md bg-blue50 py-2 px-4 flex items-start">
             <div className="pt-1">
               <InfoIcon />
@@ -287,9 +254,7 @@ const SettingSignature = ({}: Props) => {
                 checked={form.signature_type == 1}
                 className="appearance-none bg-white w-4 h-4 ring-1 ring-neutral40 border-2 border-neutral40 rounded-full checked:bg-primary checked:ring-primary"
               />
-              <Paragraph className="ml-2.5">
-                {t("fontSignature")}
-              </Paragraph>
+              <Paragraph className="ml-2.5">{t("fontSignature")}</Paragraph>
             </label>
           </div>
           <div className={form.signature_type == 0 ? undefined : "hidden"}>
