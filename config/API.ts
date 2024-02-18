@@ -19,15 +19,22 @@ const processQueue = (err: any, token = null) => {
   failedQueue = [];
 };
 
+const clearAuth = () => {
+  localStorage.removeItem("deviceToken");
+  localStorage.removeItem("fingerprint");
+  localStorage.removeItem("refreshToken");
+  localStorage.removeItem("token");
+};
+
 const unaunthenticated = () => {
   const queryString = window.location.search;
-  const origin = window.location.pathname;
   const urlParams = new URLSearchParams(window.location.search);
   const loginFromParam = urlParams.get("login_from");
+
+  clearAuth();
+
   if (queryString.includes("login_from")) {
-    window.location.replace(
-      handleRoute(`${loginFromParam}${queryString}&origin=${origin}`)
-    );
+    window.location.replace(handleRoute(`${loginFromParam}${queryString}`));
   } else {
     toast.error("Sesi and telah habis");
     window.location.reload();
@@ -43,6 +50,7 @@ export async function createRefreshToken() {
 
   if (!refresh_token) {
     unaunthenticated();
+    return;
   }
 
   try {
