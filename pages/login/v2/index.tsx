@@ -100,6 +100,14 @@ const Login = ({}: IPropsLogin) => {
       if (showAutoLogoutInfo === "1") {
         setAutoLogoutModal(true);
       }
+
+      const token = localStorage.getItem("token");
+
+      if (token) {
+        const queryString = window.location.search;
+
+        window.location.replace(handleRoute(`signing/v2/${queryString}`));
+      }
     }
   }, [router.isReady]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -180,7 +188,7 @@ const Login = ({}: IPropsLogin) => {
             pathname: handleRoute("signing/v2"),
             query: {
               ...queryWithDynamicRedirectURL,
-              login_from: "login/v2"
+              login_from: "login/v2",
             },
           });
         } else if (

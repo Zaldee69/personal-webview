@@ -17,7 +17,6 @@ import { login } from "@/redux/slices/loginSlice";
 import { handleRoute } from "@/utils/handleRoute";
 import { assetPrefix } from "../../../next.config";
 import {
-  getStorageWithExpiresIn,
   removeStorageWithExpiresIn,
   setStorageWithExpiresIn,
 } from "@/utils/localStorageWithExpiresIn";
@@ -58,8 +57,6 @@ interface IModal {
   }) => void;
   tilakaName?: string;
 }
-
-const AUTHHASH_PATHNAME = handleRoute("signing/authhash");
 
 const FRModal: React.FC<IModal> = ({ modal, setModal, callbackFailure }) => {
   const router = useRouter();
@@ -550,6 +547,14 @@ const Login = ({}: IPropsLogin) => {
       }
     });
   };
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    if (token) {
+      doIn();
+    }
+  }, []);
 
   const onChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
