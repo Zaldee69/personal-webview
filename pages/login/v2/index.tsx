@@ -106,7 +106,7 @@ const Login = ({}: IPropsLogin) => {
       if (token) {
         const queryString = window.location.search;
 
-        window.location.replace(handleRoute(`signing/v2/${queryString}`));
+        window.location.replace(handleRoute(`signing/v2?${queryString}`));
       }
     }
   }, [router.isReady]); // eslint-disable-line react-hooks/exhaustive-deps
