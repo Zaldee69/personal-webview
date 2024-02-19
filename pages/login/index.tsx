@@ -85,11 +85,11 @@ const Login = ({}: Props) => {
 
       if (router.query.setting === "2") {
         window.location.replace(
-          handleRoute(`set-mfa?${queryString}&login_from=/login`)
+          handleRoute(`set-mfa${queryString}&login_from=/login`)
         );
       } else if (router.query.setting === "3") {
         window.location.replace(
-          handleRoute(`setting-signature?${queryString}&login_from=/login`)
+          handleRoute(`setting-signature${queryString}&login_from=/login`)
         );
       }
     }
