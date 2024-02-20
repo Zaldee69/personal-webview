@@ -224,6 +224,18 @@ export const RestPersonalPManualReg = (
     });
 };
 
+export const RestPersonalPManualRegV2 = (payload: {
+  photo_selfie: string;
+  register_id: string;
+}): Promise<TPersonalPManualRegResponseData> => {
+  return axios
+    .post<TPersonalPManualRegResponseData>(`${BASE_URL}/pManualReg`, payload)
+    .then((res) => res.data)
+    .catch((err) => {
+      throw err;
+    });
+};
+
 export const RestThemeConfiguration = ({
   uuid,
   type,

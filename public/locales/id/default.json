@@ -237,6 +237,8 @@
     "photoSelfie": {
       "label": "Foto Selfie",
       "uploadPhoto": "Unggah Foto Selfie",
+      "errorMessage1": "Foto selfie harus diunggah",
+      "errorMessage2": "Foto selfie tidak memenuhi persyaratan",
       "termTitle": "Ketentuan foto selfie",
       "term1": "Wajah menghadap depan dan terlihat dengan jelas.",
       "term2": "Lepaskan atribut seperti kacamata topi dan masker, serta rambut tidak menutupi wajah.",
