@@ -56,9 +56,9 @@ const Index = (props: Props) => {
       />
     );
   } else if (props.step === "form-success") {
-    <FormSuccess />;
+    return <FormSuccess />;
   } else if (props.step === "pin-form") {
-    <PinForm />;
+    return <PinForm />;
   } else {
     return <Liveness {...props} />;
   }
