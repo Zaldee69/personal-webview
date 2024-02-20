@@ -42,7 +42,11 @@ interface Type {
   confirmPassword: string;
 }
 
-const Form: React.FC = () => {
+interface Props {
+  token: string;
+}
+
+const Form: React.FC<Props> = (props) => {
   const router = useRouter();
   const { request_id, ...restRouterQuery } = router.query;
   const [input, setInput] = useState<InputType>({
@@ -51,7 +55,11 @@ const Form: React.FC = () => {
     tilakaName: "",
   });
 
-  const[isLoading, setIsLoading] = useState<boolean>(false)
+  if (props.token) {
+    localStorage.setItem(request_id as string, props.token);
+  }
+
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const [error, setError] = useState<ErrorType>({
     password: "",
@@ -76,7 +84,8 @@ const Form: React.FC = () => {
     error.tilakaName ||
     error.confirmPassword ||
     error.password ||
-    !isChecked || isLoading;
+    !isChecked ||
+    isLoading;
 
   const onChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -451,7 +460,15 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       return { err };
     });
 
-  return serverSideRenderReturnConditions({ context, checkStepResult });
+  const serverSideRenderReturnConditionsResult =
+    serverSideRenderReturnConditions({ context, checkStepResult });
+
+  serverSideRenderReturnConditionsResult["props"] = {
+    ...serverSideRenderReturnConditionsResult["props"],
+    token: checkStepResult.res?.data?.token,
+  };
+
+  return serverSideRenderReturnConditionsResult;
 };
 
 export default Form;
