@@ -28,11 +28,8 @@ import Loading from "@/components/Loading";
 import {
   getStorageWithExpiresIn,
   removeStorageWithExpiresIn,
-  setStorageWithExpiresIn,
 } from "@/utils/localStorageWithExpiresIn";
-import { getExpFromToken } from "@/utils/getExpFromToken";
 import Link from "next/link";
-import { getEncodedCurrentUrl } from "@/utils/getEncodedCurrentUrl";
 import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
 import Button, { buttonVariants } from "@/components/atoms/Button";
 import Heading from "@/components/atoms/Heading";
@@ -72,6 +69,7 @@ const Login = ({}: IPropsLogin) => {
   const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
   const [rememberMe, setRememberMe] = useState<boolean>(false);
   const [autoLogoutModal, setAutoLogoutModal] = useState<boolean>(false);
+  const [isRender, setIsRender] = useState(false);
   const [loginQueue, setLoginQueue] = useState<{
     queue: boolean;
     data: { existingToken: TEventMessageDataToken };
@@ -95,18 +93,24 @@ const Login = ({}: IPropsLogin) => {
   const themeConfiguration = useSelector((state: RootState) => state.theme);
 
   useEffect(() => {
+    const name = localStorage.getItem(`tilakaName-${router.query.user}`);
+    const token = localStorage.getItem(`token-${name}`);
+    const rememberMe = localStorage.getItem(`rememberMe-${name}`);
+
+    if (token && rememberMe) {
+      const queryString = window.location.search;
+
+      window.location.replace(handleRoute(`signing/v2${queryString}`));
+    } else {
+      setIsRender(true);
+    }
+  }, []);
+
+  useEffect(() => {
     if (router.isReady) {
       setTilakaName(user as string);
       if (showAutoLogoutInfo === "1") {
         setAutoLogoutModal(true);
-      }
-
-      const token = localStorage.getItem("token");
-
-      if (token) {
-        const queryString = window.location.search;
-
-        window.location.replace(handleRoute(`signing/v2?${queryString}`));
       }
     }
   }, [router.isReady]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -122,9 +126,9 @@ const Login = ({}: IPropsLogin) => {
 
   useEffect(() => {
     if (rememberMe) {
-      localStorage.setItem("rememberMe", true as any);
+      localStorage.setItem(`rememberMe-${tilakaName}`, true as any);
     } else {
-      localStorage.removeItem("rememberMe");
+      localStorage.removeItem(`rememberMe-${tilakaName}`);
     }
   }, [rememberMe]);
 
@@ -196,6 +200,7 @@ const Login = ({}: IPropsLogin) => {
           certif[0].status === "Expired" ||
           certif[0].status === "Enroll"
         ) {
+          localStorage.removeItem(`token-${tilakaName}`);
           setCertifModal(true);
         } else {
           router.replace({
@@ -247,7 +252,7 @@ const Login = ({}: IPropsLogin) => {
     );
   }
 
-  return (
+  return isRender ? (
     <div
       className="min-h-screen"
       style={{
@@ -379,7 +384,7 @@ const Login = ({}: IPropsLogin) => {
         <Footer />
       </div>
     </div>
-  );
+  ) : null;
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {

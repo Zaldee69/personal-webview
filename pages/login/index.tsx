@@ -28,7 +28,6 @@ import {
 } from "@/utils/localStorageWithExpiresIn";
 import { getExpFromToken } from "@/utils/getExpFromToken";
 import Link from "next/link";
-import { getEncodedCurrentUrl } from "@/utils/getEncodedCurrentUrl";
 import Button, { buttonVariants } from "@/components/atoms/Button";
 import { TThemeResponse } from "infrastructure/rest/personal/types";
 import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
@@ -36,7 +35,6 @@ import Paragraph from "@/components/atoms/Paraghraph";
 import Heading from "@/components/atoms/Heading";
 import Label from "@/components/atoms/Label";
 import Modal from "@/components/modal/Modal";
-import { Trans } from "react-i18next";
 
 type Props = {};
 
@@ -47,6 +45,7 @@ const loginQueueInitial = { queue: false, data: { existingToken: undefined } };
 const Login = ({}: Props) => {
   const [password, setPassword] = useState<string>("");
   const [tilakaName, setTilakaName] = useState("");
+  const [isRender, setIsRender] = useState(false);
   const [certifModal, setCertifModal] = useState<boolean>(false);
   const [type, setType] = useState<{ password: string }>({
     password: "password",
@@ -78,9 +77,11 @@ const Login = ({}: Props) => {
 
   // When the component mounts
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const tilakaName = localStorage.getItem(`tilakaName-${tilaka_name}`);
+    const token = localStorage.getItem(`token-${tilakaName}`);
+    const rememberMe = localStorage.getItem(`rememberMe-${tilakaName}`);
 
-    if (token) {
+    if (token && rememberMe) {
       const queryString = window.location.search;
 
       if (router.query.setting === "2") {
@@ -92,37 +93,22 @@ const Login = ({}: Props) => {
           handleRoute(`setting-signature${queryString}&login_from=/login`)
         );
       }
+    } else {
+      setIsRender(true);
     }
   }, []);
-
-  useEffect;
 
   // When the state of the "remember me" checkbox changes
   useEffect(() => {
     if (rememberMe) {
-      localStorage.setItem("rememberMe", true as any);
+      localStorage.setItem(`rememberMe-${tilakaName}`, true as any);
     } else {
-      localStorage.removeItem("rememberMe");
+      localStorage.removeItem(`rememberMe-${tilakaName}`);
     }
   }, [rememberMe]);
 
   useEffect(() => {
     if (data.status === "FULLFILLED" && data.data.success) {
-      setStorageWithExpiresIn(
-        "token",
-        data.data.data[0],
-        getExpFromToken(data.data.data[0]) as number
-      );
-
-      if (rememberMe) {
-        setStorageWithExpiresIn(
-          "token",
-          data.data.data[0],
-          getExpFromToken(data.data.data[0]) as number
-        );
-        localStorage.setItem("refresh_token", data.data.data[1] as string);
-      }
-
       doIn(data);
     }
     toastCaller(data, themeConfiguration?.data.toast_color as string);
@@ -223,6 +209,7 @@ const Login = ({}: Props) => {
           certif[0].status === "Expired" ||
           certif[0].status === "Enroll"
         ) {
+          localStorage.removeItem(`token-${tilaka_name}`);
           setCertifModal(true);
         } else {
           router.replace({
@@ -275,7 +262,7 @@ const Login = ({}: Props) => {
 
   if (themeConfiguration.status === "PENDING") return null;
 
-  return (
+  return isRender ? (
     <div
       className="min-h-screen"
       style={{
@@ -437,7 +424,7 @@ const Login = ({}: Props) => {
         <Footer />
       </div>
     </div>
-  );
+  ) : null;
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
