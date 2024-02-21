@@ -22,9 +22,15 @@ const processQueue = (err: any, token = null) => {
 const clearAuth = () => {
   localStorage.removeItem("deviceToken");
   localStorage.removeItem("fingerprint");
-  localStorage.removeItem(`tilakaName-${Router.query.tilaka_name}`);
-  localStorage.removeItem(`refreshToken-${Router.query.tilaka_name}`);
-  localStorage.removeItem(`token-${Router.query.tilaka_name}`);
+  localStorage.removeItem(
+    `tilakaName-${Router.query.tilaka_name || Router.query.user}`
+  );
+  localStorage.removeItem(
+    `refreshToken-${Router.query.tilaka_name || Router.query.user}`
+  );
+  localStorage.removeItem(
+    `token-${Router.query.tilaka_name || Router.query.user}`
+  );
 };
 
 const unaunthenticated = () => {
@@ -47,8 +53,8 @@ export async function createRefreshToken() {
 
   const device_token = localStorage.getItem("deviceToken");
   const fingerprint = localStorage.getItem("fingerprint");
-  const refresh_token = localStorage.getItem(`refreshToken-${tilaka_name}`);
-  const rememberMe = localStorage.getItem(`rememberMe-${tilaka_name}`);
+  const refresh_token = localStorage.getItem(`refreshToken-${tilaka_name || user || user_identifier}`);
+  const rememberMe = localStorage.getItem(`rememberMe-${tilaka_name || user || user_identifier}`);
 
   if (!rememberMe) {
     unaunthenticated();
@@ -99,7 +105,7 @@ const handleUnauthorize = async (
   const originalRequest = error.config;
 
   const rememberMe = localStorage.getItem(
-    `rememberMe-${Router.query.tilaka_name}`
+    `rememberMe-${Router.query.tilaka_name || Router.query.user}`
   );
 
   if (!rememberMe) unaunthenticated();
