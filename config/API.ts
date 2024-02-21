@@ -22,8 +22,9 @@ const processQueue = (err: any, token = null) => {
 const clearAuth = () => {
   localStorage.removeItem("deviceToken");
   localStorage.removeItem("fingerprint");
-  localStorage.removeItem("refreshToken");
-  localStorage.removeItem("token");
+  localStorage.removeItem(`tilakaName-${Router.query.tilaka_name}`);
+  localStorage.removeItem(`refreshToken-${Router.query.tilaka_name}`);
+  localStorage.removeItem(`token-${Router.query.tilaka_name}`);
 };
 
 const unaunthenticated = () => {
@@ -46,42 +47,46 @@ export async function createRefreshToken() {
 
   const device_token = localStorage.getItem("deviceToken");
   const fingerprint = localStorage.getItem("fingerprint");
-  const refresh_token = localStorage.getItem("refreshToken");
+  const refresh_token = localStorage.getItem(`refreshToken-${tilaka_name}`);
+  const rememberMe = localStorage.getItem(`rememberMe-${tilaka_name}`);
 
-  if (!refresh_token) {
+  if (!rememberMe) {
     unaunthenticated();
-    return;
-  }
+  } else {
+    try {
+      const refreshResponse = await axios.post(`${BASE_URL}/v2/refreshToken`, {
+        channel_id,
+        device_token,
+        fingerprint,
+        refresh_token,
+        user_identifier: user_identifier || tilaka_name || user,
+      });
 
-  try {
-    const refreshResponse = await axios.post(`${BASE_URL}/v2/refreshToken`, {
-      channel_id,
-      device_token,
-      fingerprint,
-      refresh_token,
-      user_identifier: user_identifier || tilaka_name || user,
-    });
+      if (refreshResponse.data.success) {
+        console.log(user_identifier);
+        localStorage.setItem(
+          `token-${user_identifier || tilaka_name || user}`,
+          refreshResponse.data.data.token
+        );
+        isRefreshing = false;
+        processQueue(null, refreshResponse.data.data.token);
+        return refreshResponse.data.token;
+      } else {
+        console.error("Refresh token failed:", refreshResponse.data.message);
+        unaunthenticated();
+      }
+    } catch (error) {
+      const axiosError = error as AxiosError;
+      if (axiosError?.response?.status === 401) {
+        processQueue(axiosError);
+        unaunthenticated();
+      } else {
+        isRefreshing = false;
+        return Promise.reject(axiosError);
+      }
 
-    if (refreshResponse.data.success) {
-      localStorage.setItem("token", refreshResponse.data.data.token);
-      isRefreshing = false;
-      processQueue(null, refreshResponse.data.data.token);
-      return refreshResponse.data.token;
-    } else {
-      console.error("Refresh token failed:", refreshResponse.data.message);
-      unaunthenticated();
+      console.log("Error refreshing token: ", axiosError);
     }
-  } catch (error) {
-    const axiosError = error as AxiosError;
-    if (axiosError?.response?.status === 401) {
-      processQueue(axiosError);
-      unaunthenticated();
-    } else {
-      isRefreshing = false;
-      return Promise.reject(axiosError);
-    }
-
-    console.log("Error refreshing token: ", axiosError);
   }
 }
 
@@ -92,6 +97,12 @@ const handleUnauthorize = async (
   console.log("handle unauthorized ...");
 
   const originalRequest = error.config;
+
+  const rememberMe = localStorage.getItem(
+    `rememberMe-${Router.query.tilaka_name}`
+  );
+
+  if (!rememberMe) unaunthenticated();
 
   if (
     !originalRequest ||
@@ -139,7 +150,9 @@ export const CORE_API = axios.create({
 
 CORE_API.interceptors.request.use(
   async (config: AxiosRequestConfig) => {
-    const accessToken = localStorage.getItem("token");
+    const accessToken = localStorage.getItem(
+      `token-${Router.query.tilaka_name || Router.query.user}`
+    );
 
     // Ensure config.headers is treated as an object
     if (config.headers === undefined) {

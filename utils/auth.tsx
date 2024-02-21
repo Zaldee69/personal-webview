@@ -106,7 +106,7 @@ export async function login(
       request_id,
     };
 
-    const remember = localStorage.getItem("rememberMe");
+    const remember = localStorage.getItem(`rememberMe-${tilaka_name}`);
 
     if (remember) {
       body.device_token = deviceToken;
@@ -114,32 +114,24 @@ export async function login(
 
     const loginResponse = await axios.post(`${BASE_URL}/checkPassword`, body);
 
-    const TOKEN = loginResponse?.data.data[0];
-    const REFSRESH_TOKEN = loginResponse?.data.data[1];
-    const FINGERPRINT = deviceToken;
-    const DEVICE_TOKEN =
-      loginResponse.data.data[loginResponse.data.data.length - 1].split(
-        "device_token:"
-      )[1];
-
     if (loginResponse.data.success) {
-      // Save token, refresh token, and device token to local storage
-      localStorage.setItem("token", TOKEN);
+      const TOKEN = loginResponse?.data.data[0];
+      const REFSRESH_TOKEN = loginResponse?.data.data[1];
+      const FINGERPRINT = deviceToken;
+      const DEVICE_TOKEN =
+        loginResponse.data.data[loginResponse.data.data.length - 1].split(
+          "device_token:"
+        )[1];
 
-      if (remember) {
-        body.device_token = deviceToken;
-        localStorage.setItem("refreshToken", REFSRESH_TOKEN);
-      }
+      // Save token, refresh token, and device token to local storage
+      localStorage.setItem(`token-${tilaka_name}`, TOKEN);
+      localStorage.setItem(`tilakaName-${tilaka_name}`, tilaka_name);
+
+      body.device_token = deviceToken;
+      localStorage.setItem(`refreshToken-${tilaka_name}`, REFSRESH_TOKEN);
 
       localStorage.setItem("deviceToken", DEVICE_TOKEN);
       localStorage.setItem("fingerprint", FINGERPRINT);
-
-      // if (remember) {
-      //   localStorage.setItem(
-      //     "deviceToken",
-      //     loginResponse?.data.data.device_token
-      //   );
-      // }
     }
 
     return loginResponse;

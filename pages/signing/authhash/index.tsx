@@ -484,13 +484,6 @@ const Login = ({}: IPropsLogin) => {
 
   useEffect(() => {
     if (isSubmitted && data.status === "FULLFILLED" && data.data.success) {
-      setStorageWithExpiresIn(
-        "token",
-        data.data.data[0],
-        getExpFromToken(data.data.data[0]) as number
-      );
-
-      localStorage.setItem("refresh_token", data.data.data[1] as string);
       doIn(data);
     }
     toastCaller(data, themeConfiguration?.data.toast_color as string);
@@ -543,15 +536,23 @@ const Login = ({}: IPropsLogin) => {
                 }
               );
             });
+        } else if (
+          certif[0].status === "Revoke" ||
+          certif[0].status === "Expired" ||
+          certif[0].status === "Enroll"
+        ) {
+          localStorage.removeItem(`token-${tilakaName}`);
         }
       }
     });
   };
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const name = localStorage.getItem(`tilakaName-${router.query.user}`);
+    const token = localStorage.getItem(`token-${name}`);
+    const rememberMe = localStorage.getItem(`rememberMe-${name}`);
 
-    if (token) {
+    if (token && rememberMe) {
       doIn();
     }
   }, []);
@@ -596,9 +597,9 @@ const Login = ({}: IPropsLogin) => {
 
   useEffect(() => {
     if (rememberMe) {
-      localStorage.setItem("rememberMe", true as any);
+      localStorage.setItem(`rememberMe-${tilakaName}`, true as any);
     } else {
-      localStorage.removeItem("rememberMe");
+      localStorage.removeItem(`rememberMe-${tilakaName}`);
     }
   }, [rememberMe]);
 
