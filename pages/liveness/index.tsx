@@ -41,13 +41,14 @@ import {
 import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
 import { serverSideRenderReturnConditions } from "@/utils/serverSideRenderReturnConditions";
 import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
-import { PinInput } from "react-input-pin-code";
 import Button from "@/components/atoms/Button";
 import { TOTPResponse } from "infrastructure/rest/personal/types";
 import Loader from "@/public/icons/Loader";
 import Heading from "@/components/atoms/Heading";
 import { cn } from "@/utils/twClassMerge";
 import LivenessImagePreview from "@/components/LivenessImagePreview";
+import { useResizeDetector } from "react-resize-detector";
+import OTPInput from "@/components/OTPInput";
 
 type TQueryParams = {
   request_id?: string;
@@ -856,6 +857,8 @@ const OTP = ({ success, uuid, handleSuccessCreateOTP }: IOTPProps) => {
     localStorage.endTime = +new Date() + interval;
   };
 
+  const { width, ref } = useResizeDetector();
+
   const resendOTP = () => {
     setIsProcessResend(true);
     RestResendOTPRegistration({ request_id: uuid })
@@ -964,25 +967,20 @@ const OTP = ({ success, uuid, handleSuccessCreateOTP }: IOTPProps) => {
       }}
       className="flex justify-center items-center min-h-screen px-3 pt-3 pb-5"
     >
-      <div className="py-9 font-poppins max-w-md card-pin-form flex items-center">
+      <div
+        ref={ref}
+        className="py-9 font-poppins max-w-md card-pin-form flex items-center"
+      >
         <div>
           <Heading className="text-center">{t("frSubtitle2")}</Heading>
-          <p className="text-center text-neutral200 mt-2">
+          <p className="text-center md:text-base text-sm text-neutral200 mt-2">
             {t("OTPModalSubtitle")}
           </p>
           <form onSubmit={verifyOTP}>
-            <PinInput
-              containerStyle={{
-                alignItems: "center",
-                justifyContent: "center",
-                gap: 5,
-                marginTop: "30px",
-              }}
-              inputStyle={{ alignItems: "center", gap: 5, marginTop: "10px" }}
-              placeholder=""
-              size="lg"
+            <OTPInput
+              width={width!}
+              setValues={setOtpValues}
               values={otpValues}
-              onChange={(_, __, values) => setOtpValues(values)}
             />
             {isMaxResend ? (
               <p className="text-center mt-2 text-sm text-red300">

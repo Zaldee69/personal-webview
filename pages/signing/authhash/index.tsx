@@ -4,13 +4,11 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import Image from "next/legacy/image";
 import { toast } from "react-toastify";
-import { PinInput } from "react-input-pin-code";
 import i18n from "i18";
 import {
   getCertificateList,
   getUserName,
   restGetOtp,
-  restLogout,
 } from "infrastructure/rest/b2b";
 import { AppDispatch, RootState } from "@/redux/app/store";
 import { login } from "@/redux/slices/loginSlice";
@@ -18,9 +16,7 @@ import { handleRoute } from "@/utils/handleRoute";
 import { assetPrefix } from "../../../next.config";
 import {
   removeStorageWithExpiresIn,
-  setStorageWithExpiresIn,
 } from "@/utils/localStorageWithExpiresIn";
-import { getExpFromToken } from "@/utils/getExpFromToken";
 import { RestSigningAuthhashsign } from "infrastructure";
 import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
 import toastCaller from "@/utils/toastCaller";
@@ -37,6 +33,8 @@ import Label from "@/components/atoms/Label";
 import { TLoginInitialState, TLoginProps } from "@/interface/interface";
 import { NextParsedUrlQuery } from "next/dist/server/request-meta";
 import Head from "next/head";
+import OTPInput from "@/components/OTPInput";
+import { useResizeDetector } from "react-resize-detector";
 
 interface IPropsLogin {}
 
@@ -191,6 +189,8 @@ const OTPModal: React.FC<IModal> = ({
   } & IParameterFromRequestSign = router.query;
 
   const [values, setValues] = useState(["", "", "", "", "", ""]);
+
+  const { width, ref } = useResizeDetector();
 
   const themeConfiguration = useSelector((state: RootState) => state.theme);
 
@@ -364,38 +364,30 @@ const OTPModal: React.FC<IModal> = ({
   return modal ? (
     <div
       style={{ backgroundColor: "rgba(0, 0, 0, .5)" }}
-      className="fixed z-50 flex items-start transition-all duration-1000 pb-3 justify-center w-full left-0 top-0 h-full "
+      className="fixed z-50 flex items-start transition-all duration-1000 justify-center w-full left-0 top-0 min-h-screen "
     >
       <div className="bg-white max-w-md mt-20 pt-5 px-2 pb-3 rounded-md w-full mx-5">
-        <div className="flex flex-col">
+        <div ref={ref} className="flex flex-col">
           <Heading className="block text-center pb-5  whitespace-nowrap">
             {t("frTitle")}
           </Heading>
-          <Paragraph className="block text-center pb-5">
+          <Paragraph className="block text-center text-sm md:text-base">
             {t("frSubtitle2")}
           </Paragraph>
-          <PinInput
-            containerStyle={{
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 5,
-              marginTop: "10px",
-            }}
-            inputStyle={{ alignItems: "center", gap: 5, marginTop: "10px" }}
-            placeholder=""
-            size="lg"
+          <OTPInput
+            width={width! / 1.12}
+            setValues={setValues}
             values={values}
-            onChange={(value, index, values) => setValues(values)}
           />
           <div className="flex justify-center items-center text-sm gap-1 mt-5">
-            <Paragraph>{t("dindtReceiveOtp")}</Paragraph>
+            <Paragraph size="sm">{t("dindtReceiveOtp")}</Paragraph>
             <div
               style={{
                 color: themeConfigurationAvaliabilityChecker(
                   themeConfiguration?.data.action_font_color as string
                 ),
               }}
-              className="font-semibold"
+              className="font-semibold text-sm"
             >
               {!isCountDone ? (
                 <Button
