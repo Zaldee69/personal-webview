@@ -20,7 +20,6 @@ import React, {
   useEffect,
   useState,
 } from "react";
-import { PinInput } from "react-input-pin-code";
 import { toast } from "react-toastify";
 import i18n from "i18";
 import EyeIcon2 from "@/public/icons/EyeIcon2";
@@ -43,6 +42,8 @@ import Label from "@/components/atoms/Label";
 import useGenerateRedirectUrl from "@/hooks/useGenerateRedirectUrl";
 import FaceRecognitionModal from "@/components/modal/FaceRecognitionModal";
 import fRFailureCounter from "@/utils/fRFailureCounter";
+import { useResizeDetector } from "react-resize-detector";
+import OTPInput from "@/components/OTPInput";
 
 interface IParameterFromRequestSign {
   user?: string;
@@ -549,7 +550,7 @@ const SigningWithoutRead = () => {
                 const data = JSON.parse(res.data);
                 setTypeMFA(data.typeMfa);
                 setShouldDisableSubmit(false);
-                setShouldRender(true)
+                setShouldRender(true);
               } else {
                 toast(
                   res?.message || "Ada yang salah saat memuat Signature MFA",
@@ -1169,6 +1170,8 @@ const OTPModal: React.FC<IModal> = ({
 
   const { t }: any = i18n;
 
+  const { width, ref } = useResizeDetector();
+
   const signingFailure = (message: string) => {
     callbackFailure(
       documentList[0].pdf_name, // currently not support bulk signing, so we use docuemnt on index 0
@@ -1323,31 +1326,26 @@ const OTPModal: React.FC<IModal> = ({
     }
   }, [successSigning]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  return modal ? (
+  return  modal ? (
     <div
       style={{ backgroundColor: "rgba(0, 0, 0, .5)" }}
       className="fixed z-50 flex items-start transition-all duration-1000 pb-3 justify-center w-full left-0 top-0 h-full "
     >
-      <div className="bg-white max-w-md mt-20 pt-5 px-2 pb-3 rounded-md w-full mx-5">
+      <div
+        ref={ref}
+        className="bg-white max-w-md mt-20 pt-5 px-2 pb-3 rounded-md w-full mx-5"
+      >
         <div className="flex flex-col">
           <Heading className="block text-center pb-5  whitespace-nowrap">
             {t("frTitle")}
           </Heading>
-          <Paragraph className="block text-center pb-5  ">
+          <Paragraph className="block text-center  ">
             {t("frSubtitle2")}
           </Paragraph>
-          <PinInput
-            containerStyle={{
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 5,
-              marginTop: "10px",
-            }}
-            inputStyle={{ alignItems: "center", gap: 5, marginTop: "10px" }}
-            placeholder=""
-            size="lg"
+          <OTPInput
+            width={width! / 1.1}
+            setValues={setValues}
             values={values}
-            onChange={(value, index, values) => setValues(values)}
           />
           <div className="flex justify-center text-sm gap-1 mt-5">
             <Paragraph>{t("dindtReceiveOtp")}</Paragraph>

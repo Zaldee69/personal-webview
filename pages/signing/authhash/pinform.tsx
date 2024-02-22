@@ -1,15 +1,10 @@
-import PinFormComponent from "@/components/PinFormComponent";
 import i18n from "i18";
 import { RestOTPDedicated, RestSigningAuthhashsign } from "infrastructure";
-import { NextParsedUrlQuery } from "next/dist/server/request-meta";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/app/store";
-import { handleRoute } from "@/utils/handleRoute";
-import Modal from "@/components/modal/Modal";
-import { PinInput } from "react-input-pin-code";
 import Button from "@/components/atoms/Button";
 import Loader from "@/public/icons/Loader";
 import Heading from "@/components/atoms/Heading";
@@ -19,6 +14,8 @@ import { toast } from "react-toastify";
 import CheckOvalIcon from "@/public/icons/CheckOvalIcon";
 import XIcon from "@/public/icons/XIcon";
 import { concateRedirectUrlParams } from "@/utils/concateRedirectUrlParams";
+import { useResizeDetector } from "react-resize-detector";
+import OTPInput from "@/components/OTPInput";
 
 interface Props extends IOTPDedicatedResponse {
   id: string;
@@ -43,6 +40,8 @@ const PinFormDedicatedChannel = ({ id, user, success }: Props) => {
   const reset = () => {
     localStorage.endTime = +new Date() + interval;
   };
+
+  const { width, ref } = useResizeDetector();
 
   const resendOTP = () => {
     setIsProcessResend(true);
@@ -191,22 +190,14 @@ const PinFormDedicatedChannel = ({ id, user, success }: Props) => {
       }}
       className="flex justify-center items-center min-h-screen px-3 pt-3 pb-5"
     >
-      <div className="h-96 px-6 pb-4 font-poppins card-pin-form">
+      <div ref={ref} className="h-96 w-96 px-6 pb-4 font-poppins card-pin-form">
         <Heading className="text-center">{t("frSubtitle2")}</Heading>
         <p className="text-center text-neutral200 mt-2">{t("frTitle")}</p>
         <form onSubmit={verifyOTP}>
-          <PinInput
-            containerStyle={{
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 5,
-              marginTop: "30px",
-            }}
-            inputStyle={{ alignItems: "center", gap: 5, marginTop: "10px" }}
-            placeholder=""
-            size="lg"
+          <OTPInput
+            width={width!}
+            setValues={setOtpValues}
             values={otpValues}
-            onChange={(_, __, values) => setOtpValues(values)}
           />
 
           <div className="flex justify-center text-sm gap-1 mt-5">
