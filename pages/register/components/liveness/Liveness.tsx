@@ -263,6 +263,11 @@ const Liveness = (props: Props) => {
     setCurrentActionIndex(2);
     dispatch(setIsRetry(false));
 
+    localStorage.setItem(
+      routerQuery.request_id as string,
+      props.checkStepResult.data.token as string
+    );
+
     try {
       const body: TKycVerificationRequestData = {
         registerId: router.query.request_id as string,
