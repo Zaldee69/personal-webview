@@ -46,6 +46,7 @@ import ModalLayout from "@/components/layout/ModalLayout";
 import CloseIcon from "@/public/icons/CloseIcon";
 import TextInput from "@/components/atoms/TextInput";
 import FaceRecognitionModal from "@/components/modal/FaceRecognitionModal";
+import axios from "axios";
 
 type Props = {
   checkStepResultDataRoute: TKycCheckStepResponseData["data"]["route"];
@@ -164,6 +165,106 @@ const LinkAccount = (props: Props) => {
     }
   }, [router.isReady]);
 
+  const getCertificate = async () => {
+    let queryWithDynamicRedirectURL = {
+      ...router.query,
+    };
+
+    const setRedirectUrl = (url: string) => {
+      queryWithDynamicRedirectURL["redirect_url"] = url;
+    };
+
+    if (data.data.message.length > 0 && setting === "1") {
+      if (redirect_url) {
+        setRedirectUrl(redirect_url as string);
+        queryWithDynamicRedirectURL["request-id"] = request_id;
+        queryWithDynamicRedirectURL["tilaka-name"] = form.tilaka_name;
+      } else {
+        setRedirectUrl(data.data.message);
+      }
+    } else {
+      setRedirectUrl(redirect_url as string);
+      queryWithDynamicRedirectURL["request-id"] = request_id;
+      queryWithDynamicRedirectURL["tilaka-name"] = form.tilaka_name;
+    }
+    localStorage.setItem("refresh_token", data.data.data[1] as string);
+    setStorageWithExpiresIn(
+      "token",
+      data.data.data[0] as string,
+      getExpFromToken(data.data.data[0]) as number
+    );
+
+    const params = {
+      tilaka_name: form.tilaka_name,
+      request_id,
+      redirect_url: data.data.message,
+    };
+
+    const res = await axios.get(
+      `${process.env.NEXT_PUBLIC_DS_API_URL}/certificationlist`,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem(
+            `token-${form.tilaka_name}`
+          )}`,
+        },
+      }
+    );
+
+    if (res.data.success) {
+      const certif = JSON.parse(res.data.data);
+      if (certif[0].status == "Aktif") {
+        getUserName().then((res) => {
+          const data = JSON.parse(res.data.data);
+          if (data.typeMfa == null) {
+            if (setting === "1") {
+              router.replace({
+                pathname: handleRoute("setting-signature-and-mfa"),
+                query: {
+                  ...queryWithDynamicRedirectURL,
+                  tilaka_name: form.tilaka_name,
+                },
+              });
+            } else {
+              router.replace({
+                pathname: handleRoute("link-account/success"),
+                query: { ...params },
+              });
+            }
+          } else if (
+            setting === "1" &&
+            (data.signatureBase64 == null || data.signatureBase64 == "null")
+          ) {
+            router.replace({
+              pathname: handleRoute("setting-signature-and-mfa"),
+              query: {
+                ...queryWithDynamicRedirectURL,
+                tilaka_name: form.tilaka_name,
+              },
+            });
+          } else {
+            toast.dismiss();
+            toast.error("Sudah melakukan penautan");
+          }
+        });
+      } else if (certif[0].status == "Enroll") {
+        setIsLoading(false);
+        toast.dismiss();
+        toast.warning(
+          "Penerbitan sertifikat dalam proses, cek email Anda untuk informasi sertifikat"
+        );
+      } else {
+        router.replace({
+          pathname: handleRoute("certificate-information"),
+          query: {
+            ...queryWithDynamicRedirectURL,
+            tilaka_name: form.tilaka_name,
+          },
+        });
+      }
+    }
+  };
+
   useEffect(() => {
     // res -- data.data.is_penautan: boolean;
     if (data.status === "FULLFILLED" && data.data.success) {
@@ -204,58 +305,7 @@ const LinkAccount = (props: Props) => {
       // penautan and penautan_consent will redirected to /linking/* result page
       if (signing === "1" || setting === "1") {
         toast.dismiss("load");
-        getCertificateList().then((res) => {
-          const certif = JSON.parse(res.data);
-          if (certif[0].status == "Aktif") {
-            getUserName().then((res) => {
-              const data = JSON.parse(res.data);
-              if (data.typeMfa == null) {
-                if (setting === "1") {
-                  router.replace({
-                    pathname: handleRoute("setting-signature-and-mfa"),
-                    query: {
-                      ...queryWithDynamicRedirectURL,
-                      tilaka_name: form.tilaka_name,
-                    },
-                  });
-                } else {
-                  router.replace({
-                    pathname: handleRoute("link-account/success"),
-                    query: { ...params },
-                  });
-                }
-              } else if (
-                setting === "1" &&
-                (data.signatureBase64 == null || data.signatureBase64 == "null")
-              ) {
-                router.replace({
-                  pathname: handleRoute("setting-signature-and-mfa"),
-                  query: {
-                    ...queryWithDynamicRedirectURL,
-                    tilaka_name: form.tilaka_name,
-                  },
-                });
-              } else {
-                toast.dismiss();
-                toast.error("Sudah melakukan penautan");
-              }
-            });
-          } else if (certif[0].status == "Enroll") {
-            setIsLoading(false);
-            toast.dismiss();
-            toast.warning(
-              "Penerbitan sertifikat dalam proses, cek email Anda untuk informasi sertifikat"
-            );
-          } else {
-            router.replace({
-              pathname: handleRoute("certificate-information"),
-              query: {
-                ...queryWithDynamicRedirectURL,
-                tilaka_name: form.tilaka_name,
-              },
-            });
-          }
-        });
+        getCertificate();
       } else {
         toast.dismiss("load");
         if (
