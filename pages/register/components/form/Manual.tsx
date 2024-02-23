@@ -197,22 +197,14 @@ const Manual = (props: Props) => {
         token: res.token,
       };
 
-      if (
-        res.channel_type === "REGULAR" &&
-        props.checkStepResultDataRoute !== "manual_form"
-      ) {
-        toast.dismiss();
-        router.push({
-          pathname: handleRoute("manual-form/final"),
-          query,
-        });
-      } else {
-        toast.dismiss();
-        router.push({
-          pathname: handleRoute("manual-form/on-process"),
-          query: { ...router.query },
-        });
-      }
+      toast.dismiss();
+      router.push({
+        pathname: handleRoute("register"),
+        query: {
+          ...query,
+          step: "form-success",
+        },
+      });
     } catch (err: any) {
       setIsLoading(false);
       toast.dismiss();
