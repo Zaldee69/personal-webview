@@ -74,7 +74,10 @@ function CertificateInformation({}: Props) {
       company_id: company_id as string,
       serial_number: certificate.serialNumber,
     };
-    RestConfirmCertificate(body)
+
+    const token = localStorage.getItem(`token-${router.query.tilaka_name}`)!;
+
+    RestConfirmCertificate(body, token)
       .then((res) => {
         toast.dismiss("info");
         if (res.success) {
