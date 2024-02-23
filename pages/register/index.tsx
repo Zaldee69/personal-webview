@@ -1,10 +1,11 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Liveness, { TQueryParams } from "./components/liveness/Liveness";
 import { GetServerSideProps } from "next";
 import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
 import {
   RestGenerateOTPRegistration,
   RestKycCheckStepv2,
+  RestKycFinalForm,
 } from "infrastructure";
 import { TOTPResponse } from "infrastructure/rest/personal/types";
 import LivenessFail from "./components/liveness/LivenessFail";
@@ -17,6 +18,8 @@ import FormSuccess from "./components/form/Success";
 import PinForm from "./components/form/PinForm";
 import { toast } from "react-toastify";
 import { concateRedirectUrlParams } from "@/utils/concateRedirectUrlParams";
+import Loading from "@/components/Loading";
+import i18n from "i18";
 
 interface Props extends TOTPResponse {
   uuid: string;
@@ -35,7 +38,9 @@ const Index = (props: Props) => {
   const { status, pin_form, route, nationality_type, reason_code } =
     props?.checkStepResult?.data || {};
 
+  const { t }: any = i18n;
   const { message } = props?.checkStepResult || {};
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const router = useRouter();
   const routerQuery = router.query;
@@ -93,22 +98,80 @@ const Index = (props: Props) => {
       toast.success("Proses registrasi telah selesai", {
         autoClose: 1500,
       });
-    }
 
-    const params: TQueryParams = {
-      request_id: routerQuery.request_id as string,
+      const params: TQueryParams = {
+        request_id: routerQuery.request_id as string,
+      };
+
+      setTimeout(() => {
+        router.replace({
+          pathname: handleRoute("register"),
+          query: {
+            ...params,
+            reason_code: data.reason_code,
+            step: "form-success",
+          },
+        });
+      }, 1500);
+    }
+  };
+
+  const finalForm = (reason_code?: string | null) => {
+    setIsLoading(true);
+    const query: any = {
+      ...routerQuery,
+      registration_id: router.query.request_id,
     };
 
-    setTimeout(() => {
-      router.replace({
-        pathname: handleRoute("register"),
-        query: {
-          ...params,
-          reason_code: data.reason_code,
-          step: "form-success",
-        },
-      });
-    }, 1500);
+    const params = {
+      register_id: props.uuid,
+      request_id: props.uuid,
+      status: "S",
+      reason_code: "",
+    };
+
+    if (reason_code) {
+      query.reason_code = reason_code;
+    }
+
+    RestKycFinalForm({
+      payload: {
+        registerId: props.uuid,
+      },
+    })
+      .then((res) => {
+        if (res.success) {
+          setIsLoading(false);
+          params.reason_code = res.data.reason_code!;
+          if (routerQuery.redirect_url) {
+            const queryString = new URLSearchParams(params as any).toString();
+
+            window.top!.location.href = concateRedirectUrlParams(
+              routerQuery.redirect_url as string,
+              queryString
+            );
+          } else {
+            if (res.data.reason_code === "1") {
+              return router.replace({
+                pathname: handleRoute("register"),
+                query: {
+                  ...query,
+                  step: "liveness-failure",
+                },
+              });
+            }
+
+            router.replace({
+              pathname: handleRoute("register"),
+              query: {
+                ...query,
+                step: "form-success",
+              },
+            });
+          }
+        }
+      })
+      .catch((err) => console.log(err));
   };
 
   const handleStatusDFE = (res: {
@@ -126,27 +189,12 @@ const Index = (props: Props) => {
       res.message === "Anda berada di tahap pengisian formulir" ||
       res.data.status === "D"
     ) {
-      handleFormSubmission(res.data);
+      finalForm(res.data.reason_code);
     } else {
       toast.error(errorMessage, {
         autoClose: 1500,
       });
       handleOtherStatus(res.data);
-    }
-  };
-
-  const handleFormSubmission = (data: TKycCheckStepResponseData["data"]) => {
-    if (data.pin_form) {
-      router.replace({
-        pathname: handleRoute("register"),
-        query: {
-          ...routerQuery,
-          registration_id: routerQuery.request_id,
-          step: "pin-form",
-        },
-      });
-    } else {
-      // finalForm(data.reason_code);
     }
   };
 
@@ -224,6 +272,10 @@ const Index = (props: Props) => {
   };
 
   useEffect(() => {
+    localStorage.setItem(
+      props.uuid,
+      props.checkStepResult.data.token as string
+    );
     if (props.checkStepResult.message === "Error, Unknown requestId") {
       toast.error(props.checkStepResult.message);
     } else {
@@ -231,25 +283,33 @@ const Index = (props: Props) => {
     }
   }, [props.checkStepResult.success]);
 
-  if (props.step === "liveness-fail") {
-    return <LivenessFail />;
-  } else if (props.step === "liveness-failure") {
-    return <LivenessFailure status={status} />;
-  } else if (props.step === "liveness-success") {
-    return <LivenessSuccess />;
-  } else if (props.step === "manual-form") {
+  if (isLoading) {
     return (
-      <Manual
-        checkStepResultDataRoute={route}
-        nationalityType={nationality_type}
-      />
+      <div className="flex items-center justify-center min-h-screen">
+        <Loading title={t("loadingTitle")} />
+      </div>
     );
-  } else if (props.step === "form-success") {
-    return <FormSuccess />;
-  } else if (props.step === "pin-form") {
-    return <PinForm />;
   } else {
-    return <Liveness {...props} />;
+    if (props.step === "liveness-fail") {
+      return <LivenessFail />;
+    } else if (props.step === "liveness-failure") {
+      return <LivenessFailure status={status} />;
+    } else if (props.step === "liveness-success") {
+      return <LivenessSuccess />;
+    } else if (props.step === "manual-form") {
+      return (
+        <Manual
+          checkStepResultDataRoute={route}
+          nationalityType={nationality_type}
+        />
+      );
+    } else if (props.step === "form-success") {
+      return <FormSuccess />;
+    } else if (props.step === "pin-form") {
+      return <PinForm />;
+    } else {
+      return <Liveness {...props} />;
+    }
   }
 };
 

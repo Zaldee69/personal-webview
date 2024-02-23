@@ -263,11 +263,6 @@ const Liveness = (props: Props) => {
     setCurrentActionIndex(2);
     dispatch(setIsRetry(false));
 
-    localStorage.setItem(
-      routerQuery.request_id as string,
-      props.checkStepResult.data.token as string
-    );
-
     try {
       const body: TKycVerificationRequestData = {
         registerId: router.query.request_id as string,
@@ -576,12 +571,12 @@ const Liveness = (props: Props) => {
     if (
       props.verified &&
       props.checkStepResult.success &&
-      !props.checkStepResult.data.reason_code
+      !props.checkStepResult.data.reason_code &&
+      props.checkStepResult.data.status !== "D"
     ) {
       generateAction();
       dispatch(resetImages());
-    }
-    if (!props.success && props.message === "request_id tidak valid") {
+    } else {
       setIsDisabled(true);
     }
   }, [router.isReady]); // eslint-disable-line react-hooks/exhaustive-deps
