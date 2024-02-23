@@ -51,8 +51,13 @@ export const RestConfirmCertificate = (
   body: TConfirmCertificateRequestData,
   token?: string | null
 ): Promise<TConfirmCertificateResponseData> => {
-  token = token ? token : getStorageWithExpiresIn("token");
-  return CORE_API.post<TConfirmCertificateResponseData>(`/confirm`, body)
+  return axios
+    .post<TConfirmCertificateResponseData>(`${BASE_URL}/confirm`, body, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    })
     .then((res) => res.data)
     .catch((err) => {
       throw err;
