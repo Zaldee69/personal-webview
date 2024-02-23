@@ -11,7 +11,10 @@ import {
   RestKycGenerateAction,
   RestKycVerification,
 } from "infrastructure";
-import { TKycVerificationRequestData } from "infrastructure/rest/kyc/types";
+import {
+  TKycCheckStepResponseData,
+  TKycVerificationRequestData,
+} from "infrastructure/rest/kyc/types";
 import XIcon from "@/public/icons/XIcon";
 import CheckOvalIcon from "@/public/icons/CheckOvalIcon";
 import Footer from "@/components/Footer";
@@ -53,9 +56,10 @@ export type TQueryParams = {
   status?: string;
 };
 
-interface Props extends TOTPResponse {
+type Props = {
   uuid: string;
-}
+  checkStepResult: TKycCheckStepResponseData;
+} & TOTPResponse;
 
 let human: any = undefined;
 
@@ -75,6 +79,7 @@ const Liveness = (props: Props) => {
   const [humanDone, setHumanDone] = useState(false);
   const [isClicked, setIsClicked] = useState<boolean>(false);
   const [isCreateOTPSuccess, setIsCreateOTPSuccess] = useState<boolean>(false);
+  const [processRegister, setProcessRegister] = useState<boolean>(false);
 
   const actionList = useSelector(
     (state: RootState) => state.liveness.actionList
@@ -138,7 +143,7 @@ const Liveness = (props: Props) => {
     const body = {
       registerId: routerQuery.request_id as string,
     };
-    toast(`Mengecek status...`, {
+    toast(`Memuat aksi...`, {
       type: "info",
       toastId: "generateAction",
       isLoading: true,
@@ -147,202 +152,88 @@ const Liveness = (props: Props) => {
         backgroundColor: themeConfiguration?.data.toast_color as string,
       },
     });
-    RestKycCheckStep({
-      payload: { registerId: routerQuery.request_id as string },
-    })
-      .then((res) => {
-        if (
-          res.success &&
-          res.data.status !== "D" &&
-          res.data.status !== "F" &&
-          res.data.status !== "E"
-        ) {
-          // this scope for status A B C S
-          if (res.data.status === "S") {
-            toast.dismiss("generateAction");
-            const params: TQueryParams & { register_id?: string } = {};
-
-            if (routerQuery.redirect_url) {
-              params.status = res.data.status;
-              if (!res.data.pin_form) {
-                params.redirect_url = routerQuery.redirect_url as string;
-              }
-            }
-
-            //block for dedicated channel
-            if (res.data.pin_form) {
-              params.register_id = routerQuery.request_id as string;
-              params.reason_code = res.data.reason_code as string;
-              const queryString = new URLSearchParams(params as any).toString();
-              if (routerQuery.redirect_url) {
-                window.top!.location.href = concateRedirectUrlParams(
-                  routerQuery.redirect_url as string,
-                  queryString
-                );
-              }
-              //block for regular channel
-            } else {
-              params.request_id = routerQuery.request_id as string;
-              toast.success(res?.message || "pengecekan step berhasil", {
-                icon: <CheckOvalIcon />,
-              });
-              setTimeout(() => {
-                toast.dismiss();
-                router.replace({
-                  pathname: handleRoute("register"),
-                  query: {
-                    ...params,
-                    reason_code: res.data.reason_code,
-                    step: "form-success",
-                  },
-                });
-              }, 2000);
-            }
+    RestKycGenerateAction(body)
+      .then((result) => {
+        setIsDisabled(false);
+        if (result?.data) {
+          const payload = ["look_straight"].concat(result.data.actionList);
+          dispatch(setActionList(payload));
+          toast(`${result.message}`, {
+            type: "success",
+            position: "top-center",
+            autoClose: 3000,
+          });
+          toast.dismiss("generateAction");
+          setIsGenerateAction(false);
+        } else {
+          setIsGenerateAction(false);
+          throw new Error(result.message);
+        }
+      })
+      .catch((error) => {
+        toast.dismiss("generateAction");
+        const msg = error.response?.data?.data?.errors?.[0];
+        if (msg) {
+          if (msg === "Proses ekyc untuk registrationId ini telah sukses") {
+            toast(`${msg}`, {
+              type: "success",
+              position: "top-center",
+              autoClose: 3000,
+            });
+            setIsGenerateAction(false);
           } else {
-            RestKycGenerateAction(body)
-              .then((result) => {
-                setIsDisabled(false);
-                if (result?.data) {
-                  const payload = ["look_straight"].concat(
-                    result.data.actionList
-                  );
-                  dispatch(setActionList(payload));
-                  toast(`${result.message}`, {
-                    type: "success",
-                    position: "top-center",
-                    autoClose: 3000,
-                  });
-                  toast.dismiss("generateAction");
-                  setIsGenerateAction(false);
-                } else {
-                  setIsGenerateAction(false);
-                  throw new Error(result.message);
-                }
-              })
-              .catch((error) => {
-                toast.dismiss("generateAction");
-                const msg = error.response?.data?.data?.errors?.[0];
-                if (msg) {
-                  if (
-                    msg === "Proses ekyc untuk registrationId ini telah sukses"
-                  ) {
-                    toast(`${msg}`, {
-                      type: "success",
-                      position: "top-center",
-                      autoClose: 3000,
-                    });
-                    setIsGenerateAction(false);
-                  } else {
-                    toast.error(msg, {
-                      icon: <XIcon />,
-                    });
-                    setIsGenerateAction(false);
-                  }
-                } else {
-                  setIsGenerateAction(false);
-                  toast.error(
-                    error.response?.data?.message || "Generate Action gagal",
-                    {
-                      icon: <XIcon />,
-                    }
-                  );
-                }
-              });
+            toast.error(msg, {
+              icon: <XIcon />,
+            });
+            setIsGenerateAction(false);
           }
         } else {
-          // this scope for status D F E
           setIsGenerateAction(false);
-          toast.dismiss("generateAction");
-          if (
-            res.message === "Anda berada di tahap pengisian formulir" ||
-            res.data.status === "D"
-          ) {
-            toast(res.message, {
-              type: "success",
-              autoClose: 5000,
-              position: "top-center",
-            });
-            if (res.data.pin_form) {
-              router.replace({
-                pathname: handleRoute("register"),
-                query: {
-                  ...routerQuery,
-                  registration_id: router.query.request_id,
-                  step: "pin-form",
-                },
-              });
-            } else {
-              router.push({
-                pathname: handleRoute("form"),
-                query: { ...routerQuery, request_id: router.query.request_id },
-              });
+          toast.error(
+            error.response?.data?.message || "Generate Action gagal",
+            {
+              icon: <XIcon />,
             }
+          );
+        }
+      });
+  };
+
+  const finalForm = (reason_code?: string | null) => {
+    const query: any = {
+      ...routerQuery,
+      registration_id: router.query.request_id,
+    };
+
+    const params = {
+      register_id: props.uuid,
+      request_id: props.uuid,
+      status: "S",
+      reason_code: "",
+    };
+
+    if (reason_code) {
+      query.reason_code = reason_code;
+    }
+
+    RestKycFinalForm({
+      payload: {
+        registerId: props.uuid,
+      },
+    })
+      .then((res) => {
+        if (res.success) {
+          params.reason_code = res.data.reason_code!;
+          if (routerQuery.redirect_url) {
+            const queryString = new URLSearchParams(params as any).toString();
+
+            window.top!.location.href = concateRedirectUrlParams(
+              routerQuery.redirect_url as string,
+              queryString
+            );
           } else {
-            if (
-              res.data.status === "F" &&
-              res.data.pin_form &&
-              routerQuery.redirect_url
-            ) {
-              const params: TQueryParams & { register_id?: string } = {
-                status: res.data.status,
-                register_id: routerQuery.request_id as string,
-              };
-
-              if (res.data.reason_code) {
-                params.reason_code = res.data.reason_code;
-              }
-
-              const queryString = new URLSearchParams(params as any).toString();
-              window.top!.location.href = concateRedirectUrlParams(
-                routerQuery.redirect_url as string,
-                queryString
-              );
-            } else if (res.data.status === "F" && routerQuery.dashboard_url) {
-              // Redirect berdasarkan redirect-url
-
-              const params: TQueryParams = {
-                request_id: routerQuery.request_id as string,
-                reason_code: res.data.reason_code as string,
-              };
-              const queryString = new URLSearchParams(params as any).toString();
-              const { hostname } = new URL(routerQuery.dashboard_url as string);
-
-              if (hostname === "tilaka.id" || hostname.endsWith("tilaka.id")) {
-                window.top!.location.href = concateRedirectUrlParams(
-                  routerQuery.dashboard_url as string,
-                  queryString
-                );
-              }
-              // for dedicated channel
-            } else if (
-              res.data.reason_code === "1" &&
-              res.data.pin_form &&
-              routerQuery.redirect_url
-            ) {
-              const params: TQueryParams & { register_id?: string } = {
-                status: "S",
-                register_id: routerQuery.request_id as string,
-                reason_code: res.data.reason_code as string,
-              };
-
-              const queryString = new URLSearchParams(params as any).toString();
-
-              window.top!.location.href = concateRedirectUrlParams(
-                routerQuery.redirect_url as string,
-                queryString
-              );
-              // for regular channel
-            } else {
-              const query: TQueryParams = {
-                ...routerQuery,
-                request_id: router.query.request_id as string,
-              };
-
-              if (res.data.reason_code) {
-                query.reason_code = res.data.reason_code;
-              }
-
-              router.push({
+            if (res.data.reason_code === "1") {
+              return router.replace({
                 pathname: handleRoute("register"),
                 query: {
                   ...query,
@@ -350,22 +241,18 @@ const Liveness = (props: Props) => {
                 },
               });
             }
+
+            router.replace({
+              pathname: handleRoute("register"),
+              query: {
+                ...query,
+                step: "form-success",
+              },
+            });
           }
         }
       })
-      .catch((err) => {
-        toast.dismiss("generateAction");
-        setIsGenerateAction(false);
-        if (err.response?.data?.data?.errors?.[0]) {
-          toast.error(err.response?.data?.data?.errors?.[0], {
-            icon: <XIcon />,
-          });
-        } else {
-          toast.error(err.response?.data?.message || "pengecekan step gagal", {
-            icon: <XIcon />,
-          });
-        }
-      });
+      .catch((err) => console.log(err));
   };
 
   const changePage = async () => {
@@ -375,6 +262,11 @@ const Liveness = (props: Props) => {
     dispatch(setIsDone(false));
     setCurrentActionIndex(2);
     dispatch(setIsRetry(false));
+
+    localStorage.setItem(
+      routerQuery.request_id as string,
+      props.checkStepResult.data.token as string
+    );
 
     try {
       const body: TKycVerificationRequestData = {
@@ -456,51 +348,7 @@ const Liveness = (props: Props) => {
             }
           }
         } else {
-          const query: any = {
-            ...routerQuery,
-            registration_id: router.query.request_id,
-          };
-
-          const params = {
-            register_id: props.uuid,
-            request_id: props.uuid,
-            status: "S",
-            reason_code: "",
-          };
-
-          if (result.data.reason_code) {
-            query.reason_code = result.data.reason_code;
-          }
-
-          RestKycFinalForm({
-            payload: {
-              registerId: props.uuid,
-            },
-          })
-            .then((res) => {
-              if (res.success) {
-                params.reason_code = res.data.reason_code!;
-                if (routerQuery.redirect_url) {
-                  const queryString = new URLSearchParams(
-                    params as any
-                  ).toString();
-
-                  window.top!.location.href = concateRedirectUrlParams(
-                    routerQuery.redirect_url as string,
-                    queryString
-                  );
-                } else {
-                  router.replace({
-                    pathname: handleRoute("register"),
-                    query: {
-                      ...query,
-                      step: "form-success",
-                    },
-                  });
-                }
-              }
-            })
-            .catch((err) => console.log(err));
+          finalForm(result.data.reason_code);
         }
       } else {
         const attempt =
@@ -725,15 +573,16 @@ const Liveness = (props: Props) => {
 
   useEffect(() => {
     if (!router.isReady) return;
-    if (props.verified) {
+    if (
+      props.verified &&
+      props.checkStepResult.success &&
+      !props.checkStepResult.data.reason_code
+    ) {
       generateAction();
       dispatch(resetImages());
     }
     if (!props.success && props.message === "request_id tidak valid") {
       setIsDisabled(true);
-      toast.error("registrationId tidak valid", {
-        icon: <XIcon />,
-      });
     }
   }, [router.isReady]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -954,7 +803,7 @@ const OTP = ({ success, uuid, handleSuccessCreateOTP }: IOTPProps) => {
     }
   }, []);
 
-  return isShowOTPForm ? null : (
+  return !isShowOTPForm ? null : (
     <div
       style={{
         backgroundColor: themeConfigurationAvaliabilityChecker(
