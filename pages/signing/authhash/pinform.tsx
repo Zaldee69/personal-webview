@@ -190,9 +190,14 @@ const PinFormDedicatedChannel = ({ id, user, success }: Props) => {
       }}
       className="flex justify-center items-center min-h-screen px-3 pt-3 pb-5"
     >
-      <div ref={ref} className="h-96 w-96 px-6 pb-4 font-poppins card-pin-form">
-        <Heading className="text-center">{t("frSubtitle2")}</Heading>
-        <p className="text-center text-neutral200 mt-2">{t("frTitle")}</p>
+      <div
+        ref={ref}
+        className="h-96 w-[26rem] px-6 pb-5 font-poppins card-pin-form"
+      >
+        <Heading className="text-center pt-1.5">{t("frSubtitle2")}</Heading>
+        <p className="text-center text-neutral200 mt-3 text-base ">
+          {t("otpSubtitle")}
+        </p>
         <form onSubmit={verifyOTP}>
           <OTPInput
             width={width!}

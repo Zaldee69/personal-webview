@@ -1326,21 +1326,21 @@ const OTPModal: React.FC<IModal> = ({
     }
   }, [successSigning]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  return  modal ? (
+  return modal ? (
     <div
       style={{ backgroundColor: "rgba(0, 0, 0, .5)" }}
-      className="fixed z-50 flex items-start transition-all duration-1000 pb-3 justify-center w-full left-0 top-0 h-full "
+      className="fixed z-50 flex items-start transition-all duration-1000 justify-center w-full left-0 top-0 h-full "
     >
       <div
         ref={ref}
-        className="bg-white max-w-md mt-20 pt-5 px-2 pb-3 rounded-md w-full mx-5"
+        className="bg-white max-w-md mt-20 pt-6 px-2 pb-4 rounded-md w-full mx-5"
       >
-        <div className="flex flex-col">
-          <Heading className="block text-center pb-5  whitespace-nowrap">
-            {t("frTitle")}
-          </Heading>
-          <Paragraph className="block text-center  ">
+        <div className="flex flex-col py-3">
+          <Heading className="block text-center pb-3  whitespace-nowrap">
             {t("frSubtitle2")}
+          </Heading>
+          <Paragraph className="block text-center !text-neutral200 text-base">
+            {t("otpSubtitle")}
           </Paragraph>
           <OTPInput
             width={width! / 1.1}
@@ -1348,7 +1348,7 @@ const OTPModal: React.FC<IModal> = ({
             values={values}
           />
           <div className="flex justify-center text-sm gap-1 mt-5">
-            <Paragraph>{t("dindtReceiveOtp")}</Paragraph>
+            <Paragraph size="sm">{t("dindtReceiveOtp")}</Paragraph>
             <div
               style={{
                 color: themeConfigurationAvaliabilityChecker(
@@ -1387,7 +1387,7 @@ const OTPModal: React.FC<IModal> = ({
             className="mt-16 block mx-auto py-3"
             size="lg"
           >
-            {t("confirm")}
+            {t("send")}
           </Button>
           <Button
             onClick={() => {
