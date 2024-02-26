@@ -75,7 +75,13 @@ function CertificateInformation({}: Props) {
       serial_number: certificate.serialNumber,
     };
 
-    const token = localStorage.getItem(`token-${router.query.tilaka_name}`)!;
+    const token = localStorage.getItem(
+      `token-${
+        router.query.tilaka_name ||
+        router.query.user ||
+        router.query.user_identifier
+      }`
+    )!;
 
     RestConfirmCertificate(body, token)
       .then((res) => {

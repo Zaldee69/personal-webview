@@ -208,6 +208,7 @@ const Login = ({}: IPropsLogin) => {
             query: {
               ...queryWithDynamicRedirectURL,
               v2: "1",
+              login_from: "login/v2",
             },
           });
         }
