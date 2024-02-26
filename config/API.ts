@@ -120,7 +120,7 @@ const handleUnauthorize = async (
     `refreshToken-${Router.query.tilaka_name || Router.query.user}`
   );
 
-  if (!rememberMe || refresh_token) {
+  if (!rememberMe) {
     unaunthenticated();
     throw error; // Throw the error to prevent further processing
   }
