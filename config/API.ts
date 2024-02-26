@@ -37,14 +37,19 @@ const unaunthenticated = () => {
   const queryString = window.location.search;
   const urlParams = new URLSearchParams(window.location.search);
   const loginFromParam = urlParams.get("login_from");
+  const pathname = window.location.pathname;
 
   clearAuth();
 
   if (queryString.includes("login_from")) {
     window.location.replace(handleRoute(`${loginFromParam}${queryString}`));
-  } else {
+  } else if (pathname.includes("v2")) {
+    window.location.replace(handleRoute(`login/v2/${queryString}`));
+  } else if (pathname.includes("authhash")) {
     toast.error("Sesi and telah habis");
     window.location.reload();
+  } else {
+    window.location.replace(handleRoute(`login/${queryString}`));
   }
 };
 
@@ -53,8 +58,12 @@ export async function createRefreshToken() {
 
   const device_token = localStorage.getItem("deviceToken");
   const fingerprint = localStorage.getItem("fingerprint");
-  const refresh_token = localStorage.getItem(`refreshToken-${tilaka_name || user || user_identifier}`);
-  const rememberMe = localStorage.getItem(`rememberMe-${tilaka_name || user || user_identifier}`);
+  const refresh_token = localStorage.getItem(
+    `refreshToken-${tilaka_name || user || user_identifier}`
+  );
+  const rememberMe = localStorage.getItem(
+    `rememberMe-${tilaka_name || user || user_identifier}`
+  );
 
   if (!rememberMe) {
     unaunthenticated();
@@ -100,33 +109,34 @@ const handleUnauthorize = async (
   instance: AxiosInstance,
   error: AxiosError
 ) => {
-  console.log("handle unauthorized ...");
+  console.log("Handling unauthorized error...");
 
   const originalRequest = error.config;
 
   const rememberMe = localStorage.getItem(
     `rememberMe-${Router.query.tilaka_name || Router.query.user}`
   );
+  const refresh_token = localStorage.getItem(
+    `refreshToken-${Router.query.tilaka_name || Router.query.user}`
+  );
 
-  if (!rememberMe) unaunthenticated();
+  if (!rememberMe || refresh_token) {
+    unaunthenticated();
+    throw error; // Throw the error to prevent further processing
+  }
 
-  if (
-    !originalRequest ||
-    !originalRequest.url ||
-    originalRequest.url.includes("/login")
-  ) {
+  if (!originalRequest || originalRequest.url?.includes("/login")) {
     throw error;
   }
 
   if (isRefreshing) {
+    // If already refreshing, return a promise without initiating another refresh
     return new Promise((resolve, reject) => {
       failedQueue.push({ resolve, reject });
-    })
-      .then((accessToken) => {
-        axios.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
-        return instance(originalRequest);
-      })
-      .catch((err) => Promise.reject(err));
+    }).then((accessToken) => {
+      axios.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
+      return instance(originalRequest);
+    });
   }
 
   try {
@@ -143,9 +153,15 @@ const handleUnauthorize = async (
 
     failedQueue = [];
 
+    // Retry the original request with the new token
+    if (originalRequest && originalRequest.headers) {
+      originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+    }
     return instance(originalRequest);
   } catch (err) {
-    return Promise.reject(err);
+    // If refresh token fails, handle the error
+    isRefreshing = false;
+    throw err;
   }
 };
 
