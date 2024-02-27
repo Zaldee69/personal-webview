@@ -180,7 +180,7 @@ const AuthPinForm = ({ id, user, success }: Props) => {
         className="h-96 px-6 pb-5 font-poppins w-[26rem] card-pin-form"
       >
         <Heading className="text-center ">{t("frSubtitle2")}</Heading>
-        <p className="text-center text-sm md:text-base text-neutral200 mt-2 whitespace-pre">
+        <p className="text-center text-neutral200 mt-2 whitespace-pre">
           {t("otpSubtitle")}
         </p>
         <form onSubmit={verifyOTP}>
