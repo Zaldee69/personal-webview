@@ -1339,7 +1339,7 @@ const OTPModal: React.FC<IModal> = ({
           <Heading className="block text-center pb-3  whitespace-nowrap">
             {t("frSubtitle2")}
           </Heading>
-          <Paragraph className="block text-center !text-neutral200 text-base">
+          <Paragraph className="block text-center !text-neutral200 text-base whitespace-pre">
             {t("otpSubtitle")}
           </Paragraph>
           <OTPInput
@@ -1348,7 +1348,7 @@ const OTPModal: React.FC<IModal> = ({
             values={values}
           />
           <div className="flex justify-center text-sm gap-1 mt-5">
-            <Paragraph size="sm">{t("dindtReceiveOtp")}</Paragraph>
+            <Paragraph size="sm" className="!text-neutral200">{t("dindtReceiveOtp")}</Paragraph>
             <div
               style={{
                 color: themeConfigurationAvaliabilityChecker(
