@@ -175,10 +175,13 @@ const AuthPinForm = ({ id, user, success }: Props) => {
       }}
       className="flex justify-center items-center min-h-screen px-3 pt-3 pb-5"
     >
-      <div ref={ref} className="h-96 px-6 pb-4 font-poppins w-96 card-pin-form">
-        <Heading className="text-center mt-5">{t("frSubtitle2")}</Heading>
-        <p className="text-center text-sm md:text-base text-neutral200 mt-2">
-          {t("frTitle")}
+      <div
+        ref={ref}
+        className="h-96 px-6 pb-5 font-poppins w-[26rem] card-pin-form"
+      >
+        <Heading className="text-center ">{t("frSubtitle2")}</Heading>
+        <p className="text-center text-sm md:text-base text-neutral200 mt-2 whitespace-pre">
+          {t("otpSubtitle")}
         </p>
         <form onSubmit={verifyOTP}>
           <OTPInput

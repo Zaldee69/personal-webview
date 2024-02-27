@@ -194,8 +194,8 @@ const PinFormDedicatedChannel = ({ id, user, success }: Props) => {
         ref={ref}
         className="h-96 w-[26rem] px-6 pb-5 font-poppins card-pin-form"
       >
-        <Heading className="text-center pt-1.5">{t("frSubtitle2")}</Heading>
-        <p className="text-center text-neutral200 mt-3 text-base ">
+        <Heading className="text-center">{t("frSubtitle2")}</Heading>
+        <p className="text-center text-neutral200 mt-3 text-base whitespace-pre">
           {t("otpSubtitle")}
         </p>
         <form onSubmit={verifyOTP}>
