@@ -188,7 +188,7 @@ const PinFormDedicatedChannel = ({ id, user, success }: Props) => {
           "BG"
         ),
       }}
-      className="flex justify-center items-center min-h-screen pt-3 pb-5"
+      className="flex justify-center items-center min-h-screen pt-3 px-3 pb-5"
     >
       <div
         ref={ref}
