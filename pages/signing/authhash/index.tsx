@@ -123,6 +123,10 @@ const FRModal: React.FC<IModal> = ({ modal, setModal, callbackFailure }) => {
             }, 1500);
           } else if (res.message === "signing sudah selesai") {
             setModal(false);
+          } else if (
+            res.message === "auth hash sign gagal. token tidak valid"
+          ) {
+            setModal(false);
           } else {
             setModal(false);
             setTimeout(() => {
@@ -265,6 +269,10 @@ const OTPModal: React.FC<IModal> = ({
             );
             signingFailure(res.message || "Ada yang salah");
             setEndTimeToZero();
+          } else if (
+            res.message === "auth hash sign gagal. token tidak valid"
+          ) {
+            setModal(false);
           }
         }
       })
@@ -378,7 +386,9 @@ const OTPModal: React.FC<IModal> = ({
             values={values}
           />
           <div className="flex justify-center items-center text-sm gap-1 mt-5">
-            <Paragraph size="sm" className="!text-neutral200" >{t("dindtReceiveOtp")}</Paragraph>
+            <Paragraph size="sm" className="!text-neutral200">
+              {t("dindtReceiveOtp")}
+            </Paragraph>
             <div
               style={{
                 color: themeConfigurationAvaliabilityChecker(
