@@ -35,6 +35,7 @@ import Button, { buttonVariants } from "@/components/atoms/Button";
 import Heading from "@/components/atoms/Heading";
 import Label from "@/components/atoms/Label";
 import Paragraph from "@/components/atoms/Paraghraph";
+import { isTokenExpired } from "@/utils/auth";
 
 interface IPropsLogin {}
 
@@ -100,7 +101,9 @@ const Login = ({}: IPropsLogin) => {
     if (token && rememberMe) {
       const queryString = window.location.search;
 
-      window.location.replace(handleRoute(`signing/v2${queryString}`));
+      window.location.replace(
+        handleRoute(`signing/v2${queryString}&login_from=login/v2`)
+      );
     } else {
       setIsRender(true);
     }

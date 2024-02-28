@@ -83,7 +83,7 @@ function CertificateInformation({}: Props) {
       }`
     )!;
 
-    RestConfirmCertificate(body, token)
+    RestConfirmCertificate(body)
       .then((res) => {
         toast.dismiss("info");
         if (res.success) {
@@ -110,11 +110,23 @@ function CertificateInformation({}: Props) {
       .catch((err) => {
         toast.dismiss("info");
         setIsLoading(false);
-        toast("Terjadi kesalahan", {
-          type: "error",
-          toastId: "error",
-          position: "top-center",
-        });
+        switch (err.response.status) {
+          case 401:
+            // unauthorized
+            router.replace({
+              pathname: handleRoute("login"),
+              query: { ...router.query },
+            });
+            break;
+
+          default:
+            toast("Gagal mengecek sertifikat", {
+              type: "error",
+              toastId: "error",
+              position: "top-center",
+            });
+            break;
+        }
       });
   };
   return (
