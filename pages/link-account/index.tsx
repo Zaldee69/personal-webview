@@ -186,6 +186,7 @@ const LinkAccount = (props: Props) => {
       setRedirectUrl(redirect_url as string);
       queryWithDynamicRedirectURL["request-id"] = request_id;
       queryWithDynamicRedirectURL["tilaka-name"] = form.tilaka_name;
+      queryWithDynamicRedirectURL["tilaka_name"] = form.tilaka_name;
     }
     localStorage.setItem("refresh_token", data.data.data[1] as string);
     setStorageWithExpiresIn(
@@ -214,10 +215,35 @@ const LinkAccount = (props: Props) => {
     if (res.data.success) {
       const certif = JSON.parse(res.data.data);
       if (certif[0].status == "Aktif") {
-        getUserName().then((res) => {
-          const data = JSON.parse(res.data.data);
-          if (data.typeMfa == null) {
-            if (setting === "1") {
+        axios
+          .get(`${process.env.NEXT_PUBLIC_DS_API_URL}/default-signature-mfa`, {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem(
+                `token-${form.tilaka_name}`
+              )}`,
+            },
+          })
+          .then((res) => {
+            const data = JSON.parse(res.data.data);
+            if (data.typeMfa == null) {
+              if (setting === "1") {
+                router.replace({
+                  pathname: handleRoute("setting-signature-and-mfa"),
+                  query: {
+                    ...queryWithDynamicRedirectURL,
+                    tilaka_name: form.tilaka_name,
+                  },
+                });
+              } else {
+                router.replace({
+                  pathname: handleRoute("link-account/success"),
+                  query: { ...params },
+                });
+              }
+            } else if (
+              setting === "1" &&
+              (data.signatureBase64 == null || data.signatureBase64 == "null")
+            ) {
               router.replace({
                 pathname: handleRoute("setting-signature-and-mfa"),
                 query: {
@@ -226,27 +252,10 @@ const LinkAccount = (props: Props) => {
                 },
               });
             } else {
-              router.replace({
-                pathname: handleRoute("link-account/success"),
-                query: { ...params },
-              });
+              toast.dismiss();
+              toast.error("Sudah melakukan penautan");
             }
-          } else if (
-            setting === "1" &&
-            (data.signatureBase64 == null || data.signatureBase64 == "null")
-          ) {
-            router.replace({
-              pathname: handleRoute("setting-signature-and-mfa"),
-              query: {
-                ...queryWithDynamicRedirectURL,
-                tilaka_name: form.tilaka_name,
-              },
-            });
-          } else {
-            toast.dismiss();
-            toast.error("Sudah melakukan penautan");
-          }
-        });
+          });
       } else if (certif[0].status == "Enroll") {
         setIsLoading(false);
         toast.dismiss();

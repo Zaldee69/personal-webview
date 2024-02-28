@@ -52,12 +52,18 @@ export const RestConfirmCertificate = (
   token?: string | null
 ): Promise<TConfirmCertificateResponseData> => {
   return axios
-    .post<TConfirmCertificateResponseData>(`${BASE_URL}/confirm`, body, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
+    .post<TConfirmCertificateResponseData>(
+      `${BASE_URL}/confirm`,
+      {
+        serial_number: body.serial_number,
       },
-    })
+      {
+        headers: {
+          Authorization: `Bearer ${body.token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    )
     .then((res) => res.data)
     .catch((err) => {
       throw err;
