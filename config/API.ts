@@ -49,7 +49,7 @@ const unaunthenticated = () => {
     toast.error("Sesi and telah habis");
     window.location.reload();
   } else {
-    window.location.replace(handleRoute(`login/${queryString}`));
+    window.location.replace(`/personal-webview/login/${queryString}`);
   }
 };
 

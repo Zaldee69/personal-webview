@@ -181,44 +181,25 @@ const SigningWithRead = () => {
 
   useEffect(() => {
     if (!routerIsReady) return;
-
-    const token = getStorageWithExpiresIn("token", handleRoute("login/v2"), {
-      ...router.query,
-      showAutoLogoutInfo: "1",
-    });
     const count = parseInt(localStorage.getItem("count_v2") as string);
     localStorage.setItem("count_v2", count ? count.toString() : "0");
-    if (token) {
-      setShouldRender(true);
-      setShouldDisableSubmit(true);
-      RestSigningDownloadSignedPDF({
-        request_id: routerQuery.request_id as string,
-      })
-        .then((res) => {
-          if (res.success) {
-            setDocumentList(res.signed_pdf || []);
-            getUserName()
-              .then((res) => {
-                if (res.success) {
-                  const data = JSON.parse(res.data);
-                  setTypeMFA(data.typeMfa);
-                  setShouldDisableSubmit(false);
-                } else {
-                  toast(
-                    res?.message || "Ada yang salah saat memuat Signature MFA",
-                    {
-                      type: "error",
-                      toastId: "error",
-                      position: "top-center",
-                      icon: XIcon,
-                    }
-                  );
-                }
-              })
-              .catch((err) => {
+    RestSigningDownloadSignedPDF({
+      request_id: routerQuery.request_id as string,
+    })
+      .then((res) => {
+        if (res.success) {
+          setDocumentList(res.signed_pdf || []);
+          getUserName()
+            .then((res) => {
+              if (res.success) {
+                const data = JSON.parse(res.data);
+                setTypeMFA(data.typeMfa);
+                setShouldRender(true);
+                setShouldDisableSubmit(true);
+                setShouldDisableSubmit(false);
+              } else {
                 toast(
-                  err.response?.data?.message ||
-                    "Tidak berhasil pada saat memuat Signature MFA",
+                  res?.message || "Ada yang salah saat memuat Signature MFA",
                   {
                     type: "error",
                     toastId: "error",
@@ -226,29 +207,34 @@ const SigningWithRead = () => {
                     icon: XIcon,
                   }
                 );
-              });
-          } else {
-            setIsSuccess("0");
-            setSigningFailureDocumentName("");
-            if (res.status === "DENIED") {
-              setSiginingFailureError({
-                message: res.message || "Status dokumen DENIED",
-                status: res.status,
-              });
-            } else if (res.status === "PROCESS") {
-              if (res.signed_pdf === null) {
-                setSiginingFailureError({
-                  message: t("documentExpired"),
-                  status: "Exp",
-                });
-              } else {
-                setSiginingFailureError({
-                  message:
-                    res.message ||
-                    "Tidak berhasil pada saat memuat list dokumen",
-                  status: "Exp",
-                });
               }
+            })
+            .catch((err) => {
+              toast(
+                err.response?.data?.message ||
+                  "Tidak berhasil pada saat memuat Signature MFA",
+                {
+                  type: "error",
+                  toastId: "error",
+                  position: "top-center",
+                  icon: XIcon,
+                }
+              );
+            });
+        } else {
+          setIsSuccess("0");
+          setSigningFailureDocumentName("");
+          if (res.status === "DENIED") {
+            setSiginingFailureError({
+              message: res.message || "Status dokumen DENIED",
+              status: res.status,
+            });
+          } else if (res.status === "PROCESS") {
+            if (res.signed_pdf === null) {
+              setSiginingFailureError({
+                message: t("documentExpired"),
+                status: "Exp",
+              });
             } else {
               setSiginingFailureError({
                 message:
@@ -256,35 +242,41 @@ const SigningWithRead = () => {
                 status: "Exp",
               });
             }
+          } else {
+            setSiginingFailureError({
+              message:
+                res.message || "Tidak berhasil pada saat memuat list dokumen",
+              status: "Exp",
+            });
           }
-        })
-        .catch((err) => {
-          if (
-            err.response?.data?.message &&
-            err.response?.data?.data?.errors?.[0]
-          ) {
+        }
+      })
+      .catch((err) => {
+        if (
+          err.response?.data?.message &&
+          err.response?.data?.data?.errors?.[0]
+        ) {
+          setIsSuccess("0");
+          setSigningFailureDocumentName("");
+          setSiginingFailureError({
+            message: `${err.response?.data?.message}, ${err.response?.data?.data?.errors?.[0]}`,
+            status: "Exp",
+          });
+        } else {
+          if (err.response.status === 401) {
+            ////
+          } else {
             setIsSuccess("0");
             setSigningFailureDocumentName("");
             setSiginingFailureError({
-              message: `${err.response?.data?.message}, ${err.response?.data?.data?.errors?.[0]}`,
+              message:
+                err.response?.data?.message ||
+                "Kesalahan pada saat memuat list dokumen",
               status: "Exp",
             });
-          } else {
-            if (err.response.status === 401) {
-              ////
-            } else {
-              setIsSuccess("0");
-              setSigningFailureDocumentName("");
-              setSiginingFailureError({
-                message:
-                  err.response?.data?.message ||
-                  "Kesalahan pada saat memuat list dokumen",
-                status: "Exp",
-              });
-            }
           }
-        });
-    }
+        }
+      });
   }, [routerIsReady]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (documentsHasBeenRead.length === 0 || documentList.length === 0) return;
@@ -1348,7 +1340,9 @@ const OTPModal: React.FC<IModal> = ({
             values={values}
           />
           <div className="flex justify-center text-sm gap-1 mt-5">
-            <Paragraph size="sm" className="!text-neutral200">{t("dindtReceiveOtp")}</Paragraph>
+            <Paragraph size="sm" className="!text-neutral200">
+              {t("dindtReceiveOtp")}
+            </Paragraph>
             <div
               style={{
                 color: themeConfigurationAvaliabilityChecker(
