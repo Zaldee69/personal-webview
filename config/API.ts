@@ -44,7 +44,7 @@ const unaunthenticated = () => {
   if (queryString.includes("login_from")) {
     window.location.replace(handleRoute(`${loginFromParam}${queryString}`));
   } else if (pathname.includes("v2")) {
-    window.location.replace(handleRoute(`login/v2/${queryString}`));
+    window.location.replace(`/personal-webview/login/v2/${queryString}`);
   } else if (pathname.includes("authhash")) {
     toast.error("Sesi and telah habis");
     window.location.reload();
