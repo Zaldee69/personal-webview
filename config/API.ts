@@ -1,7 +1,6 @@
 import { handleRoute } from "@/utils/handleRoute";
 import axios, { AxiosError, AxiosInstance, AxiosRequestConfig } from "axios";
 import Router from "next/router";
-import { toast } from "react-toastify";
 
 const BASE_URL = process.env.NEXT_PUBLIC_DS_API_URL;
 
@@ -46,7 +45,6 @@ const unaunthenticated = () => {
   } else if (pathname.includes("v2")) {
     window.location.replace(`/personal-webview/login/v2/${queryString}`);
   } else if (pathname.includes("authhash")) {
-    toast.error("Sesi and telah habis");
     window.location.reload();
   } else {
     window.location.replace(`/personal-webview/login/${queryString}`);
