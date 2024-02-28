@@ -70,10 +70,6 @@ function CertificateInformation({}: Props) {
       },
     });
     setIsLoading(true);
-    const body: TConfirmCertificateRequestData = {
-      company_id: company_id as string,
-      serial_number: certificate.serialNumber,
-    };
 
     const token = localStorage.getItem(
       `token-${
@@ -82,6 +78,13 @@ function CertificateInformation({}: Props) {
         router.query.user_identifier
       }`
     )!;
+
+
+    const body: TConfirmCertificateRequestData = {
+      company_id: company_id as string,
+      serial_number: certificate.serialNumber,
+      token,
+    };
 
     RestConfirmCertificate(body)
       .then((res) => {

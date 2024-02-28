@@ -116,11 +116,13 @@ const handleUnauthorize = async (
   const rememberMe = localStorage.getItem(
     `rememberMe-${Router.query.tilaka_name || Router.query.user}`
   );
-  const refresh_token = localStorage.getItem(
-    `refreshToken-${Router.query.tilaka_name || Router.query.user}`
-  );
 
-  if (!rememberMe) {
+  if (
+    !rememberMe &&
+    Router.pathname !== "setting-signature-and-mfa" &&
+    Router.pathname !== "set-mfa" &&
+    Router.pathname !== "confirm-certificate"
+  ) {
     unaunthenticated();
     throw error; // Throw the error to prevent further processing
   }
