@@ -232,6 +232,7 @@ const LinkAccount = (props: Props) => {
                   query: {
                     ...queryWithDynamicRedirectURL,
                     tilaka_name: form.tilaka_name,
+                    login_form: "login",
                   },
                 });
               } else {
@@ -249,6 +250,7 @@ const LinkAccount = (props: Props) => {
                 query: {
                   ...queryWithDynamicRedirectURL,
                   tilaka_name: form.tilaka_name,
+                  login_form: "login",
                 },
               });
             } else {
@@ -268,6 +270,7 @@ const LinkAccount = (props: Props) => {
           query: {
             ...queryWithDynamicRedirectURL,
             tilaka_name: form.tilaka_name,
+            login_form: "login"
           },
         });
       }
