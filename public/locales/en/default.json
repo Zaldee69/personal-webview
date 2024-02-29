@@ -329,6 +329,7 @@
   "imageDark": "Face not detected, image too dark",
   "faceMoreThan1": "Multiple faces detected",
   "sideFace": "The face is only detected halfway",
-  "openEyes": "Open both eyes wider"
+  "openEyes": "Open both eyes wider",
+  "otpSubtitle": "The OTP code has been sent to \n your email address"
 }
 

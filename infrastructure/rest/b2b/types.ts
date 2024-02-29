@@ -32,7 +32,8 @@ export type TSetDefaultMFARequestData  = {} & TMultiFactorAuthenticationType
 
 export type TConfirmCertificateRequestData = {
   serial_number: string,
-  company_id: string
+  company_id: string,
+  token: string
 }
 
 export type TConfirmCertificateResponseData = {

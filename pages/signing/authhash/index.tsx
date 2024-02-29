@@ -14,9 +14,7 @@ import { AppDispatch, RootState } from "@/redux/app/store";
 import { login } from "@/redux/slices/loginSlice";
 import { handleRoute } from "@/utils/handleRoute";
 import { assetPrefix } from "../../../next.config";
-import {
-  removeStorageWithExpiresIn,
-} from "@/utils/localStorageWithExpiresIn";
+import { removeStorageWithExpiresIn } from "@/utils/localStorageWithExpiresIn";
 import { RestSigningAuthhashsign } from "infrastructure";
 import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
 import toastCaller from "@/utils/toastCaller";
@@ -124,6 +122,10 @@ const FRModal: React.FC<IModal> = ({ modal, setModal, callbackFailure }) => {
               );
             }, 1500);
           } else if (res.message === "signing sudah selesai") {
+            setModal(false);
+          } else if (
+            res.message === "auth hash sign gagal. token tidak valid"
+          ) {
             setModal(false);
           } else {
             setModal(false);
@@ -267,6 +269,10 @@ const OTPModal: React.FC<IModal> = ({
             );
             signingFailure(res.message || "Ada yang salah");
             setEndTimeToZero();
+          } else if (
+            res.message === "auth hash sign gagal. token tidak valid"
+          ) {
+            setModal(false);
           }
         }
       })
@@ -366,13 +372,13 @@ const OTPModal: React.FC<IModal> = ({
       style={{ backgroundColor: "rgba(0, 0, 0, .5)" }}
       className="fixed z-50 flex items-start transition-all duration-1000 justify-center w-full left-0 top-0 min-h-screen "
     >
-      <div className="bg-white max-w-md mt-20 pt-5 px-2 pb-3 rounded-md w-full mx-5">
+      <div className="bg-white max-w-md mt-20 py-9 px-2 rounded-md w-full mx-5">
         <div ref={ref} className="flex flex-col">
-          <Heading className="block text-center pb-5  whitespace-nowrap">
-            {t("frTitle")}
-          </Heading>
-          <Paragraph className="block text-center text-sm md:text-base">
+          <Heading className="block text-center pb-3  whitespace-nowrap">
             {t("frSubtitle2")}
+          </Heading>
+          <Paragraph className="block text-center text-base !text-neutral200 whitespace-pre">
+            {t("otpSubtitle")}
           </Paragraph>
           <OTPInput
             width={width! / 1.12}
@@ -380,7 +386,9 @@ const OTPModal: React.FC<IModal> = ({
             values={values}
           />
           <div className="flex justify-center items-center text-sm gap-1 mt-5">
-            <Paragraph size="sm">{t("dindtReceiveOtp")}</Paragraph>
+            <Paragraph size="sm" className="!text-neutral200">
+              {t("dindtReceiveOtp")}
+            </Paragraph>
             <div
               style={{
                 color: themeConfigurationAvaliabilityChecker(
@@ -419,7 +427,7 @@ const OTPModal: React.FC<IModal> = ({
             className="mt-16 py-3"
             size="lg"
           >
-            {t("confirm")}
+            {t("send")}
           </Button>
           <Button
             onClick={() => {

@@ -1,7 +1,6 @@
 import { handleRoute } from "@/utils/handleRoute";
 import axios, { AxiosError, AxiosInstance, AxiosRequestConfig } from "axios";
 import Router from "next/router";
-import { toast } from "react-toastify";
 
 const BASE_URL = process.env.NEXT_PUBLIC_DS_API_URL;
 
@@ -31,20 +30,27 @@ const clearAuth = () => {
   localStorage.removeItem(
     `token-${Router.query.tilaka_name || Router.query.user}`
   );
+  localStorage.removeItem(
+    `rememberMe-${Router.query.tilaka_name || Router.query.user}`
+  );
 };
 
 const unaunthenticated = () => {
   const queryString = window.location.search;
   const urlParams = new URLSearchParams(window.location.search);
   const loginFromParam = urlParams.get("login_from");
+  const pathname = window.location.pathname;
 
   clearAuth();
 
   if (queryString.includes("login_from")) {
     window.location.replace(handleRoute(`${loginFromParam}${queryString}`));
-  } else {
-    toast.error("Sesi and telah habis");
+  } else if (pathname.includes("v2")) {
+    window.location.replace(`/personal-webview/login/v2/${queryString}`);
+  } else if (pathname.includes("authhash")) {
     window.location.reload();
+  } else {
+    window.location.replace(`/personal-webview/login/${queryString}`);
   }
 };
 
@@ -53,8 +59,12 @@ export async function createRefreshToken() {
 
   const device_token = localStorage.getItem("deviceToken");
   const fingerprint = localStorage.getItem("fingerprint");
-  const refresh_token = localStorage.getItem(`refreshToken-${tilaka_name || user || user_identifier}`);
-  const rememberMe = localStorage.getItem(`rememberMe-${tilaka_name || user || user_identifier}`);
+  const refresh_token = localStorage.getItem(
+    `refreshToken-${tilaka_name || user || user_identifier}`
+  );
+  const rememberMe = localStorage.getItem(
+    `rememberMe-${tilaka_name || user || user_identifier}`
+  );
 
   if (!rememberMe) {
     unaunthenticated();
@@ -100,7 +110,7 @@ const handleUnauthorize = async (
   instance: AxiosInstance,
   error: AxiosError
 ) => {
-  console.log("handle unauthorized ...");
+  console.log("Handling unauthorized error...");
 
   const originalRequest = error.config;
 
@@ -108,25 +118,28 @@ const handleUnauthorize = async (
     `rememberMe-${Router.query.tilaka_name || Router.query.user}`
   );
 
-  if (!rememberMe) unaunthenticated();
-
   if (
-    !originalRequest ||
-    !originalRequest.url ||
-    originalRequest.url.includes("/login")
+    !rememberMe &&
+    Router.pathname !== "setting-signature-and-mfa" &&
+    Router.pathname !== "set-mfa" &&
+    Router.pathname !== "certificate-information"
   ) {
+    unaunthenticated();
+    throw error; // Throw the error to prevent further processing
+  }
+
+  if (!originalRequest || originalRequest.url?.includes("/login")) {
     throw error;
   }
 
   if (isRefreshing) {
+    // If already refreshing, return a promise without initiating another refresh
     return new Promise((resolve, reject) => {
       failedQueue.push({ resolve, reject });
-    })
-      .then((accessToken) => {
-        axios.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
-        return instance(originalRequest);
-      })
-      .catch((err) => Promise.reject(err));
+    }).then((accessToken) => {
+      axios.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
+      return instance(originalRequest);
+    });
   }
 
   try {
@@ -143,9 +156,15 @@ const handleUnauthorize = async (
 
     failedQueue = [];
 
+    // Retry the original request with the new token
+    if (originalRequest && originalRequest.headers) {
+      originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+    }
     return instance(originalRequest);
   } catch (err) {
-    return Promise.reject(err);
+    // If refresh token fails, handle the error
+    isRefreshing = false;
+    throw err;
   }
 };
 

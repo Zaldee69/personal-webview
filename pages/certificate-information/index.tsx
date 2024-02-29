@@ -37,20 +37,12 @@ function CertificateInformation({}: Props) {
     const body = {
       company_id: company_id as string,
     };
-    RestRegisteredCertificate(body)
-      .then((res) => {
-        if (res?.data) {
-          const result = JSON.parse(res.data[0]);
-          dispatch(setCertificate(result));
-        }
-      })
-      .catch((err) => {
-        toast("Gagal mengecek sertifikat", {
-          type: "error",
-          toastId: "error",
-          position: "top-center",
-        });
-      });
+    RestRegisteredCertificate(body).then((res) => {
+      if (res?.data) {
+        const result = JSON.parse(res.data[0]);
+        dispatch(setCertificate(result));
+      }
+    });
   };
 
   useEffect(() => {
@@ -70,10 +62,21 @@ function CertificateInformation({}: Props) {
       },
     });
     setIsLoading(true);
+
+    const token = localStorage.getItem(
+      `token-${
+        router.query.tilaka_name ||
+        router.query.user ||
+        router.query.user_identifier
+      }`
+    )!;
+
     const body: TConfirmCertificateRequestData = {
       company_id: company_id as string,
       serial_number: certificate.serialNumber,
+      token,
     };
+
     RestConfirmCertificate(body)
       .then((res) => {
         toast.dismiss("info");
@@ -101,11 +104,44 @@ function CertificateInformation({}: Props) {
       .catch((err) => {
         toast.dismiss("info");
         setIsLoading(false);
-        toast("Terjadi kesalahan", {
-          type: "error",
-          toastId: "error",
-          position: "top-center",
-        });
+        switch (err.response.status) {
+          case 401:
+            localStorage.removeItem(
+              `token-${
+                router.query.tilaka_name ||
+                router.query.user ||
+                router.query.user_identifier
+              }`
+            );
+            localStorage.removeItem(
+              `refreshToken-${
+                router.query.tilaka_name ||
+                router.query.user ||
+                router.query.user_identifier
+              }`
+            );
+            localStorage.removeItem(
+              `rememberMe-${
+                router.query.tilaka_name ||
+                router.query.user ||
+                router.query.user_identifier
+              }`
+            );
+            // unauthorized
+            router.replace({
+              pathname: handleRoute("login"),
+              query: { ...router.query },
+            });
+            break;
+
+          default:
+            toast("Gagal mengecek sertifikat", {
+              type: "error",
+              toastId: "error",
+              position: "top-center",
+            });
+            break;
+        }
       });
   };
   return (
