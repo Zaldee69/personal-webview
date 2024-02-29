@@ -37,20 +37,12 @@ function CertificateInformation({}: Props) {
     const body = {
       company_id: company_id as string,
     };
-    RestRegisteredCertificate(body)
-      .then((res) => {
-        if (res?.data) {
-          const result = JSON.parse(res.data[0]);
-          dispatch(setCertificate(result));
-        }
-      })
-      .catch((err) => {
-        toast("Gagal mengecek sertifikat", {
-          type: "error",
-          toastId: "error",
-          position: "top-center",
-        });
-      });
+    RestRegisteredCertificate(body).then((res) => {
+      if (res?.data) {
+        const result = JSON.parse(res.data[0]);
+        dispatch(setCertificate(result));
+      }
+    });
   };
 
   useEffect(() => {
