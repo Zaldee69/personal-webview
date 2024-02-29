@@ -79,7 +79,6 @@ function CertificateInformation({}: Props) {
       }`
     )!;
 
-
     const body: TConfirmCertificateRequestData = {
       company_id: company_id as string,
       serial_number: certificate.serialNumber,
@@ -115,6 +114,27 @@ function CertificateInformation({}: Props) {
         setIsLoading(false);
         switch (err.response.status) {
           case 401:
+            localStorage.removeItem(
+              `token-${
+                router.query.tilaka_name ||
+                router.query.user ||
+                router.query.user_identifier
+              }`
+            );
+            localStorage.removeItem(
+              `refreshToken-${
+                router.query.tilaka_name ||
+                router.query.user ||
+                router.query.user_identifier
+              }`
+            );
+            localStorage.removeItem(
+              `rememberMe-${
+                router.query.tilaka_name ||
+                router.query.user ||
+                router.query.user_identifier
+              }`
+            );
             // unauthorized
             router.replace({
               pathname: handleRoute("login"),

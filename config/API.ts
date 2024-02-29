@@ -30,6 +30,9 @@ const clearAuth = () => {
   localStorage.removeItem(
     `token-${Router.query.tilaka_name || Router.query.user}`
   );
+  localStorage.removeItem(
+    `rememberMe-${Router.query.tilaka_name || Router.query.user}`
+  );
 };
 
 const unaunthenticated = () => {
@@ -119,7 +122,7 @@ const handleUnauthorize = async (
     !rememberMe &&
     Router.pathname !== "setting-signature-and-mfa" &&
     Router.pathname !== "set-mfa" &&
-    Router.pathname !== "confirm-certificate"
+    Router.pathname !== "certificate-information"
   ) {
     unaunthenticated();
     throw error; // Throw the error to prevent further processing
