@@ -1,89 +1,87 @@
-import PinFormComponent from "@/components/PinFormComponent";
 import i18n from "i18";
-import { RestSigningAuthhashsign } from "infrastructure";
-import { NextParsedUrlQuery } from "next/dist/server/request-meta";
+import { RestOTPDedicated, RestSigningAuthhashsign } from "infrastructure";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/app/store";
-import { SigningFailure, SigningSuccess } from ".";
+import Button from "@/components/atoms/Button";
+import Loader from "@/public/icons/Loader";
+import Heading from "@/components/atoms/Heading";
+import { GetServerSideProps } from "next";
+import { IOTPDedicatedResponse } from "infrastructure/rest/personal/types";
+import { toast } from "react-toastify";
+import CheckOvalIcon from "@/public/icons/CheckOvalIcon";
+import XIcon from "@/public/icons/XIcon";
 import { concateRedirectUrlParams } from "@/utils/concateRedirectUrlParams";
-import { handleRoute } from "@/utils/handleRoute";
+import { useResizeDetector } from "react-resize-detector";
+import OTPInput from "@/components/OTPInput";
 
-type Props = {};
+interface Props extends IOTPDedicatedResponse {
+  id: string;
+  user: string;
+}
 
-type TUrlQuery = {
-  random?: "1";
-  user?: string;
-  id?: string;
-  redirect_url?: string;
-  token?: string; // for setPassword after success manual form
-};
+const PinFormDedicatedChannel = ({ id, user, success }: Props) => {
+  const [otpValues, setOtpValues] = useState(["", "", "", "", "", ""]);
+  const [isCountDone, setIsCountDone] = useState<boolean>(false);
+  const [timeRemaining, setTimeRemaining] = useState<string>("0");
+  const [isProcessResend, setIsProcessResend] = useState<boolean>(false);
+  const [isProcessVerify, setIsProcessVerify] = useState<boolean>(false);
 
-const PinFormDedicatedChannel = (props: Props) => {
+  const interval = 60000;
+
   const router = useRouter();
-  const { t } = i18n;
-  const {
-    random,
-    user,
-    id,
-    redirect_url,
-    token,
-    ...restRouterQuery
-  }: NextParsedUrlQuery & TUrlQuery = router.query;
-  const isRandom: boolean = random === "1";
-  const [shouldRender, setShouldRender] = useState<boolean>(false);
-  // const [pin, setPin] = useState<string>("");
-  // const [pinError, setPinError] = useState<{
-  //   isError: boolean;
-  //   message: string;
-  // }>({ isError: false, message: "" });
-  const [pinConfirmError, setPinConfirmError] = useState<{
-    isError: boolean;
-    message: string;
-  }>({ isError: false, message: "" });
-  const [pinConfirmErrorAfterSubmit, setPinConfirmErrorAfterSubmit] = useState<{
-    isError: boolean;
-    message: string;
-  }>({ isError: false, message: "" });
-  // const [isConfirmMode, setIsConfirmMode] = useState<boolean>(false);
-  const [isButtonNumberDisabled, setIsButtonNumberDisabled] =
-    useState<boolean>(false);
-  const [isProcessed, setIsProcessed] = useState<boolean>(false);
-  const [isSuccess, setIsSuccess] = useState<"-1" | "0" | "1">("-1");
-
-  const digitLength: number = 6;
+  const { redirect_url } = router.query;
 
   const themeConfiguration = useSelector((state: RootState) => state.theme);
+  const { t }: any = i18n;
 
-  // const onClickNumberHandlerCallback = (value: number) => {};
-  // const onClickDeleteHandlerCallback = () => {};
-  // const submitFormCallback = (pin: string) => {
-  //   setPin(pin);
-  //   setIsConfirmMode(true);
-  // };
-  const onClickNumberHandlerConfirmCallback = (value: number) => {
-    setPinConfirmError({ isError: false, message: "" });
+  const reset = () => {
+    localStorage.endTime = +new Date() + interval;
   };
-  const onClickDeleteHandlerConfirmCallback = () => {
-    setIsButtonNumberDisabled(false);
-    setPinConfirmError({ isError: false, message: "" });
+
+  const { width, ref } = useResizeDetector();
+
+  const resendOTP = () => {
+    setIsProcessResend(true);
+    RestOTPDedicated({
+      id,
+      user,
+    })
+      .then((res) => {
+        if (res.success) {
+          timerHandler();
+          reset();
+          setIsCountDone(true);
+          toast.success("OTP Terkirim", {
+            icon: <CheckOvalIcon />,
+          });
+        } else {
+          timerHandler();
+          reset();
+          setIsCountDone(true);
+          toast.error(res.message, {
+            icon: <XIcon />,
+          });
+        }
+        setIsProcessResend(false);
+      })
+      .catch((err) => {
+        console.log(err);
+        setIsProcessResend(false);
+        toast.error("Terjadi kesalahan, Mohon coba lagi.", {
+          icon: <XIcon />,
+        });
+      });
   };
-  const submitFormConfirmCallback = (pinConfirm: string) => {
-    setIsButtonNumberDisabled(true);
-    setIsProcessed(true);
 
-    // if (pin !== pinConfirm) {
-    //   setPinConfirmErrorAfterSubmit({
-    //     isError: true,
-    //     message: t("confirmPinDoesntMatch"),
-    //   });
-    //   setIsProcessed(false);
-    //   return;
-    // }
+  const verifyOTP = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
 
-    setPinConfirmErrorAfterSubmit({ isError: false, message: "" });
+    if (otpValues.length < 6) return;
+
+    setIsProcessVerify(true);
 
     RestSigningAuthhashsign({
       params: {
@@ -91,116 +89,96 @@ const PinFormDedicatedChannel = (props: Props) => {
         user: user as string,
       },
       payload: {
-        pin: pinConfirm,
-        // token: "?"
+        otp_pin: otpValues.join(""),
       },
     })
       .then((res) => {
         if (res.success) {
-          // setIsConfirmMode(false);
-          setIsButtonNumberDisabled(false);
-          setIsProcessed(false);
-
+          toast.success("Penandatangan Berhasil", {
+            icon: <CheckOvalIcon />,
+          });
           const params = {
             user_identifier: res.data.tilaka_name,
             request_id: res.data.request_id,
-            hmac_nonce: res.data.hmac_nonce,
             status: "Sukses",
+            signing_id: id,
           };
-
-          const queryString = new URLSearchParams(params as any).toString();
-
-          const { redirect_url, pathname } = router.query;
 
           if (redirect_url) {
-            window.top!.location.href = concateRedirectUrlParams(
-              redirect_url as string,
-              queryString
-            );
-          } else {
-            router.push(
-              {
-                pathname: handleRoute(pathname as string),
-                query: {
-                  ...router.query,
-                  user_identifier: res.data.tilaka_name,
-                  request_id: res.data.request_id,
-                  hmac_nonce: res.data.hmac_nonce,
-                },
-              },
-              undefined,
-              { shallow: true }
-            );
-            setIsSuccess("1");
+            const queryString = new URLSearchParams(params as any).toString();
+            setTimeout(() => {
+              window.top!.location.href = concateRedirectUrlParams(
+                redirect_url as string,
+                queryString
+              );
+            }, 2000);
           }
         } else {
-          setPinConfirmError({
-            isError: true,
-            message: res?.message || "gagal",
-          });
-          setIsButtonNumberDisabled(true);
-          setIsProcessed(false);
+          if (res.message === "authhashsign gagal. salah OTP sudah 5 kali") {
+            toast.error(res.message, {
+              icon: <XIcon />,
+            });
+            const params = {
+              user_identifier: user,
+              request_id: res.data.request_id,
+              status: "Blocked",
+              signing_id: id,
+            };
 
-          const params = {
-            user_identifier: router.query.user,
-            request_id: res.data.request_id,
-            status: "Gagal",
-          };
+            if (redirect_url) {
+              const queryString = new URLSearchParams(params as any).toString();
+              setTimeout(() => {
+                window.top!.location.href = concateRedirectUrlParams(
+                  redirect_url as string,
+                  queryString
+                );
+              }, 2000);
+            }
+          } else {
+            const ERROR_MESSAGE =
+              res.message === "signing sudah selesai"
+                ? t("signingComplete")
+                : res.message;
 
-          if (
-            res.message ===
-            "penandatanganan dokumen gagal. pin sudah salah 3 kali"
-          ) {
-            const queryString = new URLSearchParams(params as any).toString();
-
-            window.top!.location.href = concateRedirectUrlParams(
-              router.query.redirect_url as string,
-              queryString
-            );
+            toast.error(ERROR_MESSAGE, {
+              icon: <XIcon />,
+            });
           }
+          setIsProcessVerify(false);
+          setOtpValues(["", "", "", "", "", ""]);
         }
       })
       .catch((err) => {
-        if (err.response?.data?.data?.errors?.[0]) {
-          setPinConfirmError({
-            isError: true,
-            message: `${err.response?.data?.message}, ${err.response?.data?.data?.errors?.[0]}`,
-          });
-        } else {
-          setPinConfirmError({
-            isError: true,
-            message: err.response?.data?.message || "gagal",
-          });
-        }
-        setIsButtonNumberDisabled(true);
-        setIsProcessed(false);
-
-        // setIsSuccess("0");
+        toast.error("Terjadi kesalahan, Mohon coba lagi.", {
+          icon: <XIcon />,
+        });
+        console.log(err);
       });
   };
 
-  // const onClickBack = (_: React.SyntheticEvent) => {
-  //   setPin("");
-  //   setPinError({ isError: false, message: "" });
-  //   setPinConfirmError({ isError: false, message: "" });
-  //   setPinConfirmErrorAfterSubmit({ isError: false, message: "" });
-  //   setIsConfirmMode(false);
-  //   setIsButtonNumberDisabled(false);
-  //   setIsProcessed(false);
-  // };
+  const timerHandler = () => {
+    setInterval(function () {
+      const date: any = new Date();
+      const remaining = localStorage.endTime - date;
+      const timeRemaining = Math.floor(remaining / 1000).toString();
+      if (remaining >= 1) {
+        setTimeRemaining(timeRemaining);
+      } else {
+        setIsCountDone(false);
+      }
+    }, 100);
+  };
 
   useEffect(() => {
-    if (!router.isReady) return;
-    setShouldRender(true);
-  }, [router.isReady]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  if (!shouldRender) return;
-
-  if (isSuccess === "1") {
-    return <SigningSuccess />;
-  } else if (isSuccess === "0") {
-    return <SigningFailure />;
-  }
+    if (success) {
+      timerHandler();
+      reset();
+      setIsCountDone(true);
+    } else {
+      setIsCountDone(true);
+      timerHandler();
+    }
+  }, []);
 
   return (
     <div
@@ -210,30 +188,103 @@ const PinFormDedicatedChannel = (props: Props) => {
           "BG"
         ),
       }}
-      className="flex justify-center items-center min-h-screen px-3 pt-3 pb-5"
+      className="flex justify-center items-center min-h-screen pt-3 px-3 pb-5"
     >
-      <div className="max-w- w-full" style={{ maxWidth: "331px" }}>
-        <PinFormComponent
-          key="pinFormConfirmKey"
-          title="PIN"
-          subTitle={t("authPinSubtitle")}
-          digitLength={digitLength}
-          isRandom={isRandom}
-          onClickNumberHandlerCallback={onClickNumberHandlerConfirmCallback}
-          onClickDeleteHandlerCallback={onClickDeleteHandlerConfirmCallback}
-          submitFormCallback={submitFormConfirmCallback}
-          isResetAfterSubmit={false}
-          isErrorAfterSubmit={pinConfirmErrorAfterSubmit.isError}
-          isErrorAfterSubmitMessage={pinConfirmErrorAfterSubmit.message}
-          isError={pinConfirmError.isError}
-          isErrorMessage={pinConfirmError.message}
-          isButtonNumberDisabled={isButtonNumberDisabled}
-          isProcessed={isProcessed}
-          showPoweredByTilaka
-        />
+      <div
+        ref={ref}
+        className="h-96 px-6 pb-5 font-poppins w-[26rem] card-pin-form"
+      >
+        <Heading className="text-center">{t("frSubtitle2")}</Heading>
+        <p className="text-center text-neutral200 mt-3 text-sm md:text-base whitespace-pre">
+          {t("otpSubtitle")}
+        </p>
+        <form onSubmit={verifyOTP}>
+          <OTPInput
+            width={width!}
+            setValues={setOtpValues}
+            values={otpValues}
+          />
+
+          <div className="flex justify-center text-sm gap-1 mt-5">
+            <p className="text-neutral200">{t("dindtReceiveOtp")}</p>
+            <div
+              style={{
+                color: themeConfigurationAvaliabilityChecker(
+                  themeConfiguration?.data.action_font_color as string,
+                  "BG"
+                ),
+              }}
+              className="font-semibold"
+            >
+              {!isCountDone ? (
+                <Button
+                  variant="ghost"
+                  type="button"
+                  disabled={isProcessResend}
+                  style={{
+                    color: themeConfigurationAvaliabilityChecker(
+                      themeConfiguration?.data.action_font_color as string
+                    ),
+                  }}
+                  className="mx-0"
+                  size="none"
+                  onClick={resendOTP}
+                >
+                  {isProcessResend ? (
+                    <Loader color="#0052CC" size={20} />
+                  ) : (
+                    t("resend")
+                  )}
+                </Button>
+              ) : (
+                <p className="text-primary">{`0:${timeRemaining}`}</p>
+              )}
+            </div>
+          </div>
+          <Button
+            disabled={otpValues.join("").length < 6 || isProcessVerify}
+            type="submit"
+            className="mt-16"
+            style={{
+              backgroundColor: themeConfigurationAvaliabilityChecker(
+                themeConfiguration?.data.button_color as string
+              ),
+            }}
+          >
+            {isProcessVerify ? (
+              <div className="mx-auto flex justify-center">
+                <Loader />
+              </div>
+            ) : (
+              t("send")
+            )}
+          </Button>
+        </form>
       </div>
     </div>
   );
+};
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const cQuery = context.query;
+  const { id, user } = cQuery;
+
+  const generateOTP = await RestOTPDedicated({
+    user: user as string,
+    id: id as string,
+  })
+    .then((res) => res)
+    .catch((err) => {
+      console.log(err);
+    });
+
+  return {
+    props: {
+      ...generateOTP,
+      user,
+      id,
+    },
+  };
 };
 
 export default PinFormDedicatedChannel;

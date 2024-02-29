@@ -18,6 +18,7 @@ import Footer from "@/components/Footer";
 import { buttonVariants } from "@/components/atoms/Button";
 import Heading from "@/components/atoms/Heading";
 import Paragraph from "@/components/atoms/Paraghraph";
+import useGenerateRedirectUrl from "@/hooks/useGenerateRedirectUrl";
 
 type Props = {};
 
@@ -28,89 +29,42 @@ const LinkAccountSuccess = (props: Props) => {
     setting?: "1";
     signing?: "1";
     redirect_url?: string;
+    tilaka_name?: string;
+    request_id?: string;
+    "tilaka-name"?: string;
+    "request-id"?: string;
   } = router.query;
   const isSigning: boolean = routerQuery.signing === "1";
-  const [redirectUrl, setRedirectUrl] = useState<string>(
-    routerQuery.redirect_url as string
-  );
 
   const { t }: any = i18n;
 
   const themeConfiguration = useSelector((state: RootState) => state.theme);
 
+  const { redirect_url, request_id, tilaka_name } = routerQuery;
+
+  const params: any = {
+    request_id,
+    tilaka_name,
+  };
+
+  if (routerQuery["tilaka-name"]) {
+    params["tilaka-name"] = tilaka_name;
+  }
+
+  if (routerQuery["request-id"]) {
+    params["request-id"] = request_id;
+  }
+
+  const { generatedUrl, autoRedirect } = useGenerateRedirectUrl({
+    url: redirect_url as string,
+    params,
+  });
+
   useEffect(() => {
     if (!routerIsReady) return;
     if (!isSigning) {
-      let queryWithDynamicRedirectURL = {
-        ...routerQuery,
-      };
-      let params: any = {};
-
-      if (queryWithDynamicRedirectURL.request_id) {
-        params["request-id"] = queryWithDynamicRedirectURL.request_id;
-      }
-      if (queryWithDynamicRedirectURL.tilaka_name) {
-        params["tilaka-name"] = queryWithDynamicRedirectURL.tilaka_name;
-      }
-
-      let queryString = new URLSearchParams(params as any).toString();
-
-      if (queryWithDynamicRedirectURL.redirect_url?.length) {
-        const currentRedirectUrl =
-          queryWithDynamicRedirectURL.redirect_url as string;
-        const currentRedirectUrlArr = currentRedirectUrl.split("?");
-
-        if (currentRedirectUrlArr.length > 1) {
-          if (
-            currentRedirectUrlArr[1].includes("request-id") &&
-            currentRedirectUrlArr[1].includes("tilaka-name")
-          ) {
-            queryWithDynamicRedirectURL.redirect_url =
-              currentRedirectUrlArr[0] + "?" + currentRedirectUrlArr[1] + "&";
-          } else if (currentRedirectUrlArr[1].includes("request-id")) {
-            const additionParams = {
-              ...params,
-              "tilaka-name": queryWithDynamicRedirectURL.tilaka_name,
-            };
-            queryString = new URLSearchParams(additionParams as any).toString();
-
-            queryWithDynamicRedirectURL.redirect_url =
-              currentRedirectUrlArr[0] +
-              "?" +
-              currentRedirectUrlArr[1] +
-              "&" +
-              queryString;
-          } else if (currentRedirectUrlArr[1].includes("tilaka-name")) {
-            const additionParams = {
-              ...params,
-              "request-id": queryWithDynamicRedirectURL.request_id,
-            };
-            queryString = new URLSearchParams(additionParams as any).toString();
-
-            queryWithDynamicRedirectURL.redirect_url =
-              currentRedirectUrlArr[0] +
-              "?" +
-              currentRedirectUrlArr[1] +
-              "&" +
-              queryString;
-          } else {
-            // manualy input redirect_url on url
-            queryWithDynamicRedirectURL.redirect_url =
-              currentRedirectUrlArr[0] +
-              "?" +
-              currentRedirectUrlArr[1] +
-              "&" +
-              queryString;
-          }
-        } else {
-          // current redirect_url no has param
-          queryWithDynamicRedirectURL.redirect_url =
-            currentRedirectUrlArr[0] + "?" + queryString;
-        }
-      }
-
-      setRedirectUrl(queryWithDynamicRedirectURL.redirect_url as string);
       restLogout({});
+      autoRedirect();
     } else {
       setTimeout(() => {
         router.replace({
@@ -131,21 +85,21 @@ const LinkAccountSuccess = (props: Props) => {
       }}
       className="px-10 min-h-screen pt-16 pb-9 text-center"
     >
-      <Heading >
+      <Heading>
         {routerQuery.setting === "1"
           ? t("linkAccountSuccessTitle1")
           : t("linkAccountSuccessTitle")}
       </Heading>
       <div
-          className="bg-contain mt-5 w-52 mx-auto h-64 bg-center bg-no-repeat"
-          style={{
-            backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
-              themeConfiguration.data.asset_activation_success as string,
-              "ASSET",
-              `${assetPrefix}/images/linkAccountSuccess.svg`
-            )})`,
-          }}
-        ></div>
+        className="bg-contain mt-5 w-52 mx-auto h-64 bg-center bg-no-repeat"
+        style={{
+          backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
+            themeConfiguration.data.asset_activation_success as string,
+            "ASSET",
+            `${assetPrefix}/images/linkAccountSuccess.svg`
+          )})`,
+        }}
+      ></div>
       <div className="mt-14">
         <Paragraph size="sm">
           {routerQuery.setting === "1"
@@ -153,8 +107,8 @@ const LinkAccountSuccess = (props: Props) => {
             : t("linkAccountSuccessSubtitle")}
         </Paragraph>
       </div>
-      {!isSigning && redirectUrl && (
-        <a href={concateRedirectUrlParams(redirectUrl, "")}>
+      {!isSigning && redirect_url && (
+        <a href={generatedUrl}>
           <a
             style={{
               color: themeConfigurationAvaliabilityChecker(
@@ -170,7 +124,7 @@ const LinkAccountSuccess = (props: Props) => {
             {t("livenessSuccessButtonTitle")}
           </a>
         </a>
-        )}
+      )}
       <Footer />
     </div>
   );

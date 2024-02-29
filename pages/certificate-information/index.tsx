@@ -31,38 +31,18 @@ function CertificateInformation({}: Props) {
 
   const themeConfiguration = useSelector((state: RootState) => state.theme);
 
-  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const getRegisteredCertificate = () => {
     const body = {
       company_id: company_id as string,
     };
-    RestRegisteredCertificate(body)
-      .then((res) => {
-        if (res?.data) {
-          const result = JSON.parse(res.data[0]);
-          dispatch(setCertificate(result));
-        }
-      })
-      .catch((err) => {
-        switch (err.response.status) {
-          case 401:
-            // unauthorized
-            router.replace({
-              pathname: handleRoute("login"),
-              query: { ...router.query },
-            });
-            break;
-
-          default:
-            toast("Gagal mengecek sertifikat", {
-              type: "error",
-              toastId: "error",
-              position: "top-center",
-            });
-            break;
-        }
-      });
+    RestRegisteredCertificate(body).then((res) => {
+      if (res?.data) {
+        const result = JSON.parse(res.data[0]);
+        dispatch(setCertificate(result));
+      }
+    });
   };
 
   useEffect(() => {
@@ -81,14 +61,25 @@ function CertificateInformation({}: Props) {
         backgroundColor: themeConfiguration?.data.toast_color as string,
       },
     });
-    setIsLoading(true)
+    setIsLoading(true);
+
+    const token = localStorage.getItem(
+      `token-${
+        router.query.tilaka_name ||
+        router.query.user ||
+        router.query.user_identifier
+      }`
+    )!;
+
     const body: TConfirmCertificateRequestData = {
       company_id: company_id as string,
       serial_number: certificate.serialNumber,
+      token,
     };
+
     RestConfirmCertificate(body)
       .then((res) => {
-        toast.dismiss("info")
+        toast.dismiss("info");
         if (res.success) {
           toast(`Sukses mengaktifkan sertifikat`, {
             type: "success",
@@ -102,7 +93,7 @@ function CertificateInformation({}: Props) {
             });
           }, 1000);
         } else {
-          setIsLoading(false)
+          setIsLoading(false);
           toast(`${res.message}`, {
             type: "error",
             toastId: "error",
@@ -111,10 +102,31 @@ function CertificateInformation({}: Props) {
         }
       })
       .catch((err) => {
-        toast.dismiss("info")
-        setIsLoading(false)
+        toast.dismiss("info");
+        setIsLoading(false);
         switch (err.response.status) {
           case 401:
+            localStorage.removeItem(
+              `token-${
+                router.query.tilaka_name ||
+                router.query.user ||
+                router.query.user_identifier
+              }`
+            );
+            localStorage.removeItem(
+              `refreshToken-${
+                router.query.tilaka_name ||
+                router.query.user ||
+                router.query.user_identifier
+              }`
+            );
+            localStorage.removeItem(
+              `rememberMe-${
+                router.query.tilaka_name ||
+                router.query.user ||
+                router.query.user_identifier
+              }`
+            );
             // unauthorized
             router.replace({
               pathname: handleRoute("login"),
@@ -154,23 +166,38 @@ function CertificateInformation({}: Props) {
             )})`,
           }}
         ></div>
-        <Paragraph size="sm" >{t("certificateSubtitle")}</Paragraph>
+        <Paragraph size="sm">{t("certificateSubtitle")}</Paragraph>
         <div className="mt-5 flex flex-col">
           <div className="grid grid-cols-12 h-fit">
-            <Paragraph size="sm" className="col-span-4 md:col-span-3 pr-2">{t("country")}</Paragraph>
-            <Paragraph size="sm" className="font-semibold col-span-8 md:col-span-9"  >
+            <Paragraph size="sm" className="col-span-4 md:col-span-3 pr-2">
+              {t("country")}
+            </Paragraph>
+            <Paragraph
+              size="sm"
+              className="font-semibold col-span-8 md:col-span-9"
+            >
               {certificate.negara}
             </Paragraph>
           </div>
           <div className="grid grid-cols-12">
-            <Paragraph size="sm" className="col-span-4 md:col-span-3 pr-2">{t("name")}</Paragraph>
-            <Paragraph size="sm" className="font-semibold col-span-8 md:col-span-9">
+            <Paragraph size="sm" className="col-span-4 md:col-span-3 pr-2">
+              {t("name")}
+            </Paragraph>
+            <Paragraph
+              size="sm"
+              className="font-semibold col-span-8 md:col-span-9"
+            >
               {certificate.nama}
             </Paragraph>
           </div>
           <div className="grid grid-cols-12">
-            <Paragraph size="sm" className="col-span-4 md:col-span-3 pr-2">{t("organization")}</Paragraph>
-            <Paragraph size="sm" className="font-semibold col-span-8 md:col-span-9">
+            <Paragraph size="sm" className="col-span-4 md:col-span-3 pr-2">
+              {t("organization")}
+            </Paragraph>
+            <Paragraph
+              size="sm"
+              className="font-semibold col-span-8 md:col-span-9"
+            >
               {certificate.organisasi}
             </Paragraph>
           </div>
@@ -184,7 +211,10 @@ function CertificateInformation({}: Props) {
             <Paragraph size="sm" className="col-span-4 md:col-span-3 pr-2">
               Unique ID
             </Paragraph>
-            <Paragraph size="sm" className=" font-semibold col-span-8 md:col-span-9">
+            <Paragraph
+              size="sm"
+              className=" font-semibold col-span-8 md:col-span-9"
+            >
               {certificate.dnQualifier}{" "}
             </Paragraph>
           </div>

@@ -1,4 +1,3 @@
-import { setKycCheckstepTokenToLocalStorage } from "@/utils/setKycCheckstepTokenToLocalStorage";
 import { setTokenToLocalStorage } from "@/utils/token";
 import axios from "axios";
 import {
@@ -39,7 +38,10 @@ export const RestKycCheckStep = ({
       headers: {},
     })
     .then((res) => {
-      setKycCheckstepTokenToLocalStorage(res.data.data?.token || null);
+      setTokenToLocalStorage(
+        res.data.data?.token || null,
+        payload.registerId
+      );
       return res.data;
     })
     .catch((err) => {
@@ -55,7 +57,7 @@ export const RestKycFinalForm = ({
   return axios
     .post<TKycFinalFormResponseData>(`${BASE_URL}/api/kyc/finalform`, payload, {
       headers: {
-        Authorization: `Bearer ${localStorage.getItem("kyc_checkstep_token")}`,
+        Authorization: `Bearer ${localStorage.getItem(payload.registerId)}`,
       },
     })
     .then((res) => res.data)
@@ -93,7 +95,7 @@ export const RestKycVerification = (
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem(
-            "kyc_checkstep_token"
+            body.registerId
           )}`,
           "Content-Type": "application/json",
         },
@@ -153,8 +155,7 @@ export const RestKycCheckStepIssue = (
     .then((res) => {
       if (res.data.data?.token) {
         setTokenToLocalStorage(
-          res.data.data?.token || null,
-          "kyc_reenroll_token"
+          res.data.data?.token || null, body.issueId+"re"
         );
       }
       return res.data;
@@ -187,7 +188,7 @@ export const RestKycVerificationIssue = (
       body,
       {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("kyc_reenroll_token")}`,
+          Authorization: `Bearer ${localStorage.getItem(body.issueId+"re")}`,
           "Content-Type": "application/json",
         },
       }

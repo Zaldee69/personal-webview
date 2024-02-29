@@ -1,26 +1,8 @@
-import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
-import { GetServerSidePropsContext, PreviewData } from "next";
 import { assetPrefix } from "next.config";
-import { ParsedUrlQuery } from "querystring";
 import { concateRedirectUrlParams } from "./concateRedirectUrlParams";
 import { handleRoute } from "./handleRoute";
+import { IserverSideRenderReturnConditions } from "@/interface/interface";
 
-interface IserverSideRenderReturnConditions {
-  context: GetServerSidePropsContext<ParsedUrlQuery, PreviewData>;
-  checkStepResult: {
-    res?: TKycCheckStepResponseData;
-    err?: {
-      response: {
-        data: {
-          success: boolean;
-          message: string;
-          data: { errors: string[] };
-        };
-      };
-    };
-  };
-  isNotRedirect?: boolean;
-}
 export const serverSideRenderReturnConditions = ({
   context,
   checkStepResult,
@@ -106,30 +88,68 @@ export const serverSideRenderReturnConditions = ({
             },
           };
         }
-      } else if (checkStepResult.res.data.status === "F") {
+      } else if (
+        checkStepResult.res.data.status === "F" ||
+        checkStepResult.res.data.status === "E"
+      ) {
         const params: any = {
           ...cQuery,
           request_id: uuid,
+          register_id: uuid,
         };
 
-        if (checkStepResult.res.data.reason_code) {
-          params.reason_code = checkStepResult.res.data.reason_code;
+        const { reason_code, token, route, status } = checkStepResult.res.data;
+
+        if (reason_code) {
+          params.reason_code = reason_code;
+        }
+
+        if (token) {
+          params.token = token;
+        }
+
+        if (route === "done_set_password") {
+          params.status = "S";
+        } else {
+          params.status = status;
         }
 
         const queryString = new URLSearchParams(params as any).toString();
+
+        // if status = F && reason_code = 3 redirect to
+        if (status === "F" && reason_code === "3") {
+          if (
+            currentPathnameWithoutParams !==
+              `${assetPrefix}/liveness-failure` &&
+            currentPathnameWithoutParams !== "/liveness-failure"
+          ) {
+            return {
+              redirect: {
+                permanent: false,
+                destination: handleRoute("/liveness-failure?" + queryString),
+              },
+              props: {
+                // kyc_checkstep_token: checkStepResult.res?.data?.token || null,
+              },
+            };
+          } else {
+            return { props: {} };
+          }
+        }
 
         if (
           checkStepResult.res.data.status === "F" &&
           checkStepResult.res.data.pin_form &&
           cQuery.redirect_url
         ) {
-          const status = checkStepResult.res.data.reason_code === "1" ? "S" : "F"
+          const status =
+            checkStepResult.res.data.reason_code === "1" ? "S" : "F";
           return {
             redirect: {
               permanent: false,
               destination: concateRedirectUrlParams(
                 cQuery.redirect_url as string,
-                `status=${status}%26register_id=${uuid}${
+                `status=${status}%26register_id=${uuid}%26request_id=${uuid}${
                   checkStepResult.res.data.reason_code
                     ? "%26reason_code=" + checkStepResult.res.data.reason_code
                     : ""
@@ -138,11 +158,37 @@ export const serverSideRenderReturnConditions = ({
             },
             props: {},
           };
+        } else if (
+          checkStepResult.res.data?.route === "done_set_password" &&
+          !currentPathnameWithoutParams.includes("/link-account") &&
+          !currentPathnameWithoutParams.includes("/certificate-information") &&
+          !currentPathnameWithoutParams.includes("/setting-signature-and-mfa")
+        ) {
+          return {
+            redirect: {
+              permanent: false,
+              destination: handleRoute("manual-form/success?" + queryString),
+            },
+            props: {},
+          };
+        } else if (checkStepResult.res.data?.route === "set_password") {
+          if (!currentPathnameWithoutParams.includes("/manual-form/final")) {
+            return {
+              redirect: {
+                permanent: false,
+                destination: handleRoute("manual-form/final?" + queryString),
+              },
+              props: {},
+            };
+          } else {
+            return { props: {} };
+          }
         }
 
         if (
           currentPathnameWithoutParams === `${assetPrefix}/liveness-failure` ||
-          currentPathnameWithoutParams === "/liveness-failure"
+          currentPathnameWithoutParams === "/liveness-failure" ||
+          isNotRedirect
         ) {
           return { props: {} };
         }
@@ -159,39 +205,56 @@ export const serverSideRenderReturnConditions = ({
       } else if (checkStepResult.res.data.status === "S") {
         const params: any = {
           status: checkStepResult.res.data.status,
+          request_id: uuid,
+          register_id: uuid,
         };
+
+        if (cQuery.redirect_url) {
+          params.redirect_url = cQuery.redirect_url;
+        }
+
+        if (cQuery.lang) {
+          params.lang = cQuery.lang;
+        }
 
         if (checkStepResult.res.data.reason_code) {
           params.reason_code = checkStepResult.res.data.reason_code;
         }
 
-        // status S doesn't has `pin_form`
-        if (
-          currentPathnameWithoutParams === `${assetPrefix}/form/success` ||
-          currentPathnameWithoutParams === "/form/success"
-        ) {
-          params.request_id = uuid;
-        } else if (
-          currentPathnameWithoutParams === `${assetPrefix}/kyc/pinform` ||
-          currentPathnameWithoutParams === "/kyc/pinform"
-        ) {
-          params.register_id = uuid;
-        } else {
-          // if condition above not fulfulled, we return `register_id`,
-          // even if the channel is reguler, because if status S we don't know what channel of the uuid
-          params.register_id = uuid;
+        params.request_id = uuid;
+        params.register_id = uuid;
+
+        const queryString = new URLSearchParams(params).toString();
+
+        if (checkStepResult.res.data.pin_form) {
+          if (cQuery.redirect_url) {
+            return {
+              redirect: {
+                permanent: false,
+                destination: concateRedirectUrlParams(
+                  cQuery.redirect_url as string,
+                  `status=${
+                    params.status
+                  }%26register_id=${uuid}%26request_id=${uuid}${
+                    checkStepResult.res.data.reason_code
+                      ? "%26reason_code=" + checkStepResult.res.data.reason_code
+                      : ""
+                  }`
+                ),
+              },
+            };
+          } else {
+            return {
+              props: {},
+            };
+          }
         }
 
-        const queryString = new URLSearchParams(params as any).toString();
-
-        if (cQuery.redirect_url && !isNotRedirect) {
+        if (!isNotRedirect) {
           return {
             redirect: {
               permanent: false,
-              destination: concateRedirectUrlParams(
-                cQuery.redirect_url as string,
-                queryString
-              ),
+              destination: handleRoute("/form/success?" + queryString),
             },
             props: {},
           };
@@ -201,13 +264,17 @@ export const serverSideRenderReturnConditions = ({
           props: {},
         };
       } else if (
-        checkStepResult.res.data.route === "penautan" ||
-        checkStepResult.res.data.route === "penautan_consent"
+        checkStepResult.res?.data?.route === "penautan" ||
+        checkStepResult.res?.data?.route === "penautan_consent" ||
+        checkStepResult.res?.data?.route === "penautan_company"
       ) {
         const params: any = { ...cQuery, request_id: uuid };
         const queryString = new URLSearchParams(params as any).toString();
 
-        if (!currentPathnameWithoutParams.includes("/link-account")) {
+        if (
+          !currentPathnameWithoutParams.includes("/link-account") &&
+          !isNotRedirect
+        ) {
           return {
             redirect: {
               permanent: false,
@@ -221,7 +288,9 @@ export const serverSideRenderReturnConditions = ({
       }
     } else {
       if (
-        checkStepResult.res?.data?.errors?.[0] === "registrationId tidak valid"
+        checkStepResult.res?.data?.errors?.[0] ===
+          "registrationId tidak valid" &&
+        checkStepResult?.res?.data?.route?.length < 1
       ) {
         const params: any = { ...cQuery, request_id: uuid };
         const queryString = new URLSearchParams(params as any).toString();
@@ -234,6 +303,7 @@ export const serverSideRenderReturnConditions = ({
           currentPathnameWithoutParams === "/link-account/success" ||
           currentPathnameWithoutParams === `${assetPrefix}/link-account` ||
           currentPathnameWithoutParams === "/link-account" ||
+          currentPathnameWithoutParams.includes("/liveness") ||
           isNotRedirect
         ) {
           return {
@@ -248,6 +318,48 @@ export const serverSideRenderReturnConditions = ({
           },
           props: {},
         };
+      } else if (checkStepResult?.res?.data?.route === "manual_form") {
+        const params: any = {
+          ...cQuery,
+          request_id: uuid,
+          tilaka_name: checkStepResult.res.data.user_identifier,
+          next_path: "manual_form",
+        };
+        const queryString = new URLSearchParams(params as any).toString();
+
+        if (
+          !currentPathnameWithoutParams.includes("/manual-form") &&
+          !currentPathnameWithoutParams.includes(
+            "/link-account/linking/failure"
+          )
+        ) {
+          return {
+            redirect: {
+              permanent: false,
+              destination: handleRoute(
+                "link-account/linking/failure?" + queryString
+              ),
+            },
+            props: {},
+          };
+        }
+      } else if (checkStepResult?.res?.data?.route === "done_manual_form") {
+        const params: any = {
+          ...cQuery,
+          request_id: uuid,
+          tilaka_name: checkStepResult.res.data.user_identifier,
+        };
+        const queryString = new URLSearchParams(params as any).toString();
+
+        if (!currentPathnameWithoutParams.includes("/manual-form/on-process")) {
+          return {
+            redirect: {
+              permanent: false,
+              destination: handleRoute("manual-form/on-process?" + queryString),
+            },
+            props: {},
+          };
+        }
       } else {
         return { props: {} };
       }

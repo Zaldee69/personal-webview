@@ -17,14 +17,24 @@ import { useSelector } from "react-redux";
 import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
 import Heading from "@/components/atoms/Heading";
 import Paragraph from "@/components/atoms/Paraghraph";
+import { Trans } from "react-i18next";
+import { useCountdown } from "@/hooks/useCountdown";
+import useGenerateRedirectUrl from "@/hooks/useGenerateRedirectUrl";
 
 interface TQueryParams {
-  status?: string;
+  status?: string | undefined | string[];
+  reason_code: string | undefined | string[];
   request_id: string;
-  reason_code?: string;
+  register_id: string;
+  redirect_url?: string | undefined | string[];
+  lang?: string | undefined | string[];
 }
 
-const LivenessFailure = () => {
+interface Props {
+  status: string | null;
+}
+
+const LivenessFailure = (props: Props) => {
   const { t }: any = i18n;
   const router = useRouter();
   const routerQuery = router.query;
@@ -33,18 +43,28 @@ const LivenessFailure = () => {
     routerQuery.transaction_id ||
     routerQuery.request_id ||
     routerQuery.registration_id;
+
+  const { reason_code, redirect_url, lang } = routerQuery;
+
   const params: TQueryParams = {
     request_id: uuid as string,
+    register_id: uuid as string,
+    reason_code,
+    status: props.status as string,
   };
-  const reason_code = routerQuery.reason_code;
 
-  if (reason_code === "3") {
-    params.reason_code = "3";
-  } else {
-    params.status = "F";
+  if (lang) {
+    params["lang"] = lang;
   }
 
-  const queryString = new URLSearchParams(params as any).toString();
+  if (redirect_url && reason_code !== "3") {
+    params.redirect_url = redirect_url;
+  }
+
+  const second = 5;
+
+  const { timeLeft } = useCountdown(second);
+
   const message =
     reason_code === "1"
       ? t("ekycFailed.errorCode1")
@@ -54,14 +74,22 @@ const LivenessFailure = () => {
       ? t("ekycFailed.errorCode3")
       : t("livenessFailed3xSubtitle");
   const isRedirectToManualForm = reason_code === "1" || reason_code === "2";
+
+  const { generatedUrl, autoRedirect } = useGenerateRedirectUrl({
+    params,
+    url: redirect_url as string,
+  });
+
   useEffect(() => {
     if (isRedirectToManualForm) {
       setTimeout(() => {
         router.push({
           pathname: handleRoute("manual-form"),
-          query: routerQuery,
+          query: { ...params },
         });
       }, 5000);
+    } else if (redirect_url && reason_code === "3") {
+      autoRedirect();
     }
   }, []);
   return (
@@ -78,7 +106,7 @@ const LivenessFailure = () => {
         <title>Liveness</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
-      <div className="px-5 pt-8 sm:w-full md:w-4/5 mx-auto">
+      <div className="px-5 pt-8 max-w-md md:w-4/5 mx-auto">
         <div className="flex flex-col gap-16 items-center justify-center">
           <Heading className="text-center">{t("ekycFailed.title")}</Heading>
           <div
@@ -93,31 +121,23 @@ const LivenessFailure = () => {
             }}
           ></div>
           <div className="flex flex-col items-center gap-10 ">
-            <Paragraph size="sm" className="text-center">
+            <Paragraph className="text-center">
               {message}
               {isRedirectToManualForm && (
-                <div>
-                  <div className="hidden lg:block">
-                    <Paragraph className="text-center">
-                      {t("ekycFailed.subtitle1")} <br />
-                      {t("ekycFailed.subtitle2")}
-                    </Paragraph>
-                  </div>
-                  <div className="block lg:hidden">
-                    <Paragraph className="text-center text-red-100">
-                      {t("ekycFailed.subtitle")}
-                    </Paragraph>
-                  </div>
+                <div className="block">
+                  <Paragraph className="whitespace-pre-line">
+                    <Trans
+                      values={{
+                        timeLeft: timeLeft <= 0 ? 0 : timeLeft,
+                      }}
+                      i18nKey="ekycFailed.subtitle"
+                    ></Trans>
+                  </Paragraph>
                 </div>
               )}
             </Paragraph>
-            {routerQuery.redirect_url && reason_code === "3" ? (
-              <a
-                href={concateRedirectUrlParams(
-                  routerQuery.redirect_url as string,
-                  queryString
-                )}
-              >
+            {redirect_url && reason_code === "3" ? (
+              <a href={generatedUrl}>
                 <span
                   style={{
                     color: themeConfigurationAvaliabilityChecker(
@@ -167,7 +187,15 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       return { err };
     });
 
-  return serverSideRenderReturnConditions({ context, checkStepResult });
+  const serverSideRenderReturnConditionsResult =
+    serverSideRenderReturnConditions({ context, checkStepResult });
+
+  serverSideRenderReturnConditionsResult["props"] = {
+    status: checkStepResult.res?.data?.status || null,
+    reasonCode: checkStepResult.res?.data?.reason_code || null,
+  };
+
+  return serverSideRenderReturnConditionsResult;
 };
 
 export default LivenessFailure;

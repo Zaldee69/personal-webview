@@ -3,7 +3,10 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import Footer from "../../components/Footer";
-import { RestPersonalSetPassword } from "../../infrastructure";
+import {
+  RestKycCheckStepv2,
+  RestPersonalSetPassword,
+} from "../../infrastructure";
 import EyeIcon from "../../public/icons/EyeIcon";
 import EyeIconOff from "./../../public/icons/EyeIconOff";
 import QuestionIcon from "./../../public/icons/QuestionIcon";
@@ -13,7 +16,6 @@ import CheckOvalIcon from "@/public/icons/CheckOvalIcon";
 import i18n from "i18";
 import { assetPrefix } from "../../next.config";
 import { handleRoute } from "@/utils/handleRoute";
-import { concateRedirectUrlParams } from "@/utils/concateRedirectUrlParams";
 import Button from "@/components/atoms/Button";
 import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
 import { useSelector } from "react-redux";
@@ -21,6 +23,9 @@ import { RootState } from "@/redux/app/store";
 import Heading from "@/components/atoms/Heading";
 import Paragraph from "@/components/atoms/Paraghraph";
 import Label from "@/components/atoms/Label";
+import { GetServerSideProps } from "next";
+import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
+import { serverSideRenderReturnConditions } from "@/utils/serverSideRenderReturnConditions";
 
 interface InputType {
   password: string | number;
@@ -63,7 +68,7 @@ const Form: React.FC = () => {
   const themeConfiguration = useSelector((state: RootState) => state.theme);
 
   const [isChecked, setIsCheked] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const disabled =
     !input.password ||
     !input.confirmPassword ||
@@ -71,7 +76,8 @@ const Form: React.FC = () => {
     error.tilakaName ||
     error.confirmPassword ||
     error.password ||
-    !isChecked || isLoading;
+    !isChecked ||
+    isLoading;
 
   const onChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -168,7 +174,7 @@ const Form: React.FC = () => {
     const password = target.password.value;
 
     try {
-      setIsLoading(true)
+      setIsLoading(true);
       toast(`Loading...`, {
         type: "info",
         toastId: "load",
@@ -187,35 +193,42 @@ const Form: React.FC = () => {
         },
       });
       if (res.success) {
-        toast.dismiss()
+        toast.dismiss();
         toast.success(res?.message || "berhasil", {
           icon: <CheckOvalIcon />,
         });
 
         const query: any = {
           request_id,
-          ...restRouterQuery,
+          register_id: request_id,
+          reason_code: router.query.reason_code,
+          redirect_url: router.query.redirect_url,
+          status: "S",
         };
+
+        if(router.query.lang){
+          query.lang = router.query.lang
+        }
 
         router.replace({
           pathname: handleRoute("manual-form/success"),
           query,
         });
       } else {
-        setIsLoading(false)
-        toast.dismiss()
+        setIsLoading(false);
+        toast.dismiss();
         toast.error(res?.message || "gagal", { icon: <XIcon /> });
       }
     } catch (err: any) {
-      setIsLoading(false)
+      setIsLoading(false);
       if (err.response?.data?.data?.errors?.[0]) {
-        toast.dismiss()
+        toast.dismiss();
         toast.error(
           `${err.response?.data?.message}, ${err.response?.data?.data?.errors?.[0]}`,
           { icon: <XIcon /> }
         );
       } else {
-        toast.dismiss()
+        toast.dismiss();
         toast.error(err.response?.data?.message || "gagal", {
           icon: <XIcon />,
         });
@@ -225,7 +238,7 @@ const Form: React.FC = () => {
 
   return (
     <div
-    className="min-h-screen"
+      className="min-h-screen"
       style={{
         backgroundColor: themeConfigurationAvaliabilityChecker(
           themeConfiguration?.data.background as string,
@@ -238,9 +251,7 @@ const Form: React.FC = () => {
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
       <div className="px-5 pt-8 max-w-md mx-auto">
-        <Heading>
-          {t("finalFormTitle")}
-        </Heading>
+        <Heading>{t("finalFormTitle")}</Heading>
         <div
           className="bg-contain w-52 mx-auto h-52 mt-5 bg-center bg-no-repeat"
           style={{
@@ -257,11 +268,7 @@ const Form: React.FC = () => {
         <form autoComplete="off" className="mt-10" onSubmit={onSubmitHandler}>
           <div className="flex flex-col">
             <div className="flex flex-row">
-              <Label
-                size="base"
-                htmlFor="tilakaName"
-                className="px-2"
-              >
+              <Label size="base" htmlFor="tilakaName" className="px-2">
                 Tilaka Name
               </Label>
               <div className="relative flex flex-col items-center group">
@@ -287,17 +294,13 @@ const Form: React.FC = () => {
                   ? "border-error "
                   : "border-borderColor focus:ring"
               }`}
-              />
+            />
             <p className="text-error font-poppins pl-2 pt-2 block text-sm">
               {error.tilakaName}
             </p>
           </div>
           <div className="flex flex-col  mt-5">
-            <Label
-              className="px-2"
-              htmlFor="password"
-              size="base"
-            >
+            <Label className="px-2" htmlFor="password" size="base">
               {t("passwordLabel")}
             </Label>
             <div className="relative">
@@ -309,7 +312,7 @@ const Form: React.FC = () => {
                 placeholder={t("passwordPlaceholder")}
                 className={`font-poppins py-3 focus:outline-none  placeholder:text-placeholder placeholder:font-light  px-2 rounded-md border  w-full ${
                   error.password
-                  ? "border-error "
+                    ? "border-error "
                     : "border-borderColor focus:ring"
                 }`}
                 autoComplete="off"
@@ -317,7 +320,7 @@ const Form: React.FC = () => {
               <button
                 onClick={(e) => handleShowPwd("password", e)}
                 className="absolute right-3 top-3"
-                >
+              >
                 {type.password === "password" ? <EyeIcon /> : <EyeIconOff />}
               </button>
               <p className="text-error font-poppins pl-2 pt-2 block text-sm">
@@ -326,11 +329,7 @@ const Form: React.FC = () => {
             </div>
           </div>
           <div className="flex flex-col mt-5">
-            <Label
-              className="px-2"
-              size="base"
-              htmlFor="retype-password"
-            >
+            <Label className="px-2" size="base" htmlFor="retype-password">
               {t("passwordConfirmationLabel")}
             </Label>
             <div className="relative">
@@ -414,11 +413,11 @@ const Form: React.FC = () => {
                 themeConfiguration?.data.button_color as string
               ),
             }}
-            className={`mt-10 uppercase h-9 mx-auto block`}
+            className={`mt-10 p-2.5 mx-auto`}
             disabled={disabled as boolean}
             size="none"
           >
-            {t("CTA")}
+            {t("finalFormTitle")}
           </Button>
         </form>
         <Footer />
@@ -427,4 +426,37 @@ const Form: React.FC = () => {
   );
 };
 
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const cQuery = context.query;
+  const uuid =
+    cQuery.transaction_id || cQuery.request_id || cQuery.registration_id;
+
+  const checkStepResult: {
+    res?: TKycCheckStepResponseData;
+    err?: {
+      response: {
+        data: {
+          success: boolean;
+          message: string;
+          data: { errors: string[] };
+        };
+      };
+    };
+  } = await RestKycCheckStepv2({
+    registerId: uuid as string,
+  })
+    .then((res) => {
+      return { res };
+    })
+    .catch((err) => {
+      return { err };
+    });
+
+  return serverSideRenderReturnConditions({
+    context,
+    checkStepResult,
+  });
+};
+
 export default Form;
+

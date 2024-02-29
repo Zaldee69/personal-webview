@@ -20,6 +20,7 @@ function convertDataURIToBinary(dataURI: string) {
   return array;
 }
 
+// eslint-disable-next-line import/no-anonymous-default-export
 export default async ({
   scale = 1,
   url,

@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { API } from "@/config/API";
+import CORE_API from "@/config/API";
 import { TDocumentResponse, TDocumentProps } from "@/interface/interface";
 
 const initialState: TDocumentResponse = {
@@ -23,8 +23,7 @@ const initialState: TDocumentResponse = {
 export const getDocument = createAsyncThunk(
   "personal/document",
   async ({ transaction_id, company_id, token }: TDocumentProps) => {
-    API.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-    const res = API.post("receiveDocument", {
+    const res = CORE_API.post("receiveDocument", {
       transaction_id,
       company_id,
     });

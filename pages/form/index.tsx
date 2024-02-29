@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import Footer from "../../components/Footer";
-import { RestKycCheckStep, RestKycFinalForm } from "../../infrastructure";
+import { RestKycCheckStep, RestKycCheckStepv2, RestKycFinalForm } from "../../infrastructure";
 import EyeIcon from "../../public/icons/EyeIcon";
 import EyeIconOff from "./../../public/icons/EyeIconOff";
 import QuestionIcon from "./../../public/icons/QuestionIcon";
@@ -22,6 +22,9 @@ import Heading from "@/components/atoms/Heading";
 import Paragraph from "@/components/atoms/Paraghraph";
 import ErrorMessage from "@/components/atoms/ErrorMessage";
 import Label from "@/components/atoms/Label";
+import { GetServerSideProps } from "next";
+import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
+import { serverSideRenderReturnConditions } from "@/utils/serverSideRenderReturnConditions";
 interface InputType {
   password: string | number;
   confirmPassword: string | number;
@@ -39,7 +42,11 @@ interface Type {
   confirmPassword: string;
 }
 
-const Form: React.FC = () => {
+interface Props {
+  token: string;
+}
+
+const Form: React.FC<Props> = (props) => {
   const router = useRouter();
   const { request_id, ...restRouterQuery } = router.query;
   const [input, setInput] = useState<InputType>({
@@ -48,7 +55,11 @@ const Form: React.FC = () => {
     tilakaName: "",
   });
 
-  const[isLoading, setIsLoading] = useState<boolean>(false)
+  if (props.token) {
+    localStorage.setItem(request_id as string, props.token);
+  }
+
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const [error, setError] = useState<ErrorType>({
     password: "",
@@ -73,7 +84,8 @@ const Form: React.FC = () => {
     error.tilakaName ||
     error.confirmPassword ||
     error.password ||
-    !isChecked || isLoading;
+    !isChecked ||
+    isLoading;
 
   const onChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -204,7 +216,7 @@ const Form: React.FC = () => {
               });
             }
           }
-          
+
           router.replace({
             pathname: handleRoute("form/success"),
             query,
@@ -230,116 +242,6 @@ const Form: React.FC = () => {
         }
       });
   };
-
-  useEffect(() => {
-    if (!router.isReady) return;
-    toast.info("pengecekan step...", { toastId: "kycCheckStepRequestToast" });
-    RestKycCheckStep({ payload: { registerId: request_id as string } })
-      .then((res) => {
-        if (res.success) {
-          if (res.data.status === "D") {
-            toast.dismiss();
-            toast.success(res?.message || "pengecekan step berhasil", {
-              icon: <CheckOvalIcon />,
-            });
-            // ketika res.data.pin_form === false, tidak akan redirect kemana-mana, karena sudah benar dihalaman ini.
-            if (res.data.pin_form) {
-              router.replace({
-                pathname: handleRoute("kyc/pinform"),
-                query: { ...restRouterQuery, registration_id: request_id },
-              });
-            }
-          } else if (res.data.status === "F") {
-            toast.dismiss();
-            toast.error(
-              res?.message ||
-                "pengecekan step berhasil, tetapi proses ekyc bermasalah",
-              {
-                icon: <XIcon />,
-              }
-            );
-            if (
-              res.data.status === "F" &&
-              res.data.pin_form &&
-              restRouterQuery.redirect_url
-            ) {
-              window.top!.location.href = concateRedirectUrlParams(
-                restRouterQuery.redirect_url as string,
-                `uuid=${request_id}${
-                  res.data.reason_code
-                    ? "%26reason_code=" + res.data.reason_code
-                    : ""
-                }`
-              );
-            } else {
-              const query: any = {
-                ...restRouterQuery,
-                request_id,
-              };
-
-              if (res.data.reason_code) {
-                query.reason_code = res.data.reason_code;
-              }
-
-              router.push({
-                pathname: handleRoute("liveness-failure"),
-                query,
-              });
-            }
-          } else if (res.data.status === "S" || res.data.status === "E") {
-            toast.dismiss();
-            const params: any = {
-              uuid: request_id,
-              status: res.data.status,
-            };
-
-            if (res.data.reason_code) {
-              params.reason_code = res.data.reason_code;
-            }
-
-            const queryString = new URLSearchParams(params as any).toString();
-            if (restRouterQuery.redirect_url) {
-              window.top!.location.href = concateRedirectUrlParams(
-                restRouterQuery.redirect_url as string,
-                queryString
-              );
-            } else {
-              toast.success(res?.message || "pengecekan step berhasil", {
-                icon: <CheckOvalIcon />,
-              });
-            }
-          } else if (res.data.status === "B") {
-            toast.dismiss();
-            router.push({
-              pathname: handleRoute("guide"),
-              query: { ...restRouterQuery, request_id },
-            });
-          } else {
-            toast.dismiss();
-            toast.success(res?.message || "pengecekan step berhasil", {
-              icon: <CheckOvalIcon />,
-            });
-          }
-        } else {
-          toast.dismiss();
-          toast.error(res?.message || "pengecekan step tidak sukses", {
-            icon: <XIcon />,
-          });
-        }
-      })
-      .catch((err) => {
-        toast.dismiss();
-        if (err.response?.data?.data?.errors?.[0]) {
-          toast.error(err.response?.data?.data?.errors?.[0], {
-            icon: <XIcon />,
-          });
-        } else {
-          toast.error(err.response?.data?.message || "pengecekan step gagal", {
-            icon: <XIcon />,
-          });
-        }
-      });
-  }, [router.isReady, request_id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div
@@ -398,7 +300,7 @@ const Form: React.FC = () => {
               autoComplete="off"
               type="text"
               placeholder={t("tilakaNamePlaceHolder")}
-              className={` py-3 focus:outline-none  placeholder:text-placeholder placeholder:font-light   px-2 rounded-md border border-borderColor ${
+              className={` py-3 focus:outline-none font-poppins placeholder:text-placeholder placeholder:font-light   px-2 rounded-md border border-borderColor ${
                 error.tilakaName
                   ? "border-error "
                   : "border-borderColor focus:ring"
@@ -406,7 +308,7 @@ const Form: React.FC = () => {
             />
             <ErrorMessage errorMessage={error.tilakaName} />
           </div>
-          <div className="flex flex-col  mt-5">
+          <div className="flex flex-col mt-5">
             <Label size="base" className="px-2" htmlFor="password">
               {t("passwordLabel")}
             </Label>
@@ -417,7 +319,7 @@ const Form: React.FC = () => {
                 name="password"
                 type={type.password}
                 placeholder={t("passwordPlaceholder")}
-                className={` py-3 focus:outline-none  placeholder:text-placeholder placeholder:font-light  px-2 rounded-md border  w-full ${
+                className={` py-3 focus:outline-none font-poppins placeholder:text-placeholder placeholder:font-light  px-2 rounded-md border  w-full ${
                   error.password
                     ? "border-error "
                     : "border-borderColor focus:ring"
@@ -445,7 +347,7 @@ const Form: React.FC = () => {
                 name="confirmPassword"
                 type={type.confirmPassword}
                 placeholder={t("passwordConfirmationPlaceholder")}
-                className={` py-3 focus:outline-none  placeholder:text-placeholder placeholder:font-light  px-2 rounded-md border border-borderColor w-full ${
+                className={` py-3 focus:outline-none font-poppins  placeholder:text-placeholder placeholder:font-light  px-2 rounded-md border border-borderColor w-full ${
                   error.confirmPassword
                     ? "border-error "
                     : "border-borderColor focus:ring"
@@ -465,7 +367,7 @@ const Form: React.FC = () => {
               <ErrorMessage errorMessage={error.confirmPassword} />
             </div>
           </div>
-          <div className="flex flex-row mt-5">
+          <div className="flex flex-row mt-5 gap-1">
             <input
               tabIndex={4}
               id="tnc"
@@ -474,8 +376,8 @@ const Form: React.FC = () => {
               className=" border-borderColor"
               onChange={onChangeHandler}
             />
-            <label className="ml-2 text-neutral " htmlFor="tnc">
-              <Paragraph className="inline">{t("agree")} </Paragraph>
+            <Label htmlFor="tnc">
+              {t("agree")}{" "}
               <span className="text-primary">
                 <a
                   href="https://repository.tilaka.id/CP_CPS.pdf"
@@ -501,7 +403,7 @@ const Form: React.FC = () => {
                 </a>
                 ,{" "}
               </span>
-              <Paragraph className="inline">{t("and")}</Paragraph>
+              {t("and")}
               <a
                 target="blank"
                 href="https://repository.tilaka.id/perjanjian-pemilik-sertifikat.pdf"
@@ -510,7 +412,7 @@ const Form: React.FC = () => {
                 {" "}
                 {t("certificate")}
               </a>
-            </label>
+            </Label>
           </div>
           <Button
             disabled={disabled as boolean}
@@ -520,16 +422,53 @@ const Form: React.FC = () => {
                 themeConfiguration?.data.button_color as string
               ),
             }}
-            className="mt-24 p-2.5 block mx-auto"
+            className="mt-10 p-2.5 block mx-auto"
             size="none"
           >
-            {t("CTA")}
+            {t("finalFormTitle")}
           </Button>
         </form>
         <Footer />
       </div>
     </div>
   );
+};
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const cQuery = context.query;
+  const uuid =
+    cQuery.transaction_id || cQuery.request_id || cQuery.registration_id;
+
+  const checkStepResult: {
+    res?: TKycCheckStepResponseData;
+    err?: {
+      response: {
+        data: {
+          success: boolean;
+          message: string;
+          data: { errors: string[] };
+        };
+      };
+    };
+  } = await RestKycCheckStepv2({
+    registerId: uuid as string,
+  })
+    .then((res) => {
+      return { res };
+    })
+    .catch((err) => {
+      return { err };
+    });
+
+  const serverSideRenderReturnConditionsResult =
+    serverSideRenderReturnConditions({ context, checkStepResult });
+
+  serverSideRenderReturnConditionsResult["props"] = {
+    ...serverSideRenderReturnConditionsResult["props"],
+    token: checkStepResult.res?.data?.token,
+  };
+
+  return serverSideRenderReturnConditionsResult;
 };
 
 export default Form;

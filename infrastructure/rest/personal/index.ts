@@ -1,4 +1,3 @@
-import { setPersonalChangePasswordTokenToLocalStorage } from "@/utils/setPersonalChangePasswordTokenToLocalStorage";
 import axios from "axios";
 import {
   TPersonalChangePasswordRequestData,
@@ -20,11 +19,15 @@ import {
   TPersonalPManualRegRequestData,
   TPersonalPManualRegResponseData,
   TThemeResponse,
+  TOTPResponse,
+  IOTPDedicatedResponse,
 } from "./types";
 
 import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
 import { getStorageWithExpiresIn } from "@/utils/localStorageWithExpiresIn";
 import { initialState } from "@/redux/slices/themeSlice";
+import { setTokenToLocalStorage } from "@/utils/token";
+import CORE_API from "@/config/API";
 
 const BASE_URL =
   process.env.NEXT_PUBLIC_PERSONAL_API_URL || "https://dev-api.tilaka.id";
@@ -56,7 +59,10 @@ export const RestPersonalRequestChangePassword = ({
       payload
     )
     .then((res) => {
-      setPersonalChangePasswordTokenToLocalStorage(res.data.data?.[0] || null);
+      setTokenToLocalStorage(
+        res.data.data?.[0] || null,
+        "personal_change_password_token"
+      );
       return res.data;
     })
     .catch((err) => {
@@ -158,16 +164,10 @@ export const RestPersonalFaceRecognitionV2 = ({
 }: {
   payload: TPersonalFaceRecognitionRequestDataV2;
 }): Promise<TPersonalFaceRecognitionResponseData> => {
-  return axios
-    .post<TPersonalFaceRecognitionResponseData>(
-      `${BASE_URL}/checkFr`,
-      payload,
-      {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      }
-    )
+  return CORE_API.post<TPersonalFaceRecognitionResponseData>(
+    `/checkFr`,
+    payload
+  )
     .then((res) => res.data)
     .catch((err) => {
       throw err;
@@ -224,6 +224,18 @@ export const RestPersonalPManualReg = (
     });
 };
 
+export const RestPersonalPManualRegV2 = (payload: {
+  photo_selfie: string;
+  register_id: string;
+}): Promise<TPersonalPManualRegResponseData> => {
+  return axios
+    .post<TPersonalPManualRegResponseData>(`${BASE_URL}/pManualReg`, payload)
+    .then((res) => res.data)
+    .catch((err) => {
+      throw err;
+    });
+};
+
 export const RestThemeConfiguration = ({
   uuid,
   type,
@@ -232,15 +244,83 @@ export const RestThemeConfiguration = ({
   type?: "channel_id" | "request_id";
 }): Promise<TThemeResponse> => {
   return axios
-    .get(
-      `${BASE_URL}/channel/get_webview_configuration?${type}=${uuid}`
-    )
+    .get(`${BASE_URL}/channel/get_webview_configuration?${type}=${uuid}`)
     .then((res) => {
       if (res.data.success) {
         return res.data;
       }
       return initialState;
     })
+    .catch((err) => {
+      throw err;
+    });
+};
+
+export const RestGenerateOTPRegistration = ({
+  request_id,
+}: {
+  request_id: string;
+}): Promise<TOTPResponse> => {
+  return axios
+    .post(`${BASE_URL}/v2/generateOtpRegistration`, null, {
+      params: {
+        request_id,
+      },
+    })
+    .then((res) => res.data)
+    .catch((err) => {
+      throw err;
+    });
+};
+
+export const RestResendOTPRegistration = ({
+  request_id,
+}: {
+  request_id: string;
+}): Promise<TOTPResponse> => {
+  return axios
+    .post(`${BASE_URL}/v2/resendOtpRegistration`, null, {
+      params: {
+        request_id,
+      },
+    })
+    .then((res) => res.data)
+    .catch((err) => {
+      throw err;
+    });
+};
+
+export const RestVerifyOTPRegistration = ({
+  payload,
+}: {
+  payload: {
+    otp: string;
+    request_id: string;
+  };
+}): Promise<TOTPResponse> => {
+  return axios
+    .post(`${BASE_URL}/v2/verifyOtpRegistration`, payload)
+    .then((res) => res.data)
+    .catch((err) => {
+      throw err;
+    });
+};
+
+export const RestOTPDedicated = async ({
+  user,
+  id,
+}: {
+  user: string;
+  id: string;
+}): Promise<IOTPDedicatedResponse> => {
+  return axios
+    .get(`${BASE_URL}/totp-dedicated`, {
+      params: {
+        user,
+        id,
+      },
+    })
+    .then((res) => res.data)
     .catch((err) => {
       throw err;
     });

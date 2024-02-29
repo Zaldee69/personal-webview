@@ -2,7 +2,7 @@ import Button from "@/components/atoms/Button";
 import Heading from "@/components/atoms/Heading";
 import Paragraph from "@/components/atoms/Paraghraph";
 import Footer from "@/components/Footer";
-import FRCamera from "@/components/FRCamera";
+import FaceRecognitionModal from "@/components/modal/FaceRecognitionModal";
 import InfoIcon from "@/public/icons/InfoIcon";
 import XIcon from "@/public/icons/XIcon";
 import { AppDispatch, RootState } from "@/redux/app/store";
@@ -34,13 +34,12 @@ type IOtpModalConfrimation = {
   setIsShowOtpModalConfirmation: React.Dispatch<React.SetStateAction<boolean>>;
   onClickHandler: (clickEventType: "submit" | "confirmation") => void;
   setIsDisabled: React.Dispatch<React.SetStateAction<boolean>>;
-  isDisabled: boolean
+  isDisabled: boolean;
 };
 
 const SetMfa = () => {
   const { t }: any = i18n;
   const router = useRouter();
-  const dispatch: AppDispatch = useDispatch();
 
   const [isShowModalFr, setShowModalFr] = useState<boolean>(false);
   const [isShowOtpModalConfirmation, setIsShowOtpModalConfirmation] =
@@ -48,7 +47,7 @@ const SetMfa = () => {
   const [mfaMethod, setMfaMethod] = useState<"fr" | "otp" | null>(null);
   const [defaultMfa, setDefaultMfa] = useState<"fr" | "otp">("fr");
   const [isShowPage, setIsShowpage] = useState<boolean>(false);
-  const [isDisabled, setIsDisabled] = useState<boolean>(false)
+  const [isDisabled, setIsDisabled] = useState<boolean>(false);
 
   const themeConfiguration = useSelector((state: RootState) => state.theme);
 
@@ -65,6 +64,7 @@ const SetMfa = () => {
       }
     } else {
       if (mfaMethod === "fr" && mfaMethod !== defaultMfa) {
+        setIsDisabled(true);
         toast(`Loading...`, {
           type: "info",
           toastId: "info",
@@ -80,9 +80,8 @@ const SetMfa = () => {
           },
         })
           .then((res) => {
-            toast.dismiss("info")
+            toast.dismiss("info");
             setIsShowOtpModalConfirmation(false);
-            setIsDisabled(true)
             geTypeMfa();
             toast("Penggantian MFA berhasil", {
               type: "success",
@@ -98,23 +97,9 @@ const SetMfa = () => {
           .catch((err) => {
             setIsShowOtpModalConfirmation(false);
             toast.dismiss("info");
-            if (err.response?.status === 401) {
-              toast.error("Anda harus login terlebih dahulu", {
-                icon: <XIcon />,
-              });
-              dispatch(resetInitalState());
-              setIsDisabled(true)
-              setTimeout(() => {
-                router.replace({
-                  pathname: handleRoute("login"),
-                  query: { ...router.query, setting: "2" },
-                });
-              }, 2500);
-            } else {
-              toast.error(err.response?.data?.message || "Terjadi kesalahan", {
-                icon: <XIcon />,
-              });
-            }
+            toast.error(err.response?.data?.message || "Terjadi kesalahan", {
+              icon: <XIcon />,
+            });
           });
       } else {
         toast("Metode otentikasi anda sudah OTP", {
@@ -131,40 +116,21 @@ const SetMfa = () => {
   };
 
   const geTypeMfa = () => {
-    getUserName({})
+    getUserName()
       .then((res) => {
         const data = JSON.parse(res.data);
         setDefaultMfa(data?.typeMfa?.toLowerCase());
         setMfaMethod(data?.typeMfa?.toLowerCase());
       })
       .catch((err) => {
-        if (err.response?.status === 401) {
-          toast("Anda harus login terlebih dahulu", {
-            type: "error",
-            toastId: "error",
-            position: "top-center",
-            icon: XIcon,
-          });
-          router.replace({
-            pathname: handleRoute("login"),
-            query: { ...router.query, setting: "2" },
-          });
-        }
+        throw err;
       });
   };
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
     if (!router.isReady) return;
-    if (!token) {
-      router.push({
-        pathname: handleRoute("login"),
-        query: { ...router.query, setting: "2" },
-      });
-    } else {
-      setIsShowpage(true);
-      geTypeMfa();
-    }
+    setIsShowpage(true);
+    geTypeMfa();
   }, [router.isReady]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
@@ -186,14 +152,14 @@ const SetMfa = () => {
           />
         </Head>
         <div className="max-w-md mx-auto px-2 pt-8 sm:w-full md:w-4/5">
-          <Heading className="pb-6" >{t("setMFA.title")}</Heading>
+          <Heading className="pb-6">{t("setMFA.title")}</Heading>
           <div className="mt-1.5 rounded-md bg-blue50 py-2 px-4 flex items-start">
             <div className="pt-1">
               <InfoIcon />
             </div>
             <p className="text-xs poppins-regular text-blue500 ml-4">
               {i18n.language === "en" ? (
-                t("choosetAutheticantionModeInformation")
+                t("choosetAutheticantionModeInformation.dontHaveDefaultMfa")
               ) : (
                 <>
                   Untuk meningkatkan keamanan, diperlukan{" "}
@@ -293,13 +259,17 @@ const SetMfa = () => {
   );
 };
 
-const FRModal = ({ isShowModalFr, setShowModalFr, geTypeMfa,setIsDisabled }: IModalFR) => {
+const FRModal = ({
+  isShowModalFr,
+  setShowModalFr,
+  geTypeMfa,
+  setIsDisabled,
+}: IModalFR) => {
   const { t }: any = i18n;
   const dispatch: AppDispatch = useDispatch();
 
   const [isFRSuccess, setIsFRSuccess] = useState<boolean>(false);
-
-  const themeConfiguration = useSelector((state: RootState) => state.theme);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const router = useRouter();
 
@@ -315,6 +285,8 @@ const FRModal = ({ isShowModalFr, setShowModalFr, geTypeMfa,setIsDisabled }: IMo
       face_image: base64Img?.split(",")[1] as string,
     };
 
+    setIsLoading(true);
+
     RestPersonalFaceRecognitionV2({ payload })
       .then((res) => {
         if (res.success) {
@@ -326,7 +298,8 @@ const FRModal = ({ isShowModalFr, setShowModalFr, geTypeMfa,setIsDisabled }: IMo
             toast.dismiss("info");
             setIsFRSuccess(true);
             setShowModalFr(false);
-            setIsDisabled(true)
+            setIsDisabled(true);
+            setIsLoading(false);
             toast("Penggantian MFA berhasil", {
               type: "success",
               toastId: "success",
@@ -341,6 +314,7 @@ const FRModal = ({ isShowModalFr, setShowModalFr, geTypeMfa,setIsDisabled }: IMo
           });
         } else {
           setIsFRSuccess(false);
+          setIsLoading(false);
           toast.dismiss("info");
           const doCounting: number = getFRFailedCount("set_mfa_count") + 1;
           setFRFailedCount("set_mfa_count", doCounting);
@@ -361,51 +335,24 @@ const FRModal = ({ isShowModalFr, setShowModalFr, geTypeMfa,setIsDisabled }: IMo
         }
       })
       .catch((err) => {
+        setIsLoading(false);
         setShowModalFr(false);
         toast.dismiss("info");
-        if (err.response?.status === 401) {
-          toast.error("Anda harus login terlebih dahulu", { icon: <XIcon /> });
-          doRedirect("login");
-        } else {
-          toast.error(err.response?.data?.message || "Gagal validasi wajah", {
-            icon: <XIcon />,
-          });
-        }
+        toast.error(err.response?.data?.message || "Gagal validasi wajah", {
+          icon: <XIcon />,
+        });
       });
   };
 
-  return isShowModalFr ? (
-    <div
-      style={{ backgroundColor: "rgba(0, 0, 0, .5)" }}
-      className="fixed z-50 flex items-start transition-all duration-1000 justify-center w-full left-0 top-0 h-full"
-    >
-      <div className="bg-white mt-20 max-w-sm pt-5 px-2 pb-3 rounded-xl w-full mx-5 ">
-        <>
-          <p className="poppins-regular block text-center font-semibold ">
-            {t("setMFA.modal.title")}
-          </p>
-          <FRCamera
-            setModal={setShowModalFr}
-            setIsFRSuccess={setIsFRSuccess}
-            signingFailedRedirectTo={handleRoute("login/v2")}
-            tokenIdentifier="token_v2"
-            callbackCaptureProcessor={captureProcessor}
-          />
-          <Button
-            className="mt-3 text-base uppercase font-bold"
-            style={{
-              color: themeConfigurationAvaliabilityChecker(
-                themeConfiguration?.data.action_font_color as string
-              ),
-            }}
-            onClick={() => setShowModalFr(false)}
-          >
-            {t("cancel")}
-          </Button>
-        </>
-      </div>
-    </div>
-  ) : null;
+  return (
+    <FaceRecognitionModal
+      isShowModal={isShowModalFr}
+      isDisabled={isLoading}
+      setIsShowModal={setShowModalFr}
+      callbackCaptureProcessor={captureProcessor}
+      title={t("setMFA.modal.title")}
+    />
+  );
 };
 
 const OtpModalConfirmation = ({
@@ -413,7 +360,7 @@ const OtpModalConfirmation = ({
   isShowOtpModalConfirmation,
   onClickHandler,
   isDisabled,
-  setIsDisabled
+  setIsDisabled,
 }: IOtpModalConfrimation) => {
   const { t }: any = i18n;
   const themeConfiguration = useSelector((state: RootState) => state.theme);
@@ -442,8 +389,8 @@ const OtpModalConfirmation = ({
               ),
             }}
             onClick={() => {
-              setIsDisabled(false)
-              setIsShowOtpModalConfirmation(false)
+              setIsDisabled(false);
+              setIsShowOtpModalConfirmation(false);
             }}
           >
             {t("cancel")}

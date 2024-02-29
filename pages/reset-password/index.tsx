@@ -17,6 +17,7 @@ import { RootState } from "@/redux/app/store";
 import i18n from "i18";
 import Heading from "@/components/atoms/Heading";
 import Label from "@/components/atoms/Label";
+import { handleRoute } from "@/utils/handleRoute";
 
 type Props = {};
 
@@ -44,6 +45,8 @@ const LinkAccount = (props: Props) => {
     confirm_password: "",
   });
 
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+
   const { t }: any = i18n;
 
   const themeConfiguration = useSelector((state: RootState) => state.theme);
@@ -55,7 +58,7 @@ const LinkAccount = (props: Props) => {
     !form.password ||
     !form.confirm_password ||
     !!formErrors.password ||
-    !!formErrors.confirm_password;
+    !!formErrors.confirm_password
 
   const handleFormOnChange = (e: React.FormEvent<HTMLInputElement>): void => {
     const { name, value } = e.currentTarget;
@@ -107,6 +110,7 @@ const LinkAccount = (props: Props) => {
   };
 
   const handleFormOnSubmit = (e: React.SyntheticEvent): void => {
+    setIsLoading(true)
     e.preventDefault();
     toast(`Loading...`, {
       type: "info",
@@ -137,17 +141,25 @@ const LinkAccount = (props: Props) => {
             icon: <CheckOvalIcon />,
           });
           router.replace({
-            pathname: router.pathname + "/success",
+            pathname: handleRoute("reset-password/success"),
             query: { kunciRahasia: key, ...routerQuery },
           });
         } else {
-          toast.error(res.message || "Gagal request reset password", {
-            icon: <XIcon />,
-          });
+          setIsLoading(false)
+          if (res.message === "token tidak valid atau sudah kadaluwarsa"){
+            toast.error("Link sudah kadaluwarsa", {
+              icon: <XIcon />,
+            });
+          }else {
+             toast.error(res.message || "Gagal request reset password", {
+               icon: <XIcon />,
+             });
+          }
         }
       })
       .catch((err) => {
         toast.dismiss("loading");
+        setIsLoading(false)
         if (
           err.response?.data?.message &&
           err.response?.data?.data?.errors?.[0]
@@ -255,7 +267,7 @@ const LinkAccount = (props: Props) => {
             <Button
               type="submit"
               size="none"
-              disabled={submitShouldDisabled}
+              disabled={submitShouldDisabled || isLoading}
               className="mt-7 py-2.5 px-5 text-base fit-content"
               style={{
                 backgroundColor: themeConfigurationAvaliabilityChecker(

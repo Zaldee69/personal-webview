@@ -5,6 +5,7 @@ interface URL {
   url: string;
 }
 
+// eslint-disable-next-line import/no-anonymous-default-export
 export default ({ url }: URL) => {
   const [pages, setPages] = useState<string[]>([]);
   if(url == '{data:application/pdf;base64,') {

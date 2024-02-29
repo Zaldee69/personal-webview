@@ -14,6 +14,7 @@ type Props = {
   imageBase64: string;
   inputRef: React.MutableRefObject<HTMLInputElement | null>;
   showMaxResolution: boolean;
+  placeholder?: string;
   onChangeHandler: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onDeleteImageHandler: (name: string) => void;
   onLabelClicked: (name: string) => void;
@@ -26,6 +27,7 @@ const CustomFileInputField = ({
   imageBase64,
   inputRef,
   showMaxResolution,
+  placeholder,
   onChangeHandler,
   onDeleteImageHandler,
   onLabelClicked,
@@ -34,7 +36,9 @@ const CustomFileInputField = ({
 
   return (
     <>
-      <Label className="ml-3 mt-3" size="base" htmlFor={name}>{label}</Label>
+      <Label className="ml-3 mt-3" size="base" htmlFor={name}>
+        {label}
+      </Label>
       {imageBase64 ? (
         <PreviewImage
           name={name}
@@ -48,6 +52,7 @@ const CustomFileInputField = ({
             id={name}
             ref={inputRef}
             className="hidden"
+            value={inputRef.current?.value || ""}
             type="file"
             accept="image/jpg, image/jpeg, image/png"
             onChange={onChangeHandler}
@@ -70,9 +75,16 @@ const CustomFileInputField = ({
               <Paragraph className="text-label block font-semibold">
                 {t("upload")} {label}
               </Paragraph>
-              <Label htmlFor={name} className="text-placeholder text-center mb-0">
-                Max. 2MB (.jpg/.jpeg/.png) <br />{" "}
-                {showMaxResolution && t("manualForm.resolutionMinimum")}
+              <Label
+                htmlFor=""
+                className="text-placeholder cursor-pointer text-center mb-0 whitespace-pre-line"
+              >
+                {showMaxResolution && (
+                  <span className="block">
+                    {t("manualForm.resolutionMinimum")}
+                  </span>
+                )}
+                <span>{placeholder}</span>
               </Label>
             </div>
           </div>

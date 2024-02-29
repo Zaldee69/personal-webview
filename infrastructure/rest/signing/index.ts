@@ -9,9 +9,9 @@ import {
   ISigningAuthhashsignResponseData,
   ISigningAuthhashsignRequestData,
 } from "./types";
+import CORE_API from "@/config/API";
 
-const BASE_URL =
-  process.env.NEXT_PUBLIC_DS_API_URL || "https://dev-api.tilaka.id";
+const BASE_URL = process.env.NEXT_PUBLIC_DS_API_URL;
 
 export const restSigning = ({
   payload,
@@ -39,26 +39,20 @@ export const RestSigningAuthPIN = ({
   token?: string | null;
 }): Promise<TSigningAuthPINResponseData> => {
   const isAsync = payload.async === "true";
-  return axios
-    .post<TSigningAuthPINResponseData>(
-      `${BASE_URL}/${isAsync ? "v2/" : ""}signing-authpin`,
-      {
-        pin: payload.pin,
-        otp_pin: payload.otp_pin,
-        face_image: payload.face_image,
+  return CORE_API.post<TSigningAuthPINResponseData>(
+    `${isAsync ? "v2/" : ""}signing-authpin`,
+    {
+      pin: payload.pin,
+      otp_pin: payload.otp_pin,
+      face_image: payload.face_image,
+    },
+    {
+      params: {
+        user: payload.user,
+        id: payload.id,
       },
-      {
-        headers: token
-          ? {
-              Authorization: `Bearer ${token}`,
-            }
-          : undefined,
-        params: {
-          user: payload.user,
-          id: payload.id,
-        },
-      }
-    )
+    }
+  )
     .then((res) => res.data)
     .catch((err) => {
       throw err;
@@ -72,18 +66,10 @@ export const RestSigningDownloadSignedPDF = ({
   request_id: string;
   token?: string | null;
 }): Promise<ISigningDownloadSignedPDFResponseData> => {
-  return axios
-    .post<ISigningDownloadSignedPDFResponseData>(
-      `${BASE_URL}/signing-downloadsignedpdf`,
-      {
-        request_id,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    )
+  return CORE_API
+    .post<ISigningDownloadSignedPDFResponseData>(`/signing-downloadsignedpdf`, {
+      request_id,
+    })
     .then((res) => res.data)
     .catch((err) => {
       throw err;
@@ -93,23 +79,17 @@ export const RestSigningDownloadSignedPDF = ({
 export const RestSigningAuthhashsign = ({
   params,
   payload,
-  token = getStorageWithExpiresIn("token_hashsign"),
 }: {
   params: ISigningAuthhashsignRequestData["params"];
   payload: ISigningAuthhashsignRequestData["payload"];
-  token?: string | null;
 }): Promise<ISigningAuthhashsignResponseData> => {
-  return axios
-    .post<ISigningAuthhashsignResponseData>(
-      `${BASE_URL}/signing-authhashsign`,
-      payload,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        params,
-      }
-    )
+  return CORE_API.post<ISigningAuthhashsignResponseData>(
+    `/signing-authhashsign`,
+    payload,
+    {
+      params,
+    }
+  )
     .then((res) => res.data)
     .catch((err) => {
       throw err;

@@ -8,7 +8,7 @@
   "livenessFailedSubtitle": "Maaf, proses Liveness Anda gagal. Foto dan aksi yang diminta tidak sesuai. Mohon ulangi proses Liveness dan ikuti petunjuk dengan benar.",
   "livenessFailed3xSubtitle": "Tautan sudah tidak tersedia",
   "livenessFailedButtonTitle": "Ulangi",
-  "livenessSuccessTitle": "Permohonan Aktivasi Akun Tilaka Berhasil Diajukan",
+  "livenessSuccessTitle": "Permohonan Pembuatan Akun Tilaka Berhasil Diajukan",
   "livenessSuccessSubtitle": "Mohon menunggu 1 x 24 jam untuk proses validasi akun.",
   "livenessSuccessButtonTitle": "Kembali ke Halaman Utama",
   "livenessSubtitle": "Pastikan wajah di dalam garis panduan dan ikuti petunjuk dengan benar",
@@ -27,8 +27,9 @@
   "link": "Link Liveness",
   "copy": "Salin",
   "copied": "Disalin",
-  "finalFormTitle": "Aktivasi Akun",
-  "finalFormSubtitle": "Mohon mengisi data-data berikut sebagai proses aktivasi akun Tilaka",
+  "finalFormTitle": "Buat Akun",
+  "activationAccount": "Aktivasi Akun",
+  "finalFormSubtitle": "Mohon mengisi data-data berikut sebagai proses pembuatan akun Tilaka",
   "finalFormTooltip": "Tilaka Name tidak dapat diubah dan akan digunakan sebagai username untuk pengguna masuk ke akun Tilaka dan menggunakan layanan Tilaka.",
   "tilakaNamePlaceHolder": "Masukkan Tilaka Name",
   "tilakaNameErrorRequired": "Tilaka Name wajib diisi",
@@ -86,6 +87,10 @@
   "linkAccountFailedSubtitle": "Pastikan data sesuai dengan akun Tilaka yang akan ditautkan.",
   "linkAccountTilaka": "Tautkan Akun Tilaka",
   "linkAccountTilaka1": "Aktivasi Akun Tilaka",
+  "tilakaNameHasRegisteredModal": {
+    "title": "NIK Anda telah Terdaftar",
+    "subtitle": "Lanjutkan proses Penautan Akun dengan masukkan Kata Sandi Anda"
+  },
   "hi": "hai",
   "loginCheckBox": "Tetap masuk selama 30 hari",
   "loginCTA": "Masuk",
@@ -104,7 +109,10 @@
   "chooseSignature": "Pilih tipe tanda tangan",
   "chooseSignatureInformation": "Tanda tangan yang dipilih akan digunakan di dalam dokumen yang Anda tandatangani.",
   "choosetAutheticantionMode": "Pilih metode otentikasi",
-  "choosetAutheticantionModeInformation": "Demi keamanan, diperlukan Multi Factor Authentication yang harus Anda gunakan saat melakukan aktivitas tanda tangan digital atau layanan Tilaka lainnya.",
+  "choosetAutheticantionModeInformation": {
+    "haveDefaultMfa": "Akun anda terdeteksi telah memiliki MFA,\napakah anda ingin melakukan update pada MFA?\nUpdate ini akan diterapkan kepada seluruh akun anda.",
+    "dontHaveDefaultMfa": "Demi keamanan, diperlukan <0>{{mfa}}</0> yang harus Anda gunakan saat melakukan aktivitas tanda tangan digital atau layanan Tilaka lainnya."
+  },
   "autheticantionMode1": "Face Recognition",
   "autheticantionMode2": "OTP via Email",
   "autheticantionMode3": "OTP via Ponsel",
@@ -135,7 +143,7 @@
   "relogin2": "Mohon lakukan login ulang dengan mengisi Kata Sandi.",
   "close": "Tutup",
   "dontHaveCertifTitle": "Anda tidak memiliki sertifikat",
-  "dontHaveCertifSubtitle": "Sertifikat Anda telah kadaluarsa atau telah dicabut. Mohon membuat sertifikat baru untuk melakukan penandatanganan",
+  "dontHaveCertifSubtitle": "Sertifikat Anda telah kedaluwarsa atau telah dicabut",
   "createNewCertif": "Buat Sertifikat Baru",
   "handwritingRequired": "Tanda tangan goresan tidak boleh kosong",
   "FontRequired": "Anda harus memilih salah satu tipe font",
@@ -168,6 +176,7 @@
   "rememberMe": "Ingat saya",
   "livenessSuccess": "Liveness Berhasil",
   "settingSignatureSuccessTitle": "Pengaturan Tanda Tangan Berhasil",
+  "settingSignatureAndMFASuccessTitle": "Pengaturan Tanda Tangan dan MFA Berhasil",
   "settingMFASuccessTitle": "Pengaturan MFA Berhasil",
   "settingSignatureSuccessSubtitle": "Pengaturan tanda tangan berhasil disimpan.",
   "settingSignatureSuccessButton": "Kembali ke Halaman Utama",
@@ -218,25 +227,29 @@
       "label": "Foto e-KTP",
       "uploadPhoto": "Unggah Foto e-KTP",
       "errorMessage1": "Foto e-KTP wajib diunggah",
-      "errorMessage2": "Foto e-KTP tidak memenuhi ketentuan",
       "termTitle": "Ketentuan foto e-KTP",
       "term1": "Foto e-KTP terlihat dengan jelas.",
       "term2": "Data pada e-KTP dapat dibaca.",
-      "term3": "Ekstensi dokumen berupa .JPG / .JPEG /.PNG dengan batas ukuran 2MB."
+      "term3": "Ekstensi dokumen berupa .JPG / .JPEG /.PNG dengan batas ukuran minimal 500KB.",
+      "placeholder": "Ukuran min. 500KB \n (.jpg/.jpeg/.png)"
+
     },
     "photoSelfie": {
       "label": "Foto Selfie",
       "uploadPhoto": "Unggah Foto Selfie",
-      "errorMessage1": "Foto Selfie wajib diunggah",
-      "errorMessage2": "Foto Selfie tidak memenuhi ketentuan",
+      "errorMessage1": "Foto selfie harus diunggah",
+      "errorMessage2": "Foto selfie tidak memenuhi persyaratan",
       "termTitle": "Ketentuan foto selfie",
       "term1": "Wajah menghadap depan dan terlihat dengan jelas.",
       "term2": "Lepaskan atribut seperti kacamata topi dan masker, serta rambut tidak menutupi wajah.",
       "term3": "Pastikan pencahayaan baik, tidak terlalu terang atau terlalu gelap.",
-      "term4": "Ekstensi dokumen berupa .JPG / .JPEG /.PNG dengan batas ukuran 2MB dan batas resolusi minimal 200 x 200 pixel."
+      "term4": "Ekstensi dokumen berupa .JPG / .JPEG /.PNG dan batas resolusi minimal 200 x 200 pixel."
     },
     "extensionAndSizeRequirement": "Max. 2MB (.jpg/.jpeg/.png)",
-    "resolutionMinimum": "Resolusi min. 200 x 200 pixel"
+    "resolutionMinimum": "Resolusi min. 200 x 200 pixel",
+    "invalidFileType": "Format file harus jpg, jpeg atau png",
+    "InvalidResolution": "Resolusi minimal 200x200 pixel",
+    "invalidFileSize": "File harus berukuran minimal 500KB"
   },
   "forgotPassword": {
     "title": "Lupa Kata Sandi",
@@ -248,14 +261,14 @@
   },
   "send": "Kirim",
   "upload": "Unggah",
-  "registrationInProcessTitle": "Pendaftaran Dalam Proses",
-  "registrationInProcessSubtitle": "Pendaftaran Anda sedang dalam proses verifikasi. Mohon periksa email Anda secara berkala dalam 1x24 jam.",
+  "registrationInProcessTitle": "Pendaftaran dalam Proses",
+  "registrationInProcessSubtitle": "Pendaftaran Anda sedang dalam proses verifikasi. Mohon periksa email Anda secara berkala dalam 1 x 24 jam.",
   "emailWasSend": "Email Telah Dikirim",
   "checkEmail": "Silahkan periksa email Anda untuk mereset kata sandi Anda.",
   "checkEmail2": "Silahkan periksa email Anda untuk melihat informasi Tilaka Name.",
   "ekycFailed": {
     "title": "e-KYC Gagal",
-    "subtitle": "Untuk melanjutkan proses registrasi, Anda akan diarahkan ke halaman Verifikasi Manual dalam 5 detik",
+    "subtitle": "Untuk melanjutkan proses registrasi, Anda akan diarahkan ke halaman Registrasi Manual\n dalam {{timeLeft}} detik",
     "subtitle1": "Untuk melanjutkan proses registrasi, Anda akan diarahkan ",
     "subtitle2": "ke halaman Verifikasi Manual dalam 5 detik",
     "errorCode1": "Gagal pemeriksaan Dukcapil",
@@ -264,7 +277,8 @@
   },
   "linkAccountFailed5x": {
     "title": "Otentikasi Identitas Gagal",
-    "subtitle": "Mohon lakukan proses verifikasi penautan akun secara manual melalui link yang diterima di email Anda"
+    "subtitle": "Mohon lakukan proses verifikasi penautan akun secara manual melalui link yang diterima di email Anda",
+    "subtitle1": "Untuk melanjutkan proses Penautan, Anda akan diarahkan ke halaman Registrasi Manual dalam {{timeLeft}} detik"
   },
   "setMFA": {
     "title": "Pengaturan MFA",
@@ -282,5 +296,39 @@
     "confirmNewPasswordLabel": "Konfirmasi Kata Sandi Baru",
     "confirmNewPasswordPlaceholder": "Konfirmasi Kata Sandi Baru",
     "submitButton": "Kirim"
-  }
+  },
+  "neverRegisteredBefore": "Tidak pernah mendaftar sebelumnya?",
+  "contactUs": "Hubungi Kami",
+  "contactCantika": "Hubungi <0>cantika@tilaka.id</0>",
+  "furtherQuestions": "Pertanyaan lebih lanjut?",
+  "OTPModalSubtitle": "Kode OTP dikirimkan ke alamat email Anda untuk proses verifikasi email",
+  "OTPResendMaxLimit": "Anda telah mencapai batas maksimal pengiriman kode OTP",
+  "livenessSelfiePreview": {
+    "title": "Hasil Hadap Depan",
+    "subtitle": "Gambar ini akan digunakan untuk verifikasi Dukcapil. Maksimal pengulangan adalah 3 kali.",
+    "retryBtn": "Ambil Ulang",
+    "retake": {
+      "1": "Ambil Ulang (1/3)",
+      "2": "Ambil Ulang (2/3)",
+      "3": "Ambil Ulang (3/3)"
+    },
+    "hasReachMaxRetakeSubtitle": "Maksimum percobaan pengambilan gambar telah tercapai. Anda akan diarahkan secara otomatis\n ke tahap berikutnya dalam {{timeLeft}} detik.",
+    "listHeading": "Pastikan bahwa:",
+    "list1": "Wajah terlihat jelas dan tidak terpotong",
+    "list2": "Wajah tidak tertutup kacamata, masker atau topi",
+    "list3": "Wajah menghadap kamera dengan latar belakang jelas, dan tidak ada orang lain",
+    "list4": "Mengenakan pakaian sopan",
+    "list5": "Gambar diambil di tempat terang"
+  },
+  "cameraNotFoundModal": {
+    "title": "Tidak dapat mengakses kamera",
+    "subtitle": "Tilaka memerlukan akses ke kamera Anda. klik ikon kamera diblokir <1/> pada browser Anda untuk memberikan akses kamera.",
+    "button": "Coba lagi"
+  },
+  "signingComplete": "User sudah selesai signing",
+  "imageDark": "Wajah tidak terdeteksi, gambar terlalu gelap",
+  "faceMoreThan1": "Lebih dari satu wajah terdeteksi",
+  "sideFace": "Wajah hanya terdeteksi setengah",
+  "openEyes": "Buka kedua mata lebih lebar",
+  "otpSubtitle": "Kode OTP telah dikirimkan ke \n alamat email Anda"
 }

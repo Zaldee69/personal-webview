@@ -76,7 +76,7 @@ const Signing = () => {
     const count = parseInt(localStorage.getItem("count") as string);
     localStorage.setItem("count", count ? count.toString() : "0");
 
-    getUserName({}).then((res) => {
+    getUserName().then((res) => {
       const data = JSON.parse(res.data);
       setData(data.name);
     });
@@ -101,7 +101,7 @@ const Signing = () => {
 
   return (
     <div
-    className="min-h-screen"
+      className="min-h-screen"
       style={{
         backgroundColor: themeConfigurationAvaliabilityChecker(
           themeConfiguration?.data.background as string,
@@ -151,7 +151,7 @@ const Signing = () => {
               <Button
                 style={{
                   backgroundColor: themeConfigurationAvaliabilityChecker(
-                    themeConfiguration?.data.button_color as string,
+                    themeConfiguration?.data.button_color as string
                   ),
                 }}
                 size="md"
@@ -226,7 +226,7 @@ const Configuration: React.FC<{
             height={25}
             src={`${assetPrefix}/images/goresan.svg`}
             alt="scratch"
-            />
+          />
           <Heading className="text-[#727272] text-base">
             {t("signatureOption1")}
           </Heading>
@@ -314,7 +314,7 @@ export const FRModal: React.FC<Active | any> = ({ modal, setModal }) => {
             <Paragraph className="mt-2 block text-center text-sm font-normal">
               {t("frSubtitle1")}
             </Paragraph>
-            <FRCamera setModal={setModal} setIsFRSuccess={setIsFRSuccess} />
+            {/* <FRCamera setModal={setModal} setIsFRSuccess={setIsFRSuccess} /> */}
             <Button
               onClick={() => setModal(!modal)}
               size="full"
@@ -571,7 +571,7 @@ export const OTPModal: React.FC<Active> = ({ modal, setModal }) => {
   };
 
   const handleTriggerSendOTP = () => {
-    restGetOtp({})
+    restGetOtp()
       .then((res) => {
         if (res.success) {
           toast(`Kode OTP telah dikirim ke Email anda`, {

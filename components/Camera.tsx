@@ -11,14 +11,14 @@ import lookLeftHandler from "@/utils/lookLeftHandler";
 import lookRightHandler from "@/utils/lookRightHandler";
 import lookUpHandler from "@/utils/lookUpHandler";
 import lookDownHandler from "@/utils/lookDownHandler";
-import {log} from "@/utils/logging";
+import { log } from "@/utils/logging";
 import i18n from "i18";
+import { useRouter } from "next/router";
 
 let result: any;
 let dom: any;
 let isDone: any;
 let count: number = 1;
-
 
 interface Constraint {
   width: number;
@@ -33,8 +33,8 @@ interface Props {
   setCurrentActionIndex: Dispatch<SetStateAction<number>>;
   setFailedMessage: Dispatch<SetStateAction<string>>;
   setHumanReady: () => void;
-  humanDone: boolean
-  human: any
+  humanDone: boolean;
+  human: any;
 }
 
 const Camera: React.FC<Props> = ({
@@ -45,9 +45,8 @@ const Camera: React.FC<Props> = ({
   setProgress,
   setHumanReady,
   humanDone,
-  human
+  human,
 }) => {
-  
   const constraints: Constraint = {
     width: 1280,
     height: 720,
@@ -57,11 +56,15 @@ const Camera: React.FC<Props> = ({
   const captureButtonRef = useRef<HTMLButtonElement>(null);
   const webcamRef = useRef<Webcam | null>(null);
   const _isMounted = useRef(true);
+  const router = useRouter();
 
   const actionList = useSelector(
     (state: RootState) => state.liveness.actionList
   );
-  const {t}: any = i18n
+
+  const isRetry = useSelector((state: RootState) => state.liveness.isRetry);
+
+  const { t }: any = i18n;
 
   const [currentActionState, setCurrentActionState] = useState("look_straight");
   const [isCurrentStepDone, setIsCurrentStepDone] = useState(false);
@@ -80,8 +83,8 @@ const Camera: React.FC<Props> = ({
 
   const perfSetter = (display: string) => {
     const perf = document.getElementById("perf") as HTMLDivElement;
-    perf.style.display = display
-  }
+    perf.style.display = display;
+  };
 
   const wrongActionSetter = (error: boolean, message: string) => {
     setFailedMessage(message);
@@ -97,7 +100,7 @@ const Camera: React.FC<Props> = ({
     const progressCircle: any = document.querySelector(".progress-circle");
     if (
       currentActionState === "mouth_open" ||
-      currentActionState === "look_straight"  
+      currentActionState === "look_straight"
     ) {
       progressCircle.style.transition = "2s";
     } else {
@@ -106,7 +109,6 @@ const Camera: React.FC<Props> = ({
       }, 2000);
     }
   }, [currentActionState]);
-
 
   useEffect(() => {
     if (_isMounted) {
@@ -119,10 +121,10 @@ const Camera: React.FC<Props> = ({
       _isMounted.current = false;
     };
   });
-  
+
   async function detectionLoop() {
     // main detection loop
-    if (human != undefined && dom != undefined ) {
+    if (human != undefined && dom != undefined) {
       result = await human.detect(dom.video); // actual detection; were not capturing output in a local variable as it can also be reached via human.result
       requestAnimationFrame(detectionLoop); // start new frame immediately
     } else {
@@ -137,15 +139,51 @@ const Camera: React.FC<Props> = ({
     const circumference =
       (verticalRadius + horizontalRadius - 60) * 2.7 * Math.PI;
 
-      progressCircle === null
-        ? ""
-        : (progressCircle.style.strokeDashoffset =
+    progressCircle === null
+      ? ""
+      : (progressCircle.style.strokeDashoffset =
           circumference - (100 / 100) * circumference);
-  }
+  };
 
   async function drawLoop() {
     // main screen refresh loop
     let clicked = false;
+
+    function calculateImageBrightness(boxRaw: any) {
+      const avgPixelValue =
+        (boxRaw[0] + boxRaw[1] + boxRaw[2] + boxRaw[3]) / boxRaw.length;
+
+      return avgPixelValue;
+    }
+
+    function isFaceHalf(faceData: any) {
+      const leftMiddleEyeIndex = 32; // Index of the left middle eye
+      const rightMiddleEyeIndex = 27; // Index of the right middle eye
+      const noseTipIndex = 32; // Index of the nose tip
+
+      const leftMiddleEye = faceData.silhouette[leftMiddleEyeIndex];
+      const rightMiddleEye = faceData.silhouette[rightMiddleEyeIndex];
+      const noseTip = faceData.silhouette[noseTipIndex];
+
+      // Check if the required points are defined
+      if (!leftMiddleEye || !rightMiddleEye || !noseTip) {
+        console.log("Required points are not available.");
+        return false;
+      }
+
+      // Assume a simple threshold for horizontal alignment
+      const horizontalAlignmentThreshold = 20; // Adjust as needed
+
+      // Calculate the middle point between the left and right middle eyes
+      const middleEyeX = (leftMiddleEye[0] + rightMiddleEye[0]) / 2;
+
+      // Check if the nose tip is on one side of the middle eyes within the threshold
+      const isFaceHalf =
+        Math.abs(noseTip[0] - middleEyeX) > horizontalAlignmentThreshold;
+
+      return isFaceHalf;
+    }
+
     if (result) {
       const interpolated = await human.next(result);
       const capture = captureButtonRef.current;
@@ -159,112 +197,96 @@ const Camera: React.FC<Props> = ({
         const pitch =
           interpolated.face[0].rotation.angle.pitch * (180 / Math.PI);
         const distance = interpolated.face[0].iris;
+
+        const isDarkImage =
+          calculateImageBrightness(interpolated.face[0].boxRaw) >
+            Number(process.env.NEXT_PUBLIC_DARKNESS_LEVEL_TRESHOLD) || 0.40 &&
+          distance < 30;
+
+        const faceData = interpolated.face[0].annotations;
+        const faceIsHalf = isFaceHalf(faceData) && isDarkImage;
+
+        const totalPersonOnCam = interpolated.object.filter(
+          (item: any) => item.label === "person"
+        ).length;
+
+        const isEyeClosed = interpolated.face[0].rotation.gaze.strength > 0.5;
+
+        // const rollAngle = interpolated.face[0].rotation.angle.roll;
+
+        // const isFacing = Math.abs(rollAngle) < 0.1;
+
+        let mouth_score: number = 0;
+        let look_center: boolean = false;
         let blink_left_eye: boolean = false;
         let blink_right_eye: boolean = false;
-        let mouth_score: number = 0;
-        let look_left: boolean = false;
-        let look_right: boolean = false;
-        let look_center: boolean = false;
+
         interpolated.gesture.forEach((item: any) => {
-          if (item.gesture == "blink left eye") {
+          if (item.gesture.substring(0, 5) == "mouth") {
+            const mouth = item.gesture.split(" ", 3);
+            mouth_score = parseFloat(mouth[1]) / 100;
+          } else if (item.gesture == "facing center") {
+            look_center = true;
+          } else if (item.gesture == "blink left eye") {
             blink_left_eye = true;
           } else if (item.gesture == "blink right eye") {
             blink_right_eye = true;
-          } else if (item.gesture.substring(0, 5) == "mouth") {
-            const mouth = item.gesture.split(" ", 3);
-            mouth_score = parseFloat(mouth[1]) / 100;
-          } else if (item.gesture == "facing left") {
-            look_left = true;
-          } else if (item.gesture == "facing right") {
-            look_right = true;
-          } else if (item.gesture == "facing center") {
-            look_center = true;
           }
         });
+
+        console.log({
+          "Person on cam:": totalPersonOnCam,
+          "Darkness level:": calculateImageBrightness(
+            interpolated.face[0].boxRaw
+          ),
+          "Face half:": isFaceHalf,
+          "Left eye closed:": blink_left_eye,
+          "Right eye closed:": blink_right_eye,
+        });
+
         if (actionList[currentActionIndex] == "look_straight") {
-          if (look_center && distance < 25) {
+          if (isRetry)
+            await new Promise((resolve) => setTimeout(resolve, 2000));
+          if (
+            look_center &&
+            distance < 25 &&
+            totalPersonOnCam <= 1 &&
+            !faceIsHalf &&
+            isDarkImage &&
+            (!blink_left_eye || !blink_right_eye)
+          ) {
             if (roll > -10 && roll < 10) {
               if (yaw > -10 && yaw < 10) {
                 if (pitch > -10 && pitch < 10) {
-                  setCircle()
+                  setCircle();
+                  log(t("dontMove"), t("doNotMove"));
                   await new Promise((resolve) => setTimeout(resolve, 1000));
-                  log(t("dontMove"), t("doNotMove"))
-                  perfSetter("block")
+                  perfSetter("block");
                   await new Promise((resolve) => setTimeout(resolve, 500));
-                    let done = await isIndexDone(currentActionIndex);
-                    if (!done) {
-                      await setIndexDone(currentActionIndex);
-                      capture.click();
-                      clicked = true;
-                      progressSetter(100);
-                    }
+                  let done = await isIndexDone(currentActionIndex);
+                  if (!done) {
+                    await setIndexDone(currentActionIndex);
+                    capture.click();
+                    clicked = true;
+                    progressSetter(100);
+                  }
                 }
               }
             }
-          } else if (distance > 25){
-            log(t("closeYourFace"))
+          } else if (totalPersonOnCam > 1) {
+            log(t("faceMoreThan1"));
+          } else if (blink_left_eye || blink_right_eye) {
+            log(t("openEyes"));
+          } else if (faceIsHalf) {
+            log(t("sideFace"));
+          } else if (distance > 25) {
+            log(t("closeYourFace"));
+          } else if (!isDarkImage) {
+            log(t("imageDark"));
           }
-        } else if (actionList[currentActionIndex] == "look_left") {
-          progressSetter(0);
-          await lookLeftHandler({
-            look_left,
-            distance,
-            roll,
-            progressSetter,
-            capture,
-            clicked,
-            currentActionIndex,
-            isIndexDone,
-            setIndexDone,
-            wrongActionSetter,
-          });
-        } else if (actionList[currentActionIndex] == "look_right") {
-          progressSetter(0);
-          await lookRightHandler({
-            look_right,
-            distance,
-            roll,
-            progressSetter,
-            capture,
-            clicked,
-            currentActionIndex,
-            isIndexDone,
-            setIndexDone,
-            wrongActionSetter,
-          });
-        } else if (actionList[currentActionIndex] == "look_up") {
-          progressSetter(0);
-          await lookUpHandler({
-            distance,
-            roll,
-            yaw,
-            pitch,
-            progressSetter,
-            capture,
-            clicked,
-            currentActionIndex,
-            isIndexDone,
-            setIndexDone,
-            wrongActionSetter,
-          });
-        } else if (actionList[currentActionIndex] == "look_down") {
-          progressSetter(0);
-          await lookDownHandler({
-            distance,
-            roll,
-            yaw,
-            pitch,
-            progressSetter,
-            capture,
-            clicked,
-            currentActionIndex,
-            isIndexDone,
-            setIndexDone,
-            wrongActionSetter,
-          });
         } else if (actionList[currentActionIndex] == "mouth_open") {
           progressSetter(0);
-          perfSetter("none")
+          perfSetter("none");
           await openMouthHandler({
             distance,
             mouth_score,
@@ -276,11 +298,16 @@ const Camera: React.FC<Props> = ({
             currentActionIndex,
             clicked,
             capture,
-            perfSetter
+            perfSetter,
+            totalPersonOnCam,
+            faceIsHalf,
+            isDarkImage,
+            blink_left_eye,
+            blink_right_eye,
           });
         } else if (actionList[currentActionIndex] == "blink") {
           progressSetter(0);
-          perfSetter("none")
+          perfSetter("none");
           await blinkHandler({
             distance,
             blink_left_eye,
@@ -293,7 +320,10 @@ const Camera: React.FC<Props> = ({
             currentActionIndex,
             clicked,
             capture,
-            perfSetter
+            perfSetter,
+            totalPersonOnCam,
+            faceIsHalf,
+            isDarkImage,
           });
         }
       }
@@ -301,21 +331,27 @@ const Camera: React.FC<Props> = ({
     if (clicked) {
       setTimeout(drawLoop, 1000); // Wait for click update
     } else {
-      setTimeout(drawLoop, 30)
+      setTimeout(drawLoop, 30);
     }
   }
 
   async function actionDone() {
-    if (humanDone && (actionList[currentActionIndex] !== undefined)) {
+    if (humanDone && actionList[currentActionIndex] !== undefined) {
       const dt = new Date();
-      const ts = `${dt.getHours().toString().padStart(2, '0')}:${dt.getMinutes().toString().padStart(2, '0')}:${dt.getSeconds().toString().padStart(2, '0')}.${dt.getMilliseconds().toString().padStart(3, '0')}`;
-      console.log(ts, "Human ready")
-      setHumanReady()
+      const ts = `${dt.getHours().toString().padStart(2, "0")}:${dt
+        .getMinutes()
+        .toString()
+        .padStart(2, "0")}:${dt.getSeconds().toString().padStart(2, "0")}.${dt
+        .getMilliseconds()
+        .toString()
+        .padStart(3, "0")}`;
+      console.log(ts, "Human ready");
+      setHumanReady();
       detectionLoop();
       drawLoop();
     }
   }
-  
+
   useEffect(() => {
     actionDone();
   }, [humanDone, actionList]);
@@ -406,10 +442,15 @@ const Camera: React.FC<Props> = ({
 
   return (
     <>
-      {
-        _isMounted && (
-          <div className="relative">
-            <div style={{ backgroundColor: "rgba(0, 0, 0, .5)" }} id="perf" className="absolute text-center poppins-regular hidden  text-white top-0 left-0 right-0" >{t("doNotMove")}</div>
+      {_isMounted && (
+        <div className="relative">
+          <div
+            style={{ backgroundColor: "rgba(0, 0, 0, .5)" }}
+            id="perf"
+            className="absolute text-center poppins-regular hidden  text-white top-0 left-0 right-0"
+          >
+            {t("doNotMove")}
+          </div>
           <Webcam
             style={{ height: "270px", objectFit: "cover" }}
             className="mt-3 rounded-md sm:w-full md:w-full"
@@ -439,8 +480,7 @@ const Camera: React.FC<Props> = ({
             style={{ display: "none" }}
           ></button>
         </div>
-        )
-      }
+      )}
     </>
   );
 };

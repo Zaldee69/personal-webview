@@ -1,33 +1,30 @@
-import CustomFileInputField from "@/components/atoms/CustomFileInputField";
-import ErrorMessage from "@/components/atoms/ErrorMessage";
-import Label from "@/components/atoms/Label";
-import TextInput from "@/components/atoms/TextInput";
-import Footer from "@/components/Footer";
-import ModalLayout from "@/components/layout/ModalLayout";
+import React, { useEffect, useImperativeHandle, useRef, useState } from "react";
+import { useSelector } from "react-redux";
+import { GetServerSideProps } from "next";
+import { useRouter } from "next/router";
+import { toast } from "react-toastify";
+import { assetPrefix } from "next.config";
+import i18n from "i18";
+import { RootState } from "@/redux/app/store";
 import { fileToBase64 } from "@/utils/fileToBase64";
 import { handleRoute } from "@/utils/handleRoute";
 import { inputValidator } from "@/utils/inputValidator";
-import { assetPrefix } from "next.config";
-import { useRouter } from "next/router";
-import { toast } from "react-toastify";
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
-import Image from "next/legacy/image";
-import i18n from "i18";
-import { RestPersonalPManualReg } from "infrastructure";
-import { TPersonalPManualRegRequestData } from "infrastructure/rest/personal/types";
-import XIcon from "@/public/icons/XIcon";
-import Button from "@/components/atoms/Button";
-import { RootState } from "@/redux/app/store";
-import { useSelector } from "react-redux";
 import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
+import { serverSideRenderReturnConditions } from "@/utils/serverSideRenderReturnConditions";
+import XIcon from "@/public/icons/XIcon";
+import { RestKycCheckStepv2, RestPersonalPManualReg } from "infrastructure";
+import { TPersonalPManualRegRequestData } from "infrastructure/rest/personal/types";
+import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
+
+import Button from "@/components/atoms/Button";
+import CustomFileInputField from "@/components/atoms/CustomFileInputField";
+import ErrorMessage from "@/components/atoms/ErrorMessage";
+import Footer from "@/components/Footer";
 import Heading from "@/components/atoms/Heading";
+import Label from "@/components/atoms/Label";
+import ModalLayout from "@/components/layout/ModalLayout";
 import Paragraph from "@/components/atoms/Paraghraph";
+import TextInput from "@/components/atoms/TextInput";
 
 type TForm = {
   nik: string;
@@ -46,7 +43,15 @@ type TModal = {
   fileFotoSelfieRef?: React.MutableRefObject<HTMLInputElement | null>;
 };
 
-const Index = () => {
+type Props = {
+  checkStepResultDataRoute: TKycCheckStepResponseData["data"]["route"];
+  nationalityType: TKycCheckStepResponseData["data"]["nationality_type"];
+};
+
+const MIN_FILE_SIZE = (1024 * 1024) / 2;
+const MIN_RESOLUTION = 200;
+
+const Index = (props: Props) => {
   const router = useRouter();
   const { request_id, ...restRouterQuery } = router.query;
   const { t }: any = i18n;
@@ -90,19 +95,23 @@ const Index = () => {
   };
 
   const onChangeHandler = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    let isErrorImage: boolean = false;
+    let isSizeLessThan1Mb: boolean = false;
+    let isRatioLessThan200Px: boolean = false;
     let isEligibleFileType: boolean = true;
     const { value, name, files } = e.target;
     const file: File = files?.[0] as File;
     if (name === "photo_ktp" || name === "photo_selfie") {
       const fileType = ["jpg", "jpeg", "png"];
-      isEligibleFileType = fileType.some((el) => file?.name.includes(el));
+      isEligibleFileType = fileType.some((el) =>
+        file?.name.toLowerCase().includes(el)
+      );
 
       if (isEligibleFileType) {
         const { width, height } = (await resolutionChecker(file)) as any;
-        isErrorImage =
-          file.size > 2000000 ||
-          ((height < 200 || width < 200) && name === "photo_selfie");
+        isSizeLessThan1Mb = file.size < MIN_FILE_SIZE;
+        isRatioLessThan200Px =
+          (height < MIN_RESOLUTION || width < MIN_RESOLUTION) &&
+          name === "photo_selfie";
       }
     }
 
@@ -126,30 +135,31 @@ const Index = () => {
     };
 
     setErrorMessage((prev) => {
-      const stateObj = { ...prev, [name]: "" };
-      switch (name) {
-        case "photo_ktp":
-          if (!isEligibleFileType) {
-            stateObj[name] = t("manualForm.photoKtp.errorMessage2");
-            setForm({
-              ...form,
-              ["photo_ktp"]: "",
-            });
-          }
-          break;
-        case "photo_selfie":
-          if (isErrorImage || !isEligibleFileType) {
-            stateObj[name] = t("manualForm.photoSelfie.errorMessage2");
-            setForm({
-              ...form,
-              ["photo_selfie"]: "",
-            });
-          }
-          break;
-        case "nik":
-          stateObj[name] = inputValidator.nikValidator(value);
-        default:
-          break;
+      const stateObj: any = { ...prev, [name]: "" };
+
+      if (name === "photo_ktp" || "photo_selfie") {
+        if (!isEligibleFileType) {
+          fileFotoKtpRef.current?.value;
+          stateObj[name] = t("manualForm.invalidFileType");
+          setForm({
+            ...form,
+            [name]: "",
+          });
+        } else if (isRatioLessThan200Px && name === "photo_selfie") {
+          stateObj[name] = t("manualForm.InvalidResolution");
+          setForm({
+            ...form,
+            [name]: "",
+          });
+        } else if (isSizeLessThan1Mb && name === "photo_ktp") {
+          stateObj[name] = t("manualForm.invalidFileSize");
+          setForm({
+            ...form,
+            [name]: "",
+          });
+        }
+      } else if (name === "nik") {
+        stateObj[name] = inputValidator.nikValidator(value);
       }
 
       return stateObj;
@@ -177,7 +187,7 @@ const Index = () => {
     });
   };
 
-  const onsubmitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
+  const onSubmitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     setErrorMessage({
@@ -209,7 +219,11 @@ const Index = () => {
       (x) => x === ""
     );
 
-    if (isFormEmpty || !isErrorMessageEmpty) return;
+    if (
+      (isFormEmpty || !isErrorMessageEmpty) &&
+      props.nationalityType !== "WNA"
+    )
+      return;
 
     toast(`Loading...`, {
       type: "info",
@@ -227,6 +241,7 @@ const Index = () => {
         ...form,
         register_id: request_id as string,
       };
+
       const res = await RestPersonalPManualReg(formReq);
       if (!res.success) {
         setIsLoading(false);
@@ -240,7 +255,10 @@ const Index = () => {
         token: res.token,
       };
 
-      if (res.channel_type === "REGULAR") {
+      if (
+        res.channel_type === "REGULAR" &&
+        props.checkStepResultDataRoute !== "manual_form"
+      ) {
         toast.dismiss();
         router.push({
           pathname: handleRoute("manual-form/final"),
@@ -292,51 +310,56 @@ const Index = () => {
     >
       <div className="px-5 pt-8 max-w-md mx-auto">
         <Heading>{t("manualForm.title")}</Heading>
-        <form onSubmit={onsubmitHandler}>
-          <Label className="ml-3 mt-5" size="base" htmlFor="nik">
-            NIK
-          </Label>
-          <TextInput
-            name="nik"
-            placeholder={t("manualForm.nik.placeholder")}
-            value={form.nik}
-            onChangeHandler={onChangeHandler}
-            isError={errorMessage.nik.length > 1}
-          />
-          <ErrorMessage errorMessage={errorMessage.nik} />
-          <Label className="ml-3 mt-3" size="base" htmlFor="name">
-            {t("manualForm.name.label")}
-          </Label>
-          <TextInput
-            name="name"
-            placeholder={t("manualForm.name.placeholder")}
-            value={form.name}
-            onChangeHandler={onChangeHandler}
-            isError={errorMessage.name.length > 1}
-          />
-          <ErrorMessage errorMessage={errorMessage.name} />
-          <Label className="ml-3 mt-3" size="base" htmlFor="email">
-            {t("manualForm.email.label")}
-          </Label>
-          <TextInput
-            name="email"
-            placeholder={t("manualForm.email.placeholder")}
-            value={form.email}
-            onChangeHandler={onChangeHandler}
-            isError={errorMessage.email.length > 1}
-          />
-          <ErrorMessage errorMessage={errorMessage.email} />
-          <CustomFileInputField
-            name="photo_ktp"
-            label={t("manualForm.photoKtp.label")}
-            imageBase64={form.photo_ktp}
-            errorMessage={errorMessage.photo_ktp}
-            onDeleteImageHandler={onDeleteImageHandler}
-            onChangeHandler={onChangeHandler}
-            onLabelClicked={onLabelClicked}
-            inputRef={fileFotoKtpRef}
-            showMaxResolution={false}
-          />
+        <form onSubmit={onSubmitHandler}>
+          {props.nationalityType !== "WNA" ? (
+            <>
+              <Label className="ml-3 mt-5" size="base" htmlFor="nik">
+                NIK
+              </Label>
+              <TextInput
+                name="nik"
+                placeholder={t("manualForm.nik.placeholder")}
+                value={form.nik}
+                onChangeHandler={onChangeHandler}
+                isError={errorMessage.nik.length > 1}
+              />
+              <ErrorMessage errorMessage={errorMessage.nik} />
+              <Label className="ml-3 mt-3" size="base" htmlFor="name">
+                {t("manualForm.name.label")}
+              </Label>
+              <TextInput
+                name="name"
+                placeholder={t("manualForm.name.placeholder")}
+                value={form.name}
+                onChangeHandler={onChangeHandler}
+                isError={errorMessage.name.length > 1}
+              />
+              <ErrorMessage errorMessage={errorMessage.name} />
+              <Label className="ml-3 mt-3" size="base" htmlFor="email">
+                {t("manualForm.email.label")}
+              </Label>
+              <TextInput
+                name="email"
+                placeholder={t("manualForm.email.placeholder")}
+                value={form.email}
+                onChangeHandler={onChangeHandler}
+                isError={errorMessage.email.length > 1}
+              />
+              <ErrorMessage errorMessage={errorMessage.email} />
+              <CustomFileInputField
+                name="photo_ktp"
+                label={t("manualForm.photoKtp.label")}
+                imageBase64={form.photo_ktp}
+                errorMessage={errorMessage.photo_ktp}
+                onDeleteImageHandler={onDeleteImageHandler}
+                onChangeHandler={onChangeHandler}
+                onLabelClicked={onLabelClicked}
+                inputRef={fileFotoKtpRef}
+                showMaxResolution={false}
+                placeholder={t("manualForm.photoKtp.placeholder")}
+              />
+            </>
+          ) : null}
           <CustomFileInputField
             label={t("manualForm.photoSelfie.label")}
             name="photo_selfie"
@@ -347,11 +370,15 @@ const Index = () => {
             onLabelClicked={onLabelClicked}
             inputRef={fileFotoSelfieRef}
             showMaxResolution
+            placeholder="(.jpg/.jpeg/.png)"
           />
 
           <Button
             type="submit"
-            disabled={errorMessage.nik.length > 1 || isLoading}
+            disabled={
+              (errorMessage.nik.length > 1 || isLoading) &&
+              props.nationalityType !== "WNA"
+            }
             size="sm"
             className="bg-primary btn font-semibold mt-7 h-9 hover:opacity-50"
             style={{
@@ -556,6 +583,49 @@ const PhotoSelfieTermModal = ({ show, fileFotoSelfieRef }: TModal) => {
       </div>
     </div>
   ) : null;
+};
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const cQuery = context.query;
+  const isNotRedirect = true;
+  const uuid =
+    cQuery.transaction_id || cQuery.request_id || cQuery.registration_id;
+
+  const checkStepResult: {
+    res?: TKycCheckStepResponseData;
+    err?: {
+      response: {
+        data: {
+          success: boolean;
+          message: string;
+          data: { errors: string[] };
+        };
+      };
+    };
+  } = await RestKycCheckStepv2({
+    registerId: uuid as string,
+  })
+    .then((res) => {
+      return { res };
+    })
+    .catch((err) => {
+      return { err };
+    });
+
+  const serverSideRenderReturnConditionsResult =
+    serverSideRenderReturnConditions({
+      context,
+      checkStepResult,
+      isNotRedirect,
+    });
+
+  serverSideRenderReturnConditionsResult["props"] = {
+    ...serverSideRenderReturnConditionsResult["props"],
+    checkStepResultDataRoute: checkStepResult.res?.data?.route || null,
+    nationalityType: checkStepResult.res?.data?.nationality_type || null,
+  };
+
+  return serverSideRenderReturnConditionsResult;
 };
 
 export default Index;

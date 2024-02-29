@@ -63,6 +63,7 @@ const ChangePinDedicatedChannel = (props: Props) => {
   };
   const onClickDeleteHandlerConfirmCallback = () => {
     setPinConfirmError({ isError: false, message: "" });
+    setPinConfirmErrorAfterSubmit({ isError: false, message: "" });
   };
   const onClickNumberHandlerOldPinCallback = (value: number) => {
     setOldPinErrorAfterSubmit({ isError: false, message: "" });

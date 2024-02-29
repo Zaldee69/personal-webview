@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Head from "next/head";
 import { AppDispatch, RootState } from "@/redux/app/store";
@@ -16,24 +16,39 @@ import XIcon from "@/public/icons/XIcon";
 import CheckOvalIcon from "@/public/icons/CheckOvalIcon";
 import Footer from "../../components/Footer";
 import ProgressStepBar from "../../components/ProgressStepBar";
-import { resetImages, setActionList } from "@/redux/slices/livenessSlice";
+import {
+  resetImages,
+  setActionList,
+  setIsDone,
+  setIsRetry,
+} from "@/redux/slices/livenessSlice";
 import { handleRoute } from "@/utils/handleRoute";
 import Loading from "@/components/Loading";
-import SkeletonLoading from "@/components/SkeletonLoading";
 import { concateRedirectUrlParams } from "@/utils/concateRedirectUrlParams";
 import i18n from "i18";
 import UnsupportedDeviceModal from "@/components/UnsupportedDeviceModal";
 import Guide from "@/components/Guide";
-import InitializingFailed from "@/components/atoms/InitializingFailed";
-import Initializing from "@/components/atoms/Initializing";
 import { ActionGuide1, ActionGuide2 } from "@/components/atoms/ActionGuide";
 import { actionText } from "@/utils/actionText";
 import { assetPrefix } from "next.config";
 import { GetServerSideProps } from "next";
-import { RestKycCheckStepv2 } from "infrastructure/rest/personal";
+import {
+  RestGenerateOTPRegistration,
+  RestKycCheckStepv2,
+  RestResendOTPRegistration,
+  RestVerifyOTPRegistration,
+} from "infrastructure/rest/personal";
 import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
 import { serverSideRenderReturnConditions } from "@/utils/serverSideRenderReturnConditions";
 import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
+import Button from "@/components/atoms/Button";
+import { TOTPResponse } from "infrastructure/rest/personal/types";
+import Loader from "@/public/icons/Loader";
+import Heading from "@/components/atoms/Heading";
+import { cn } from "@/utils/twClassMerge";
+import LivenessImagePreview from "@/components/LivenessImagePreview";
+import { useResizeDetector } from "react-resize-detector";
+import OTPInput from "@/components/OTPInput";
 
 type TQueryParams = {
   request_id?: string;
@@ -43,9 +58,13 @@ type TQueryParams = {
   status?: string;
 };
 
+interface Props extends TOTPResponse {
+  uuid: string;
+}
+
 let human: any = undefined;
 
-const Liveness = () => {
+const Liveness = (props: Props) => {
   const router = useRouter();
   const routerQuery = router.query;
 
@@ -60,6 +79,7 @@ const Liveness = () => {
   const [isDisabled, setIsDisabled] = useState<boolean>(false);
   const [humanDone, setHumanDone] = useState(false);
   const [isClicked, setIsClicked] = useState<boolean>(false);
+  const [isCreateOTPSuccess, setIsCreateOTPSuccess] = useState<boolean>(false);
 
   const actionList = useSelector(
     (state: RootState) => state.liveness.actionList
@@ -79,6 +99,26 @@ const Liveness = () => {
       ? "pejam"
       : "hadap-depan";
 
+  const imageSrc1 = themeConfigurationAvaliabilityChecker(
+    currentIndex === "hadap-depan"
+      ? (themeConfiguration.data.asset_liveness_action_selfie as string)
+      : currentIndex === "buka-mulut"
+      ? (themeConfiguration.data.asset_liveness_action_open_mouth as string)
+      : (themeConfiguration.data.asset_liveness_action_blink as string),
+    "ASSET",
+    `${assetPrefix}/images/${currentIndex}.svg`
+  );
+
+  const imageSrc2 = themeConfigurationAvaliabilityChecker(
+    currentIndex === "hadap-depan" || !isStepDone
+      ? (themeConfiguration.data.asset_liveness_action_selfie as string)
+      : currentIndex === "buka-mulut"
+      ? (themeConfiguration.data.asset_liveness_action_open_mouth as string)
+      : (themeConfiguration.data.asset_liveness_action_blink as string),
+    "ASSET",
+    `${assetPrefix}/images/${currentIndex}.svg`
+  );
+
   useEffect(() => {
     const track: any = document.querySelector(".track");
     if (progress === 100) {
@@ -91,6 +131,12 @@ const Liveness = () => {
   }, [progress]);
 
   const dispatch: AppDispatch = useDispatch();
+
+  const handleSuccessCreateOTP = () => {
+    setIsCreateOTPSuccess(true);
+    generateAction();
+    dispatch(resetImages());
+  };
 
   const setHumanReady = () => {
     const loading: any = document.getElementById("loading");
@@ -130,6 +176,9 @@ const Liveness = () => {
 
             if (routerQuery.redirect_url) {
               params.status = res.data.status;
+              if (!res.data.pin_form) {
+                params.redirect_url = routerQuery.redirect_url as string;
+              }
             }
 
             //block for dedicated channel
@@ -145,7 +194,6 @@ const Liveness = () => {
               }
               //block for regular channel
             } else {
-              params.redirect_url = routerQuery.redirect_url as string;
               params.request_id = routerQuery.request_id as string;
               toast.success(res?.message || "pengecekan step berhasil", {
                 icon: <CheckOvalIcon />,
@@ -216,17 +264,15 @@ const Liveness = () => {
           // this scope for status D F E
           setIsGenerateAction(false);
           toast.dismiss("generateAction");
-          toast(`${res.message || "Tidak merespon!"}`, {
-            type: "error",
-            autoClose: 5000,
-            position: "top-center",
-            toastId: "errToast1",
-          });
           if (
             res.message === "Anda berada di tahap pengisian formulir" ||
             res.data.status === "D"
           ) {
-            toast.dismiss("errToast1");
+            toast(res.message, {
+              type: "success",
+              autoClose: 5000,
+              position: "top-center",
+            });
             if (res.data.pin_form) {
               router.replace({
                 pathname: handleRoute("kyc/pinform"),
@@ -333,6 +379,10 @@ const Liveness = () => {
     setIsLoading(true);
     setFailedMessage("");
 
+    dispatch(setIsDone(false));
+    setCurrentActionIndex(2);
+    dispatch(setIsRetry(false));
+
     try {
       const body: TKycVerificationRequestData = {
         registerId: router.query.request_id as string,
@@ -418,14 +468,43 @@ const Liveness = () => {
             registration_id: router.query.request_id,
           };
 
+          const params = {
+            register_id: props.uuid,
+            request_id: props.uuid,
+            status: "S",
+            reason_code: "",
+          };
+
           if (result.data.reason_code) {
             query.reason_code = result.data.reason_code;
           }
 
-          router.replace({
-            pathname: handleRoute("kyc/pinform"),
-            query,
-          });
+          RestKycFinalForm({
+            payload: {
+              registerId: props.uuid,
+            },
+          })
+            .then((res) => {
+              if (res.success) {
+                params.reason_code = res.data.reason_code!;
+                if (routerQuery.redirect_url) {
+                  const queryString = new URLSearchParams(
+                    params as any
+                  ).toString();
+
+                  window.top!.location.href = concateRedirectUrlParams(
+                    routerQuery.redirect_url as string,
+                    queryString
+                  );
+                } else {
+                  router.replace({
+                    pathname: handleRoute("form/success"),
+                    query,
+                  });
+                }
+              }
+            })
+            .catch((err) => console.log(err));
         } else {
           const query: any = {
             ...routerQuery,
@@ -478,7 +557,7 @@ const Liveness = () => {
                   position: "top-center",
                 }
               );
-              setIsLoading(false);
+              // setIsLoading(false);
             } else if (status === "F") {
               toast(
                 result?.data?.numFailedLivenessCheck &&
@@ -525,6 +604,7 @@ const Liveness = () => {
                   const params: any = {
                     status: status,
                     register_id: routerQuery.request_id,
+                    request_id: routerQuery.request_id,
                   };
 
                   if (result?.data.reason_code) {
@@ -548,27 +628,37 @@ const Liveness = () => {
                     query.reason_code = result?.data.reason_code;
                   }
 
-                  router.push({
-                    pathname: handleRoute("liveness-fail"),
-                    query,
-                  });
+                  if (result.data.pin_form) {
+                    router.push({
+                      pathname: handleRoute("liveness-failure"),
+                      query: {
+                        status: status,
+                        register_id: routerQuery.request_id,
+                        request_id: routerQuery.request_id,
+                      },
+                    });
+                  } else {
+                    router.push({
+                      pathname: handleRoute("liveness-failure"),
+                      query,
+                    });
+                  }
                 }
-              }, 5000);
-              setIsLoading(false);
+              }, 1000);
             }
-          } else {
-            setIsLoading(false);
           }
         }
       }
+      localStorage.removeItem((routerQuery.request_id + "c") as string);
     } catch (e) {
+      localStorage.removeItem((routerQuery.request_id + "c") as string);
       toast.dismiss("verification");
       toast(`${e || "Tidak merespon!"}`, {
         type: "error",
         autoClose: e ? 5000 : false,
         position: "top-center",
       });
-      setIsLoading(false);
+      // setIsLoading(false);
       setTimeout(() => {
         router.push({
           pathname: handleRoute("liveness-fail"),
@@ -577,7 +667,7 @@ const Liveness = () => {
             request_id: router.query.request_id,
           },
         });
-      }, 5000);
+      }, 1000);
     }
   };
 
@@ -603,9 +693,9 @@ const Liveness = () => {
         },
         body: { enabled: false },
         hand: { enabled: false },
-        object: { enabled: false },
+        object: { enabled: true, maxDetected: 2 },
         gesture: { enabled: true },
-        debug: true,
+        debug: false,
       };
       import("@vladmandic/human").then((H) => {
         human = new H.default(humanConfig);
@@ -616,11 +706,6 @@ const Liveness = () => {
     };
     initHuman();
   }, []);
-
-  useEffect(() => {
-    if (!isDone) return;
-    changePage();
-  }, [isDone]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!humanDone && isClicked) {
@@ -643,12 +728,38 @@ const Liveness = () => {
 
   useEffect(() => {
     if (!router.isReady) return;
-    generateAction();
-    dispatch(resetImages());
+    if (props.verified) {
+      generateAction();
+      dispatch(resetImages());
+    }
+    if (!props.success && props.message === "request_id tidak valid") {
+      setIsDisabled(true);
+      toast.error("registrationId tidak valid", {
+        icon: <XIcon />,
+      });
+    }
   }, [router.isReady]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  if (!isLivenessStarted)
-    return <Guide setIsClicked={setIsClicked} isDisabled={isDisabled} />;
+  if (!isLivenessStarted) {
+    if (
+      !isCreateOTPSuccess &&
+      !props.verified &&
+      props.message !== "request_id tidak valid"
+    ) {
+      return <OTP handleSuccessCreateOTP={handleSuccessCreateOTP} {...props} />;
+    } else {
+      return <Guide setIsClicked={setIsClicked} isDisabled={isDisabled} />;
+    }
+  }
+
+  if (isDone && !isLoading) {
+    return (
+      <LivenessImagePreview
+        setCurrentActionIndex={setCurrentActionIndex}
+        verifyLiveness={changePage}
+      />
+    );
+  }
 
   return (
     <div
@@ -665,51 +776,19 @@ const Liveness = () => {
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
       <div className="py-10 max-w-sm mx-auto px-2">
-        <h2 className="poppins-regular text-xl font-semibold">
-          {isGenerateAction ? <SkeletonLoading width="w-2/5" /> : "Liveness"}
-        </h2>
-        {(!isStepDone && actionList.length > 1) || isMustReload ? (
+        <h2 className="poppins-regular text-xl font-semibold">Liveness</h2>
+        {!isStepDone && actionList.length > 1 ? (
           <ActionGuide2
-            imageSrc={themeConfigurationAvaliabilityChecker(
-              currentIndex === "hadap-depan" || !isStepDone
-                ? (themeConfiguration.data
-                    .asset_liveness_action_selfie as string)
-                : currentIndex === "buka-mulut"
-                ? (themeConfiguration.data
-                    .asset_liveness_action_open_mouth as string)
-                : (themeConfiguration.data
-                    .asset_liveness_action_blink as string),
-              "ASSET",
-              `${assetPrefix}/images/${currentIndex}.svg`
-            )}
+            imageSrc={imageSrc2}
             isGenerateAction={isGenerateAction}
             isMustReload={isMustReload}
           />
         ) : (
           <div>
-            {isGenerateAction && (
-              <div className="flex gap-5 mx-2 mt-5">
-                <SkeletonLoading width="w-[60px]" height="h-[50px]" />
-                <div className="flex items-center w-full flex-col">
-                  <SkeletonLoading width="w-full" height="h-[20px]" isDouble />
-                </div>
-              </div>
-            )}
             {!isLoading && (
               <ActionGuide1
                 actionList={actionList}
-                imageSrc={themeConfigurationAvaliabilityChecker(
-                  currentIndex === "hadap-depan"
-                    ? (themeConfiguration.data
-                        .asset_liveness_action_selfie as string)
-                    : currentIndex === "buka-mulut"
-                    ? (themeConfiguration.data
-                        .asset_liveness_action_open_mouth as string)
-                    : (themeConfiguration.data
-                        .asset_liveness_action_blink as string),
-                  "ASSET",
-                  `${assetPrefix}/images/${currentIndex}.svg`
-                )}
+                imageSrc={imageSrc1}
                 currentActionIndex={currentActionIndex}
                 failedMessage={failedMessage}
                 actionText={actionText}
@@ -718,15 +797,22 @@ const Liveness = () => {
           </div>
         )}
         <div
-          className={[
-            "mt-5 rounded-md h-[270px] flex justify-center items-center sm:w-full md:w-full",
-            isLoading ? "block" : "hidden",
-          ].join(" ")}
+          className={cn(
+            "mt-5 rounded-md h-[270px] justify-center items-center sm:w-full md:w-full",
+            {
+              flex: isLoading,
+              hidden: !isLoading,
+            }
+          )}
         >
           <Loading title={t("loadingTitle")} />
         </div>
-        <div className={["relative", isLoading ? "hidden" : "block"].join(" ")}>
-          {!isMustReload ? <Initializing /> : <InitializingFailed />}
+        <div
+          className={cn("relative", {
+            block: !isLoading,
+            hidden: isLoading,
+          })}
+        >
           <Camera
             currentActionIndex={currentActionIndex}
             setCurrentActionIndex={setCurrentActionIndex}
@@ -738,22 +824,226 @@ const Liveness = () => {
             human={human}
           />
         </div>
-        {isGenerateAction ? (
-          <div className="w-2/5 h-[5px] mx-auto mt-5 border-b-2 border-[#E6E6E6] "></div>
-        ) : (
-          <div>
-            {isMustReload ? (
-              <ProgressStepBar actionList={actionList} currentActionIndex={0} />
-            ) : (
-              <ProgressStepBar
-                actionList={actionList}
-                currentActionIndex={isStepDone ? currentActionIndex : 0}
-              />
-            )}
-          </div>
-        )}
-        <Footer />
+        <ProgressStepBar
+          actionList={actionList}
+          currentActionIndex={isStepDone ? currentActionIndex : 0}
+        />
         <UnsupportedDeviceModal />
+        <Footer />
+      </div>
+    </div>
+  );
+};
+
+interface IOTPProps extends Props {
+  handleSuccessCreateOTP: () => void;
+}
+
+const OTP = ({ success, uuid, handleSuccessCreateOTP }: IOTPProps) => {
+  const [isShowOTPForm, setIsShowOTPForm] = useState<boolean>(true);
+  const [otpValues, setOtpValues] = useState(["", "", "", "", "", ""]);
+  const [isCountDone, setIsCountDone] = useState<boolean>(false);
+  const [timeRemaining, setTimeRemaining] = useState<string>("0");
+  const [isMaxResend, setIsMaxResend] = useState<boolean>(false);
+  const [isProcessResend, setIsProcessResend] = useState<boolean>(false);
+  const [isProcessVerify, setIsProcessVerify] = useState<boolean>(false);
+
+  const interval = 60000;
+
+  const themeConfiguration = useSelector((state: RootState) => state.theme);
+  const { t }: any = i18n;
+
+  const reset = () => {
+    localStorage.endTime = +new Date() + interval;
+  };
+
+  const { width, ref } = useResizeDetector();
+
+  const resendOTP = () => {
+    setIsProcessResend(true);
+    RestResendOTPRegistration({ request_id: uuid })
+      .then((res) => {
+        const errorMessage =
+          res.message === "tidak bisa resend OTP. resend OTP sudah maksimal" &&
+          !res.success
+            ? "Jumlah pengiriman kode OTP telah mencapai batas maksimal"
+            : res.message;
+
+        if (res.success) {
+          timerHandler();
+          reset();
+          setIsCountDone(true);
+          toast.success("OTP Terkirim", {
+            icon: <CheckOvalIcon />,
+          });
+        } else {
+          if (
+            res.message === "tidak bisa resend OTP. resend OTP sudah maksimal"
+          ) {
+            setIsMaxResend(true);
+          } else {
+            timerHandler();
+            reset();
+            setIsCountDone(true);
+          }
+          toast.error(errorMessage, {
+            icon: <XIcon />,
+          });
+        }
+        setIsProcessResend(false);
+      })
+      .catch((err) => {
+        console.log(err);
+        setIsProcessResend(false);
+      });
+  };
+
+  const verifyOTP = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (otpValues.length < 6) return;
+
+    setIsProcessVerify(true);
+    RestVerifyOTPRegistration({
+      payload: {
+        otp: otpValues.join(""),
+        request_id: uuid,
+      },
+    })
+      .then((res) => {
+        if (res.success) {
+          setIsShowOTPForm(false);
+          handleSuccessCreateOTP();
+        } else {
+          setIsProcessVerify(false);
+          setOtpValues(["", "", "", "", "", ""]);
+          toast.error(
+            res.message === "verifikasi gagal. OTP salah"
+              ? "Kode OTP Salah"
+              : res.message,
+            {
+              icon: <XIcon />,
+            }
+          );
+        }
+      })
+      .catch((err) => {
+        setIsProcessVerify(false);
+        console.log(err);
+      });
+  };
+
+  const timerHandler = () => {
+    setInterval(function () {
+      const date: any = new Date();
+      const remaining = localStorage.endTime - date;
+      const timeRemaining = Math.floor(remaining / 1000).toString();
+      if (remaining >= 1) {
+        setTimeRemaining(timeRemaining);
+      } else {
+        setIsCountDone(false);
+      }
+    }, 100);
+  };
+
+  useEffect(() => {
+    if (success) {
+      timerHandler();
+      reset();
+      setIsCountDone(true);
+    } else {
+      setIsCountDone(true);
+      timerHandler();
+    }
+  }, []);
+
+  return !isShowOTPForm ? null : (
+    <div
+      style={{
+        backgroundColor: themeConfigurationAvaliabilityChecker(
+          themeConfiguration?.data.background as string,
+          "BG"
+        ),
+      }}
+      className="flex justify-center items-center min-h-screen px-3 pt-3 pb-5"
+    >
+      <div
+        ref={ref}
+        className="py-9 font-poppins max-w-md card-pin-form flex items-center"
+      >
+        <div>
+          <Heading className="text-center">{t("frSubtitle2")}</Heading>
+          <p className="text-center md:text-base text-sm text-neutral200 mt-2">
+            {t("OTPModalSubtitle")}
+          </p>
+          <form onSubmit={verifyOTP}>
+            <OTPInput
+              width={width!}
+              setValues={setOtpValues}
+              values={otpValues}
+            />
+            {isMaxResend ? (
+              <p className="text-center mt-2 text-sm text-red300">
+                {t("OTPResendMaxLimit")}
+              </p>
+            ) : (
+              <div className="flex justify-center text-sm gap-1 mt-5">
+                <p className="text-neutral200">{t("dindtReceiveOtp")}</p>
+                <div
+                  style={{
+                    color: themeConfigurationAvaliabilityChecker(
+                      themeConfiguration?.data.action_font_color as string,
+                      "BG"
+                    ),
+                  }}
+                  className="font-semibold"
+                >
+                  {!isCountDone ? (
+                    <Button
+                      variant="ghost"
+                      type="button"
+                      disabled={isProcessResend}
+                      style={{
+                        color: themeConfigurationAvaliabilityChecker(
+                          themeConfiguration?.data.action_font_color as string
+                        ),
+                      }}
+                      className="mx-0"
+                      size="none"
+                      onClick={resendOTP}
+                    >
+                      {isProcessResend ? (
+                        <Loader color="#0052CC" size={20} />
+                      ) : (
+                        t("resend")
+                      )}
+                    </Button>
+                  ) : (
+                    <p className="text-primary">{`0:${timeRemaining}`}</p>
+                  )}
+                </div>
+              </div>
+            )}
+            <Button
+              disabled={otpValues.join("").length < 6 || isProcessVerify}
+              type="submit"
+              className="mt-10"
+              style={{
+                backgroundColor: themeConfigurationAvaliabilityChecker(
+                  themeConfiguration?.data.button_color as string
+                ),
+              }}
+            >
+              {isProcessVerify ? (
+                <div className="mx-auto flex justify-center">
+                  <Loader />
+                </div>
+              ) : (
+                t("send")
+              )}
+            </Button>
+          </form>
+        </div>
       </div>
     </div>
   );
@@ -761,7 +1051,7 @@ const Liveness = () => {
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const cQuery = context.query;
-  const isNotRedirect: boolean = true;
+  const isNotRedirect: boolean = false;
   const uuid =
     cQuery.transaction_id || cQuery.request_id || cQuery.registration_id;
 
@@ -786,11 +1076,30 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       return { err };
     });
 
-  return serverSideRenderReturnConditions({
-    context,
-    checkStepResult,
-    isNotRedirect,
-  });
+  const serverSideRenderReturnConditionsResult =
+    serverSideRenderReturnConditions({
+      context,
+      checkStepResult,
+      isNotRedirect,
+    });
+
+  const generateOTPResults = await RestGenerateOTPRegistration({
+    request_id: uuid as string,
+  })
+    .then((res) => {
+      return res;
+    })
+    .catch((err) => {
+      return err;
+    });
+
+  serverSideRenderReturnConditionsResult["props"] = {
+    ...serverSideRenderReturnConditionsResult["props"],
+    ...generateOTPResults,
+    uuid: uuid ? uuid : "",
+  };
+
+  return serverSideRenderReturnConditionsResult;
 };
 
 export default Liveness;

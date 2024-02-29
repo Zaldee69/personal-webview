@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { TLoginInitialState, TLoginProps } from "./../../interface/interface";
-import { API } from "../../config/API";
+import { login as loginHandler } from "@/utils/auth";
 
 const initialState: TLoginInitialState = {
   data: {
@@ -15,24 +15,27 @@ const initialState: TLoginInitialState = {
 export const login = createAsyncThunk(
   "personal/login",
   async ({
-    password,
-    request_id,
     tilaka_name,
+    password,
     channel_id,
-    nik,
-    company_id,
+    request_id,
+    remember,
   }: TLoginProps) => {
-    const req = API.post(`/checkPassword`, {
-      company_id,
-      request_id,
-      password,
+    const req = loginHandler(
       tilaka_name,
-      channel_id,
-      nik,
-    });
+      password,
+      channel_id!,
+      request_id!,
+      (remember = true)
+    );
     return req;
   }
 );
+// tilaka_name: string,
+// password: string,
+// channel_id: string,
+// request_id: string,
+// remember: boolean
 
 const loginSlice = createSlice({
   name: "login",
@@ -45,8 +48,8 @@ const loginSlice = createSlice({
         message: "",
         success: false,
         nik: "",
-      }
-    }
+      };
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -65,5 +68,5 @@ const loginSlice = createSlice({
 
 export { initialState as initialStateLoginSlice };
 
-export const {resetInitalState} = loginSlice.actions
+export const { resetInitalState } = loginSlice.actions;
 export default loginSlice.reducer;

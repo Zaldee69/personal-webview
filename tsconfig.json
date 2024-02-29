@@ -17,12 +17,14 @@
     "baseUrl": ".",
     "paths": {
       "@/components/*": ["components/*"],
+      "@/constants/*": ["constants/*"],
       "@/hooks/*": ["hooks/*"],
       "@/interface/*": ["interface/*"],
       "@/redux/*": ["redux/*"],
       "@/public/*": ["public/*"],
       "@/config/*": ["config/*"],
-      "@/utils/*": ["utils/*"]
+      "@/utils/*": ["utils/*"],
+      "react": [ "./node_modules/@types/react"]
     },
     "downlevelIteration": true
   },

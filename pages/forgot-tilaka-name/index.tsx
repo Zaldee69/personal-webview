@@ -68,11 +68,12 @@ const ForgotTilakaName = (props: Props) => {
 
     RestPersonalRequestTilakaName({ payload: data })
     .then((res) => {
+        setIsLoading(false)
         toast.dismiss("loading");
         if (res.success) {
           modalSuccessSetter(true);
+          formSetter({})
         } else {
-          setIsLoading(false)
           toast.error(res.message || "Gagal request tilaka name", {
             icon: <XIcon />,
           });
@@ -171,7 +172,7 @@ const ForgotTilakaName = (props: Props) => {
                   <Button
                     type="submit"
                     size="sm"
-                    disabled={!form.email}
+                    disabled={!form.email || isLoading}
                     className="mt-32  mb-5 h-10"
                     style={{
                       backgroundColor: themeConfigurationAvaliabilityChecker(

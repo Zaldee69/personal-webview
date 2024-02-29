@@ -22,8 +22,10 @@ export type TKycCheckStepResponseData = {
     token?: string;
     pin_form?: boolean; // shown when status === 'D' || status === 'F'
     reason_code: TReasonCode;
-    route: "penautan" | "penautan_consent";
-    errors?: string[]
+    route: "penautan" | "penautan_consent" | "manual_form" | "done_manual_form" | "done_set_password" | "set_password" | "penautan_company";
+    errors?: string[];
+    user_identifier: string
+    nationality_type: string
   };
 };
 
@@ -200,3 +202,4 @@ export type TLivenessV2VerificationRequestData = {
   uuid: string;
   selfie_image: string;
 };
+

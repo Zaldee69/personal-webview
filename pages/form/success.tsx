@@ -4,7 +4,7 @@ import { TKycCheckStepResponseData } from "infrastructure/rest/kyc/types";
 import { GetServerSideProps } from "next";
 import Image from "next/legacy/image";
 import { useRouter } from "next/router";
-import React from "react";
+import React, { useEffect } from "react";
 import { assetPrefix } from "../../next.config";
 import i18n from "i18";
 import { RestKycCheckStepv2 } from "infrastructure/rest/personal";
@@ -16,6 +16,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/redux/app/store";
 import Paragraph from "@/components/atoms/Paraghraph";
 import Heading from "@/components/atoms/Heading";
+import useGenerateRedirectUrl from "@/hooks/useGenerateRedirectUrl";
 
 type Props = {};
 
@@ -24,15 +25,25 @@ const FormSuccess = (props: Props) => {
   const routerQuery = router.query;
   const { t }: any = i18n;
   const themeConfiguration = useSelector((state: RootState) => state.theme);
-  const uuid =
-    router.query.transaction_id ||
-    router.query.request_id ||
-    router.query.registration_id;
+  const { request_id, reason_code, status, redirect_url } = routerQuery;
+
   const params = {
-    reason_code: routerQuery.reason_code,
-    request_id: uuid,
+    request_id: request_id,
+    register_id: request_id,
+    reason_code,
+    status: "S",
   };
-  const queryString = new URLSearchParams(params as any).toString();
+
+  const { generatedUrl, autoRedirect } = useGenerateRedirectUrl({
+    params,
+    url: redirect_url as string,
+  });
+
+  useEffect(() => {
+    if(redirect_url){
+      autoRedirect();
+    }
+  }, []);
 
   return (
     <div
@@ -61,10 +72,7 @@ const FormSuccess = (props: Props) => {
       <div className="mt-10 text-primary text-base poppins-medium underline hover:cursor-pointer">
         {routerQuery.redirect_url && (
           <a
-            href={concateRedirectUrlParams(
-              routerQuery.redirect_url as string,
-              queryString
-            )}
+            href={generatedUrl}
             style={{
               color: themeConfigurationAvaliabilityChecker(
                 themeConfiguration?.data.action_font_color as string

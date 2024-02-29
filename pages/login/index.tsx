@@ -28,21 +28,15 @@ import {
 } from "@/utils/localStorageWithExpiresIn";
 import { getExpFromToken } from "@/utils/getExpFromToken";
 import Link from "next/link";
-import { getEncodedCurrentUrl } from "@/utils/getEncodedCurrentUrl";
 import Button, { buttonVariants } from "@/components/atoms/Button";
 import { TThemeResponse } from "infrastructure/rest/personal/types";
 import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
 import Paragraph from "@/components/atoms/Paraghraph";
 import Heading from "@/components/atoms/Heading";
 import Label from "@/components/atoms/Label";
+import Modal from "@/components/modal/Modal";
 
 type Props = {};
-
-type ModalProps = {
-  certifModal: boolean;
-  setCertifModal: React.Dispatch<React.SetStateAction<boolean>>;
-  theme: TThemeResponse | undefined;
-};
 
 type TEventMessageDataToken = string | undefined;
 
@@ -51,6 +45,7 @@ const loginQueueInitial = { queue: false, data: { existingToken: undefined } };
 const Login = ({}: Props) => {
   const [password, setPassword] = useState<string>("");
   const [tilakaName, setTilakaName] = useState("");
+  const [isRender, setIsRender] = useState(false);
   const [certifModal, setCertifModal] = useState<boolean>(false);
   const [type, setType] = useState<{ password: string }>({
     password: "password",
@@ -82,40 +77,38 @@ const Login = ({}: Props) => {
 
   // When the component mounts
   useEffect(() => {
-    const rememberMeFlag = localStorage.getItem("rememberMe");
-    if (rememberMeFlag) {
-      setRememberMe(true);
+    const tilakaName = localStorage.getItem(`tilakaName-${tilaka_name}`);
+    const token = localStorage.getItem(`token-${tilakaName}`);
+    const rememberMe = localStorage.getItem(`rememberMe-${tilakaName}`);
+
+    if (token && rememberMe) {
+      const queryString = window.location.search;
+
+      if (router.query.setting === "2") {
+        window.location.replace(
+          handleRoute(`set-mfa${queryString}&login_from=/login`)
+        );
+      } else if (router.query.setting === "3") {
+        window.location.replace(
+          handleRoute(`setting-signature${queryString}&login_from=/login`)
+        );
+      }
+    } else {
+      setIsRender(true);
     }
   }, []);
 
   // When the state of the "remember me" checkbox changes
   useEffect(() => {
     if (rememberMe) {
-      localStorage.setItem("rememberMe", true as any);
+      localStorage.setItem(`rememberMe-${tilakaName}`, true as any);
     } else {
-      localStorage.removeItem("rememberMe");
-      // localStorage.removeItem("token");
-      localStorage.removeItem("refresh_token");
+      localStorage.removeItem(`rememberMe-${tilakaName}`);
     }
   }, [rememberMe]);
 
   useEffect(() => {
     if (data.status === "FULLFILLED" && data.data.success) {
-      setStorageWithExpiresIn(
-        "token",
-        data.data.data[0],
-        getExpFromToken(data.data.data[0]) as number
-      );
-
-      if (rememberMe) {
-        setStorageWithExpiresIn(
-          "token",
-          data.data.data[0],
-          getExpFromToken(data.data.data[0]) as number
-        );
-        localStorage.setItem("refresh_token", data.data.data[1] as string);
-      }
-
       doIn(data);
     }
     toastCaller(data, themeConfiguration?.data.toast_color as string);
@@ -159,13 +152,14 @@ const Login = ({}: Props) => {
   const doIn = (data?: TLoginInitialState): void => {
     let queryWithDynamicRedirectURL = {
       ...router.query,
+      login_from: "login",
     };
 
     if (data) {
       setDoInAuto(false);
     }
 
-    getCertificateList({ params: company_id as string }).then((res) => {
+    getCertificateList().then((res) => {
       const certif = JSON.parse(res.data);
       if (!transaction_id && signing === "1") {
         toast.dismiss("success");
@@ -177,11 +171,12 @@ const Login = ({}: Props) => {
         });
       } else {
         if (certif[0].status == "Aktif") {
-          getUserName({}).then((res) => {
+          getUserName().then((res) => {
             const data = JSON.parse(res.data);
-            if (data.typeMfa == null) {
+            const path = "setting-signature-and-mfa";
+            if (data.typeMfa == null || router.query.next_path === path) {
               router.replace({
-                pathname: handleRoute("setting-signature-and-mfa"),
+                pathname: handleRoute(path),
                 query: {
                   ...queryWithDynamicRedirectURL,
                 },
@@ -202,7 +197,7 @@ const Login = ({}: Props) => {
               });
             } else {
               router.replace({
-                pathname: handleRoute("signing"),
+                pathname: handleRoute(router.query.origin as string),
                 query: {
                   ...queryWithDynamicRedirectURL,
                 },
@@ -214,6 +209,7 @@ const Login = ({}: Props) => {
           certif[0].status === "Expired" ||
           certif[0].status === "Enroll"
         ) {
+          localStorage.removeItem(`token-${tilaka_name}`);
           setCertifModal(true);
         } else {
           router.replace({
@@ -266,7 +262,7 @@ const Login = ({}: Props) => {
 
   if (themeConfiguration.status === "PENDING") return null;
 
-  return (
+  return isRender ? (
     <div
       className="min-h-screen"
       style={{
@@ -276,11 +272,39 @@ const Login = ({}: Props) => {
         ),
       }}
     >
-      <CertifModal
-        setCertifModal={setCertifModal}
-        certifModal={certifModal}
-        theme={theme}
-      />
+      <Modal
+        isShowModal={certifModal}
+        setModal={setCertifModal}
+        headingTitle={t("dontHaveCertifTitle")}
+        size="sm"
+      >
+        <div className="flex flex-col pb-6 px-2 justify-center">
+          <div
+            className="bg-contain w-32 mx-auto mt-3 h-32 bg-center bg-no-repeat"
+            style={{
+              backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
+                theme?.data.asset_activation_cert_error as string,
+                "ASSET",
+                `${assetPrefix}/images/certif.svg`
+              )})`,
+            }}
+          ></div>
+          <Paragraph className="text-center my-5">
+            {t("dontHaveCertifSubtitle")}
+          </Paragraph>
+          <Paragraph size="sm" className="text-center">
+            {t("furtherQuestions")}{" "}
+            <a
+              href="https://tilaka.id/contact/"
+              target="_blank"
+              className="text-[#4b68af]"
+              key={0}
+            >
+              {t("contactUs")}
+            </a>
+          </Paragraph>
+        </div>
+      </Modal>
       <Head>
         <title>Tilaka</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
@@ -296,11 +320,7 @@ const Login = ({}: Props) => {
         </div>
         <form onSubmit={submitHandler}>
           <div className="flex flex-col  mt-20">
-            <Label
-              size="base"
-              className="px-2"
-              htmlFor="password"
-            >
+            <Label size="base" className="px-2" htmlFor="password">
               {t("passwordLabel")}
             </Label>
             <div className="relative flex-1">
@@ -325,16 +345,13 @@ const Login = ({}: Props) => {
             <div className="flex items-center mt-5">
               <input
                 type="checkbox"
-                className="mr-2"
+                className="mr-2 !w-5 !h-5"
                 id="rememberMe"
                 name="rememberMe"
                 checked={rememberMe}
                 onChange={() => setRememberMe(!rememberMe)}
               />
-              <Label
-                size="base"
-                htmlFor="rememberMe"
-              >
+              <Label size="base" htmlFor="rememberMe">
                 {t("rememberMe")}
               </Label>
             </div>
@@ -345,9 +362,10 @@ const Login = ({}: Props) => {
                   query: router.query,
                 }}
                 passHref
-                legacyBehavior
+                target="_blank"
+                rel="noopener noreferrer"
               >
-                <a
+                <p
                   style={{
                     color: themeConfigurationAvaliabilityChecker(
                       theme?.data.action_font_color as string
@@ -356,7 +374,7 @@ const Login = ({}: Props) => {
                   className={buttonVariants({ variant: "ghost", size: "none" })}
                 >
                   {t("linkAccountForgotPasswordButton")}
-                </a>
+                </p>
               </Link>
               <div className="block mx-2.5">
                 <Image
@@ -372,9 +390,10 @@ const Login = ({}: Props) => {
                   query: router.query,
                 }}
                 passHref
-                legacyBehavior
+                target="_blank"
+                rel="noopener noreferrer"
               >
-                <a
+                <p
                   style={{
                     color: themeConfigurationAvaliabilityChecker(
                       theme?.data.action_font_color as string
@@ -383,7 +402,7 @@ const Login = ({}: Props) => {
                   className={buttonVariants({ variant: "ghost", size: "none" })}
                 >
                   {t("linkAccountForgotTilakaName")}
-                </a>
+                </p>
               </Link>
             </div>
           </div>
@@ -405,7 +424,7 @@ const Login = ({}: Props) => {
         <Footer />
       </div>
     </div>
-  );
+  ) : null;
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
@@ -451,63 +470,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
 export default Login;
 
-const CertifModal = ({ certifModal, setCertifModal, theme }: ModalProps) => {
-  const { t }: any = i18n;
-  return certifModal ? (
-    <div
-      style={{ backgroundColor: "rgba(0, 0, 0, .5)" }}
-      className="fixed z-50 flex items-start transition-all duration-1000 pb-3 justify-center w-full left-0 top-0 h-full "
-    >
-      <div className="bg-white max-w-md mt-20 pt-5 px-2 pb-4 rounded-xl w-full mx-5">
-        <Heading className="text-center">
-          {t("dontHaveCertifTitle")}
-        </Heading>
-        <div className="flex flex-col justify-center">
-          <div
-            className="bg-contain w-32 mx-auto mt-3 h-32 bg-center bg-no-repeat"
-            style={{
-              backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
-                theme?.data.asset_activation_cert_error as string,
-                "ASSET",
-                `${assetPrefix}/images/certif.svg`
-              )})`,
-            }}
-          ></div>
-          <Paragraph className="text-center mt-5">
-            {t("dontHaveCertifSubtitle")}
-          </Paragraph>
-        </div>
-        <Button
-          style={{
-            backgroundColor: themeConfigurationAvaliabilityChecker(
-              theme?.data.button_color as string
-            ),
-          }}
-          size="full"
-          className=" mt-8 disabled:opacity-50 text-white h-9"
-        >
-          {t("createNewCertif")}
-        </Button>
-        <Button
-          variant="ghost"
-          onClick={() => {
-            // restLogout({})
-            setCertifModal(false);
-          }}
-          className="uppercase w-full mt-4 mx-auto rounded-sm h-9"
-          style={{
-            color: themeConfigurationAvaliabilityChecker(
-              theme?.data.action_font_color as string
-            ),
-          }}
-        >
-          {t("cancel")}
-        </Button>
-      </div>
-    </div>
-  ) : null;
-};
-
 type TPropsLoginQueue = {
   existingToken: TEventMessageDataToken;
   setLoginQueue: React.Dispatch<
@@ -544,7 +506,7 @@ const LoginQueue = ({
 
   useEffect(() => {
     // validate token
-    getUserName({ token: existingToken })
+    getUserName()
       .then((_) => {
         // token valid and redirect to authenticated page
         setStorageWithExpiresIn(

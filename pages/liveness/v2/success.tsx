@@ -14,6 +14,7 @@ import { RootState } from "@/redux/app/store";
 import { useSelector } from "react-redux";
 import Footer from "@/components/Footer";
 import Heading from "@/components/atoms/Heading";
+import useGenerateRedirectUrl from "@/hooks/useGenerateRedirectUrl";
 
 type Props = {};
 
@@ -27,21 +28,18 @@ const FormSuccess = (props: Props) => {
     router.query.request_id ||
     router.query.registration_id;
   const params = {
-    status: "S",
+    status: "True",
     uuid,
   };
-  const queryString = new URLSearchParams(params as any).toString();
+
+  const { generatedUrl, autoRedirect } = useGenerateRedirectUrl({
+    params,
+    url: routerQuery.redirect_url as string,
+  });
 
   useEffect(() => {
-    if (routerQuery.redirect_url) {
-      setTimeout(() => {
-        window.top!.location.href = concateRedirectUrlParams(
-          routerQuery.redirect_url as string,
-          queryString
-        );
-      }, 5000);
-    }
-  }, [router.isReady]);
+    autoRedirect()
+  }, [router.isReady]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div
@@ -76,10 +74,7 @@ const FormSuccess = (props: Props) => {
             size: "none",
             className: "font-medium mt-20",
           })}
-          href={concateRedirectUrlParams(
-            routerQuery.redirect_url as string,
-            queryString
-          )}
+          href={generatedUrl}
         >
           {t("livenessSuccessButtonTitle")}
         </a>

@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import React, { useState } from "react";
 import i18n from "i18";
 import { assetPrefix } from "next.config";
@@ -11,7 +12,7 @@ const DisconnectModal = () => {
   return (
     <div
       style={{ backgroundColor: "rgba(0, 0, 0, .5)" }}
-      className={`fixed z-50 items-center transition-all duration-1000 pb-3 justify-center w-full left-0 top-0 h-full ${
+      className={`fixed z-[99] items-center transition-all duration-1000 pb-3 justify-center w-full left-0 top-0 h-full ${
         !status && show ? "flex" : "hidden"
       }`}
     >

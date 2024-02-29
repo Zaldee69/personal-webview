@@ -1,47 +1,42 @@
-import React, { useState, useEffect, Dispatch, SetStateAction } from "react";
+import React, { useState, useEffect, SetStateAction, Dispatch } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useRouter } from "next/router";
+import Link from "next/link";
+import Image from "next/legacy/image";
+import { toast } from "react-toastify";
+import i18n from "i18";
 import {
   getCertificateList,
   getUserName,
   restGetOtp,
-  restLogout,
 } from "infrastructure/rest/b2b";
+import { AppDispatch, RootState } from "@/redux/app/store";
+import { login } from "@/redux/slices/loginSlice";
+import { handleRoute } from "@/utils/handleRoute";
+import { assetPrefix } from "../../../next.config";
+import { removeStorageWithExpiresIn } from "@/utils/localStorageWithExpiresIn";
+import { RestSigningAuthhashsign } from "infrastructure";
+import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
+import toastCaller from "@/utils/toastCaller";
 import Footer from "@/components/Footer";
 import EyeIcon from "@/public/icons/EyeIcon";
 import EyeIconOff from "@/public/icons/EyeIconOff";
-import { AppDispatch, RootState } from "@/redux/app/store";
-import { useDispatch, useSelector } from "react-redux";
-import { login } from "@/redux/slices/loginSlice";
-import { TLoginInitialState, TLoginProps } from "@/interface/interface";
-import Head from "next/head";
-import toastCaller from "@/utils/toastCaller";
-import { toast } from "react-toastify";
 import XIcon from "@/public/icons/XIcon";
-import { useRouter } from "next/router";
-import { handleRoute } from "../../../utils/handleRoute";
-import Image from "next/legacy/image";
-import { assetPrefix } from "../../../next.config";
-import { NextParsedUrlQuery } from "next/dist/server/request-meta";
-import i18n from "i18";
-import {
-  getStorageWithExpiresIn,
-  removeStorageWithExpiresIn,
-  setStorageWithExpiresIn,
-} from "@/utils/localStorageWithExpiresIn";
-import { getExpFromToken } from "@/utils/getExpFromToken";
-import Link from "next/link";
-import { PinInput } from "react-input-pin-code";
-import { RestSigningAuthhashsign } from "infrastructure";
-import FRCamera from "@/components/FRCamera";
-import { concateRedirectUrlParams } from "@/utils/concateRedirectUrlParams";
+import FaceRecognitionModal from "@/components/modal/FaceRecognitionModal";
 import Button, { buttonVariants } from "@/components/atoms/Button";
-import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
 import Paragraph from "@/components/atoms/Paraghraph";
 import Heading from "@/components/atoms/Heading";
 import Label from "@/components/atoms/Label";
 
+import { TLoginInitialState, TLoginProps } from "@/interface/interface";
+import { NextParsedUrlQuery } from "next/dist/server/request-meta";
+import Head from "next/head";
+import OTPInput from "@/components/OTPInput";
+import { useResizeDetector } from "react-resize-detector";
+
 interface IPropsLogin {}
 
-interface IParameterFromRequestSign {
+export interface IParameterFromRequestSign {
   user?: string;
   id?: string;
   channel_id?: string;
@@ -59,26 +54,18 @@ interface IModal {
   tilakaName?: string;
 }
 
-const AUTHHASH_PATHNAME = handleRoute("signing/authhash");
-
-const FRModal: React.FC<IModal> = ({
-  modal,
-  setModal,
-  callbackSuccess,
-  callbackFailure,
-}) => {
+const FRModal: React.FC<IModal> = ({ modal, setModal, callbackFailure }) => {
   const router = useRouter();
   const routerQuery: NextParsedUrlQuery & {
     redirect_url?: string;
     fr?: "1";
   } & IParameterFromRequestSign = router.query;
   const [isFRSuccess, setIsFRSuccess] = useState<boolean>(false);
-  const themeConfiguration = useSelector((state: RootState) => state.theme);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const signingFailure = (message: string) => {
-    callbackFailure({ message, status: "Gagal" });
-  };
   const captureProcessor = (base64Img: string | null | undefined) => {
+    setIsLoading(true);
+
     RestSigningAuthhashsign({
       params: {
         id: routerQuery.id as string,
@@ -87,26 +74,18 @@ const FRModal: React.FC<IModal> = ({
       payload: {
         face_image: base64Img?.split(",")[1] as string,
       },
-      token: getStorageWithExpiresIn("token_hashsign", AUTHHASH_PATHNAME, {
-        ...router.query,
-        showAutoLogoutInfo: "1",
-      }),
     })
       .then((res) => {
         if (res.success) {
-          router.push(
-            {
-              pathname: router.pathname,
-              query: {
-                ...routerQuery,
-                user_identifier: res.data.tilaka_name,
-                request_id: res.data.request_id,
-                hmac_nonce: res.data.hmac_nonce,
-              },
+          router.replace({
+            pathname: handleRoute("signing/success"),
+            query: {
+              redirect_url: routerQuery.redirect_url,
+              user_identifier: res.data.tilaka_name,
+              request_id: res.data.request_id,
+              status: "Sukses",
             },
-            undefined,
-            { shallow: true }
-          );
+          });
           toast.dismiss("info");
           toast(`Pencocokan berhasil`, {
             type: "success",
@@ -114,47 +93,67 @@ const FRModal: React.FC<IModal> = ({
           });
           setIsFRSuccess(true);
         } else {
+          const ERROR_MESSAGE =
+            res.message === "signing sudah selesai"
+              ? t("signingComplete")
+              : res.message;
+          setIsLoading(false);
           setIsFRSuccess(false);
           toast.dismiss("info");
-          toast.error(res.message || "Ada yang salah", { icon: <XIcon /> });
+          toast.error(ERROR_MESSAGE || "Ada yang salah", { icon: <XIcon /> });
           if (
             res.message.toLowerCase() ===
             "authhashsign gagal. gagal FR sudah 5 kali".toLocaleLowerCase()
           ) {
             setModal(false);
-            signingFailure(res.message || "Ada yang salah");
+            setTimeout(() => {
+              router.push(
+                {
+                  pathname: handleRoute("signing/failure"),
+                  query: {
+                    redirect_url: routerQuery.redirect_url,
+                    user_identifier: routerQuery.user,
+                    request_id: res.data.request_id,
+                    status: "Gagal",
+                  },
+                },
+                undefined,
+                { shallow: false }
+              );
+            }, 1500);
+          } else if (res.message === "signing sudah selesai") {
+            setModal(false);
+          } else if (
+            res.message === "auth hash sign gagal. token tidak valid"
+          ) {
+            setModal(false);
+          } else {
+            setModal(false);
+            setTimeout(() => {
+              setModal(true);
+            }, 100);
           }
         }
       })
       .catch((err) => {
+        setIsLoading(false);
         setIsFRSuccess(false);
         toast.dismiss("info");
-        if (err.response?.status === 401) {
-          restLogout({ token: localStorage.getItem("refresh_token_hashsign") });
-          removeStorageWithExpiresIn("token_hashsign");
-          localStorage.removeItem("refresh_token_hashsign");
-          router.replace({
-            pathname: AUTHHASH_PATHNAME,
-            query: { ...router.query, showAutoLogoutInfo: "1" },
-          });
-        } else {
-          toast.error(err.response?.data?.message || "Wajah tidak cocok", {
-            icon: <XIcon />,
-          });
-          if (
-            err.response?.data?.message?.toLowerCase() ===
-            "authhashsign gagal. gagal FR sudah 5 kali".toLocaleLowerCase()
-          ) {
-            setModal(false);
-            signingFailure(err.response?.data?.message || "Ada yang salah");
-          }
+
+        toast.error(err.response?.data?.message || "Wajah tidak cocok", {
+          icon: <XIcon />,
+        });
+        if (
+          err.response?.data?.message?.toLowerCase() ===
+          "authhashsign gagal. gagal FR sudah 5 kali".toLocaleLowerCase()
+        ) {
+          setModal(false);
         }
       });
   };
 
   useEffect(() => {
     if (isFRSuccess) {
-      callbackSuccess();
       if (modal) {
         document.body.style.overflow = "hidden";
       }
@@ -165,43 +164,15 @@ const FRModal: React.FC<IModal> = ({
 
   const { t }: any = i18n;
 
-  return modal ? (
-    <div
-      style={{ backgroundColor: "rgba(0, 0, 0, .5)" }}
-      className="fixed z-50 flex items-start transition-all duration-1000 justify-center w-full left-0 top-0 h-full "
-    >
-      <div className="bg-white max-w-md mt-20 pt-5 px-2 pb-3 rounded-md w-full mx-5 ">
-        <>
-          <p className="font-poppins block text-center font-semibold ">
-            {t("frTitle")}
-          </p>
-          <span className="font-poppins mt-2 block text-center text-sm font-normal">
-            {t("frSubtitle1")}
-          </span>
-          <FRCamera
-            setModal={setModal}
-            setIsFRSuccess={setIsFRSuccess}
-            signingFailedRedirectTo={AUTHHASH_PATHNAME}
-            tokenIdentifier="token_hashsign"
-            callbackCaptureProcessor={captureProcessor}
-            countdownRepeatDelay={5}
-          />
-          <Button
-            onClick={() => setModal(!modal)}
-            size="none"
-            className="mt-3 uppercase text-base font-bold h-9"
-            style={{
-              color: themeConfigurationAvaliabilityChecker(
-                themeConfiguration?.data.action_font_color as string
-              ),
-            }}
-          >
-            {t("cancel")}
-          </Button>
-        </>
-      </div>
-    </div>
-  ) : null;
+  return (
+    <FaceRecognitionModal
+      isShowModal={modal}
+      isDisabled={isLoading}
+      setIsShowModal={setModal}
+      callbackCaptureProcessor={captureProcessor}
+      title={t("frTitle")}
+    />
+  );
 };
 
 const OTPModal: React.FC<IModal> = ({
@@ -220,6 +191,8 @@ const OTPModal: React.FC<IModal> = ({
   } & IParameterFromRequestSign = router.query;
 
   const [values, setValues] = useState(["", "", "", "", "", ""]);
+
+  const { width, ref } = useResizeDetector();
 
   const themeConfiguration = useSelector((state: RootState) => state.theme);
 
@@ -246,21 +219,17 @@ const OTPModal: React.FC<IModal> = ({
       payload: {
         otp_pin: values.join(""),
       },
-      token: getStorageWithExpiresIn("token_hashsign", AUTHHASH_PATHNAME, {
-        ...router.query,
-        showAutoLogoutInfo: "1",
-      }),
     })
       .then((res) => {
         if (res.success) {
           router.push(
             {
-              pathname: router.pathname,
+              pathname: handleRoute("/signing/success"),
               query: {
-                ...routerQuery,
-                user_identifier: res.data.tilaka_name,
+                redirect_url: routerQuery.redirect_url,
+                user_identifier: routerQuery.user,
                 request_id: res.data.request_id,
-                hmac_nonce: res.data.hmac_nonce,
+                status: "Sukses",
               },
             },
             undefined,
@@ -273,15 +242,37 @@ const OTPModal: React.FC<IModal> = ({
           setSuccessSigning(false);
           toast.dismiss("loading");
           setValues(["", "", "", "", "", ""]);
-          toast.error(res.message || "Ada yang salah", { icon: <XIcon /> });
+
+          const ERROR_MESSAGE =
+            res.message === "signing sudah selesai"
+              ? t("signingComplete")
+              : res.message;
+
+          toast.error(ERROR_MESSAGE || "Ada yang salah", { icon: <XIcon /> });
 
           if (
             res.message.toLowerCase() ===
             "authhashsign gagal. salah OTP sudah 5 kali".toLocaleLowerCase()
           ) {
-            setModal(false);
+            router.push(
+              {
+                pathname: handleRoute("/signing/failure"),
+                query: {
+                  redirect_url: routerQuery.redirect_url,
+                  user_identifier: routerQuery.user,
+                  request_id: res.data.request_id,
+                  status: "Gagal",
+                },
+              },
+              undefined,
+              { shallow: true }
+            );
             signingFailure(res.message || "Ada yang salah");
             setEndTimeToZero();
+          } else if (
+            res.message === "auth hash sign gagal. token tidak valid"
+          ) {
+            setModal(false);
           }
         }
       })
@@ -290,12 +281,8 @@ const OTPModal: React.FC<IModal> = ({
         toast.dismiss("loading");
         setValues(["", "", "", "", "", ""]);
         if (err.response?.status === 401) {
-          restLogout({ token: localStorage.getItem("refresh_token_hashsign") });
-          removeStorageWithExpiresIn("token_hashsign");
-          localStorage.removeItem("refresh_token_hashsign");
-          router.replace({
-            pathname: AUTHHASH_PATHNAME,
-            query: { ...router.query, showAutoLogoutInfo: "1" },
+          toast.error("Terjadi kesalahan", {
+            icon: <XIcon />,
           });
         } else {
           toast.error(err.response?.data?.message || t("otpInvalid"), {
@@ -337,12 +324,7 @@ const OTPModal: React.FC<IModal> = ({
   };
 
   const handleTriggerSendOTP = () => {
-    restGetOtp({
-      token: getStorageWithExpiresIn("token_hashsign", AUTHHASH_PATHNAME, {
-        ...router.query,
-        showAutoLogoutInfo: "1",
-      }),
-    })
+    restGetOtp()
       .then((res) => {
         if (res.success) {
           timerHandler();
@@ -364,19 +346,9 @@ const OTPModal: React.FC<IModal> = ({
         }
       })
       .catch((err) => {
-        if (err?.request?.status === 401) {
-          restLogout({ token: localStorage.getItem("refresh_token_hashsign") });
-          removeStorageWithExpiresIn("token_hashsign");
-          localStorage.removeItem("refresh_token_hashsign");
-          router.replace({
-            pathname: AUTHHASH_PATHNAME,
-            query: { ...router.query, showAutoLogoutInfo: "1" },
-          });
-        } else {
-          toast.error("Kode OTP gagal dikirim", {
-            icon: <XIcon />,
-          });
-        }
+        toast.error("Kode OTP gagal dikirim", {
+          icon: <XIcon />,
+        });
       });
   };
 
@@ -398,38 +370,32 @@ const OTPModal: React.FC<IModal> = ({
   return modal ? (
     <div
       style={{ backgroundColor: "rgba(0, 0, 0, .5)" }}
-      className="fixed z-50 flex items-start transition-all duration-1000 pb-3 justify-center w-full left-0 top-0 h-full "
+      className="fixed z-50 flex items-start transition-all duration-1000 justify-center w-full left-0 top-0 min-h-screen "
     >
-      <div className="bg-white max-w-md mt-20 pt-5 px-2 pb-3 rounded-md w-full mx-5">
-        <div className="flex flex-col">
-          <Heading className="block text-center pb-5  whitespace-nowrap">
-            {t("frTitle")}
-          </Heading>
-          <Paragraph className="block text-center pb-5">
+      <div className="bg-white max-w-md mt-20 py-9 px-2 rounded-md w-full mx-5">
+        <div ref={ref} className="flex flex-col">
+          <Heading className="block text-center pb-3  whitespace-nowrap">
             {t("frSubtitle2")}
+          </Heading>
+          <Paragraph className="block text-center text-base !text-neutral200 whitespace-pre">
+            {t("otpSubtitle")}
           </Paragraph>
-          <PinInput
-            containerStyle={{
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 5,
-              marginTop: "10px",
-            }}
-            inputStyle={{ alignItems: "center", gap: 5, marginTop: "10px" }}
-            placeholder=""
-            size="lg"
+          <OTPInput
+            width={width! / 1.12}
+            setValues={setValues}
             values={values}
-            onChange={(value, index, values) => setValues(values)}
           />
-          <div className="flex justify-center text-sm gap-1 mt-5">
-            <Paragraph>{t("dindtReceiveOtp")}</Paragraph>
+          <div className="flex justify-center items-center text-sm gap-1 mt-5">
+            <Paragraph size="sm" className="!text-neutral200">
+              {t("dindtReceiveOtp")}
+            </Paragraph>
             <div
               style={{
                 color: themeConfigurationAvaliabilityChecker(
                   themeConfiguration?.data.action_font_color as string
                 ),
               }}
-              className="font-semibold"
+              className="font-semibold text-sm"
             >
               {!isCountDone ? (
                 <Button
@@ -461,7 +427,7 @@ const OTPModal: React.FC<IModal> = ({
             className="mt-16 py-3"
             size="lg"
           >
-            {t("confirm")}
+            {t("send")}
           </Button>
           <Button
             onClick={() => {
@@ -484,156 +450,6 @@ const OTPModal: React.FC<IModal> = ({
   ) : null;
 };
 
-export const SigningSuccess = () => {
-  const router = useRouter();
-  const routerQuery: NextParsedUrlQuery & {
-    redirect_url?: string;
-  } & IParameterFromRequestSign = router.query;
-
-  const themeConfiguration = useSelector((state: RootState) => state.theme);
-
-  const params = {
-    user_identifier: routerQuery.user,
-    request_id: routerQuery.request_id,
-    hmac_nonce: routerQuery.hmac_nonce,
-    status: "Sukses",
-  };
-  const queryString = new URLSearchParams(params as any).toString();
-
-  const { t }: any = i18n;
-
-  return (
-    <div
-      style={{
-        backgroundColor: themeConfigurationAvaliabilityChecker(
-          themeConfiguration?.data.background as string,
-          "BG"
-        ),
-      }}
-      className="px-10 pt-16 pb-9 text-center flex flex-col justify-center min-h-screen"
-    >
-      <div>
-        <Heading>{t("authenticationSuccessTitle")}</Heading>
-        <div
-          className="bg-contain mx-auto w-52 h-52 bg-center bg-no-repeat"
-          style={{
-            backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
-              themeConfiguration.data.asset_signing_success as string,
-              "ASSET",
-              `${assetPrefix}/images/signingSuccess.svg`
-            )})`,
-          }}
-        ></div>
-        <div className="mt-3">
-          <Paragraph size="sm" className="whitespace-pre-line">
-            {t("authenticationSuccessSubtitle")}
-          </Paragraph>
-        </div>
-      </div>
-      <div className="mt-32">
-        {routerQuery.redirect_url && (
-          <a
-            href={concateRedirectUrlParams(
-              routerQuery.redirect_url,
-              queryString
-            )}
-          >
-            <span
-              style={{
-                color: themeConfigurationAvaliabilityChecker(
-                  themeConfiguration?.data.action_font_color as string
-                ),
-              }}
-              className={buttonVariants({
-                variant: "link",
-                size: "none",
-                className: "font-medium",
-              })}
-            >
-              {t("livenessSuccessButtonTitle")}
-            </span>
-          </a>
-        )}
-        <Footer />
-      </div>
-    </div>
-  );
-};
-
-export const SigningFailure = () => {
-  const router = useRouter();
-  const routerQuery: NextParsedUrlQuery & {
-    redirect_url?: string;
-  } & IParameterFromRequestSign = router.query;
-
-  const themeConfiguration = useSelector((state: RootState) => state.theme);
-
-  const params = {
-    user_identifier: routerQuery.user,
-    id: routerQuery.id,
-    status: "Gagal"
-  };
-  const queryString = new URLSearchParams(params as any).toString();
-  const { t }: any = i18n;
-
-  return (
-    <div
-      style={{
-        backgroundColor: themeConfigurationAvaliabilityChecker(
-          themeConfiguration?.data.background as string,
-          "BG"
-        ),
-      }}
-      className="px-10 pt-16 pb-9 text-center flex flex-col justify-center min-h-screen"
-    >
-      <div>
-        <Heading>{t("signFailed")}</Heading>
-        <div
-          className="bg-contain mx-auto w-52 h-52 bg-center bg-no-repeat"
-          style={{
-            backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
-              themeConfiguration.data.asset_signing_failed as string,
-              "ASSET",
-              `${assetPrefix}/images/signingFailure.svg`
-            )})`,
-          }}
-        ></div>
-        <div className="mt-3">
-          <Paragraph size="sm">{t("signFailedSubtitle")} </Paragraph>
-        </div>
-      </div>
-      <div className="mt-32">
-        {routerQuery.redirect_url && (
-          <div className="text-primary text-base font-medium font-poppins underline hover:cursor-pointer">
-            <a
-              href={concateRedirectUrlParams(
-                routerQuery.redirect_url,
-                queryString
-              )}
-            >
-              <span
-                style={{
-                  color: themeConfigurationAvaliabilityChecker(
-                    themeConfiguration?.data.action_font_color as string
-                  ),
-                }}
-                className={buttonVariants({
-                  variant: "link",
-                  size: "none",
-                  className: "font-medium",
-                })}
-              >
-                {t("livenessSuccessButtonTitle")}
-              </span>
-            </a>
-          </div>
-        )}
-        <Footer />
-      </div>
-    </div>
-  );
-};
-
 const Login = ({}: IPropsLogin) => {
   const router = useRouter();
   const dispatch: AppDispatch = useDispatch();
@@ -647,6 +463,7 @@ const Login = ({}: IPropsLogin) => {
   const [openFRModal, setopenFRModal] = useState<boolean>(false);
   const [otpModal, setOtpModal] = useState<boolean>(false);
   const [isSuccess, setIsSuccess] = useState<"-1" | "0" | "1">("-1");
+  const [rememberMe, setRememberMe] = useState<boolean>(false);
 
   const {
     channel_id,
@@ -667,38 +484,13 @@ const Login = ({}: IPropsLogin) => {
 
   useEffect(() => {
     if (isSubmitted && data.status === "FULLFILLED" && data.data.success) {
-      setStorageWithExpiresIn(
-        "token_hashsign",
-        data.data.data[0],
-        getExpFromToken(data.data.data[0]) as number
-      );
-
-      localStorage.setItem(
-        "refresh_token_hashsign",
-        data.data.data[1] as string
-      );
       doIn(data);
     }
     toastCaller(data, themeConfiguration?.data.toast_color as string);
   }, [data.status]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const doIn = (data?: TLoginInitialState): void => {
-    let queryWithDynamicRedirectURL = {
-      ...router.query,
-    };
-
-    const token_hashsign = getStorageWithExpiresIn(
-      "token_hashsign",
-      handleRoute("signing/authhash"),
-      {
-        ...queryWithDynamicRedirectURL,
-        showAutoLogoutInfo: "1",
-      }
-    );
-
-    getCertificateList({
-      token: token_hashsign,
-    }).then((res) => {
+    getCertificateList().then((res) => {
       const certif = JSON.parse(res.data);
       if (!id) {
         toast.dismiss("success");
@@ -710,7 +502,7 @@ const Login = ({}: IPropsLogin) => {
         });
       } else {
         if (certif[0].status == "Aktif") {
-          getUserName({ token: token_hashsign })
+          getUserName()
             .then((res) => {
               if (res.success) {
                 const data = JSON.parse(res.data);
@@ -733,33 +525,37 @@ const Login = ({}: IPropsLogin) => {
               }
             })
             .catch((err) => {
-              if (err.response?.status === 401) {
-                restLogout({
-                  token: localStorage.getItem("refresh_token_hashsign"),
-                });
-                removeStorageWithExpiresIn("token_hashsign");
-                localStorage.removeItem("refresh_token_hashsign");
-                router.replace({
-                  pathname: AUTHHASH_PATHNAME,
-                  query: { ...router.query, showAutoLogoutInfo: "1" },
-                });
-              } else {
-                toast(
-                  err.response?.data?.message ||
-                    "Tidak berhasil pada saat memuat Signature MFA",
-                  {
-                    type: "error",
-                    toastId: "error",
-                    position: "top-center",
-                    icon: XIcon,
-                  }
-                );
-              }
+              toast(
+                err.response?.data?.message ||
+                  "Tidak berhasil pada saat memuat Signature MFA",
+                {
+                  type: "error",
+                  toastId: "error",
+                  position: "top-center",
+                  icon: XIcon,
+                }
+              );
             });
+        } else if (
+          certif[0].status === "Revoke" ||
+          certif[0].status === "Expired" ||
+          certif[0].status === "Enroll"
+        ) {
+          localStorage.removeItem(`token-${tilakaName}`);
         }
       }
     });
   };
+
+  useEffect(() => {
+    const name = localStorage.getItem(`tilakaName-${router.query.user}`);
+    const token = localStorage.getItem(`token-${name}`);
+    const rememberMe = localStorage.getItem(`rememberMe-${name}`);
+
+    if (token && rememberMe) {
+      doIn();
+    }
+  }, []);
 
   const onChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
@@ -789,21 +585,23 @@ const Login = ({}: IPropsLogin) => {
 
   const mfaCallbackSuccess = () => {
     setIsSuccess("1");
-    removeStorageWithExpiresIn("token_hashsign");
-    localStorage.removeItem("refresh_token_hashsign");
+    removeStorageWithExpiresIn("token");
+    localStorage.removeItem("refresh_token");
   };
 
   const mfaCallbackFailure = () => {
     setIsSuccess("0");
-    removeStorageWithExpiresIn("token_hashsign");
-    localStorage.removeItem("refresh_token_hashsign");
+    removeStorageWithExpiresIn("token");
+    localStorage.removeItem("refresh_token");
   };
 
-  if (isSuccess === "1") {
-    return <SigningSuccess />;
-  } else if (isSuccess === "0") {
-    return <SigningFailure />;
-  }
+  useEffect(() => {
+    if (rememberMe) {
+      localStorage.setItem(`rememberMe-${tilakaName}`, true as any);
+    } else {
+      localStorage.removeItem(`rememberMe-${tilakaName}`);
+    }
+  }, [rememberMe]);
 
   return (
     <div
@@ -837,6 +635,7 @@ const Login = ({}: IPropsLogin) => {
             <div className="relative flex-1">
               <input
                 onChange={(e) => onChangeHandler(e)}
+                autoFocus
                 value={password}
                 name="password"
                 type={type.password}
@@ -852,6 +651,19 @@ const Login = ({}: IPropsLogin) => {
                 {type.password === "password" ? <EyeIcon /> : <EyeIconOff />}
               </button>
             </div>
+            <div className="flex items-center mt-5">
+              <input
+                type="checkbox"
+                className="mr-2 !w-5 !h-5"
+                id="rememberMe"
+                name="rememberMe"
+                checked={rememberMe}
+                onChange={() => setRememberMe(!rememberMe)}
+              />
+              <Label size="base" htmlFor="rememberMe">
+                {t("rememberMe")}
+              </Label>
+            </div>
             <div className="flex justify-center items-center mt-5">
               <Link
                 href={{
@@ -859,9 +671,10 @@ const Login = ({}: IPropsLogin) => {
                   query: router.query,
                 }}
                 passHref
-                legacyBehavior
+                target="_blank"
+                rel="noopener noreferrer"
               >
-                <a
+                <p
                   style={{
                     color: themeConfigurationAvaliabilityChecker(
                       themeConfiguration?.data.action_font_color as string
@@ -870,7 +683,7 @@ const Login = ({}: IPropsLogin) => {
                   className={buttonVariants({ variant: "ghost", size: "none" })}
                 >
                   {t("linkAccountForgotPasswordButton")}
-                </a>
+                </p>
               </Link>
               <div className="block mx-2.5">
                 <Image
@@ -886,9 +699,10 @@ const Login = ({}: IPropsLogin) => {
                   query: router.query,
                 }}
                 passHref
-                legacyBehavior
+                target="_blank"
+                rel="noopener noreferrer"
               >
-                <a
+                <p
                   style={{
                     color: themeConfigurationAvaliabilityChecker(
                       themeConfiguration?.data.action_font_color as string
@@ -897,7 +711,7 @@ const Login = ({}: IPropsLogin) => {
                   className={buttonVariants({ variant: "ghost", size: "none" })}
                 >
                   {t("linkAccountForgotTilakaName")}
-                </a>
+                </p>
               </Link>
             </div>
           </div>

@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/app/store";
@@ -72,6 +73,7 @@ export const Viewer: React.FC<Props> = ({
                 }}
                 className="mt-5 shadow-xl"
                 src={canvasURL}
+                alt=""
               />
           );
         })}

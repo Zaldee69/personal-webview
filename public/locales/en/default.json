@@ -8,7 +8,7 @@
   "livenessFailedSubtitle": "Sorry, your Liveness process failed. Photo does not match the required action. Please redo the process and follow the instructions properly.",
   "livenessFailed3xSubtitle": "Link is no longer available",
   "livenessFailedButtonTitle": "Retry",
-  "livenessSuccessTitle": "Tilaka Account Activation Request Submitted",
+  "livenessSuccessTitle": "Tilaka Account Request Submitted",
   "livenessSuccessSubtitle": "Please wait 1 x 24 hours for validation process.",
   "livenessSuccessButtonTitle": "Back to Main Page",
   "livenessSubtitle": "Please ensure your face is inside the border line and follow the instructions properly",
@@ -22,8 +22,9 @@
   "blink": "Eyes closed for 3 seconds",
   "blinkError": "Close your eyes",
   "dontMove": "Do not move during the process",
-  "finalFormTitle": "Account Activation",
-  "finalFormSubtitle": "Please fill in the following data to proceed Tilaka account activation",
+  "finalFormTitle": "Create Account",
+  "activationAccount": "Activation Account",
+  "finalFormSubtitle": "Please fill in the following data to proceed Tilaka account",
   "finalFormTooltip": "Tilaka Name cannot be changed and will be used as username for users to login and use Tilaka services.",
   "tilakaNamePlaceHolder": "Input Tilaka Name",
   "tilakaNameErrorRequired": "Tilaka Name is required",
@@ -86,6 +87,10 @@
   "linkAccountFailedSubtitle": "Please ensure the data matches with the Tilaka account to be linked.",
   "linkAccountTilaka": "Link Tilaka Account",
   "linkAccountTilaka1": "Activate Tilaka Account",
+  "tilakaNameHasRegisteredModal": {
+    "title": "Your NIK has been Registered ",
+    "subtitle": "Continue linking account process using your Password"
+  },
   "hi": "hi",
   "loginCheckBox": "Stay signed in for 30 days",
   "loginCTA": "Login",
@@ -104,7 +109,10 @@
   "chooseSignature": "Select signature type",
   "chooseSignatureInformation": "The selected signature will be used in the document you sign.",
   "choosetAutheticantionMode": "Select authentication method",
-  "choosetAutheticantionModeInformation": "For security reasons, Multi Factor Authentication is required while using digital signature or other Tilaka services.",
+  "choosetAutheticantionModeInformation": {
+    "haveDefaultMfa": "Your account is detected to have MFA, Do you want to update MFA? This update will be applied to all your accounts.",
+    "dontHaveDefaultMfa": "For security reasons, Multi Factor Authentication is required while using digital signature or other Tilaka services."
+  },
   "autheticantionMode1": "Face Recognition",
   "autheticantionMode2": "OTP via Email",
   "autheticantionMode3": "OTP via Mobile",
@@ -135,7 +143,7 @@
   "relogin2": "Please fill the password to re-login. ",
   "close": "Close",
   "dontHaveCertifTitle": "You don’t have any certificate",
-  "dontHaveCertifSubtitle": "Your certificate has expired or has been revoked. Please reenroll to use digital signature.",
+  "dontHaveCertifSubtitle": "Your certificate has expired or has been revoked",
   "createNewCertif": "Create New Certificate",
   "handwritingRequired": "Handwriting cannot be empty",
   "FontRequired": "You must choose a font type",
@@ -155,7 +163,7 @@
   "authenticationSuccessSubtitle": "Signing is currently in process.\n Notification will be received when document(s)\nare succesfully signed.",
   "singingReadDocCheckbox": "I have read the documents",
   "singingAgreeDocCheckbox": "I agree to sign the documents",
-  "dindtReceiveOtp": "Din't receive OTP?",
+  "dindtReceiveOtp": "Didn’t  receive OTP?",
   "resend": "Resend",
   "doNotMove": "Please do not move",
   "offlineModal": {
@@ -168,6 +176,7 @@
   "rememberMe": "Remember me",
   "livenessSuccess": "Liveness Success",
   "settingSignatureSuccessTitle": "Signature Setting Success",
+  "settingSignatureAndMFASuccessTitle": "Signature and MFA Setting Success",
   "settingMFASuccessTitle": "Signature Setting Success",
   "settingSignatureSuccessSubtitle": "Signature setting has been successfully updated.",
   "settingSignatureSuccessButton": "Back to Main Page",
@@ -218,11 +227,11 @@
       "label": "e-KTP",
       "uploadPhoto": "Upload e-KTP Image",
       "errorMessage1": "e-KTP image must be uploaded",
-      "errorMessage2": "e-KTP image does not meet requirements",
       "termTitle": "e-KTP Requirement",
       "term1": "e-KTP image clear and visible.",
       "term2": "e-KTP data are readable.",
-      "term3": "Ensure image extension in .JPG  .JPEG / .PNG with maximum file size 2MB."
+      "term3": "Ensure image extension in .JPG  .JPEG / .PNG with minimum file size 500KB.",
+      "placeholder": "Size min. 500KB \n (.jpg/.jpeg/.png)"
     },
     "photoSelfie": {
       "label": "Selfie",
@@ -233,11 +242,14 @@
       "term1": "Face facing forward and visible.",
       "term2": "Take off any accessories such as glasses, hat, face masks, and hair doesn’t cover the face.",
       "term3": "Ensure the lighting is good, not too bright and not too dark.",
-      "term4": "Ensure image extension in .JPG  .JPEG / .PNG with maximum file size 2MB and minimum resolution 200x200 pixel"
+      "term4": "Ensure image extension in .JPG  .JPEG / .PNG with maximum and minimum resolution 200x200 pixel"
     },
     "uploadPhoto": "Unggah Foto",
     "extensionAndSizeRequirement": "Max. 2MB (.jpg/.jpeg/.png)",
-    "resolutionMinimum": "Resolution min. 200 x 200 pixel"
+    "resolutionMinimum": "Resolution min. 200 x 200 pixel",
+    "invalidFileType": "File format must be JPG, JPEG or PNG",
+    "InvalidResolution": "Minimum resolution 200x200 pixels",
+    "invalidFileSize": "File size must be a minimum of 500KB."
   },
   "forgotPassword": {
     "title": "Forgot Password",
@@ -249,14 +261,14 @@
   },
   "send": "Send",
   "upload": "Upload",
-  "registrationInProcessTitle": "Registration In Process",
-  "registrationInProcessSubtitle": "Your registration is in the verification process. Please check your email regularly within 1x24 hours.",
+  "registrationInProcessTitle": "Registration in Process",
+  "registrationInProcessSubtitle": "Your registration is in the verification process. Please check your email within 1 x 24 hours.",
   "emailWasSend": "Email Send",
   "checkEmail": "Please check your email to reset your password.",
   "checkEmail2": "Please check your email for Tilaka Name information.",
   "ekycFailed": {
     "title": "e-KYC Failed",
-    "subtitle": "To continue the Registration Process, you will be directed to Manual Verification Page within 5 seconds",
+    "subtitle": "To continue the Registration Process, you will be directed to Manual Registration Page\n within {{timeLeft}} seconds",
     "subtitle1": "To continue the Registration Process, you will be directed ",
     "subtitle2": "to Manual Verification Page within 5 seconds",
     "errorCode1": "Dukcapil Checking Failed",
@@ -265,7 +277,8 @@
   },
   "linkAccountFailed5x": {
     "title": "Identity Authentication Failed",
-    "subtitle": "Please continue linking account verification process manually by using the link received in your email"
+    "subtitle": "Please continue linking account verification process manually by using the link received in your email",
+    "subtitle1": "To continue the Linking Process, you will be directed to Manual Registration Page \n within {{timeLeft}} seconds"
   },
   "setMFA": {
     "title": "Setting MFA",
@@ -283,5 +296,40 @@
     "confirmNewPasswordLabel": "Confirm New Password",
     "confirmNewPasswordPlaceholder": "Confirm New Password",
     "submitButton": "Submit"
-  }
+  },
+  "neverRegisteredBefore": "Never registered before?",
+  "contactUs": "Contact Us",
+  "contactCantika": "Contact <0>cantika@tilaka.id</0>",
+  "furtherQuestions": "Further questions?",
+  "OTPModalSubtitle": "The OTP code has been sent to your email address for the email verification process",
+  "OTPResendMaxLimit": "You have reached the maximum limit for sending OTP codes",
+  "livenessSelfiePreview": {
+    "title": "Selfie Image",
+    "subtitle": "This image will be used for Dukcapil verification.\nMaximum retake is up to 3 times.",
+    "retryBtn": "Retake",
+    "retake": {
+      "1": "Retake (1/3)",
+      "2": "Retake (2/3)",
+      "3": "Retake (3/3)"
+    },
+    "hasReachMaxRetakeSubtitle": "Maximum retake attempts have been reached.\nYou will be automatically redirected to the next step in {{timeLeft}} seconds.",
+    "listHeading": "Please ensure that:",
+    "list1": "Face is clearly visible and not cut-off",
+    "list2": "Face is not covered by glasses, a mask or a hat",
+    "list3": "Face facing forward with clear background,\nand no other people",
+    "list4": "Wearing modest clothing",
+    "list5": "Image taken in a well-lit area"
+  },
+  "cameraNotFoundModal": {
+    "title": "Unable to access the camera",
+    "subtitle": "Tilaka needs access to your camera. Click on the blocked camera icon <1/> in your browser to grant camera access.",
+    "button": "Try again"
+  },
+  "signingComplete": "User has finished signing",
+  "imageDark": "Face not detected, image too dark",
+  "faceMoreThan1": "Multiple faces detected",
+  "sideFace": "The face is only detected halfway",
+  "openEyes": "Open both eyes wider",
+  "otpSubtitle": "The OTP code has been sent to \n your email address"
 }
+

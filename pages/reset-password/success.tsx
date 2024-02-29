@@ -10,6 +10,8 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/redux/app/store";
 import Heading from "@/components/atoms/Heading";
 import Paragraph from "@/components/atoms/Paraghraph";
+import { buttonVariants } from "@/components/atoms/Button";
+import i18n from "i18";
 
 type Props = {};
 
@@ -26,7 +28,7 @@ type Props = {};
  * Email
  * /reset-password?kunciRahasia=rahasia&redirect_url=http%253A%252F%252Flocalhost%253A3000%252Flogin
  */
-const autoRedirect = false;
+const autoRedirect = true;
 const timeoutInSecond = 5;
 
 const LinkAccount = (props: Props) => {
@@ -35,6 +37,7 @@ const LinkAccount = (props: Props) => {
 
   const { redirect_url } = router.query;
   const themeConfiguration = useSelector((state: RootState) => state.theme);
+  const {t}: any = i18n
 
   useEffect(() => {
     if (!router.isReady || !redirect_url || !autoRedirect) return;
@@ -90,11 +93,34 @@ const LinkAccount = (props: Props) => {
           <Paragraph size="sm" className="mt-4 text-center">
             Silahkan login kembali menggunakan Kata Sandi Anda yang terbaru
           </Paragraph>
-          {autoRedirect && redirect_url && (
+          {/* {autoRedirect && redirect_url && (
             <Paragraph size="sm" className="mt-4 text-center">
               Silahkan login ulang dalam {currentSecond} detik
             </Paragraph>
-          )}
+          )} */}
+          {redirect_url ? (
+              <a
+                className="mt-14 block"
+                href={concateRedirectUrlParams(
+                  redirect_url as string,
+                  ""
+                )}
+              >
+                <span
+                  style={{
+                    color: themeConfigurationAvaliabilityChecker(
+                      themeConfiguration?.data.action_font_color as string
+                    ),
+                  }}
+                  className={buttonVariants({
+                    variant: "link",
+                    size: "none",
+                  })}
+                >
+                  {t("livenessSuccessButtonTitle")}
+                </span>
+              </a>
+            ) : null}
         </div>
         <Footer />
       </div>

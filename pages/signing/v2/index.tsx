@@ -20,7 +20,6 @@ import React, {
   useEffect,
   useState,
 } from "react";
-import { PinInput } from "react-input-pin-code";
 import { toast } from "react-toastify";
 import i18n from "i18";
 import EyeIcon2 from "@/public/icons/EyeIcon2";
@@ -40,6 +39,11 @@ import Footer from "@/components/Footer";
 import Heading from "@/components/atoms/Heading";
 import Paragraph from "@/components/atoms/Paraghraph";
 import Label from "@/components/atoms/Label";
+import useGenerateRedirectUrl from "@/hooks/useGenerateRedirectUrl";
+import FaceRecognitionModal from "@/components/modal/FaceRecognitionModal";
+import fRFailureCounter from "@/utils/fRFailureCounter";
+import { useResizeDetector } from "react-resize-detector";
+import OTPInput from "@/components/OTPInput";
 
 interface IParameterFromRequestSign {
   user?: string;
@@ -177,97 +181,60 @@ const SigningWithRead = () => {
 
   useEffect(() => {
     if (!routerIsReady) return;
-
-    const token_v2 = getStorageWithExpiresIn(
-      "token_v2",
-      handleRoute("login/v2"),
-      {
-        ...router.query,
-        showAutoLogoutInfo: "1",
-      }
-    );
     const count = parseInt(localStorage.getItem("count_v2") as string);
     localStorage.setItem("count_v2", count ? count.toString() : "0");
-    if (!token_v2) {
-      router.replace({
-        pathname: handleRoute("login/v2"),
-        query: { ...router.query },
-      });
-    } else {
-      setShouldRender(true);
-    }
-    if (token_v2) {
-      setShouldDisableSubmit(true);
-      RestSigningDownloadSignedPDF({
-        request_id: routerQuery.request_id as string,
-      })
-        .then((res) => {
-          if (res.success) {
-            setDocumentList(res.signed_pdf || []);
-            getUserName({ token: token_v2 })
-              .then((res) => {
-                if (res.success) {
-                  const data = JSON.parse(res.data);
-                  setTypeMFA(data.typeMfa);
-                  setShouldDisableSubmit(false);
-                } else {
-                  toast(
-                    res?.message || "Ada yang salah saat memuat Signature MFA",
-                    {
-                      type: "error",
-                      toastId: "error",
-                      position: "top-center",
-                      icon: XIcon,
-                    }
-                  );
-                }
-              })
-              .catch((err) => {
-                if (err.response?.status === 401) {
-                  restLogout({
-                    token: localStorage.getItem("refresh_token_v2"),
-                  });
-                  removeStorageWithExpiresIn("token_v2");
-                  localStorage.removeItem("refresh_token_v2");
-                  router.replace({
-                    pathname: handleRoute("login/v2"),
-                    query: { ...router.query, showAutoLogoutInfo: "1" },
-                  });
-                } else {
-                  toast(
-                    err.response?.data?.message ||
-                      "Tidak berhasil pada saat memuat Signature MFA",
-                    {
-                      type: "error",
-                      toastId: "error",
-                      position: "top-center",
-                      icon: XIcon,
-                    }
-                  );
-                }
-              });
-          } else {
-            setIsSuccess("0");
-            setSigningFailureDocumentName("");
-            if (res.status === "DENIED") {
-              setSiginingFailureError({
-                message: res.message || "Status dokument DENIED",
-                status: res.status,
-              });
-            } else if (res.status === "PROCESS") {
-              if (res.signed_pdf === null) {
-                setSiginingFailureError({
-                  message: t("documentExpired"),
-                  status: "Exp",
-                });
+    RestSigningDownloadSignedPDF({
+      request_id: routerQuery.request_id as string,
+    })
+      .then((res) => {
+        if (res.success) {
+          setDocumentList(res.signed_pdf || []);
+          getUserName()
+            .then((res) => {
+              if (res.success) {
+                const data = JSON.parse(res.data);
+                setTypeMFA(data.typeMfa);
+                setShouldRender(true);
+                setShouldDisableSubmit(true);
+                setShouldDisableSubmit(false);
               } else {
-                setSiginingFailureError({
-                  message:
-                    res.message ||
-                    "Tidak berhasil pada saat memuat list dokumen",
-                  status: "Exp",
-                });
+                toast(
+                  res?.message || "Ada yang salah saat memuat Signature MFA",
+                  {
+                    type: "error",
+                    toastId: "error",
+                    position: "top-center",
+                    icon: XIcon,
+                  }
+                );
               }
+            })
+            .catch((err) => {
+              toast(
+                err.response?.data?.message ||
+                  "Tidak berhasil pada saat memuat Signature MFA",
+                {
+                  type: "error",
+                  toastId: "error",
+                  position: "top-center",
+                  icon: XIcon,
+                }
+              );
+            });
+        } else {
+          setIsSuccess("0");
+          setSigningFailureDocumentName("");
+          if (res.status === "DENIED") {
+            setSiginingFailureError({
+              message: res.message || "Status dokumen DENIED",
+              status: res.status,
+            });
+          } else if (res.status === "PROCESS") {
+            if (res.signed_pdf === null) {
+              setSiginingFailureError({
+                message: t("documentExpired"),
+                status: "Exp",
+              });
             } else {
               setSiginingFailureError({
                 message:
@@ -275,41 +242,41 @@ const SigningWithRead = () => {
                 status: "Exp",
               });
             }
+          } else {
+            setSiginingFailureError({
+              message:
+                res.message || "Tidak berhasil pada saat memuat list dokumen",
+              status: "Exp",
+            });
           }
-        })
-        .catch((err) => {
-          if (
-            err.response?.data?.message &&
-            err.response?.data?.data?.errors?.[0]
-          ) {
+        }
+      })
+      .catch((err) => {
+        if (
+          err.response?.data?.message &&
+          err.response?.data?.data?.errors?.[0]
+        ) {
+          setIsSuccess("0");
+          setSigningFailureDocumentName("");
+          setSiginingFailureError({
+            message: `${err.response?.data?.message}, ${err.response?.data?.data?.errors?.[0]}`,
+            status: "Exp",
+          });
+        } else {
+          if (err.response.status === 401) {
+            ////
+          } else {
             setIsSuccess("0");
             setSigningFailureDocumentName("");
             setSiginingFailureError({
-              message: `${err.response?.data?.message}, ${err.response?.data?.data?.errors?.[0]}`,
+              message:
+                err.response?.data?.message ||
+                "Kesalahan pada saat memuat list dokumen",
               status: "Exp",
             });
-          } else {
-            if (err.response.status === 401) {
-              restLogout({ token: localStorage.getItem("refresh_token_v2") });
-              removeStorageWithExpiresIn("token_v2");
-              localStorage.removeItem("refresh_token_v2");
-              router.replace({
-                pathname: handleRoute("login/v2"),
-                query: { ...router.query, showAutoLogoutInfo: "1" },
-              });
-            } else {
-              setIsSuccess("0");
-              setSigningFailureDocumentName("");
-              setSiginingFailureError({
-                message:
-                  err.response?.data?.message ||
-                  "Kesalahan pada saat memuat list dokumen",
-                status: "Exp",
-              });
-            }
           }
-        });
-    }
+        }
+      });
   }, [routerIsReady]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (documentsHasBeenRead.length === 0 || documentList.length === 0) return;
@@ -364,10 +331,8 @@ const SigningWithRead = () => {
         }}
         className="px-10 py-8 text-center flex flex-col justify-center min-h-screen"
       >
-        <div style={{maxWidth: "360px"}} className="mx-auto" >
-          <Heading
-            className="font-poppins text-lg font-semibold text-neutral800 text-left mx-auto"
-          >
+        <div style={{ maxWidth: "360px" }} className="mx-auto">
+          <Heading className="font-poppins text-lg font-semibold text-neutral800 text-left mx-auto">
             {t("signRequestTitle")}
           </Heading>
           <div
@@ -381,9 +346,7 @@ const SigningWithRead = () => {
             }}
           ></div>
           <div className="mt-3 flex justify-center">
-            <Paragraph
-              className="text-sm text-left"
-            >
+            <Paragraph className="text-sm text-left">
               {t("signRequestSubtitle.subtitle1")}
               {routerQuery.mustread === "1" ? (
                 <>
@@ -490,7 +453,7 @@ const SigningWithRead = () => {
               backgroundColor: themeConfigurationAvaliabilityChecker(
                 themeConfiguration?.data.button_color as string
               ),
-              borderRadius: "12px"
+              borderRadius: "12px",
             }}
             onClick={() =>
               typeMFA === "FR" ? setopenFRModal(true) : setOtpModal(true)
@@ -564,96 +527,72 @@ const SigningWithoutRead = () => {
   useEffect(() => {
     if (!routerIsReady) return;
 
-    const token_v2 = getStorageWithExpiresIn(
-      "token_v2",
-      handleRoute("login/v2"),
-      {
-        ...router.query,
-        showAutoLogoutInfo: "1",
-      }
-    );
     const count = parseInt(localStorage.getItem("count_v2") as string);
     localStorage.setItem("count_v2", count ? count.toString() : "0");
-    if (!token_v2) {
-      router.replace({
-        pathname: handleRoute("login/v2"),
-        query: { ...router.query },
-      });
-    } else {
-      setShouldRender(true);
-    }
-    if (token_v2) {
-      setShouldDisableSubmit(true);
-      RestSigningDownloadSignedPDF({
-        request_id: routerQuery.request_id as string,
-      })
-        .then((res) => {
-          if (res.success) {
-            setDocumentList(res.signed_pdf || []);
-            getUserName({ token: token_v2 })
-              .then((res) => {
-                if (res.success) {
-                  const data = JSON.parse(res.data);
-                  setTypeMFA(data.typeMfa);
-                  setShouldDisableSubmit(false);
-                } else {
-                  toast(
-                    res?.message || "Ada yang salah saat memuat Signature MFA",
-                    {
-                      type: "error",
-                      toastId: "error",
-                      position: "top-center",
-                      icon: XIcon,
-                    }
-                  );
-                }
-              })
-              .catch((err) => {
-                if (err.response?.status === 401) {
-                  restLogout({
-                    token: localStorage.getItem("refresh_token_v2"),
-                  });
-                  removeStorageWithExpiresIn("token_v2");
-                  localStorage.removeItem("refresh_token_v2");
-                  router.replace({
-                    pathname: handleRoute("login/v2"),
-                    query: { ...router.query, showAutoLogoutInfo: "1" },
-                  });
-                } else {
-                  toast(
-                    err.response?.data?.message ||
-                      "Tidak berhasil pada saat memuat Signature MFA",
-                    {
-                      type: "error",
-                      toastId: "error",
-                      position: "top-center",
-                      icon: XIcon,
-                    }
-                  );
-                }
-              });
-          } else {
-            setIsSuccess("0");
-            setSigningFailureDocumentName("");
-            if (res.status === "DENIED") {
-              setSiginingFailureError({
-                message: res.message || "Status dokument DENIED",
-                status: res.status,
-              });
-            } else if (res.status === "PROCESS") {
-              if (res.signed_pdf === null) {
-                setSiginingFailureError({
-                  message: t("documentExpired"),
-                  status: "Exp",
+    setShouldDisableSubmit(true);
+    RestSigningDownloadSignedPDF({
+      request_id: routerQuery.request_id as string,
+    })
+      .then((res) => {
+        if (res.success) {
+          setDocumentList(res.signed_pdf || []);
+          getUserName()
+            .then((res) => {
+              if (res.success) {
+                const data = JSON.parse(res.data);
+                setTypeMFA(data.typeMfa);
+                setShouldDisableSubmit(false);
+                setShouldRender(true);
+              } else {
+                toast(
+                  res?.message || "Ada yang salah saat memuat Signature MFA",
+                  {
+                    type: "error",
+                    toastId: "error",
+                    position: "top-center",
+                    icon: XIcon,
+                  }
+                );
+              }
+            })
+            .catch((err) => {
+              if (err.response?.status === 401) {
+                restLogout({
+                  token: localStorage.getItem("refresh_token"),
+                });
+                removeStorageWithExpiresIn("token");
+                localStorage.removeItem("refresh_token");
+                router.replace({
+                  pathname: handleRoute("login/v2"),
+                  query: { ...router.query, showAutoLogoutInfo: "1" },
                 });
               } else {
-                setSiginingFailureError({
-                  message:
-                    res.message ||
-                    "Tidak berhasil pada saat memuat list dokumen",
-                  status: "Exp",
-                });
+                toast(
+                  err.response?.data?.message ||
+                    "Tidak berhasil pada saat memuat Signature MFA",
+                  {
+                    type: "error",
+                    toastId: "error",
+                    position: "top-center",
+                    icon: XIcon,
+                  }
+                );
               }
+            });
+        } else {
+          setIsSuccess("0");
+          setSigningFailureDocumentName("");
+          if (res.status === "DENIED") {
+            setSiginingFailureError({
+              message: res.message || "Status dokument DENIED",
+              status: res.status,
+            });
+          } else if (res.status === "PROCESS") {
+            if (res.signed_pdf === null) {
+              setSiginingFailureError({
+                message: t("documentExpired"),
+                status: "Exp",
+              });
             } else {
               setSiginingFailureError({
                 message:
@@ -661,41 +600,47 @@ const SigningWithoutRead = () => {
                 status: "Exp",
               });
             }
+          } else {
+            setSiginingFailureError({
+              message:
+                res.message || "Tidak berhasil pada saat memuat list dokumen",
+              status: "Exp",
+            });
           }
-        })
-        .catch((err) => {
-          if (
-            err.response?.data?.message &&
-            err.response?.data?.data?.errors?.[0]
-          ) {
+        }
+      })
+      .catch((err) => {
+        if (
+          err.response?.data?.message &&
+          err.response?.data?.data?.errors?.[0]
+        ) {
+          setIsSuccess("0");
+          setSigningFailureDocumentName("");
+          setSiginingFailureError({
+            message: `${err.response?.data?.message}, ${err.response?.data?.data?.errors?.[0]}`,
+            status: "Exp",
+          });
+        } else {
+          if (err.response.status === 401) {
+            restLogout({ token: localStorage.getItem("refresh_token") });
+            removeStorageWithExpiresIn("token");
+            localStorage.removeItem("refresh_token");
+            router.replace({
+              pathname: handleRoute("login/v2"),
+              query: { ...router.query, showAutoLogoutInfo: "1" },
+            });
+          } else {
             setIsSuccess("0");
             setSigningFailureDocumentName("");
             setSiginingFailureError({
-              message: `${err.response?.data?.message}, ${err.response?.data?.data?.errors?.[0]}`,
+              message:
+                err.response?.data?.message ||
+                "Kesalahan pada saat memuat list dokumen",
               status: "Exp",
             });
-          } else {
-            if (err.response.status === 401) {
-              restLogout({ token: localStorage.getItem("refresh_token_v2") });
-              removeStorageWithExpiresIn("token_v2");
-              localStorage.removeItem("refresh_token_v2");
-              router.replace({
-                pathname: handleRoute("login/v2"),
-                query: { ...router.query, showAutoLogoutInfo: "1" },
-              });
-            } else {
-              setIsSuccess("0");
-              setSigningFailureDocumentName("");
-              setSiginingFailureError({
-                message:
-                  err.response?.data?.message ||
-                  "Kesalahan pada saat memuat list dokumen",
-                status: "Exp",
-              });
-            }
           }
-        });
-    }
+        }
+      });
   }, [routerIsReady]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!shouldRender) return null;
@@ -738,10 +683,8 @@ const SigningWithoutRead = () => {
         }}
         className="px-10 py-8 text-center flex flex-col justify-center min-h-screen"
       >
-        <div style={{maxWidth: "360px"}} className="mx-auto" >
-          <Heading
-            className="text-left mx-auto"
-          >
+        <div style={{ maxWidth: "360px" }} className="mx-auto">
+          <Heading className="text-left mx-auto">
             {t("signRequestTitle")}
           </Heading>
           <div
@@ -755,10 +698,7 @@ const SigningWithoutRead = () => {
             }}
           ></div>
           <div className="mt-3 flex justify-center">
-            <Paragraph
-              size="sm"
-              className="text-left"
-            >
+            <Paragraph size="sm" className="text-left">
               {t("signRequestSubtitle.subtitle1")}
               {routerQuery.mustread === "1" ? (
                 <>
@@ -823,9 +763,9 @@ const SigningWithoutRead = () => {
             style={{
               backgroundColor: themeConfigurationAvaliabilityChecker(
                 themeConfiguration?.data.button_color as string
-                ),
-                borderRadius: "6px"
-              }}
+              ),
+              borderRadius: "6px",
+            }}
             size="none"
             className="px-4 fit-content py-2.5"
             disabled={shouldDisableSubmit || !agree}
@@ -859,6 +799,15 @@ const SigningSuccess = (props: TPropsSigningSuccess) => {
 
   const { t }: any = i18n;
 
+  const { generatedUrl, autoRedirect } = useGenerateRedirectUrl({
+    params,
+    url: router.query.redirect_url as string,
+  });
+
+  useEffect(() => {
+    autoRedirect();
+  }, []);
+
   return (
     <div
       style={{
@@ -870,19 +819,17 @@ const SigningSuccess = (props: TPropsSigningSuccess) => {
       className="px-10 pt-16 pb-9 text-center flex flex-col justify-center min-h-screen"
     >
       <div>
-        <Heading>
-          {t("signSuccess")}
-        </Heading>
+        <Heading>{t("signSuccess")}</Heading>
         <div
-            className="bg-contain mx-auto w-52 h-52 bg-center bg-no-repeat"
-            style={{
-              backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
-                themeConfiguration.data.asset_signing_success as string,
-                "ASSET",
-                `${assetPrefix}/images/signingSuccess.svg`
-              )})`,
-            }}
-          ></div>
+          className="bg-contain mx-auto w-52 h-52 bg-center bg-no-repeat"
+          style={{
+            backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
+              themeConfiguration.data.asset_signing_success as string,
+              "ASSET",
+              `${assetPrefix}/images/signingSuccess.svg`
+            )})`,
+          }}
+        ></div>
         <div className="mt-3">
           <Paragraph size="sm">
             {props.documentCount} {t("documentSuccess")}
@@ -935,6 +882,15 @@ const SigningOnProgress = (props: TPropsSigningSuccess) => {
 
   const { t }: any = i18n;
 
+  const { generatedUrl, autoRedirect } = useGenerateRedirectUrl({
+    params,
+    url: router.query.redirect_url as string,
+  });
+
+  useEffect(() => {
+    autoRedirect();
+  }, []);
+
   return (
     <div
       style={{
@@ -946,19 +902,18 @@ const SigningOnProgress = (props: TPropsSigningSuccess) => {
       className="pt-16 px-1 pb-9 text-center flex flex-col justify-center min-h-screen"
     >
       <div>
-        <Heading className="mb-10">
-          {t("authenticationSuccessTitle")}
-        </Heading>
+        <Heading className="mb-10">{t("authenticationSuccessTitle")}</Heading>
         <div
-            className="bg-contain mx-auto w-52 h-52 bg-center bg-no-repeat"
-            style={{
-              backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
-                themeConfiguration.data.asset_signing_authenticated_success as string,
-                "ASSET",
-                `${assetPrefix}/images/progress.svg`
-              )})`,
-            }}
-          ></div>
+          className="bg-contain mx-auto w-52 h-52 bg-center bg-no-repeat"
+          style={{
+            backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
+              themeConfiguration.data
+                .asset_signing_authenticated_success as string,
+              "ASSET",
+              `${assetPrefix}/images/progress.svg`
+            )})`,
+          }}
+        ></div>
         <div className="mt-3">
           <Paragraph size="sm" className="whitespace-pre-line">
             {t("authenticationSuccessSubtitle")}
@@ -979,10 +934,7 @@ const SigningOnProgress = (props: TPropsSigningSuccess) => {
                 size: "none",
                 className: "font-medium",
               })}
-              href={concateRedirectUrlParams(
-                routerQuery.redirect_url,
-                queryString
-              )}
+              href={generatedUrl}
             >
               <span>{t("livenessSuccessButtonTitle")}</span>
             </a>
@@ -1005,10 +957,19 @@ const SigningFailure = (props: TPropsSigningFailure) => {
   const params = {
     user_identifier: routerQuery.user,
     request_id: routerQuery.request_id,
-    status: props.error.status,
+    status: "Gagal",
   };
   const queryString = new URLSearchParams(params as any).toString();
   const { t }: any = i18n;
+
+  const { generatedUrl, autoRedirect } = useGenerateRedirectUrl({
+    params,
+    url: router.query.redirect_url as string,
+  });
+
+  useEffect(() => {
+    autoRedirect();
+  }, []);
 
   return (
     <div
@@ -1021,23 +982,19 @@ const SigningFailure = (props: TPropsSigningFailure) => {
       className="px-10 pt-16 pb-9 text-center flex flex-col justify-center min-h-screen"
     >
       <div>
-        <Heading>
-          {t("signFailed")}
-        </Heading>
-           <div
-            className="bg-contain mx-auto w-52 h-52 bg-center bg-no-repeat"
-            style={{
-              backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
-                themeConfiguration.data.asset_signing_failed as string,
-                "ASSET",
-                `${assetPrefix}/images/signingFailure.svg`
-              )})`,
-            }}
-          ></div>
+        <Heading>{t("signFailed")}</Heading>
+        <div
+          className="bg-contain mx-auto w-52 h-52 bg-center bg-no-repeat"
+          style={{
+            backgroundImage: `url(${themeConfigurationAvaliabilityChecker(
+              themeConfiguration.data.asset_signing_failed as string,
+              "ASSET",
+              `${assetPrefix}/images/signingFailure.svg`
+            )})`,
+          }}
+        ></div>
         <div className="mt-3">
-          <Paragraph size="sm" >
-            {t("signFailedSubtitle")}{" "}
-          </Paragraph>
+          <Paragraph size="sm">{t("signFailedSubtitle")} </Paragraph>
         </div>
       </div>
       <div className="mt-32">
@@ -1054,10 +1011,7 @@ const SigningFailure = (props: TPropsSigningFailure) => {
                 size: "none",
                 className: "font-medium",
               })}
-              href={concateRedirectUrlParams(
-                routerQuery.redirect_url,
-                queryString
-              )}
+              href={generatedUrl}
             >
               <span>{t("livenessSuccessButtonTitle")}</span>
             </a>
@@ -1082,8 +1036,7 @@ const FRModal: React.FC<IModal> = ({
     fr?: "1";
   } & IParameterFromRequestSign = router.query;
   const [isFRSuccess, setIsFRSuccess] = useState<boolean>(false);
-
-  const themeConfiguration = useSelector((state: RootState) => state.theme);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const signingFailure = (message: string) => {
     callbackFailure(
@@ -1092,6 +1045,8 @@ const FRModal: React.FC<IModal> = ({
     );
   };
   const captureProcessor = (base64Img: string | null | undefined) => {
+    setIsLoading(true);
+
     RestSigningAuthPIN({
       payload: {
         face_image: base64Img?.split(",")[1] as string,
@@ -1099,7 +1054,7 @@ const FRModal: React.FC<IModal> = ({
         user: routerQuery.user as string,
         async: routerQuery.async as string,
       },
-      token: getStorageWithExpiresIn("token_v2", handleRoute("login/v2"), {
+      token: getStorageWithExpiresIn("token", handleRoute("login/v2"), {
         ...router.query,
         showAutoLogoutInfo: "1",
       }),
@@ -1112,32 +1067,35 @@ const FRModal: React.FC<IModal> = ({
             type: "success",
             position: "top-center",
           });
+          setIsLoading(false);
           setIsFRSuccess(true);
         } else {
-          setIsFRSuccess(false);
+          setIsLoading(false);
           toast.dismiss("info");
-          toast.error(res.message || "Ada yang salah", { icon: <XIcon /> });
-          const newCount =
-            parseInt(localStorage.getItem("count_v2") as string) + 1;
-          localStorage.setItem("count_v2", newCount.toString());
+          fRFailureCounter({
+            setModal: setModal,
+            failureCountIdentifier: "count_v2",
+            redirectTo: () => "",
+            errorMessage: res.message,
+          });
           const count = parseInt(localStorage.getItem("count_v2") as string);
           if (
             count >= 5 ||
             res.message.toLowerCase() ===
               "penandatanganan dokumen gagal. gagal FR sudah 5 kali".toLocaleLowerCase()
           ) {
-            setModal(false);
             signingFailure(res.message || "Ada yang salah");
           }
         }
       })
       .catch((err) => {
+        setIsLoading(false);
         setIsFRSuccess(false);
         toast.dismiss("info");
         if (err.response?.status === 401) {
-          restLogout({ token: localStorage.getItem("refresh_token_v2") });
-          removeStorageWithExpiresIn("token_v2");
-          localStorage.removeItem("refresh_token_v2");
+          restLogout({ token: localStorage.getItem("refresh_token") });
+          removeStorageWithExpiresIn("token");
+          localStorage.removeItem("refresh_token");
           router.replace({
             pathname: handleRoute("login/v2"),
             query: { ...router.query, showAutoLogoutInfo: "1" },
@@ -1171,44 +1129,15 @@ const FRModal: React.FC<IModal> = ({
 
   const { t }: any = i18n;
 
-  return modal ? (
-    <div
-      style={{ backgroundColor: "rgba(0, 0, 0, .5)" }}
-      className="fixed z-50 flex items-start transition-all duration-1000 justify-center w-full left-0 top-0 h-full "
-    >
-      <div className="bg-white max-w-md mt-20 pt-5 px-2 pb-3 rounded-md w-full mx-5 ">
-        <>
-          <Heading className="block text-center">
-            {t("frTitle")}
-          </Heading>
-          <Paragraph size="sm" className="mt-2 block text-center">
-            {t("frSubtitle1")}
-          </Paragraph>
-          <FRCamera
-            setModal={setModal}
-            setIsFRSuccess={setIsFRSuccess}
-            signingFailedRedirectTo={handleRoute("login/v2")}
-            tokenIdentifier="token_v2"
-            countIdentifier="count_v2"
-            callbackCaptureProcessor={captureProcessor}
-            countdownRepeatDelay={5}
-          />
-          <Button
-            onClick={() => setModal(!modal)}
-            size="none"
-            className="mt-3 mb-1 uppercase font-bold text-base h-9"
-            style={{
-              color: themeConfigurationAvaliabilityChecker(
-                themeConfiguration?.data.action_font_color as string
-              ),
-            }}
-          >
-            {t("cancel")}
-          </Button>
-        </>
-      </div>
-    </div>
-  ) : null;
+  return (
+    <FaceRecognitionModal
+      isShowModal={modal}
+      isDisabled={isLoading}
+      setIsShowModal={setModal}
+      callbackCaptureProcessor={captureProcessor}
+      title={t("frTitle")}
+    />
+  );
 };
 
 const OTPModal: React.FC<IModal> = ({
@@ -1233,6 +1162,8 @@ const OTPModal: React.FC<IModal> = ({
 
   const { t }: any = i18n;
 
+  const { width, ref } = useResizeDetector();
+
   const signingFailure = (message: string) => {
     callbackFailure(
       documentList[0].pdf_name, // currently not support bulk signing, so we use docuemnt on index 0
@@ -1256,7 +1187,7 @@ const OTPModal: React.FC<IModal> = ({
         user: routerQuery.user as string,
         async: routerQuery.async as string,
       },
-      token: getStorageWithExpiresIn("token_v2", handleRoute("login/v2"), {
+      token: getStorageWithExpiresIn("token", handleRoute("login/v2"), {
         ...router.query,
         showAutoLogoutInfo: "1",
       }),
@@ -1292,13 +1223,7 @@ const OTPModal: React.FC<IModal> = ({
         toast.dismiss("loading");
         setValues(["", "", "", "", "", ""]);
         if (err.response?.status === 401) {
-          restLogout({ token: localStorage.getItem("refresh_token_v2") });
-          removeStorageWithExpiresIn("token_v2");
-          localStorage.removeItem("refresh_token_v2");
-          router.replace({
-            pathname: handleRoute("login/v2"),
-            query: { ...router.query, showAutoLogoutInfo: "1" },
-          });
+          ///
         } else {
           toast.error(err.response?.data?.message || t("otpInvalid"), {
             icon: <XIcon />,
@@ -1340,12 +1265,7 @@ const OTPModal: React.FC<IModal> = ({
   };
 
   const handleTriggerSendOTP = () => {
-    restGetOtp({
-      token: getStorageWithExpiresIn("token_v2", handleRoute("login/v2"), {
-        ...router.query,
-        showAutoLogoutInfo: "1",
-      }),
-    })
+    restGetOtp()
       .then((res) => {
         if (res.success) {
           timerHandler();
@@ -1368,9 +1288,9 @@ const OTPModal: React.FC<IModal> = ({
       })
       .catch((err) => {
         if (err?.request?.status === 401) {
-          restLogout({ token: localStorage.getItem("refresh_token_v2") });
-          removeStorageWithExpiresIn("token_v2");
-          localStorage.removeItem("refresh_token_v2");
+          restLogout({ token: localStorage.getItem("refresh_token") });
+          removeStorageWithExpiresIn("token");
+          localStorage.removeItem("refresh_token");
           router.replace({
             pathname: handleRoute("login/v2"),
             query: { ...router.query, showAutoLogoutInfo: "1" },
@@ -1401,31 +1321,28 @@ const OTPModal: React.FC<IModal> = ({
   return modal ? (
     <div
       style={{ backgroundColor: "rgba(0, 0, 0, .5)" }}
-      className="fixed z-50 flex items-start transition-all duration-1000 pb-3 justify-center w-full left-0 top-0 h-full "
+      className="fixed z-50 flex items-start transition-all duration-1000 justify-center w-full left-0 top-0 h-full "
     >
-      <div className="bg-white max-w-md mt-20 pt-5 px-2 pb-3 rounded-md w-full mx-5">
-        <div className="flex flex-col">
-          <Heading className="block text-center pb-5  whitespace-nowrap">
-            {t("frTitle")}
-          </Heading>
-          <Paragraph className="block text-center pb-5  ">
+      <div
+        ref={ref}
+        className="bg-white max-w-md mt-20 pt-6 px-2 pb-4 rounded-md w-full mx-5"
+      >
+        <div className="flex flex-col py-3">
+          <Heading className="block text-center pb-3  whitespace-nowrap">
             {t("frSubtitle2")}
+          </Heading>
+          <Paragraph className="block text-center !text-neutral200 text-base whitespace-pre">
+            {t("otpSubtitle")}
           </Paragraph>
-          <PinInput
-            containerStyle={{
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 5,
-              marginTop: "10px",
-            }}
-            inputStyle={{ alignItems: "center", gap: 5, marginTop: "10px" }}
-            placeholder=""
-            size="lg"
+          <OTPInput
+            width={width! / 1.1}
+            setValues={setValues}
             values={values}
-            onChange={(value, index, values) => setValues(values)}
           />
           <div className="flex justify-center text-sm gap-1 mt-5">
-            <Paragraph>{t("dindtReceiveOtp")}</Paragraph>
+            <Paragraph size="sm" className="!text-neutral200">
+              {t("dindtReceiveOtp")}
+            </Paragraph>
             <div
               style={{
                 color: themeConfigurationAvaliabilityChecker(
@@ -1464,7 +1381,7 @@ const OTPModal: React.FC<IModal> = ({
             className="mt-16 block mx-auto py-3"
             size="lg"
           >
-            {t("confirm")}
+            {t("send")}
           </Button>
           <Button
             onClick={() => {

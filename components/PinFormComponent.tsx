@@ -49,28 +49,40 @@ const PinFormComponent = (props: IPropsPinFormComponent): JSX.Element => {
   const [values, setValues] = useState<Array<number>>([]);
   const [digitArr, setDigitArr] = useState<Array<boolean>>(
     Array.apply(null, Array(props.digitLength)).map((_) => false)
-    );
-    const [onDelete, setOnDelete] = useState<boolean>(false);
-    const [submitted, setSubmitted] = useState<boolean>(false);
-    const themeConfiguration = useSelector((state: RootState) => state.theme);
-    
+  );
+  const [onDelete, setOnDelete] = useState<boolean>(false);
+  const [submitted, setSubmitted] = useState<boolean>(false);
+  const themeConfiguration = useSelector((state: RootState) => state.theme);
+
   const shouldShowErrorAfterSubmit: boolean =
     values.length === props.digitLength && props.isErrorAfterSubmit
       ? true
       : false;
 
+  const resetPinForm = () => {
+    setValues([]);
+    setDigitArr(Array.apply(null, Array(props.digitLength)).map((_) => false));
+  };
+
   const onClickNumberHandler = (_: React.SyntheticEvent, value: number) => {
-    if (values.length === props.digitLength) return;
+    if (props.isErrorAfterSubmit || props.isError) {
+      resetPinForm();
+      props.onClickDeleteHandlerCallback();
+    }
     setValues((prev) => [...prev, value]);
     setOnDelete(false);
     props.onClickNumberHandlerCallback(value);
   };
   const onClickDeleteHandler = (_: React.SyntheticEvent) => {
-    setValues((prev) => {
-      prev.pop();
-      return [...prev];
-    });
-    if (values.length === 0) {
+    if (props.isErrorAfterSubmit || props.isError) {
+      resetPinForm();
+    } else {
+      setValues((prev) => {
+        prev.pop();
+        return [...prev];
+      });
+    }
+    if (values.length === 0 || props.isErrorAfterSubmit || props.isError) {
       setOnDelete(false);
     } else {
       setOnDelete(true);
@@ -116,10 +128,7 @@ const PinFormComponent = (props: IPropsPinFormComponent): JSX.Element => {
   useEffect(() => {
     if (submitted && props.isResetAfterSubmit && !props.isErrorAfterSubmit) {
       setTimeout(() => {
-        setValues([]);
-        setDigitArr(
-          Array.apply(null, Array(props.digitLength)).map((_) => false)
-        );
+        resetPinForm();
       }, 300);
     }
     setSubmitted(false);
@@ -149,7 +158,7 @@ const PinFormComponent = (props: IPropsPinFormComponent): JSX.Element => {
       <div className="mt-8">
         <div
           className={[
-            "text-center animate-spin",
+            "text-center",
             props.isProcessed ? "block" : "hidden",
           ].join(" ")}
         >
@@ -158,6 +167,7 @@ const PinFormComponent = (props: IPropsPinFormComponent): JSX.Element => {
             width="30"
             height="30"
             alt="loader"
+            className="animate-spin"
           />
         </div>
         <div className={[props.isProcessed ? "hidden" : "block"].join(" ")}>
@@ -235,9 +245,7 @@ const PinFormComponent = (props: IPropsPinFormComponent): JSX.Element => {
           </p>
         </div>
       )}
-      {props.showPoweredByTilaka && (
-        <Footer addMarginBottom />
-      )}
+      {props.showPoweredByTilaka && <Footer addMarginBottom />}
     </div>
   );
 };

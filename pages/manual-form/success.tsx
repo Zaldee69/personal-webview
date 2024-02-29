@@ -1,7 +1,7 @@
 import { concateRedirectUrlParams } from "@/utils/concateRedirectUrlParams";
 import Image from "next/legacy/image";
 import { useRouter } from "next/router";
-import React from "react";
+import React, { useEffect } from "react";
 import { assetPrefix } from "../../next.config";
 import i18n from "i18";
 import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfigurationChecker";
@@ -11,6 +11,7 @@ import { RootState } from "@/redux/app/store";
 import Footer from "@/components/Footer";
 import Heading from "@/components/atoms/Heading";
 import Paragraph from "@/components/atoms/Paraghraph";
+import useGenerateRedirectUrl from "@/hooks/useGenerateRedirectUrl";
 
 type Props = {};
 
@@ -19,11 +20,24 @@ const FormSuccess = (props: Props) => {
   const routerQuery = router.query;
   const { t }: any = i18n;
   const themeConfiguration = useSelector((state: RootState) => state.theme);
+  const { request_id, reason_code, status, redirect_url } = routerQuery;
+
   const params = {
-    request_id: routerQuery.request_id,
-    reason_code: routerQuery.reason_code,
+    request_id: request_id,
+    register_id: request_id,
+    reason_code,
+    status,
   };
-  const queryString = new URLSearchParams(params as any).toString();
+
+  const { generatedUrl, autoRedirect } = useGenerateRedirectUrl({
+    params,
+    url: redirect_url as string,
+  });
+
+  useEffect(() => {
+    autoRedirect()
+  }, []);
+  
   return (
     <div
       style={{
@@ -59,10 +73,7 @@ const FormSuccess = (props: Props) => {
               size: "none",
               className: "font-semibold",
             })}
-            href={concateRedirectUrlParams(
-              routerQuery.redirect_url as string,
-              queryString
-            )}
+            href={generatedUrl}
           >
             {t("livenessSuccessButtonTitle")}
           </a>

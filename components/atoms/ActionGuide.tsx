@@ -24,7 +24,7 @@ export const ActionGuide1 = (props: ActionGuide1Props) => {
     <div className="flex gap-5 mx-2 mt-5">
       <div className="mt-1">
         {props.actionList.length === 2 && (
-          <Image src={props.imageSrc} width={50} height={50} alt="2" />
+          <Image src={props.imageSrc} width={50} height={50} alt="2" layout="fixed" />
         )}
       </div>
       <div className="flex flex-col">

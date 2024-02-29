@@ -18,6 +18,7 @@ import { themeConfigurationAvaliabilityChecker } from "@/utils/themeConfiguratio
 import Footer from "@/components/Footer";
 import { buttonVariants } from "@/components/atoms/Button";
 import Heading from "@/components/atoms/Heading";
+import useGenerateRedirectUrl from "@/hooks/useGenerateRedirectUrl";
 
 type Props = {};
 
@@ -34,10 +35,18 @@ const SettingSignatureSuccess = (props: Props) => {
 
   const { t }: any = i18n;
 
+  const { generatedUrl, autoRedirect } = useGenerateRedirectUrl({
+    params: {
+      tilaka_name: routerQuery.tilaka_name
+    },
+    url: router.query.redirect_url as string,
+  });
+
   useEffect(() => {
     if (!routerIsReady) return;
     if (!isSigning) {
       restLogout({});
+      autoRedirect();
     } else {
       setTimeout(() => {
         router.replace({
@@ -81,7 +90,7 @@ const SettingSignatureSuccess = (props: Props) => {
             size: "none",
             className: "font-medium mt-20",
           })}
-          href={concateRedirectUrlParams(routerQuery.redirect_url, `tilaka_name=${routerQuery.tilaka_name as string}`)}
+          href={generatedUrl}
         >
           <p>{t("settingSignatureSuccessButton")}</p>
         </a>
