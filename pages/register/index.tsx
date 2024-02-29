@@ -103,16 +103,18 @@ const Index = (props: Props) => {
         request_id: routerQuery.request_id as string,
       };
 
-      setTimeout(() => {
-        router.replace({
-          pathname: handleRoute("register"),
-          query: {
-            ...params,
-            reason_code: data.reason_code,
-            step: "form-success",
-          },
-        });
-      }, 1500);
+      if (props.step !== "liveness-success") {
+        setTimeout(() => {
+          router.replace({
+            pathname: handleRoute("register"),
+            query: {
+              ...params,
+              reason_code: data.reason_code,
+              step: "form-success",
+            },
+          });
+        }, 1500);
+      }
     }
   };
 
@@ -151,7 +153,10 @@ const Index = (props: Props) => {
               queryString
             );
           } else {
-            if (res.data.reason_code === "1") {
+            if (
+              res.data.reason_code === "1" &&
+              props.step !== "liveness-failure"
+            ) {
               return router.replace({
                 pathname: handleRoute("register"),
                 query: {
@@ -161,13 +166,15 @@ const Index = (props: Props) => {
               });
             }
 
-            router.replace({
-              pathname: handleRoute("register"),
-              query: {
-                ...query,
-                step: "form-success",
-              },
-            });
+            if (props.step !== "form-success") {
+              router.replace({
+                pathname: handleRoute("register"),
+                query: {
+                  ...query,
+                  step: "form-success",
+                },
+              });
+            }
           }
         }
       })
@@ -187,9 +194,9 @@ const Index = (props: Props) => {
 
     if (
       res.message === "Anda berada di tahap pengisian formulir" ||
-      res.data.status === "D"
+      res.data?.status === "D"
     ) {
-      finalForm(res.data.reason_code);
+      finalForm(res.data?.reason_code);
     } else {
       toast.error(errorMessage, {
         autoClose: 1500,
@@ -199,7 +206,7 @@ const Index = (props: Props) => {
   };
 
   const handleOtherStatus = (data: TKycCheckStepResponseData["data"]) => {
-    if (data.status === "F" && data.pin_form && routerQuery.redirect_url) {
+    if (data?.status === "F" && data.pin_form && routerQuery.redirect_url) {
       const params: TQueryParams & { register_id?: string } = {
         status: data.status,
         register_id: routerQuery.request_id as string,
@@ -212,10 +219,10 @@ const Index = (props: Props) => {
         routerQuery.redirect_url as string,
         queryString
       );
-    } else if (data.status === "F" && routerQuery.dashboard_url) {
+    } else if (data?.status === "F" && routerQuery.dashboard_url) {
       handleDashboardRedirect(data);
     } else if (
-      data.reason_code === "1" &&
+      data?.reason_code === "1" &&
       data.pin_form &&
       routerQuery.redirect_url
     ) {
@@ -260,21 +267,23 @@ const Index = (props: Props) => {
       ...routerQuery,
       request_id: routerQuery.request_id as string,
     };
-    if (data.reason_code) {
+    if (data?.reason_code) {
       query.reason_code = data.reason_code;
     }
-    setTimeout(() => {
-      router.push({
-        pathname: handleRoute("register"),
-        query: { ...query, step: "liveness-failure" },
-      });
-    }, 1500);
+    if (props.step !== "liveness-failure") {
+      setTimeout(() => {
+        router.push({
+          pathname: handleRoute("register"),
+          query: { ...query, step: "liveness-failure" },
+        });
+      }, 1500);
+    }
   };
 
   useEffect(() => {
     localStorage.setItem(
       props.uuid,
-      props.checkStepResult.data.token as string
+      props.checkStepResult?.data?.token as string
     );
     if (props.checkStepResult.message === "Error, Unknown requestId") {
       toast.error(props.checkStepResult.message);
